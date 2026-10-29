@@ -104,6 +104,9 @@ func (f *fakePlugin) Finalize(_ context.Context, _ pluginsCore.TaskExecutionCont
 	return nil
 }
 
+// fakeLaunchState is the plugin state of a fake that records whether it launched its resource.
+type fakeLaunchState struct{ Launched bool }
+
 // fakeEventsClient is a no-op implementation of EventsProxyServiceClient for tests.
 type fakeEventsClient struct{}
 
@@ -966,6 +969,140 @@ var _ = Describe("TaskAction Controller", func() {
 			Entry("plugin", "plugin"),
 			Entry("catalog", "catalog"),
 		)
+
+		It("keeps the system failure count when the first plugin call fails", func() {
+			nn := createTaskAction("qt-first-call-fails",
+				buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
+			fakeClock := testingclock.NewFakeClock(getTaskAction(nn).CreationTimestamp.Time)
+			fake := &fakePlugin{id: "timeout-plugin", handleErrors: []error{stderrors.New("temporary lookup failure")}}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+
+			_, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			Expect(err).NotTo(HaveOccurred())
+
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.AttemptQueuedAt).NotTo(BeNil())
+			Expect(persisted.Status.SystemFailures).To(Equal(uint32(1)))
+		})
+
+		It("starts the queue budget of a retry scheduled before upgrade when its backoff ends", func() {
+			const budget = 2 * time.Second
+			nn := createTaskAction("qt-upgraded-retry",
+				buildTaskTemplateBytesWithQueuedTimeoutAndRetries(1))
+			base := getTaskAction(nn).CreationTimestamp.Time
+			launchableAt := metav1.NewTime(base.Add(10 * time.Second))
+			// What a controller without queue budgets wrote: the retry was queued at base
+			// and may launch once its backoff ends.
+			upgraded := getTaskAction(nn)
+			upgraded.Status.Attempts = 2
+			upgraded.Status.PluginPhase = pluginsCore.PhaseQueued.String()
+			upgraded.Status.NextAttemptAt = &launchableAt
+			upgraded.Status.PhaseHistory = []flyteorgv1.PhaseTransition{{
+				Phase: string(flyteorgv1.ConditionReasonQueued), OccurredAt: metav1.NewTime(base),
+			}}
+			Expect(k8sClient.Status().Update(ctx, upgraded)).To(Succeed())
+			fakeClock := testingclock.NewFakeClock(launchableAt.Add(time.Second))
+			queued := pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(base, pluginsCore.DefaultPhaseVersion, "queued"))
+			fake := &fakePlugin{id: "timeout-plugin", transitions: []pluginsCore.Transition{queued}}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			req := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeFalse(), "one second into the budget")
+			Expect(persisted.Status.AttemptQueuedAt.Time).To(BeTemporally("==", launchableAt.Time))
+			Expect(fake.abortCalls).To(BeZero())
+
+			fakeClock.Step(budget)
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(isTerminal(getTaskAction(nn))).To(BeTrue())
+		})
+
+		It("does not end an attempt on the Queued report that launched or adopted its resource", func() {
+			nn := createTaskAction("qt-first-report",
+				buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
+			base := getTaskAction(nn).CreationTimestamp.Time
+			fakeClock := testingclock.NewFakeClock(base)
+			fake := &fakePlugin{id: "timeout-plugin"}
+			fake.handleFunc = func(_ context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+				state := fakeLaunchState{}
+				if _, err := tCtx.PluginStateReader().Get(&state); err != nil {
+					return pluginsCore.UnknownTransition, err
+				}
+				if !state.Launched {
+					if err := tCtx.PluginStateWriter().Put(1, &fakeLaunchState{Launched: true}); err != nil {
+						return pluginsCore.UnknownTransition, err
+					}
+					// Adopting a resource only says that it exists, whatever it has done since.
+					return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(
+						fakeClock.Now(), pluginsCore.DefaultPhaseVersion, "task submitted")), nil
+				}
+				return runningTransition(base.Add(time.Second)), nil
+			}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			req := reconcile.Request{NamespacedName: nn}
+			fakeClock.Step(10 * time.Second) // the controller was away for several budgets
+
+			_, err := r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeFalse())
+			Expect(persisted.Status.TimeoutAt).To(BeNil())
+			Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseQueued.String()))
+			Expect(fake.abortCalls).To(BeZero())
+
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			persisted = getTaskAction(nn)
+			Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseRunning.String()))
+			Expect(persisted.Status.AttemptStartedAt).NotTo(BeNil())
+			Expect(persisted.Status.TimeoutAt).To(BeNil())
+			Expect(fake.abortCalls).To(BeZero())
+		})
+
+		It("keeps an attempt seen initializing in time when that event never publishes", func() {
+			nn := createTaskAction("qt-initialized-in-time",
+				buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
+			base := getTaskAction(nn).CreationTimestamp.Time
+			fakeClock := testingclock.NewFakeClock(base)
+			calls := 0
+			fake := &fakePlugin{id: "timeout-plugin"}
+			fake.handleFunc = func(context.Context, pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+				calls++
+				observedAt := fakeClock.Now()
+				if calls == 1 {
+					return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(
+						observedAt, pluginsCore.DefaultPhaseVersion, "queued")), nil
+				}
+				// Dask, Ray and Spark report the time of the poll as the time they initialized.
+				return pluginsCore.DoTransition(pluginsCore.PhaseInfoInitializing(
+					observedAt, pluginsCore.DefaultPhaseVersion, "initializing",
+					&pluginsCore.TaskInfo{OccurredAt: &observedAt})), nil
+			}
+			recorded := &failingEventsClient{}
+			r := newReconciler(fake, fakeClock, recorded, nil)
+			req := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			fakeClock.Step(time.Second) // inside the 2s budget
+			recorded.failures = 1
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).To(MatchError("events unavailable"))
+			Expect(getTaskAction(nn).Status.PluginPhase).To(Equal(pluginsCore.PhaseQueued.String()))
+
+			fakeClock.Step(2 * time.Second) // the events came back after the budget ran out
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeFalse())
+			Expect(persisted.Status.TimeoutAt).To(BeNil())
+			Expect(persisted.Status.AttemptInitializedAt).NotTo(BeNil())
+			Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseInitializing.String()))
+			Expect(fake.abortCalls).To(BeZero())
+		})
 
 		It("leaves a valid zero max runtime unlimited", func() {
 			startedAt := time.Date(2026, time.August, 25, 0, 0, 0, 0, time.UTC)

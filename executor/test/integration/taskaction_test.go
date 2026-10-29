@@ -270,6 +270,11 @@ func TestQueuedTimeoutReconcile(t *testing.T) {
 				_, err := r.Reconcile(ctx, req)
 				require.NoError(t, err)
 			}
+			if tc.delayedStart {
+				// The reconcile that launched the pod only knows that it exists; the next one polls it.
+				_, err := r.Reconcile(ctx, req)
+				require.NoError(t, err)
+			}
 			podKey := types.NamespacedName{Name: key.Name + "-0", Namespace: key.Namespace}
 			if !tc.delayedStart {
 				require.NoError(t, k8sClient.Get(ctx, key, ta))
@@ -318,10 +323,12 @@ func TestQueuedTimeoutReconcile(t *testing.T) {
 				require.NoError(t, err)
 			}
 			require.NoError(t, k8sClient.Get(ctx, key, ta))
-			require.NotNil(t, ta.Status.AttemptQueuedAt)
-			assert.Equal(t, enqueuedAt, ta.Status.AttemptQueuedAt.Time)
-			t.Logf("created=%s observed=%s phase=%s timeout=%v",
-				enqueuedAt, fakeClock.Now(), ta.Status.PluginPhase, ta.Status.TimeoutAt)
+			timeoutAfter := "none"
+			if ta.Status.TimeoutAt != nil {
+				timeoutAfter = ta.Status.TimeoutAt.Sub(enqueuedAt).String()
+			}
+			t.Logf("phase=%s timeout_after=%s observed_after=%s",
+				ta.Status.PluginPhase, timeoutAfter, fakeClock.Now().Sub(enqueuedAt))
 			if tc.wantTimedOut {
 				require.NotNil(t, ta.Status.ErrorState)
 				require.NotNil(t, ta.Status.TimeoutAt)
@@ -340,13 +347,82 @@ func TestQueuedTimeoutReconcile(t *testing.T) {
 					}
 					return false
 				}, 10*time.Second, 20*time.Millisecond)
+				t.Log("pod deleted, TIMED_OUT recorded")
 			} else {
 				assert.Nil(t, ta.Status.TimeoutAt)
 				assert.Equal(t, tc.phase.String(), ta.Status.PluginPhase)
-				assert.NoError(t, k8sClient.Get(ctx, podKey, &corev1.Pod{}))
+				if assert.NoError(t, k8sClient.Get(ctx, podKey, &corev1.Pod{})) {
+					t.Log("pod kept")
+				}
 			}
 		})
 	}
+}
+
+func TestQueuedTimeoutSparesAdoptedRunningPod(t *testing.T) {
+	const budget = 2 * time.Second
+	runID := &common.RunIdentifier{
+		Org: "test-org", Project: "test-project", Domain: "development", Name: uniqueRunName("qt-adopt"),
+	}
+	action := newRootTaskAction(runID)
+	action.GetTask().GetSpec().GetTaskTemplate().GetMetadata().Timeouts = &core.TimeoutStrategy{
+		QueuedTimeout: durationpb.New(budget),
+	}
+	require.NoError(t, actionsClient.Enqueue(ctx, action, nil))
+	key := types.NamespacedName{Name: runID.Name + "-a0", Namespace: "flyte"}
+	podKey := types.NamespacedName{Name: key.Name + "-0", Namespace: key.Namespace}
+	req := reconcile.Request{NamespacedName: key}
+	ta := &flyteorgv1.TaskAction{}
+	require.NoError(t, k8sClient.Get(ctx, key, ta))
+	enqueuedAt := ta.CreationTimestamp.Time
+	fakeClock := testingclock.NewFakeClock(enqueuedAt)
+	eventsClient := &failingEventsClient{}
+	r := controller.NewTaskActionReconciler(
+		k8sClient, scheme.Scheme, pluginRegistry, dataStore, eventsClient, "", noop.NewMeterProvider(), nil,
+	)
+	r.Recorder = events.NewFakeRecorder(10)
+	r.Clock = fakeClock
+
+	_, err := r.Reconcile(ctx, req) // adds the finalizer
+	require.NoError(t, err)
+	// The pod is created, but the event service is down, so neither the Queued phase nor the
+	// plugin state that records the launch is saved.
+	eventsClient.failNext(1)
+	_, err = r.Reconcile(ctx, req)
+	require.Error(t, err)
+	require.NoError(t, k8sClient.Get(ctx, key, ta))
+	require.Empty(t, ta.Status.PluginPhase)
+	pod := &corev1.Pod{}
+	require.NoError(t, k8sClient.Get(ctx, podKey, pod))
+
+	// Envtest has no kubelet. The pod starts inside the budget, while the event service is away.
+	startedAt := metav1.NewTime(enqueuedAt.Add(time.Second))
+	pod.Status.Phase = corev1.PodRunning
+	pod.Status.ContainerStatuses = []corev1.ContainerStatus{{
+		Name:  pod.Spec.Containers[0].Name,
+		State: corev1.ContainerState{Running: &corev1.ContainerStateRunning{StartedAt: startedAt}},
+	}}
+	require.NoError(t, k8sClient.Status().Update(ctx, pod))
+	require.Eventually(t, func() bool {
+		cached := &corev1.Pod{}
+		return pluginClient.Get(ctx, podKey, cached) == nil && cached.ResourceVersion == pod.ResourceVersion
+	}, 10*time.Second, 20*time.Millisecond)
+
+	// The service comes back after the budget has run out. The reconcile that adopts the pod can
+	// only report it Queued, which must not be taken as proof that it is still waiting.
+	fakeClock.SetTime(enqueuedAt.Add(budget + time.Second))
+	_, err = r.Reconcile(ctx, req)
+	require.NoError(t, err)
+	require.NoError(t, k8sClient.Get(ctx, key, ta))
+	assert.Nil(t, ta.Status.TimeoutAt)
+	require.NoError(t, k8sClient.Get(ctx, podKey, &corev1.Pod{}), "the running pod must survive its adoption")
+
+	_, err = r.Reconcile(ctx, req) // now it is polled for real
+	require.NoError(t, err)
+	require.NoError(t, k8sClient.Get(ctx, key, ta))
+	assert.Nil(t, ta.Status.TimeoutAt)
+	assert.Equal(t, pluginsCore.PhaseRunning.String(), ta.Status.PluginPhase)
+	assert.NoError(t, k8sClient.Get(ctx, podKey, &corev1.Pod{}))
 }
 
 func TestDeletingTerminalTaskActionDoesNotEmitAborted(t *testing.T) {

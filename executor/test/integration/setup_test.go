@@ -22,6 +22,7 @@ package integration
 
 import (
 	"context"
+	"errors"
 	"log"
 	"os"
 	"path/filepath"
@@ -217,6 +218,30 @@ func (r *recordingEventsClient) RecordedEvents() []*workflow.ActionEvent {
 	out := make([]*workflow.ActionEvent, len(r.events))
 	copy(out, r.events)
 	return out
+}
+
+// failingEventsClient rejects the next failures events, standing in for an event service outage.
+type failingEventsClient struct {
+	mu       sync.Mutex
+	failures int
+}
+
+func (c *failingEventsClient) Record(
+	_ context.Context, _ *connect.Request[workflow.RecordRequest],
+) (*connect.Response[workflow.RecordResponse], error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if c.failures > 0 {
+		c.failures--
+		return nil, errors.New("events unavailable")
+	}
+	return connect.NewResponse(&workflow.RecordResponse{}), nil
+}
+
+func (c *failingEventsClient) failNext(failures int) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.failures = failures
 }
 
 // recordingRunClient captures what the ActionsClient forwards to the internal

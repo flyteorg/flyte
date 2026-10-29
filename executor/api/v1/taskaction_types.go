@@ -348,6 +348,13 @@ type TaskActionStatus struct {
 	// +optional
 	AttemptQueuedAt *metav1.Time `json:"attemptQueuedAt,omitempty"`
 
+	// AttemptInitializedAt is when the current user attempt was first seen initializing
+	// within its queue budget. It is persisted independently from ActionEvent
+	// publication so a resource that left the queue in time is not expired by a later
+	// controller or event-service outage.
+	// +optional
+	AttemptInitializedAt *metav1.Time `json:"attemptInitializedAt,omitempty"`
+
 	// AttemptStartedAt is when the current user attempt first entered the Running phase.
 	// It is persisted independently from ActionEvent publication so max-runtime
 	// enforcement survives controller and event-service outages.
