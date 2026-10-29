@@ -23,11 +23,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/metric/noop"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/tools/events"
 	testingclock "k8s.io/utils/clock/testing"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
@@ -76,6 +80,26 @@ func newRootTaskAction(runID *common.RunIdentifier) *actions.Action {
 			},
 		},
 	}
+}
+
+func taskTemplateBytes(t *testing.T, taskType, image string) []byte {
+	t.Helper()
+	data, err := proto.Marshal(&core.TaskTemplate{
+		Type: taskType,
+		Target: &core.TaskTemplate_Container{
+			Container: &core.Container{
+				Image:   image,
+				Command: []string{"echo"},
+				Args:    []string{"hello"},
+			},
+		},
+		Metadata: &core.TaskMetadata{
+			Runtime: &core.RuntimeMetadata{Type: core.RuntimeMetadata_FLYTE_SDK},
+		},
+		Interface: &core.TypedInterface{},
+	})
+	require.NoError(t, err)
+	return data
 }
 
 // TestEnqueueReconcile drives the CRD handoff end-to-end on a real apiserver:
@@ -322,5 +346,64 @@ func TestQueuedTimeoutReconcile(t *testing.T) {
 				assert.NoError(t, k8sClient.Get(ctx, podKey, &corev1.Pod{}))
 			}
 		})
+	}
+}
+
+func TestDeletingTerminalTaskActionDoesNotEmitAborted(t *testing.T) {
+	eventsClient := &recordingEventsClient{}
+	terminalReconciler := controller.NewTaskActionReconciler(
+		k8sClient, scheme.Scheme, pluginRegistry, dataStore,
+		eventsClient, "", noop.NewMeterProvider(), nil,
+	)
+	terminalReconciler.Recorder = events.NewFakeRecorder(10)
+
+	name := fmt.Sprintf("td-%d", time.Now().UnixNano()%1_000_000_000)
+	crKey := types.NamespacedName{Name: name, Namespace: "default"}
+	ta := &flyteorgv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:       name,
+			Namespace:  "default",
+			Finalizers: []string{"flyte.org/plugin-finalizer"},
+		},
+		Spec: flyteorgv1.TaskActionSpec{
+			RunName:       name,
+			Project:       "test-project",
+			Domain:        "development",
+			ActionName:    name,
+			InputURI:      "/tmp/input",
+			RunOutputBase: "/tmp/output",
+			TaskType:      "python",
+			TaskTemplate:  taskTemplateBytes(t, "python", "python:3.11"),
+		},
+	}
+	require.NoError(t, k8sClient.Create(ctx, ta))
+	t.Cleanup(func() {
+		current := &flyteorgv1.TaskAction{}
+		if err := k8sClient.Get(ctx, crKey, current); err == nil {
+			current.Finalizers = nil
+			_ = k8sClient.Update(ctx, current)
+			_ = k8sClient.Delete(ctx, current)
+		}
+	})
+
+	ta.Status.Conditions = []metav1.Condition{{
+		Type:               string(flyteorgv1.ConditionTypeSucceeded),
+		Status:             metav1.ConditionTrue,
+		Reason:             string(flyteorgv1.ConditionReasonCompleted),
+		Message:            "TaskAction completed successfully",
+		LastTransitionTime: metav1.Now(),
+	}}
+	require.NoError(t, k8sClient.Status().Update(ctx, ta))
+	require.NoError(t, k8sClient.Delete(ctx, ta))
+
+	_, err := terminalReconciler.Reconcile(ctx, reconcile.Request{NamespacedName: crKey})
+	require.NoError(t, err)
+
+	getErr := k8sClient.Get(ctx, crKey, &flyteorgv1.TaskAction{})
+	require.Error(t, getErr)
+	assert.Contains(t, getErr.Error(), "not found")
+
+	for _, event := range eventsClient.RecordedEvents() {
+		assert.NotEqual(t, common.ActionPhase_ACTION_PHASE_ABORTED, event.GetPhase())
 	}
 }

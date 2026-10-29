@@ -66,3 +66,9 @@ client, err := cfg.NewClient(ctx,
 Tracing and metrics are enabled independently through `redisotel` only when the
 corresponding non-nil provider is supplied. These options apply to standalone,
 cluster, and Sentinel clients. The caller owns the providers and their shutdown.
+
+Redis metrics use `redisotel-native` and are process-wide. `WithMeterProvider`
+initializes them before the first client is created; later providers do not replace
+that provider. Applications combining components should call `redis.InitMetrics`
+at startup with a shared provider. The manager does this with the `flyte`
+service name when running all components. Tracing remains per-client via `redisotel`.

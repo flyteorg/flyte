@@ -606,6 +606,33 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(ta.Status.ErrorState.Message).To(ContainSubstring("invalid ray submission mode"))
 			Expect(isTerminal(ta)).To(BeTrue())
 		})
+
+		It("fails an Apple Silicon task immediately when the backend has no bridge", func() {
+			r := &TaskActionReconciler{
+				Client:            k8sClient,
+				Scheme:            k8sClient.Scheme(),
+				Recorder:          events.NewFakeRecorder(10),
+				eventsClient:      &fakeEventsClient{},
+				MaxSystemFailures: 3,
+			}
+			ta := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, ta)).To(Succeed())
+			original := ta.DeepCopy()
+			startingAttempts := ta.Status.Attempts
+
+			handleErr := pluginserrors.Errorf(pluginserrors.AppleSiliconNotAvailable,
+				"gpu='AppleSilicon' requires an Apple Silicon devbox; this backend has no Apple Silicon bridge.")
+
+			res, err := r.recordSystemError(ctx, ta, original, "container", handleErr, 0, 0)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(res.RequeueAfter).To(BeZero(), "terminal - should not requeue")
+			Expect(ta.Status.SystemFailures).To(BeZero(), "retrying cannot conjure a bridge")
+			Expect(ta.Status.Attempts).To(Equal(startingAttempts))
+			Expect(ta.Status.ErrorState).NotTo(BeNil())
+			Expect(ta.Status.ErrorState.Code).To(Equal(pluginserrors.AppleSiliconNotAvailable))
+			Expect(ta.Status.ErrorState.Kind).To(Equal("USER"))
+			Expect(isTerminal(ta)).To(BeTrue())
+		})
 	})
 
 	Context("task max runtime", func() {
@@ -1874,8 +1901,9 @@ var _ = Describe("TaskAction Controller", func() {
 					&pluginsCore.TaskInfo{OccurredAt: &at},
 				))
 			}
-			// Preempted, relaunched and running again, then preempted a second time: the
-			// progress in between puts the consecutive failure count back to zero.
+			// Preempted, relaunched and running again, then preempted a second time. Both
+			// failures belong to the same attempt, so the progress in between does not
+			// reset the system-failure count.
 			fake := &fakePlugin{
 				id: "kueue-plugin",
 				transitions: []pluginsCore.Transition{
@@ -1912,8 +1940,93 @@ var _ = Describe("TaskAction Controller", func() {
 
 			persisted := getTaskAction(nn)
 			Expect(persisted.Status.Attempts).To(Equal(uint32(1)))
-			Expect(persisted.Status.SystemFailures).To(Equal(uint32(1)), "the failures were not consecutive")
+			Expect(persisted.Status.SystemFailures).To(Equal(uint32(2)), "both failures count against the attempt")
 			Expect(persisted.Status.SystemRetries).To(Equal(uint32(2)))
+			Expect(isTerminal(persisted)).To(BeFalse())
+		})
+
+		It("fails the TaskAction once an attempt is relaunched past the system-failure limit", func() {
+			base := time.Date(2026, time.October, 24, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			deleted := func(at time.Time) pluginsCore.Transition {
+				return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(
+					"ResourceDeletedExternally",
+					"pod deleted",
+					&pluginsCore.TaskInfo{OccurredAt: &at},
+				))
+			}
+			// The pod is deleted every time it starts running. Each relaunch reports
+			// Running again, which must not reset the count, or the pod would be
+			// relaunched forever.
+			var transitions []pluginsCore.Transition
+			for i := 0; i <= int(DefaultMaxSystemFailures); i++ {
+				transitions = append(transitions,
+					runningTransition(base.Add(time.Duration(2*i)*time.Minute)),
+					deleted(base.Add(time.Duration(2*i+1)*time.Minute)),
+				)
+			}
+			fake := &fakePlugin{id: "k8s-plugin", transitions: transitions}
+			r := newReconciler(fake, fakeClock, &fakeEventsClient{}, nil)
+			nn := createTaskAction(
+				"system-retry-limit",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+			request := reconcile.Request{NamespacedName: nn}
+
+			for i := 0; i < len(transitions); i++ {
+				_, err := r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				fakeClock.Step(time.Minute)
+				if i < len(transitions)-1 {
+					Expect(isTerminal(getTaskAction(nn))).To(BeFalse(), "reconcile %d", i)
+				}
+			}
+
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.ErrorState).NotTo(BeNil())
+			Expect(persisted.Status.ErrorState.Code).To(Equal(MaxSystemFailuresExceededCode))
+			Expect(persisted.Status.SystemFailures).To(Equal(DefaultMaxSystemFailures + 1))
+			Expect(persisted.Status.Attempts).To(Equal(uint32(1)), "system failures do not consume user retries")
+		})
+
+		It("resets the system-failure count when a user failure starts a new attempt", func() {
+			base := time.Date(2026, time.October, 24, 0, 0, 0, 0, time.UTC)
+			fakeClock := testingclock.NewFakeClock(base)
+			preemptedAt := base.Add(time.Minute)
+			fake := &fakePlugin{
+				id: "k8s-plugin",
+				transitions: []pluginsCore.Transition{
+					runningTransition(base),
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(
+						"WorkloadEvictedDueToPreempted",
+						"preempted",
+						&pluginsCore.TaskInfo{OccurredAt: &preemptedAt},
+					)),
+					runningTransition(base.Add(2 * time.Minute)),
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("UserError", "task raised", nil)),
+				},
+			}
+			r := newReconciler(fake, fakeClock, &fakeEventsClient{}, nil)
+			nn := createTaskAction(
+				"system-failures-new-attempt",
+				buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", time.Hour, 2),
+			)
+			request := reconcile.Request{NamespacedName: nn}
+
+			for i := 0; i < 3; i++ {
+				_, err := r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				fakeClock.Step(time.Minute)
+			}
+			Expect(getTaskAction(nn).Status.SystemFailures).To(Equal(uint32(1)), "running again does not reset the count")
+
+			_, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.Attempts).To(Equal(uint32(2)))
+			Expect(persisted.Status.SystemFailures).To(BeZero(), "the new attempt starts with a clean count")
+			Expect(persisted.Status.SystemRetries).To(Equal(uint32(1)))
 			Expect(isTerminal(persisted)).To(BeFalse())
 		})
 
@@ -2280,6 +2393,65 @@ var _ = Describe("TaskAction Controller", func() {
 			}
 			Expect(phases).To(ContainElement(common.ActionPhase_ACTION_PHASE_ABORTED))
 		})
+
+		It("should finalize a terminal TaskAction without aborting it or emitting ACTION_PHASE_ABORTED", func() {
+			fake := &fakePlugin{id: "timeout-plugin"}
+			terminalResource := &flyteorgv1.TaskAction{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:       "abort-terminal-resource",
+					Namespace:  "default",
+					Finalizers: []string{taskActionFinalizer},
+				},
+				Spec: flyteorgv1.TaskActionSpec{
+					RunName:       "terminal-run",
+					Project:       "terminal-project",
+					Domain:        "terminal-domain",
+					ActionName:    "terminal-action",
+					InputURI:      "/tmp/input",
+					RunOutputBase: "/tmp/output",
+					TaskType:      "timeout-test",
+					TaskTemplate:  buildTaskTemplateBytes("timeout-test", "busybox"),
+				},
+			}
+			Expect(k8sClient.Create(ctx, terminalResource)).To(Succeed())
+			terminalResource.Status.Conditions = []metav1.Condition{{
+				Type:               string(flyteorgv1.ConditionTypeSucceeded),
+				Status:             metav1.ConditionTrue,
+				Reason:             string(flyteorgv1.ConditionReasonCompleted),
+				Message:            "TaskAction completed successfully",
+				LastTransitionTime: metav1.Now(),
+			}}
+			Expect(k8sClient.Status().Update(ctx, terminalResource)).To(Succeed())
+			Expect(k8sClient.Delete(ctx, terminalResource)).To(Succeed())
+
+			recorder := &recordingEventsClient{}
+			reconciler := &TaskActionReconciler{
+				Client:         k8sClient,
+				Scheme:         k8sClient.Scheme(),
+				Recorder:       events.NewFakeRecorder(10),
+				PluginRegistry: newFakePluginRegistry(fake),
+				DataStore:      dataStore,
+				eventsClient:   recorder,
+			}
+
+			result, err := reconciler.Reconcile(ctx, reconcile.Request{
+				NamespacedName: types.NamespacedName{Name: "abort-terminal-resource", Namespace: "default"},
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result.RequeueAfter).To(BeZero())
+			Expect(fake.abortCalls).To(BeZero())
+			Expect(fake.finalizeCalls).To(Equal(1))
+
+			deleted := &flyteorgv1.TaskAction{}
+			Expect(errors.IsNotFound(k8sClient.Get(ctx, types.NamespacedName{Name: "abort-terminal-resource", Namespace: "default"}, deleted))).To(BeTrue())
+
+			recorded := recorder.RecordedEvents()
+			phases := make([]interface{}, 0, len(recorded))
+			for _, e := range recorded {
+				phases = append(phases, e.GetPhase())
+			}
+			Expect(phases).NotTo(ContainElement(common.ActionPhase_ACTION_PHASE_ABORTED))
+		})
 	})
 
 	Context("toClusterEvents", func() {
@@ -2309,6 +2481,27 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(events[0].GetOccurredAt().AsTime()).To(Equal(phaseOccurredAt))
 			Expect(events[1].GetMessage()).To(Equal("Head pod pending"))
 			Expect(events[1].GetOccurredAt().AsTime()).To(Equal(eventOccurredAt))
+		})
+
+		It("should carry a reason's gpu fault over as data and never read one from the text", func() {
+			occurredAt := time.Date(2026, 4, 2, 10, 0, 0, 0, time.UTC)
+			fault := &core.GpuFault{Kind: core.GpuFault_KIND_XID, Code: 79, Node: "ip-10-0-0-1"}
+			faultMessage := "[gpu-health] [critical] Xid 79 (GPU has fallen off the bus) on GPU 0. xid=79 severity=critical"
+
+			phaseInfo := pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &pluginsCore.TaskInfo{
+				OccurredAt: &occurredAt,
+				AdditionalReasons: []pluginsCore.ReasonInfo{
+					{Reason: faultMessage, OccurredAt: &occurredAt, GpuFault: fault},
+					// The plugin did not trust this one, so the message alone must not
+					// turn into a fault.
+					{Reason: faultMessage, OccurredAt: &occurredAt},
+				},
+			})
+
+			events := toClusterEvents(phaseInfo, timestamppb.New(occurredAt))
+			Expect(events).To(HaveLen(2))
+			Expect(proto.Equal(events[0].GetGpuFault(), fault)).To(BeTrue())
+			Expect(events[1].GetGpuFault()).To(BeNil())
 		})
 	})
 })

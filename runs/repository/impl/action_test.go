@@ -1245,6 +1245,62 @@ func TestRunNotifyLoop_RetriesUndeliveredPayloads(t *testing.T) {
 	}
 }
 
+// A listener ping that fails during a Postgres outage must not stop notification delivery once pq reconnects.
+func TestProcessNotifications_SurvivesPingFailureDuringOutage(t *testing.T) {
+	const appName = "flyte_listener_outage_test"
+	db := setupActionDB(t)
+	ctx := context.Background()
+
+	r := &actionRepo{
+		db:                           db,
+		dsn:                          database.GetPostgresDsn(ctx, testDbConfig.Postgres) + " application_name=" + appName,
+		listenerPingInterval:         100 * time.Millisecond,
+		listenerMinReconnectInterval: 100 * time.Millisecond,
+		runSubscribers:               make(map[chan string]bool),
+		actionSubscribers:            make(map[chan string]bool),
+	}
+	require.NoError(t, r.startPostgresListener())
+	t.Cleanup(func() { r.listener.Close() }) //nolint:errcheck
+	updates := subscribeActions(t, r, 16)
+
+	// A database cannot disallow its own connections, so run the outage SQL from the maintenance database.
+	adminCfg := testDbConfig.Postgres
+	adminCfg.DbName = "postgres"
+	admin, err := sql.Open("postgres", database.GetPostgresDsn(ctx, adminCfg))
+	require.NoError(t, err)
+	t.Cleanup(func() { admin.Close() }) //nolint:errcheck
+	dbName := testDbConfig.Postgres.DbName
+
+	// Keep pq's reconnect attempts failing, then drop the LISTEN connection.
+	_, err = admin.ExecContext(ctx, fmt.Sprintf("ALTER DATABASE %q WITH ALLOW_CONNECTIONS false", dbName))
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_, _ = admin.ExecContext(ctx, fmt.Sprintf("ALTER DATABASE %q WITH ALLOW_CONNECTIONS true", dbName))
+	})
+	var terminated int
+	require.NoError(t, admin.QueryRowContext(ctx,
+		"SELECT count(*) FROM (SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE application_name = $1) t",
+		appName).Scan(&terminated))
+	require.Equal(t, 1, terminated, "expected to terminate exactly the listener connection")
+
+	// Hold the outage across several ping ticks so Ping fails while pq has no connection.
+	time.Sleep(10 * r.listenerPingInterval)
+	_, err = admin.ExecContext(ctx, fmt.Sprintf("ALTER DATABASE %q WITH ALLOW_CONNECTIONS true", dbName))
+	require.NoError(t, err)
+
+	// pq retries with backoff; keep notifying until the reader forwards one.
+	require.Eventually(t, func() bool {
+		_, err := db.ExecContext(ctx, "SELECT pg_notify('action_updates', 'after-outage')")
+		require.NoError(t, err)
+		select {
+		case got := <-updates:
+			return got == "after-outage"
+		case <-time.After(200 * time.Millisecond):
+			return false
+		}
+	}, 10*time.Second, 100*time.Millisecond, "notifications must reach subscribers after the listener reconnects")
+}
+
 // subscribeActions registers a raw subscriber the way WatchActionUpdates does.
 func subscribeActions(t *testing.T, r *actionRepo, size int) chan string {
 	t.Helper()

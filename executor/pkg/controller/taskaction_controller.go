@@ -65,8 +65,8 @@ const (
 	TaskActionDefaultRequeueDuration = 10 * time.Second
 	taskActionFinalizer              = "flyte.org/plugin-finalizer"
 
-	// DefaultMaxSystemFailures bounds consecutive system errors before the
-	// TaskAction is forced to PermanentFailure.
+	// DefaultMaxSystemFailures bounds the system errors one attempt may take
+	// before the TaskAction is forced to PermanentFailure.
 	DefaultMaxSystemFailures uint32 = 3
 
 	// MaxSystemFailuresExceededCode is the ExecutionError.Code stamped on
@@ -702,8 +702,8 @@ func (r *TaskActionReconciler) reconcileTimedOutAttempt(
 		taskAction.Status.PluginState = nil
 		taskAction.Status.PluginStateVersion = 0
 		r.scheduleNextAttempt(ctx, taskAction, currentAttempts)
-		// Same rule as the ordinary reconcile tail: a fresh attempt does not
-		// inherit the previous one's consecutive system-failure count.
+		// Same rule as an in-place restart: a fresh attempt does not inherit
+		// the previous one's system-failure count.
 		taskAction.Status.SystemFailures = 0
 		taskAction.Status.CacheStatus = observedCacheStatus(phaseInfo.Info())
 		if err := r.applyTimeoutPhase(ctx, taskAction, original, phaseInfo); err != nil {
@@ -799,8 +799,8 @@ func (r *TaskActionReconciler) recordSystemRetry(
 	// The system-retry count places this retry within the reserved range: it holds until
 	// the retry is persisted, so republishing after a failed status update lands on the
 	// same row and stays idempotent, and it moves on with every retry after that. The
-	// consecutive system-failure count would not do: it goes back to zero as soon as the
-	// relaunched attempt makes progress, and the next failure would reuse a spent version.
+	// system-failure count would not do: it also counts Plugin.Handle errors, which publish
+	// no event, and goes back to zero on a new attempt.
 	version := systemRetryEventVersionBase + taskAction.Status.SystemRetries
 	queued := pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, version, systemRetryReason, info)
 	return r.recordEvent(ctx, r.buildActionEvent(ctx, taskAction, queued))
@@ -814,6 +814,7 @@ func (r *TaskActionReconciler) recordSystemRetry(
 var nonRetryableErrorCodes = []stdErrors.ErrorCode{
 	pluginserrors.BadTaskSpecification,
 	pluginserrors.MetadataTooLarge,
+	pluginserrors.AppleSiliconNotAvailable,
 }
 
 // nonRetryableCode reports the first non-retryable code found in err's cause chain.
@@ -1162,11 +1163,6 @@ func (r *TaskActionReconciler) reconcileTask(
 		)
 	}
 
-	// Reset the consecutive system-failure counter on any non-system-error
-	// transition so transient blips earlier in the lifecycle don't accumulate
-	// toward the permanent-failure threshold.
-	taskAction.Status.SystemFailures = 0
-
 	// Whether the plugin asked for its resource to be deleted if this failure ends the task.
 	// Read it before the retry block below, which rebuilds a final failure without the flag.
 	cleanupOnFailure := phaseInfo.CleanupOnFailure()
@@ -1179,6 +1175,7 @@ func (r *TaskActionReconciler) reconcileTask(
 		maxAttempts := tCtx.TaskExecutionMetadata().GetMaxAttempts()
 
 		if currentAttempts < maxAttempts {
+			restartedAt := r.now()
 			// Abort (delete) the current pod before incrementing attempts.
 			// tCtx was built with the current attempt number so Abort targets the right pod.
 			if abortErr := p.Abort(ctx, tCtx); abortErr != nil {
@@ -1186,11 +1183,14 @@ func (r *TaskActionReconciler) reconcileTask(
 			}
 			// Track the new attempt count; applied to Status.Attempts after the stateMgr block.
 			restartAttempts = currentAttempts + 1
+			// Not a system failure (those returned above), so the new attempt starts with a
+			// clean system-failure count.
+			taskAction.Status.SystemFailures = 0
 			r.scheduleNextAttempt(ctx, taskAction, currentAttempts)
 			logger.Info("restarting task in-place",
 				"attempt", currentAttempts+1, "maxAttempts", maxAttempts, "nextAttemptAt", taskAction.Status.NextAttemptAt)
 			// Override the transition to Queued so the TaskAction stays non-terminal.
-			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(r.now(), pluginsCore.DefaultPhaseVersion, "restarting task"))
+			transition = pluginsCore.DoTransition(queuedForInPlaceRestart(phaseInfo, restartedAt))
 			phaseInfo = transition.Info()
 		} else {
 			// All retries exhausted — convert to a permanent (terminal) failure.
@@ -1291,6 +1291,7 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		return ctrl.Result{}, nil
 	}
+	terminal := isTerminal(taskAction)
 
 	p, err := r.PluginRegistry.ResolvePlugin(taskAction.Spec.TaskType)
 	if err != nil {
@@ -1313,9 +1314,12 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 		return r.removeFinalizer(ctx, taskAction)
 	}
 
-	if err := p.Abort(ctx, tCtx); err != nil {
-		logger.Error(err, "plugin Abort failed, will retry")
-		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+	// A terminal action already has its outcome; aborting it would report it as ABORTED.
+	if !terminal {
+		if err := p.Abort(ctx, tCtx); err != nil {
+			logger.Error(err, "plugin Abort failed, will retry")
+			return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+		}
 	}
 
 	if err := p.Finalize(ctx, tCtx); err != nil {
@@ -1329,6 +1333,10 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 		if err := r.releaseCacheReservation(ctx, cacheCfg); err != nil {
 			logger.Error(err, "failed to release cache reservation during finalization cleanup")
 		}
+	}
+
+	if terminal {
+		return r.removeFinalizer(ctx, taskAction)
 	}
 
 	abortTime := time.Now()
@@ -1386,13 +1394,25 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	}
 
 	if err := r.persistStatusWithRetry(ctx, newTaskAction, func(latest *flyteorgv1.TaskAction) {
-		latest.Status = newTaskAction.Status
+		applyReconciledStatus(latest, newTaskAction)
 	}); err != nil {
 		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
 		return err
 	}
 
 	return nil
+}
+
+// applyReconciledStatus writes the reconciled status onto the re-fetched
+// TaskAction, keeping the fields the actions service owns: the address its
+// worker reported may land after this reconcile read the TaskAction, and
+// copying the whole status would erase it. The controller never clears the
+// address itself; a retry or relaunch hides it by moving Attempts or
+// SystemRetries past the ones it was reported for.
+func applyReconciledStatus(latest, reconciled *flyteorgv1.TaskAction) {
+	address := latest.Status.Address
+	latest.Status = reconciled.Status
+	latest.Status.Address = address
 }
 
 // persistStatusWithRetry re-fetches the TaskAction and applies the status
@@ -1568,6 +1588,23 @@ func isTaskExecutionTimedOut(info pluginsCore.PhaseInfo) bool {
 	return info.Err() != nil && info.Err().GetCode() == TaskExecutionTimedOutCode
 }
 
+// queuedForInPlaceRestart turns the failure an attempt reported into the Queued phase the
+// in-place restart continues from.
+//
+// The reasons the failed attempt accumulated come along. They are the only account of what
+// happened to it that reaches the user on this path, because the failure itself is being
+// replaced here and never reported: for a GPU fault that is the line naming which worker
+// the hardware failed on, and losing it leaves the user with a task that silently restarted.
+// The rest of the failed attempt's task info is deliberately left behind, since its logs
+// and custom info describe the pod that just went away rather than the one being queued.
+func queuedForInPlaceRestart(failed pluginsCore.PhaseInfo, at time.Time) pluginsCore.PhaseInfo {
+	info := &pluginsCore.TaskInfo{OccurredAt: &at}
+	if failedInfo := failed.Info(); failedInfo != nil {
+		info.AdditionalReasons = failedInfo.AdditionalReasons
+	}
+	return pluginsCore.PhaseInfoQueuedWithTaskInfo(at, pluginsCore.DefaultPhaseVersion, "restarting task", info)
+}
+
 func toClusterEvents(phaseInfo pluginsCore.PhaseInfo, fallbackTime *timestamppb.Timestamp) []*workflow.ClusterEvent {
 	info := phaseInfo.Info()
 	if phaseInfo.Reason() == "" && (info == nil || len(info.AdditionalReasons) == 0) {
@@ -1606,6 +1643,9 @@ func toClusterEvents(phaseInfo pluginsCore.PhaseInfo, fallbackTime *timestamppb.
 			e.SourceComponent = k8sEvent.SourceComponent
 			e.Count = k8sEvent.Count
 		}
+		// The fault is carried over as the plugin attached it, which it does only for an
+		// event it trusts. The message is never parsed for one here.
+		e.GpuFault = reason.GpuFault
 		out = append(out, e)
 	}
 	return out

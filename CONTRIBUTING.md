@@ -17,7 +17,7 @@ Thank you for your interest in contributing to Flyte 2! This guide will help you
 
 Before contributing, ensure you have:
 - [Buf CLI](https://buf.build/docs/installation) installed
-- Go 1.27.2 or later
+- Go 1.27.3 or later
 - Node.js and npm (for TypeScript)
 - Python 3.10+ with `uv` package manager
 - Rust toolchain (if working with Rust bindings)
@@ -58,13 +58,13 @@ From the repo root:
 make devbox-build
 
 # Start the devbox cluster in dev mode (required for running the manager locally)
-make devbox-run FLYTE_DEV=true
+make devbox-run FLYTE_DEV=True
 
 # Stop the devbox when you're done
 make devbox-stop
 ```
 
-`FLYTE_DEV=true` is required when you intend to run the manager locally — it disables the in-cluster manager so your local process can take over. `make devbox-run` writes a kubeconfig pointing at the devbox cluster in global kubeconfig, so `kubectl` will target it automatically.
+`FLYTE_DEV=True` is required when you intend to run the manager locally — it disables the in-cluster manager so your local process can take over. The value is case-insensitive. `make devbox-run` writes a kubeconfig pointing at the devbox cluster in global kubeconfig, so `kubectl` will target it automatically.
 
 ### Build and Run the Manager
 
