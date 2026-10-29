@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -154,6 +155,19 @@ func TestConvertProtoFilters_ActionTypeColumn(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "action_type = ?", expr.Query)
 	assert.Equal(t, []interface{}{"3"}, expr.Args)
+}
+
+// A VALUE_IN filter with one value must bind the same Postgres array as one with several.
+func TestConvertProtoFilters_ValueInSingleValue(t *testing.T) {
+	filter, err := ConvertProtoFilters([]*common.Filter{
+		{Field: "phase", Function: common.Filter_VALUE_IN, Values: []string{"3"}},
+	}, models.ActionColumnsSet)
+	require.NoError(t, err)
+
+	expr, err := filter.QueryExpression("")
+	require.NoError(t, err)
+	assert.Equal(t, "phase = ANY(?)", expr.Query)
+	assert.Equal(t, []interface{}{pq.Array([]string{"3"})}, expr.Args)
 }
 
 func TestConvertProtoFilters_EmptyList(t *testing.T) {

@@ -6,6 +6,7 @@
 package config
 
 import (
+	"maps"
 	"strings"
 	"time"
 
@@ -95,6 +96,15 @@ var (
 			"RTX PRO 6000":  "nvidia-rtx-pro-6000",
 			"T4":            "nvidia-tesla-t4",
 			"V100":          "nvidia-tesla-v100",
+
+			// Time-sliced or MPS-shared NVIDIA GPUs. Nodes in a shared pool carry
+			// the plain model's label with a "-shared" suffix, so a task asking
+			// for a shared device lands only on those nodes.
+			"A10 SHARED":  "nvidia-a10-shared",
+			"A10G SHARED": "nvidia-a10g-shared",
+			"L4 SHARED":   "nvidia-l4-shared",
+			"L40S SHARED": "nvidia-l40s-shared",
+			"T4 SHARED":   "nvidia-tesla-t4-shared",
 
 			// Google Cloud TPUs
 			"V5E": "tpu-v5-lite-podslice",
@@ -225,6 +235,9 @@ var (
 			core.GPUAccelerator_HABANA_GAUDI.String(): {
 				ResourceName: "habana.ai/gaudi",
 			},
+			// No resource name: the Apple Silicon GPU is reached through the devbox's host
+			// Apple Silicon bridge (see AppleSiliconBridge), never through a device plugin.
+			core.GPUAccelerator_APPLE_SILICON.String(): {},
 		},
 		DefaultPodTemplateResync: config2.Duration{
 			Duration: 30 * time.Second,
@@ -237,6 +250,10 @@ var (
 	// K8sPluginConfigSection provides a singular top level config section for all plugins.
 	// If you are a plugin developer writing a k8s plugin, register your config section as a subsection to this.
 	K8sPluginConfigSection = config.MustRegisterSubSection(k8sPluginConfigSectionKey, &defaultK8sConfig)
+
+	// defaultAcceleratorDevices is the built-in accelerator device map with upper-cased keys. Configured
+	// accelerator devices are merged over it, so setting one entry does not drop the rest.
+	defaultAcceleratorDevices = upperCaseKeys(defaultK8sConfig.AcceleratorDevices)
 )
 
 // K8sPluginConfig should be used to configure per-pod defaults for the entire platform. This allows adding global defaults
@@ -400,6 +417,25 @@ type K8sPluginConfig struct {
 
 	// DisableInjectOwnerReferences is a boolean flag that indicates if owner references should be injected into the k8s resources.
 	DisableInjectOwnerReferences bool `json:"disable-inject-owner-references" pflag:",Override to not set owner references on k8s resources. This is useful for V2 node execution"`
+
+	// AppleSiliconBridge configures the devbox-local Apple Silicon accelerator. It is only
+	// set by a devbox running on an Apple Silicon host; everywhere else it stays empty and a
+	// workload requesting the APPLE_SILICON device class fails with APPLE_SILICON_NOT_AVAILABLE.
+	AppleSiliconBridge AppleSiliconBridgeConfig `json:"apple-silicon-bridge" pflag:"-,Devbox-local Apple Silicon bridge configuration."`
+}
+
+// AppleSiliconBridgeConfig points Apple Silicon workloads at the host-side Apple Silicon bridge a devbox runs on an
+// Apple Silicon Mac. Pods cannot reach the host's Metal GPU, so instead of scheduling against a
+// device plugin they are handed the bridge's OpenAI-compatible endpoint and a per-workload token.
+type AppleSiliconBridgeConfig struct {
+	// Endpoint is the bridge's base URL as reachable from pods, e.g. http://192.168.65.254:30090.
+	// Empty means this backend has no Apple Silicon bridge.
+	Endpoint string `json:"endpoint"`
+	// TokenSecret is the HMAC key shared with the bridge, used to mint each workload's credential.
+	TokenSecret string `json:"token-secret"`
+	// HostPlatform is the devbox host's os/arch (e.g. darwin/arm64, linux/amd64), quoted in the
+	// APPLE_SILICON_NOT_AVAILABLE message so the user sees why their host cannot provide Apple Silicon.
+	HostPlatform string `json:"host-platform"`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers
@@ -444,6 +480,16 @@ type AcceleratorDeviceClassConfig struct {
 
 	// The node label that specifies the attached accelerator partition size.
 	PartitionSizeNodeLabel string `json:"partition-size-node-label" pflag:"-,The node label that specifies the attached partition size."`
+
+	// Optional template for the Kubernetes resource name a task requests when it asks for a
+	// specific partition of this device class. Every "{partition}" in the template is replaced
+	// with the task's partition size, so "nvidia.com/mig-{partition}" turns a 1g.5gb partition
+	// into a request for nvidia.com/mig-1g.5gb. Set it on clusters whose NVIDIA device plugin runs
+	// with migStrategy=mixed, which offers each MIG profile as its own resource. A partitioned
+	// request then asks for the rendered name in place of ResourceName, with the same count, and
+	// gets no partition size node affinity or toleration, because only nodes that offer that
+	// profile can satisfy the resource. Requests without a partition size still use ResourceName.
+	PartitionResourceName string `json:"partition-resource-name" pflag:"-,Template for the resource name requested for a partition, such as nvidia.com/mig-{partition}."`
 
 	// Override for node selector requirement added to pods intended for unpartitioned nodes.
 	UnpartitionedNodeSelectorRequirement *v1.NodeSelectorRequirement `json:"unpartitioned-node-selector-requirement" pflag:"-,Override for node selector requirement added to pods intended for unpartitioned nodes."`
@@ -490,7 +536,23 @@ func GetK8sPluginConfig() *K8sPluginConfig {
 	}
 	cfg.AcceleratorDeviceClasses = acceleratorDeviceClasses
 
+	// The config loader replaces the default accelerator device map instead of merging into it, and viper lowercases
+	// its keys. Merge the configured entries over the defaults with upper-cased keys to match the lookup.
+	acceleratorDevices := maps.Clone(defaultAcceleratorDevices)
+	for name, label := range cfg.AcceleratorDevices {
+		acceleratorDevices[strings.ToUpper(name)] = label
+	}
+	cfg.AcceleratorDevices = acceleratorDevices
+
 	return cfg
+}
+
+func upperCaseKeys(m map[string]string) map[string]string {
+	upper := make(map[string]string, len(m))
+	for key, value := range m {
+		upper[strings.ToUpper(key)] = value
+	}
+	return upper
 }
 
 // SetK8sPluginConfig should be used for TESTING ONLY, It Sets current value for the config.

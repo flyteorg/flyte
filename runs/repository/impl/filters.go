@@ -370,10 +370,10 @@ func ConvertProtoFilters(protoFilters []*common.Filter, allowedColumns sets.Set[
 
 		// Get filter value(s)
 		var value interface{}
-		if len(protoFilter.Values) == 1 {
+		if len(protoFilter.Values) == 1 && expression != interfaces.FilterExpressionValueIn {
 			value = protoFilter.Values[0]
-		} else if len(protoFilter.Values) > 1 {
-			// For VALUE_IN, pass the array
+		} else if len(protoFilter.Values) >= 1 {
+			// Several values, or one value for VALUE_IN, which binds an array
 			value = protoFilter.Values
 		} else {
 			return nil, fmt.Errorf("filter %s has no values", protoFilter.Field)

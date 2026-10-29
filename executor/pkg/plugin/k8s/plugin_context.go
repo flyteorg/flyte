@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	v1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
@@ -48,6 +49,22 @@ func newPluginContext(tCtx pluginsCore.TaskExecutionContext, k8sPluginState *k8s
 		k8sPluginState:       k8sPluginState,
 		k8sReader:            k8sReader,
 	}
+}
+
+// actionReader limits a plugin's List calls to the namespace of the resource it watches and,
+// for pods, to the labels of this attempt of the action.
+type actionReader struct {
+	client.Reader
+	namespace string
+	podLabels client.MatchingLabels
+}
+
+func (r actionReader) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
+	opts = append(opts, client.InNamespace(r.namespace))
+	if _, ok := list.(*v1.PodList); ok {
+		opts = append(opts, r.podLabels)
+	}
+	return r.Reader.List(ctx, list, opts...)
 }
 
 // pluginStateReader is a specialized PluginStateReader that returns a pre-assigned k8s.PluginState.

@@ -1245,6 +1245,62 @@ func TestRunNotifyLoop_RetriesUndeliveredPayloads(t *testing.T) {
 	}
 }
 
+// A listener ping that fails during a Postgres outage must not stop notification delivery once pq reconnects.
+func TestProcessNotifications_SurvivesPingFailureDuringOutage(t *testing.T) {
+	const appName = "flyte_listener_outage_test"
+	db := setupActionDB(t)
+	ctx := context.Background()
+
+	r := &actionRepo{
+		db:                           db,
+		dsn:                          database.GetPostgresDsn(ctx, testDbConfig.Postgres) + " application_name=" + appName,
+		listenerPingInterval:         100 * time.Millisecond,
+		listenerMinReconnectInterval: 100 * time.Millisecond,
+		runSubscribers:               make(map[chan string]bool),
+		actionSubscribers:            make(map[chan string]bool),
+	}
+	require.NoError(t, r.startPostgresListener())
+	t.Cleanup(func() { r.listener.Close() }) //nolint:errcheck
+	updates := subscribeActions(t, r, 16)
+
+	// A database cannot disallow its own connections, so run the outage SQL from the maintenance database.
+	adminCfg := testDbConfig.Postgres
+	adminCfg.DbName = "postgres"
+	admin, err := sql.Open("postgres", database.GetPostgresDsn(ctx, adminCfg))
+	require.NoError(t, err)
+	t.Cleanup(func() { admin.Close() }) //nolint:errcheck
+	dbName := testDbConfig.Postgres.DbName
+
+	// Keep pq's reconnect attempts failing, then drop the LISTEN connection.
+	_, err = admin.ExecContext(ctx, fmt.Sprintf("ALTER DATABASE %q WITH ALLOW_CONNECTIONS false", dbName))
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_, _ = admin.ExecContext(ctx, fmt.Sprintf("ALTER DATABASE %q WITH ALLOW_CONNECTIONS true", dbName))
+	})
+	var terminated int
+	require.NoError(t, admin.QueryRowContext(ctx,
+		"SELECT count(*) FROM (SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE application_name = $1) t",
+		appName).Scan(&terminated))
+	require.Equal(t, 1, terminated, "expected to terminate exactly the listener connection")
+
+	// Hold the outage across several ping ticks so Ping fails while pq has no connection.
+	time.Sleep(10 * r.listenerPingInterval)
+	_, err = admin.ExecContext(ctx, fmt.Sprintf("ALTER DATABASE %q WITH ALLOW_CONNECTIONS true", dbName))
+	require.NoError(t, err)
+
+	// pq retries with backoff; keep notifying until the reader forwards one.
+	require.Eventually(t, func() bool {
+		_, err := db.ExecContext(ctx, "SELECT pg_notify('action_updates', 'after-outage')")
+		require.NoError(t, err)
+		select {
+		case got := <-updates:
+			return got == "after-outage"
+		case <-time.After(200 * time.Millisecond):
+			return false
+		}
+	}, 10*time.Second, 100*time.Millisecond, "notifications must reach subscribers after the listener reconnects")
+}
+
 // subscribeActions registers a raw subscriber the way WatchActionUpdates does.
 func subscribeActions(t *testing.T, r *actionRepo, size int) chan string {
 	t.Helper()
@@ -1740,5 +1796,58 @@ func TestUpdateActionDetailedInfo_NotifiesWatchers(t *testing.T) {
 		require.NoError(t, err)
 	case <-time.After(2 * time.Second):
 		t.Fatal("timed out waiting for detailed_info notification")
+	}
+}
+
+func TestCreateActionPromotesOnlyPendingParent(t *testing.T) {
+	db := setupActionDB(t)
+	repo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	for value, name := range common.ActionPhase_name {
+		t.Run(name, func(t *testing.T) {
+			parentID := &common.ActionIdentifier{
+				Run:  &common.RunIdentifier{Project: "parent-project", Domain: "dev", Name: name},
+				Name: "a0",
+			}
+			parent := models.NewActionModel(parentID)
+			parent.Phase = value
+			parent.Attempts = 3
+			parent.CacheStatus = core.CatalogCacheStatus_CACHE_MISS
+			terminal := value == int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_FAILED) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_ABORTED) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_RECOVERED)
+			if terminal {
+				parent.EndedAt = sql.NullTime{Time: time.Now(), Valid: true}
+			}
+			promote := value == int32(common.ActionPhase_ACTION_PHASE_QUEUED) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_INITIALIZING) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES)
+			before, err := repo.CreateAction(ctx, parent, false)
+			require.NoError(t, err)
+
+			childID := &common.ActionIdentifier{Run: parentID.Run, Name: "child"}
+			child := models.NewActionModel(childID)
+			child.ParentActionName = sql.NullString{String: "a0", Valid: true}
+			for i := 0; i < 2; i++ { // Initial recording and duplicate delivery.
+				_, err := repo.CreateAction(ctx, child, false)
+				require.NoError(t, err)
+				after, err := repo.GetAction(ctx, parentID)
+				require.NoError(t, err)
+				if !promote {
+					assert.Equal(t, before, after, "ineligible parent must remain untouched")
+				} else {
+					assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_RUNNING), after.Phase)
+					assert.Equal(t, before.Attempts, after.Attempts)
+					assert.Equal(t, before.CacheStatus, after.CacheStatus)
+					assert.Equal(t, before.CreatedAt, after.CreatedAt)
+					assert.Equal(t, before.EndedAt, after.EndedAt)
+					assert.Equal(t, before.DurationMs, after.DurationMs)
+				}
+			}
+		})
 	}
 }

@@ -1121,6 +1121,10 @@ func (m *TaskActionMetadata) validate(all bool) error {
 
 	// no validation rules for ShortName
 
+	if m.Queue != nil {
+		// no validation rules for Queue
+	}
+
 	if len(errors) > 0 {
 		return TaskActionMetadataMultiError(errors)
 	}
@@ -1881,6 +1885,64 @@ func (m *ActionStatus) validate(all bool) error {
 	// no validation rules for Attempts
 
 	// no validation rules for CacheStatus
+
+	if all {
+		switch v := interface{}(m.GetQueuedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionStatusValidationError{
+					field:  "QueuedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionStatusValidationError{
+					field:  "QueuedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetQueuedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionStatusValidationError{
+				field:  "QueuedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetWorkerAssignedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionStatusValidationError{
+					field:  "WorkerAssignedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionStatusValidationError{
+					field:  "WorkerAssignedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetWorkerAssignedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionStatusValidationError{
+				field:  "WorkerAssignedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if m.EndTime != nil {
 

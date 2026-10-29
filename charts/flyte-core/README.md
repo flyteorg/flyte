@@ -281,6 +281,7 @@ Distributed Flyte 2 core services
 | components.executor.podSecurityContext | object | `{}` |  |
 | components.executor.priorityClassName | string | `""` |  |
 | components.executor.readinessProbe | object | `{}` |  |
+| components.executor.replicaCount | int | `1` | Replicas above 1 need configuration.executor.leaderElect: one replica reconciles at a time and the rest stand by. |
 | components.executor.resources | object | `{}` |  |
 | components.executor.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | components.executor.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
@@ -512,7 +513,9 @@ Distributed Flyte 2 core services
 | configuration.storage.providerConfig.s3.secretKeyPath | string | `""` |  |
 | configuration.storage.providerConfig.s3.v2Signing | bool | `false` |  |
 | configuration.webhook.cacheInvalidationPort | int | `9444` |  |
+| configuration.webhook.certDir | string | `"/var/run/flyte/certs"` | Directory the webhook serves its TLS certs from. |
 | configuration.webhook.listenPort | int | `9443` |  |
+| configuration.webhook.localCert | bool | `true` | Whether to copy the webhook TLS certs from their Secret into certDir at startup. |
 | configuration.webhook.webhookTimeout | int | `30` |  |
 | console.affinity | object | `{}` |  |
 | console.autoscaling | object | `{"behavior":{},"enabled":false,"maxReplicas":10,"metrics":[],"minReplicas":1,"targetCPUUtilizationPercentage":80,"targetMemoryUtilizationPercentage":null}` | Opt-in horizontal autoscaling. Resource utilization requires resource requests. |
@@ -550,6 +553,7 @@ Distributed Flyte 2 core services
 | ingress.apiJwtIngress.enabled | bool | `false` |  |
 | ingress.apiJwtIngress.host | string | `""` |  |
 | ingress.apiJwtIngress.ingressClassName | string | `""` |  |
+| ingress.apiJwtIngress.keepHttpRoutes | bool | `false` | Also serve the API routes on the http ingress, for requests without a bearer token (e.g. console calls behind cookie auth). The controller must send bearer requests to this ingress first, e.g. with an ALB Authorization header condition. |
 | ingress.apiJwtIngress.tls | list | `[]` |  |
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |

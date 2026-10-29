@@ -62,7 +62,8 @@ type RunServiceClient interface {
 	// Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
 	// runs or updates to existing ones from the point of invocation.
 	WatchRuns(ctx context.Context, in *WatchRunsRequest, opts ...grpc.CallOption) (RunService_WatchRunsClient, error)
-	// List all actions for a given run.
+	// List actions for a run, or live pending and in-flight task actions for a queue
+	// when supported. Phase filters in the list request select the returned phases.
 	ListActions(ctx context.Context, in *ListActionsRequest, opts ...grpc.CallOption) (*ListActionsResponse, error)
 	// Stream updates for actions given a run. Responses may include newly discovered nested runs or updates
 	// to  existing ones from the point of invocation.
@@ -408,7 +409,8 @@ type RunServiceServer interface {
 	// Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
 	// runs or updates to existing ones from the point of invocation.
 	WatchRuns(*WatchRunsRequest, RunService_WatchRunsServer) error
-	// List all actions for a given run.
+	// List actions for a run, or live pending and in-flight task actions for a queue
+	// when supported. Phase filters in the list request select the returned phases.
 	ListActions(context.Context, *ListActionsRequest) (*ListActionsResponse, error)
 	// Stream updates for actions given a run. Responses may include newly discovered nested runs or updates
 	// to  existing ones from the point of invocation.

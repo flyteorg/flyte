@@ -431,6 +431,22 @@ func TestDecorateEnvVars(t *testing.T) {
 	}
 }
 
+func TestGetPodTolerationsMIGPartitionResource(t *testing.T) {
+	migMixedConfig(t, "nvidia.com/mig-{partition}")
+	gpuTol := v12.Toleration{Key: "flyte/gpu", Value: "dedicated", Operator: v12.TolerationOpEqual, Effect: v12.TaintEffectNoSchedule}
+
+	tols := GetPodTolerations(false, v12.ResourceRequirements{
+		Limits: v12.ResourceList{"nvidia.com/mig-1g.5gb": resource.MustParse("1")},
+	})
+	assert.Equal(t, []v12.Toleration{gpuTol}, tols)
+
+	// A resource that only looks like a partition of an unconfigured template gets nothing.
+	tols = GetPodTolerations(false, v12.ResourceRequirements{
+		Limits: v12.ResourceList{"amd.com/mig-1g.5gb": resource.MustParse("1")},
+	})
+	assert.Empty(t, tols)
+}
+
 func TestDecorateEnvVars_TelemetryOptOut(t *testing.T) {
 	telemetryEnv := func(envVars []v12.EnvVar) []string {
 		var got []string

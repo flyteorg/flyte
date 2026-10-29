@@ -6865,6 +6865,12 @@ spec:
                 maxLength: 30
                 minLength: 1
                 type: string
+              podTemplateName:
+                description: |-
+                  PodTemplateName is the run-scoped pod template name projected from RunSpec.DefaultSettings.
+                  Stamped onto tasks that do not name one themselves.
+                maxLength: 253
+                type: string
               project:
                 description: Project this action belongs to
                 maxLength: 63
@@ -6906,6 +6912,56 @@ spec:
           status:
             description: status defines the observed state of TaskAction
             properties:
+              address:
+                description: |-
+                  Address is where the running task can be reached, as reported by its worker with
+                  actions.UpdateRequest.address (e.g. an interactive sandbox session). Watchers of the parent
+                  receive it on ActionUpdate.address while the task runs. The actions service owns it: the
+                  reconciler keeps it when persisting status. A later address replaces it and an empty one
+                  withdraws it; it is not delivered once Attempts or SystemRetries move past the ones it was
+                  reported for, or once the task is terminal.
+                properties:
+                  attempt:
+                    description: |-
+                      Attempt is the attempt that reported the address, and SystemRetries the TaskAction's
+                      system-retry count when it did. The address is delivered only while both are still the
+                      TaskAction's own, so a new attempt or an in-place relaunch never exposes a dead pod.
+                    format: int32
+                    type: integer
+                  cluster:
+                    description: Cluster is the cluster the action runs in.
+                    type: string
+                  path:
+                    description: |-
+                      Path is the path on Pod that reaches this action (e.g. /s/<session>); empty when the whole
+                      pod serves it.
+                    type: string
+                  pod:
+                    description: 'Pod is the pod serving the action: its own, or that
+                      of a worker serving many actions.'
+                    properties:
+                      ip:
+                        description: IP is the pod's IP, reachable from inside the
+                          cluster.
+                        type: string
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                      port:
+                        description: Port is the port the action serves on.
+                        format: int32
+                        type: integer
+                    type: object
+                  systemRetries:
+                    format: int32
+                    type: integer
+                  url:
+                    description: |-
+                      URL is an endpoint that cannot be derived from Pod (a gateway or tunnel); it takes
+                      precedence when set.
+                    type: string
+                type: object
               attemptStartedAt:
                 description: |-
                   AttemptStartedAt is when the current user attempt first entered the Running phase.
@@ -7098,7 +7154,8 @@ spec:
                 type: integer
               timeoutAt:
                 description: |-
-                  TimeoutAt is the max-runtime deadline for an expired current attempt.
+                  TimeoutAt is the expired deadline that ended the current attempt: the earlier
+                  of the attempt's max runtime and the action's deadline across all attempts.
                   While set on a non-terminal action, timeout cleanup is pending and the
                   plugin resource must not be handled or recreated.
                 format: date-time
@@ -7796,6 +7853,7 @@ data:
         maxSize: 100Mi
         storagePrefix: uploads
     runs:
+      notificationBufferLimit: 65000
       server:
         host: 0.0.0.0
         port: 8090
@@ -7891,6 +7949,10 @@ data:
       scheme: http
     plugins:
       k8s:
+        apple-silicon-bridge:
+          endpoint: '%{APPLE_SILICON_BRIDGE_ENDPOINT}%'
+          host-platform: '%{DEVBOX_HOST_PLATFORM}%'
+          token-secret: '%{APPLE_SILICON_BRIDGE_TOKEN_SECRET}%'
         default-env-vars:
         - FLYTE_AWS_ENDPOINT: http://rustfs-svc.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: rustfs
@@ -8729,7 +8791,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 21a742d07793d02ffa71b00e29bf0ac75148c13c48a68838f9ffb85af7f6bc82
+        checksum/configuration: a0401c9392460d1e527456d213b4ab1bda9b9bf2731750f219ef262f147efdbb
         checksum/configuration-secret: ff95a9986cc42dff0a114449c9b8e9a95c781b7bdd9832b31ca461423ae0b678
       labels:
         app.kubernetes.io/component: flyte-binary

@@ -69,6 +69,12 @@ func dummyTaskCtx(taskTemplate *core.TaskTemplate, podTemplate *core.K8SPod) *co
 // dummyTaskCtxWithGeneratedName is dummyTaskCtx with a caller-supplied generated name, used to
 // exercise the long composed/nested-name truncation path.
 func dummyTaskCtxWithGeneratedName(taskTemplate *core.TaskTemplate, generatedName string, podTemplate *core.K8SPod) *coreMocks.TaskExecutionContext {
+	return dummyTaskCtxWithLabels(taskTemplate, generatedName, podTemplate, map[string]string{"execution-id": "my-exec", "node-id": "n1"})
+}
+
+// dummyTaskCtxWithLabels is dummyTaskCtxWithGeneratedName with caller-supplied execution
+// labels, used to exercise the attempt identity the framework finds child pods by.
+func dummyTaskCtxWithLabels(taskTemplate *core.TaskTemplate, generatedName string, podTemplate *core.K8SPod, executionLabels map[string]string) *coreMocks.TaskExecutionContext {
 	taskCtx := &coreMocks.TaskExecutionContext{}
 
 	inputReader := &pluginIOMocks.InputReader{}
@@ -121,7 +127,7 @@ func dummyTaskCtxWithGeneratedName(taskTemplate *core.TaskTemplate, generatedNam
 	meta.EXPECT().GetTaskExecutionID().Return(tID)
 	meta.EXPECT().GetNamespace().Return(testNS)
 	meta.EXPECT().GetAnnotations().Return(map[string]string{"flyte.org/test-annotation": "av"})
-	meta.EXPECT().GetLabels().Return(map[string]string{"execution-id": "my-exec", "node-id": "n1"})
+	meta.EXPECT().GetLabels().Return(executionLabels)
 	meta.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{Kind: "node", Name: "n1"})
 	meta.EXPECT().IsInterruptible().Return(false)
 	meta.EXPECT().GetOverrides().Return(overrides)
@@ -1491,6 +1497,29 @@ func TestGetTaskPhase_LogContext(t *testing.T) {
 			assert.Equal(t, primaryContainer, p.GetPrimaryContainerName())
 			assert.GreaterOrEqual(t, len(p.GetContainers()), 1)
 		}
+	})
+
+	t.Run("pods of other JobSets are excluded", func(t *testing.T) {
+		js := makeRunningJobSet()
+		otherJobSet := mkPod("other-job-workers-0-0-qwert", corev1.PodRunning)
+		otherJobSet.Labels = map[string]string{
+			jobsetv1alpha2.JobSetNameKey:        "other-job",
+			jobsetv1alpha2.ReplicatedJobNameKey: workersReplicatedJobName,
+		}
+		fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).
+			WithObjects(mkPod(rank0, corev1.PodRunning), otherJobSet).Build()
+
+		spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
+		pCtx := dummyPluginCtx(buildTaskTemplate(spec), fakeClient)
+
+		handler := clusteredResourceHandler{}
+		phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+		assert.NoError(t, err)
+
+		lc := phase.Info().LogContext
+		require.NotNil(t, lc)
+		require.Len(t, lc.Pods, 1)
+		assert.Equal(t, rank0, lc.Pods[0].GetPodName())
 	})
 
 	t.Run("primary falls back when rank-0 pod is pending", func(t *testing.T) {

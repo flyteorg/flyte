@@ -992,6 +992,8 @@ func (m *CreateUploadLocationRequest) validate(all bool) error {
 
 	// no validation rules for ContentLength
 
+	// no validation rules for Queue
+
 	if len(errors) > 0 {
 		return CreateUploadLocationRequestMultiError(errors)
 	}
@@ -1263,6 +1265,8 @@ func (m *UploadInputsRequest) validate(all bool) error {
 	}
 
 	// no validation rules for BaseDir
+
+	// no validation rules for Queue
 
 	switch v := m.Id.(type) {
 	case *UploadInputsRequest_RunId:

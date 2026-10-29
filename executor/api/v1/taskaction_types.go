@@ -89,8 +89,9 @@ const (
 	ConditionReasonSignaled TaskActionConditionReason = "Signaled"
 
 	// ConditionReasonTimedOut indicates the action reached its deadline (Failed=True).
-	// This applies to both condition actions that were not signalled in time and to
-	// task actions whose per-attempt max-runtime was exhausted.
+	// This applies to condition actions that were not signalled in time, to task
+	// actions whose per-attempt max-runtime was exhausted, and to task actions that
+	// did not finish within their deadline.
 	ConditionReasonTimedOut TaskActionConditionReason = "TimedOut"
 )
 
@@ -238,6 +239,46 @@ func (in *TaskActionSpec) SetActionSpec(spec *workflow.ActionSpec) error {
 	return nil
 }
 
+// ActionAddress is where a running action can be reached. Callers use URL when it is set, and
+// otherwise Pod and Path.
+type ActionAddress struct {
+	// Pod is the pod serving the action: its own, or that of a worker serving many actions.
+	// +optional
+	Pod *PodAddress `json:"pod,omitempty"`
+	// Path is the path on Pod that reaches this action (e.g. /s/<session>); empty when the whole
+	// pod serves it.
+	// +optional
+	Path string `json:"path,omitempty"`
+	// URL is an endpoint that cannot be derived from Pod (a gateway or tunnel); it takes
+	// precedence when set.
+	// +optional
+	URL string `json:"url,omitempty"`
+	// Cluster is the cluster the action runs in.
+	// +optional
+	Cluster string `json:"cluster,omitempty"`
+	// Attempt is the attempt that reported the address, and SystemRetries the TaskAction's
+	// system-retry count when it did. The address is delivered only while both are still the
+	// TaskAction's own, so a new attempt or an in-place relaunch never exposes a dead pod.
+	// +optional
+	Attempt uint32 `json:"attempt,omitempty"`
+	// +optional
+	SystemRetries uint32 `json:"systemRetries,omitempty"`
+}
+
+// PodAddress locates a pod that serves an action.
+type PodAddress struct {
+	// +optional
+	Namespace string `json:"namespace,omitempty"`
+	// +optional
+	Name string `json:"name,omitempty"`
+	// IP is the pod's IP, reachable from inside the cluster.
+	// +optional
+	IP string `json:"ip,omitempty"`
+	// Port is the port the action serves on.
+	// +optional
+	Port uint32 `json:"port,omitempty"`
+}
+
 // ErrorState captures the structured error returned by the plugin for a
 // failed/aborted attempt. Persisted on TaskAction status so it can be
 // surfaced as a full core.ExecutionError on the ActionUpdate (and reach
@@ -308,7 +349,8 @@ type TaskActionStatus struct {
 	// +optional
 	AttemptStartedAt *metav1.Time `json:"attemptStartedAt,omitempty"`
 
-	// TimeoutAt is the max-runtime deadline for an expired current attempt.
+	// TimeoutAt is the expired deadline that ended the current attempt: the earlier
+	// of the attempt's max runtime and the action's deadline across all attempts.
 	// While set on a non-terminal action, timeout cleanup is pending and the
 	// plugin resource must not be handled or recreated.
 	// +optional
@@ -369,6 +411,15 @@ type TaskActionStatus struct {
 	// Only meaningful for condition actions.
 	// +optional
 	SignalValue []byte `json:"signalValue,omitempty"`
+
+	// Address is where the running task can be reached, as reported by its worker with
+	// actions.UpdateRequest.address (e.g. an interactive sandbox session). Watchers of the parent
+	// receive it on ActionUpdate.address while the task runs. The actions service owns it: the
+	// reconciler keeps it when persisting status. A later address replaces it and an empty one
+	// withdraws it; it is not delivered once Attempts or SystemRetries move past the ones it was
+	// reported for, or once the task is terminal.
+	// +optional
+	Address *ActionAddress `json:"address,omitempty"`
 
 	// SignalledBy identifies the principal that signalled the condition.
 	// +optional

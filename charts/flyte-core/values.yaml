@@ -419,6 +419,8 @@ components:
       clusterIP: ""
   executor:
     enabled: true
+    # -- Replicas above 1 need configuration.executor.leaderElect: one replica reconciles at a time and the rest stand by.
+    replicaCount: 1
     image:
       repository: cr.flyte.org/flyteorg/flyte-binary-v2
       tag: latest  # FLYTE_TAG
@@ -654,6 +656,10 @@ configuration:
     defaultEnvVars: {}
 
   webhook:
+    # -- Whether to copy the webhook TLS certs from their Secret into certDir at startup.
+    localCert: true
+    # -- Directory the webhook serves its TLS certs from.
+    certDir: /var/run/flyte/certs
     listenPort: 9443
     cacheInvalidationPort: 9444
     webhookTimeout: 30
@@ -704,6 +710,8 @@ ingress:
   # apiJwtIngress creates a separate ingress for API requests authenticated with bearer tokens.
   apiJwtIngress:
     enabled: false
+    # -- Also serve the API routes on the http ingress, for requests without a bearer token (e.g. console calls behind cookie auth). The controller must send bearer requests to this ingress first, e.g. with an ALB Authorization header condition.
+    keepHttpRoutes: false
     host: ""
     annotations: {}
     ingressClassName: ""
