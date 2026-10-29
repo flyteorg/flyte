@@ -1456,6 +1456,8 @@ func (m *TimePartition) validate(all bool) error {
 
 	// no validation rules for Granularity
 
+	// no validation rules for Key
+
 	if len(errors) > 0 {
 		return TimePartitionMultiError(errors)
 	}

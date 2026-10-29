@@ -3,8 +3,11 @@ package data
 import (
 	"bytes"
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -68,6 +71,43 @@ func TestHandleBlobMultipart(t *testing.T) {
 		}
 	})
 
+	t.Run("Sibling Sharing The Prefix Is Not Downloaded", func(t *testing.T) {
+		mem, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+		assert.NoError(t, err)
+		s := storage.NewCompositeDataStore(mem.ReferenceConstructor, rawPrefixListStore{mem.ComposedProtobufStore})
+
+		inside := storage.DataReference("mem://container/oz/results/index/part.bin")
+		err = s.WriteRaw(context.Background(), inside, 0, storage.Options{}, bytes.NewReader([]byte("inside")))
+		assert.NoError(t, err)
+		// A sibling whose key starts with the directory's key, but is not in it.
+		sibling := storage.DataReference("mem://container/oz/results/index_info.json")
+		err = s.WriteRaw(context.Background(), sibling, 0, storage.Options{}, bytes.NewReader([]byte("sibling")))
+		assert.NoError(t, err)
+
+		d := Downloader{store: s}
+		blob := &core.Blob{
+			Uri: "mem://container/oz/results/index",
+			Metadata: &core.BlobMetadata{
+				Type: &core.BlobType{
+					Dimensionality: core.BlobType_MULTIPART,
+				},
+			},
+		}
+
+		testPath := filepath.Join(t.TempDir(), "inputs", "index")
+		result, err := d.handleBlob(context.Background(), blob, testPath)
+		assert.NoError(t, err)
+		assert.Equal(t, testPath, result)
+
+		entries, err := os.ReadDir(testPath)
+		assert.NoError(t, err)
+		var names []string
+		for _, e := range entries {
+			names = append(names, e.Name())
+		}
+		assert.Equal(t, []string{"part.bin"}, names)
+	})
+
 	t.Run("No Items", func(t *testing.T) {
 		s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 		assert.NoError(t, err)
@@ -95,6 +135,84 @@ func TestHandleBlobMultipart(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, result)
 	})
+}
+
+// rawPrefixListStore lists by raw key prefix, as object stores do (the in-memory store lists
+// "<prefix>/"): a listing of ".../dir" also returns ".../dir_info.json".
+type rawPrefixListStore struct {
+	storage.ComposedProtobufStore
+}
+
+func (s rawPrefixListStore) List(ctx context.Context, reference storage.DataReference, maxItems int, cursor storage.Cursor) ([]storage.DataReference, storage.Cursor, error) {
+	ref := string(reference)
+	parent := storage.DataReference(ref[:strings.LastIndex(ref, "/")])
+	items, next, err := s.ComposedProtobufStore.List(ctx, parent, maxItems, cursor)
+	var matched []storage.DataReference
+	for _, item := range items {
+		if strings.HasPrefix(string(item), string(reference)) {
+			matched = append(matched, item)
+		}
+	}
+	return matched, next, err
+}
+
+// httpListingStore mimics stow's S3 backend, whose List reports items as public
+// https URLs (https://s3-<region>.amazonaws.com/<bucket>/<key>) rather than s3:// refs.
+type httpListingStore struct {
+	storage.ComposedProtobufStore
+	host string
+}
+
+func (s httpListingStore) List(ctx context.Context, reference storage.DataReference, maxItems int, cursor storage.Cursor) ([]storage.DataReference, storage.Cursor, error) {
+	items, next, err := s.ComposedProtobufStore.List(ctx, reference, maxItems, cursor)
+	for i, item := range items {
+		_, container, key, splitErr := item.Split()
+		if splitErr != nil {
+			return nil, next, splitErr
+		}
+		items[i] = storage.DataReference(s.host + "/" + container + "/" + key)
+	}
+	return items, next, err
+}
+
+func TestHandleBlobMultipartListReturnsHTTPURLs(t *testing.T) {
+	// The public URL is not readable without credentials, as on a private S3 bucket.
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusForbidden)
+		_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?><Error><Code>AccessDenied</Code></Error>`))
+	}))
+	defer srv.Close()
+
+	ctx := context.Background()
+	base, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+	files := map[string]string{
+		"info.json":            `{"k": 31}`,
+		"nested/deep_file.bin": "nested content",
+	}
+	for rel, content := range files {
+		err = base.WriteRaw(ctx, storage.DataReference("mem://container/sm/run-n0-0/index/"+rel), 0, storage.Options{}, bytes.NewReader([]byte(content)))
+		assert.NoError(t, err)
+	}
+
+	s := storage.NewCompositeDataStore(base.ReferenceConstructor, httpListingStore{ComposedProtobufStore: base.ComposedProtobufStore, host: srv.URL})
+	d := Downloader{store: s}
+	blob := &core.Blob{
+		Uri:      "mem://container/sm/run-n0-0/index",
+		Metadata: &core.BlobMetadata{Type: &core.BlobType{Dimensionality: core.BlobType_MULTIPART}},
+	}
+
+	toPath := filepath.Join(t.TempDir(), "inputs", "index")
+	result, err := d.handleBlob(ctx, blob, toPath)
+	assert.NoError(t, err)
+	assert.Equal(t, toPath, result)
+
+	for rel, content := range files {
+		got, err := os.ReadFile(filepath.Join(toPath, rel))
+		if assert.NoError(t, err) {
+			assert.Equal(t, content, string(got), "file %s must hold the stored bytes, not the HTTP error body", rel)
+		}
+	}
 }
 
 func TestHandleBlobSinglePart(t *testing.T) {
@@ -168,6 +286,36 @@ func TestNamedDirLayoutPreservesExtensions(t *testing.T) {
 	for _, rel := range []string{"reads/sample_R1.fastq.gz", "reads/sample_R2.fastq.gz", "fasta/genome.fasta"} {
 		_, statErr := os.Stat(filepath.Join(dir, rel))
 		assert.False(t, os.IsNotExist(statErr), "expected staged file %s", rel)
+	}
+}
+
+func unionLit(value *core.Literal) *core.Literal {
+	return &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Union{Union: &core.Union{Value: value}}}}}
+}
+
+func TestNamedDirLayoutStagesOptionalFileLikeFile(t *testing.T) {
+	s, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+	d := Downloader{store: s, layout: core.DataLoadingConfig_NAMED_DIR}
+
+	dir := t.TempDir()
+	inputs := &core.LiteralMap{Literals: map[string]*core.Literal{
+		// Optional[File] that is set: serialized as a union wrapping the blob.
+		"reads_2": unionLit(writeBlobLit(t, s, "sample_R2.fastq.gz")),
+		// Optional[File] left unset: a union wrapping none, so nothing is staged as a file.
+		"decoys": unionLit(&core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_NoneType{NoneType: &core.Void{}}}}}),
+	}}
+	_, _, err = d.RecursiveDownload(context.Background(), inputs, dir, true)
+	assert.NoError(t, err)
+
+	// Same per-input dir + original basename as a plain File, so a glob over reads_2/ finds it.
+	info, statErr := os.Stat(filepath.Join(dir, "reads_2", "sample_R2.fastq.gz"))
+	if assert.NoError(t, statErr) {
+		assert.False(t, info.IsDir())
+	}
+	// An unset optional must not become a per-input dir, so a glob over decoys/ matches nothing.
+	if info, statErr := os.Stat(filepath.Join(dir, "decoys")); statErr == nil {
+		assert.False(t, info.IsDir())
 	}
 }
 
@@ -499,4 +647,34 @@ func TestHandleScalar(t *testing.T) {
 		assert.Equal(t, []interface{}{"string1", "string2"}, resultValue)
 		assert.Equal(t, scalar, resultScalar)
 	})
+}
+
+func TestHandleBlobMultipartHTTPListingSkipsPrefixSibling(t *testing.T) {
+	// S3 lists by raw key prefix and reports items as https://<host>/<bucket>/<key>:
+	// the sibling ".../index_info.json" must still be left out.
+	ctx := context.Background()
+	mem, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	assert.NoError(t, err)
+	for _, key := range []string{"sm/run-n0-0/index/part.bin", "sm/run-n0-0/index_info.json"} {
+		err = mem.WriteRaw(ctx, storage.DataReference("mem://container/"+key), 0, storage.Options{}, bytes.NewReader([]byte(key)))
+		assert.NoError(t, err)
+	}
+	listing := httpListingStore{ComposedProtobufStore: rawPrefixListStore{mem.ComposedProtobufStore}, host: "https://s3-us-east-2.amazonaws.com"}
+	d := Downloader{store: storage.NewCompositeDataStore(mem.ReferenceConstructor, listing)}
+	blob := &core.Blob{
+		Uri:      "mem://container/sm/run-n0-0/index",
+		Metadata: &core.BlobMetadata{Type: &core.BlobType{Dimensionality: core.BlobType_MULTIPART}},
+	}
+
+	toPath := filepath.Join(t.TempDir(), "inputs", "index")
+	_, err = d.handleBlob(ctx, blob, toPath)
+	assert.NoError(t, err)
+
+	entries, err := os.ReadDir(toPath)
+	assert.NoError(t, err)
+	var names []string
+	for _, e := range entries {
+		names = append(names, e.Name())
+	}
+	assert.Equal(t, []string{"part.bin"}, names)
 }

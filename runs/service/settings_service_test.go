@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"math"
 	"testing"
 
 	"connectrpc.com/connect"
@@ -9,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 )
@@ -25,6 +27,20 @@ func envSettings(key, value string) *settings.Settings {
 			MapValue: &settings.StringMap{Entries: map[string]string{key: value}},
 		},
 	}
+}
+
+const (
+	stateValue   = settings.SettingState_SETTING_STATE_VALUE
+	stateInherit = settings.SettingState_SETTING_STATE_INHERIT
+	stateUnset   = settings.SettingState_SETTING_STATE_UNSET
+)
+
+func quantity(state settings.SettingState, value string) *settings.QuantitySetting {
+	return &settings.QuantitySetting{State: state, QuantityValue: value}
+}
+
+func concurrency(state settings.SettingState, value int64) *settings.Int64Setting {
+	return &settings.Int64Setting{State: state, IntValue: value}
 }
 
 func TestSettingsCRUD(t *testing.T) {
@@ -171,6 +187,15 @@ func TestCreateSettings_Validation(t *testing.T) {
 				Settings: envSettings("LOG_LEVEL", "debug"),
 			},
 		},
+		{
+			name: "invalid quantity",
+			req: &settings.CreateSettingsRequest{
+				Key: &settings.SettingsKey{Org: "acme", Domain: "development"},
+				Settings: &settings.Settings{TaskResource: &settings.TaskResourceSettings{
+					Max: &settings.TaskResourceDefaults{Cpu: quantity(stateValue, "apple")},
+				}},
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -218,6 +243,16 @@ func TestUpdateSettings_Validation(t *testing.T) {
 			req: &settings.UpdateSettingsRequest{
 				Key:      &settings.SettingsKey{Org: "acme", Domain: "development"},
 				Settings: envSettings("LOG_LEVEL", "debug"),
+			},
+		},
+		{
+			name: "invalid quantity",
+			req: &settings.UpdateSettingsRequest{
+				Key: &settings.SettingsKey{Org: "acme", Domain: "development"},
+				Settings: &settings.Settings{TaskResource: &settings.TaskResourceSettings{
+					Max: &settings.TaskResourceDefaults{Cpu: quantity(stateValue, "apple")},
+				}},
+				Version: 1,
 			},
 		},
 	}
@@ -298,7 +333,7 @@ func TestGetSettingsForEdit_AllLevels(t *testing.T) {
 	require.Len(t, levels, 3)
 
 	// Each level carries only what it stores. Nothing is merged, which is the job
-	// of GetSettings, which is not implemented yet.
+	// of GetSettings.
 	assert.True(t, proto.Equal(orgKey, levels[0].GetKey()))
 	assert.True(t, proto.Equal(envSettings("LOG_LEVEL", "org"), levels[0].GetSettings()))
 	assert.Equal(t, uint64(1), levels[0].GetVersion())
@@ -388,4 +423,253 @@ func TestGetSettingsForEdit_LevelsFollowKeyDepth(t *testing.T) {
 			assert.Len(t, resp.Msg.GetLevels(), tt.wantLevels)
 		})
 	}
+}
+
+func TestValidateMaxActionConcurrency(t *testing.T) {
+	tests := []struct {
+		name    string
+		setting *settings.Int64Setting
+		wantErr bool
+	}{
+		{"nil leaf", nil, false},
+		{"inherit ignores its value", concurrency(stateInherit, 1), false},
+		{"unset ignores its value", concurrency(stateUnset, 1), false},
+		{"zero means unlimited", concurrency(stateValue, 0), false},
+		{"one is rejected", concurrency(stateValue, 1), true},
+		{"two is allowed", concurrency(stateValue, 2), false},
+		{"negative is rejected", concurrency(stateValue, -1), true},
+		{"max uint32 is allowed", concurrency(stateValue, math.MaxUint32), false},
+		{"above max uint32 is rejected", concurrency(stateValue, math.MaxUint32+1), true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateMaxActionConcurrency(tt.setting)
+			if tt.wantErr {
+				require.Error(t, err)
+				assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+				return
+			}
+			assert.NoError(t, err)
+		})
+	}
+}
+
+func TestValidateQuantity(t *testing.T) {
+	tests := []struct {
+		name    string
+		setting *settings.QuantitySetting
+		wantErr bool
+	}{
+		{"nil leaf", nil, false},
+		{"inherit ignores its value", quantity(stateInherit, "apple"), false},
+		{"unset ignores its value", quantity(stateUnset, "apple"), false},
+		{"millicore", quantity(stateValue, "500m"), false},
+		{"whole cpus", quantity(stateValue, "16"), false},
+		{"binary memory", quantity(stateValue, "64Gi"), false},
+		{"garbage value is rejected", quantity(stateValue, "apple"), true},
+		{"empty value is rejected", quantity(stateValue, ""), true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateQuantity("task_resource.max.cpu", tt.setting)
+			if tt.wantErr {
+				require.Error(t, err)
+				assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+				return
+			}
+			assert.NoError(t, err)
+		})
+	}
+}
+
+func TestValidateTaskResourceDefaults(t *testing.T) {
+	t.Run("nil defaults has nothing to check", func(t *testing.T) {
+		assert.NoError(t, validateTaskResourceDefaults("task_resource.max", nil))
+	})
+
+	t.Run("all four valid pass", func(t *testing.T) {
+		assert.NoError(t, validateTaskResourceDefaults("task_resource.max",
+			&settings.TaskResourceDefaults{
+				Cpu:     quantity(stateValue, "16"),
+				Gpu:     quantity(stateValue, "1"),
+				Memory:  quantity(stateValue, "64Gi"),
+				Storage: quantity(stateValue, "10Gi"),
+			}))
+	})
+
+	tests := []struct {
+		name     string
+		defaults *settings.TaskResourceDefaults
+		wantPath string
+	}{
+		{"cpu", &settings.TaskResourceDefaults{Cpu: quantity(stateValue, "apple")}, "task_resource.max.cpu"},
+		{"gpu", &settings.TaskResourceDefaults{Gpu: quantity(stateValue, "apple")}, "task_resource.max.gpu"},
+		{"memory", &settings.TaskResourceDefaults{Memory: quantity(stateValue, "apple")}, "task_resource.max.memory"},
+		{"storage", &settings.TaskResourceDefaults{Storage: quantity(stateValue, "apple")}, "task_resource.max.storage"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateTaskResourceDefaults("task_resource.max", tt.defaults)
+			require.Error(t, err)
+			assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+			assert.Contains(t, err.Error(), tt.wantPath)
+		})
+	}
+}
+
+func TestValidateSettings(t *testing.T) {
+	t.Run("nil settings has nothing to check", func(t *testing.T) {
+		assert.NoError(t, validateSettings(nil))
+	})
+
+	t.Run("empty settings has nothing to check", func(t *testing.T) {
+		assert.NoError(t, validateSettings(&settings.Settings{}))
+	})
+
+	t.Run("valid settings pass", func(t *testing.T) {
+		assert.NoError(t, validateSettings(&settings.Settings{
+			Run: &settings.RunSettings{MaxActionConcurrency: concurrency(stateValue, 64)},
+			TaskResource: &settings.TaskResourceSettings{
+				Min: &settings.TaskResourceDefaults{Cpu: quantity(stateValue, "500m")},
+				Max: &settings.TaskResourceDefaults{Cpu: quantity(stateValue, "16")},
+			},
+		}))
+	})
+
+	tests := []struct {
+		name     string
+		input    *settings.Settings
+		wantPath string
+	}{
+		{
+			name: "bad min quantity names the min path",
+			input: &settings.Settings{TaskResource: &settings.TaskResourceSettings{
+				Min: &settings.TaskResourceDefaults{Cpu: quantity(stateValue, "apple")},
+			}},
+			wantPath: "task_resource.min.cpu",
+		},
+		{
+			name: "bad max quantity names the max path",
+			input: &settings.Settings{TaskResource: &settings.TaskResourceSettings{
+				Max: &settings.TaskResourceDefaults{Memory: quantity(stateValue, "apple")},
+			}},
+			wantPath: "task_resource.max.memory",
+		},
+		{
+			name: "non-canonical default accelerator names its path",
+			input: &settings.Settings{TaskResource: &settings.TaskResourceSettings{
+				DefaultAccelerator: accel(stateValue, "H100"),
+			}},
+			wantPath: "task_resource.default_accelerator",
+		},
+		{
+			name: "bad concurrency is reported",
+			input: &settings.Settings{Run: &settings.RunSettings{
+				MaxActionConcurrency: concurrency(stateValue, 1),
+			}},
+			wantPath: "max_action_concurrency",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateSettings(tt.input)
+			require.Error(t, err)
+			assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+			assert.Contains(t, err.Error(), tt.wantPath)
+		})
+	}
+}
+
+func TestGetSettings_MergesAcrossLevels(t *testing.T) {
+	ctx := context.Background()
+	svc := setupSettingsService(t)
+
+	orgKey := &settings.SettingsKey{Org: "acme"}
+	projectKey := &settings.SettingsKey{Org: "acme", Domain: "development", Project: "recsys"}
+
+	_, err := svc.CreateSettings(ctx, connect.NewRequest(&settings.CreateSettingsRequest{
+		Key:      orgKey,
+		Settings: envSettings("LOG_LEVEL", "info"),
+	}))
+	require.NoError(t, err)
+
+	_, err = svc.CreateSettings(ctx, connect.NewRequest(&settings.CreateSettingsRequest{
+		Key:      projectKey,
+		Settings: envSettings("TEAM", "ml"),
+	}))
+	require.NoError(t, err)
+
+	resp, err := svc.GetSettings(ctx, connect.NewRequest(&settings.GetSettingsRequest{
+		Key: projectKey,
+	}))
+	require.NoError(t, err)
+
+	record := resp.Msg.GetSettingsRecord()
+	assert.True(t, proto.Equal(projectKey, record.GetKey()))
+
+	// Entries from both levels, with no domain row in between.
+	assert.Equal(t, map[string]string{"LOG_LEVEL": "info", "TEAM": "ml"},
+		record.GetSettings().GetEnvironmentVariables().GetMapValue().GetEntries())
+	assert.Equal(t, levelProject, record.GetSettings().GetEnvironmentVariables().GetScopeLevel())
+
+	// Merged settings are not a stored row, so no version comes back even though
+	// both stored rows are at version 1.
+	assert.Equal(t, uint64(0), record.GetVersion())
+}
+
+func TestGetSettings_NothingStored(t *testing.T) {
+	ctx := context.Background()
+	svc := setupSettingsService(t)
+
+	resp, err := svc.GetSettings(ctx, connect.NewRequest(&settings.GetSettingsRequest{
+		Key: &settings.SettingsKey{Org: "acme", Domain: "development", Project: "recsys"},
+	}))
+	require.NoError(t, err)
+
+	record := resp.Msg.GetSettingsRecord()
+	require.NotNil(t, record)
+	require.NotNil(t, record.GetSettings())
+	assert.Nil(t, record.GetSettings().GetEnvironmentVariables())
+	assert.Equal(t, uint64(0), record.GetVersion())
+}
+
+func TestValidateDefaultAccelerator(t *testing.T) {
+	tests := []struct {
+		name    string
+		setting *settings.AcceleratorSetting
+		wantErr bool
+	}{
+		{"nil leaf", nil, false},
+		{"inherit ignores its value", accel(stateInherit, "bogus"), false},
+		{"unset ignores its value", accel(stateUnset, ""), false},
+		{"canonical nvidia", accel(stateValue, "nvidia-h100"), false},
+		{"canonical with memory", accel(stateValue, "nvidia-a100-80gb"), false},
+		{"canonical tpu", accel(stateValue, "google-tpu-v5e"), false},
+		{"old SDK short name is rejected", accel(stateValue, "H100"), true},
+		{"old SDK long name is rejected", accel(stateValue, "nvidia-tesla-h100"), true},
+		{"unknown device is rejected", accel(stateValue, "nvidia-h9000"), true},
+		{"value with no accelerator is rejected", accel(stateValue, ""), true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateDefaultAccelerator(tt.setting)
+			if tt.wantErr {
+				require.Error(t, err)
+				assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+				return
+			}
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestCanonicalAcceleratorNamesCoversEveryModel(t *testing.T) {
+	values := core.AcceleratorModel(0).Descriptor().Values()
+	// Every value but UNSPECIFIED carries a name.
+	assert.Len(t, canonicalAcceleratorNames, values.Len()-1)
 }

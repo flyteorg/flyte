@@ -5,6 +5,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 )
 
 const configSectionKey = "runs"
@@ -16,10 +17,15 @@ var defaultConfig = &Config{
 		Port: 8090,
 		Host: "0.0.0.0",
 	},
-	WatchBufferSize:   100,
-	ActionsServiceURL: "http://localhost:8090",
-	StoragePrefix:     "file:///tmp/flyte/data",
-	SeedProjects:      []string{"flytesnacks"},
+	WatchBufferSize:         100,
+	NotificationBufferLimit: 65_000,
+	NotifyRetryMinBackoff:   config.Duration{Duration: 50 * time.Millisecond},
+	NotifyRetryMaxBackoff:   config.Duration{Duration: 5 * time.Second},
+	ActionsService: serviceclient.ServiceConfig{
+		URL: "http://localhost:8090",
+	},
+	StoragePrefix: "file:///tmp/flyte/data",
+	SeedProjects:  []string{"flytesnacks"},
 	Domains: []DomainConfig{
 		{ID: "development", Name: "Development"},
 		{ID: "production", Name: "Production"},
@@ -55,11 +61,21 @@ type Config struct {
 	// Database configuration
 	Database database.DbConfig `json:"database"`
 
-	// Watch/streaming settings
+	// WatchBufferSize is the capacity of each watch stream's notification channel. A notification for a stream
+	// whose channel is full is dropped, so a client watching many busy actions needs it larger.
 	WatchBufferSize int `json:"watchBufferSize" pflag:",Buffer size for watch streams"`
 
-	// Actions service URL for enqueuing actions
-	ActionsServiceURL string `json:"actionsServiceUrl" pflag:",URL of the actions service"`
+	// NotificationBufferLimit is the maximum number of pending entries in each action or run queue.
+	NotificationBufferLimit int `json:"notificationBufferLimit" pflag:",Maximum pending entries in each notification queue"`
+
+	// NotifyRetryMinBackoff is the initial delay after notification delivery fails.
+	NotifyRetryMinBackoff config.Duration `json:"notifyRetryMinBackoff" pflag:",Initial notification retry delay"`
+
+	// NotifyRetryMaxBackoff caps the notification retry delay.
+	NotifyRetryMaxBackoff config.Duration `json:"notifyRetryMaxBackoff" pflag:",Maximum notification retry delay"`
+
+	// ActionsService configures the actions service client.
+	ActionsService serviceclient.ServiceConfig `json:"actionsService" pflag:",Actions service client configuration"`
 
 	// StoragePrefix is the base URI for storing run data (inputs, outputs)
 	// e.g. "s3://my-bucket" or "gs://my-bucket" or "file:///tmp/flyte/data"

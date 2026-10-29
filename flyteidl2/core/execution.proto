@@ -87,6 +87,65 @@ message ExecutionError {
   // truth: ordinary exceptions -> RECOVERABLE; flyte.errors.NonRecoverableError
   // -> NON_RECOVERABLE.
   ContainerError.Kind recoverability = 7;
+
+  // Set when the failure was classified as caused by or coincident with a GPU
+  // fault. It carries the fault as data so that consumers do not have to parse
+  // message.
+  GpuFault gpu_fault = 8;
+}
+
+// GpuFault is a GPU fault reported by the NVIDIA driver in the node kernel log
+// and attributed to an action attempt by the data plane. Field semantics follow
+// the driver's Xid line: which device faulted, which fault, and, when the driver
+// could blame a process, which process.
+message GpuFault {
+  enum Kind {
+    KIND_UNSPECIFIED = 0;
+    // An Xid: a fault on a GPU.
+    KIND_XID = 1;
+    // An SXid: a fault on an NVSwitch, which affects every GPU attached to it.
+    KIND_SXID = 2;
+  }
+
+  // Severity classifies the fault for the reader. USER faults are caused by the
+  // workload (for example an out-of-bounds memory access, Xid 31) and need no
+  // node action; CRITICAL faults are hardware faults (for example Xid 79, GPU
+  // fallen off the bus) after which the device or node is not trustworthy; WARN
+  // covers everything in between and any code the data plane does not know.
+  enum Severity {
+    SEVERITY_UNSPECIFIED = 0;
+    SEVERITY_USER = 1;
+    SEVERITY_WARN = 2;
+    SEVERITY_CRITICAL = 3;
+  }
+
+  Kind kind = 1;
+
+  // The Xid or SXid number as printed by the driver, for example 79.
+  uint32 code = 2;
+
+  // Short human-readable name of the fault, for example "GPU has fallen off the
+  // bus". Empty when the data plane does not know the code.
+  string name = 3;
+
+  Severity severity = 4;
+
+  // Identity of the faulting device. gpu_uuid is the NVML UUID ("GPU-..."),
+  // gpu_index is the host device index (the same index DCGM and nvidia-smi use,
+  // not an ordinal within the pod), pci_bus_id is the sysfs bus id such as
+  // "0000:3b:00.0". For an SXid only pci_bus_id is set. gpu_index is optional
+  // because 0 is a valid index.
+  string gpu_uuid = 5;
+  optional uint32 gpu_index = 6;
+  string pci_bus_id = 7;
+
+  // The Kubernetes node the device is attached to.
+  string node = 8;
+
+  // The host process the driver blamed for the fault, when it named one. Only
+  // workload-caused faults carry a process; hardware faults usually do not.
+  uint32 pid = 9;
+  string process = 10;
 }
 
 // Error message to propagate detailed errors from container executions to the

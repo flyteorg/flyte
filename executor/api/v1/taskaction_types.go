@@ -88,7 +88,9 @@ const (
 	// ConditionReasonSignaled indicates a condition action received its signal (Succeeded=True)
 	ConditionReasonSignaled TaskActionConditionReason = "Signaled"
 
-	// ConditionReasonTimedOut indicates a condition action passed its deadline unsignalled (Failed=True)
+	// ConditionReasonTimedOut indicates the action reached its deadline (Failed=True).
+	// This applies to both condition actions that were not signalled in time and to
+	// task actions whose per-attempt max-runtime was exhausted.
 	ConditionReasonTimedOut TaskActionConditionReason = "TimedOut"
 )
 
@@ -186,6 +188,12 @@ type TaskActionSpec struct {
 	// +optional
 	Interruptible *bool `json:"interruptible,omitempty"`
 
+	// PodTemplateName is the run-scoped pod template name projected from RunSpec.DefaultSettings.
+	// Stamped onto tasks that do not name one themselves.
+	// +optional
+	// +kubebuilder:validation:MaxLength=253
+	PodTemplateName string `json:"podTemplateName,omitempty"`
+
 	// Group is the group this action belongs to, if applicable.
 	// +optional
 	// +kubebuilder:validation:MaxLength=256
@@ -228,6 +236,46 @@ func (in *TaskActionSpec) SetActionSpec(spec *workflow.ActionSpec) error {
 	in.Group = spec.Group
 
 	return nil
+}
+
+// ActionAddress is where a running action can be reached. Callers use URL when it is set, and
+// otherwise Pod and Path.
+type ActionAddress struct {
+	// Pod is the pod serving the action: its own, or that of a worker serving many actions.
+	// +optional
+	Pod *PodAddress `json:"pod,omitempty"`
+	// Path is the path on Pod that reaches this action (e.g. /s/<session>); empty when the whole
+	// pod serves it.
+	// +optional
+	Path string `json:"path,omitempty"`
+	// URL is an endpoint that cannot be derived from Pod (a gateway or tunnel); it takes
+	// precedence when set.
+	// +optional
+	URL string `json:"url,omitempty"`
+	// Cluster is the cluster the action runs in.
+	// +optional
+	Cluster string `json:"cluster,omitempty"`
+	// Attempt is the attempt that reported the address, and SystemRetries the TaskAction's
+	// system-retry count when it did. The address is delivered only while both are still the
+	// TaskAction's own, so a new attempt or an in-place relaunch never exposes a dead pod.
+	// +optional
+	Attempt uint32 `json:"attempt,omitempty"`
+	// +optional
+	SystemRetries uint32 `json:"systemRetries,omitempty"`
+}
+
+// PodAddress locates a pod that serves an action.
+type PodAddress struct {
+	// +optional
+	Namespace string `json:"namespace,omitempty"`
+	// +optional
+	Name string `json:"name,omitempty"`
+	// IP is the pod's IP, reachable from inside the cluster.
+	// +optional
+	IP string `json:"ip,omitempty"`
+	// Port is the port the action serves on.
+	// +optional
+	Port uint32 `json:"port,omitempty"`
 }
 
 // ErrorState captures the structured error returned by the plugin for a
@@ -294,6 +342,24 @@ type TaskActionStatus struct {
 	// +optional
 	Attempts uint32 `json:"attempts,omitempty"`
 
+	// AttemptStartedAt is when the current user attempt first entered the Running phase.
+	// It is persisted independently from ActionEvent publication so max-runtime
+	// enforcement survives controller and event-service outages.
+	// +optional
+	AttemptStartedAt *metav1.Time `json:"attemptStartedAt,omitempty"`
+
+	// TimeoutAt is the max-runtime deadline for an expired current attempt.
+	// While set on a non-terminal action, timeout cleanup is pending and the
+	// plugin resource must not be handled or recreated.
+	// +optional
+	TimeoutAt *metav1.Time `json:"timeoutAt,omitempty"`
+
+	// NextAttemptAt is the earliest time the next user attempt may launch, set when a
+	// failed attempt is retried under a RetryStrategy with a backoff. While it lies in
+	// the future the plugin is not handled; it is cleared when the attempt launches.
+	// +optional
+	NextAttemptAt *metav1.Time `json:"nextAttemptAt,omitempty"`
+
 	// SystemFailures counts system-level failures observed during reconciliation —
 	// either Go errors returned from Plugin.Handle (e.g. transient k8s API errors,
 	// admission webhook denials) or plugin transitions reporting a system-retryable
@@ -301,6 +367,12 @@ type TaskActionStatus struct {
 	// maximum, the TaskAction is converted to a permanent failure.
 	// +optional
 	SystemFailures uint32 `json:"systemFailures,omitempty"`
+
+	// SystemRetries counts the times this TaskAction was relaunched in place after a
+	// system-retryable failure. Unlike SystemFailures it is never reset, so it gives
+	// each system-retry event a version no earlier one used.
+	// +optional
+	SystemRetries uint32 `json:"systemRetries,omitempty"`
 
 	// CacheStatus is the latest observed cache lookup result for this action.
 	// +optional
@@ -337,6 +409,15 @@ type TaskActionStatus struct {
 	// Only meaningful for condition actions.
 	// +optional
 	SignalValue []byte `json:"signalValue,omitempty"`
+
+	// Address is where the running task can be reached, as reported by its worker with
+	// actions.UpdateRequest.address (e.g. an interactive sandbox session). Watchers of the parent
+	// receive it on ActionUpdate.address while the task runs. The actions service owns it: the
+	// reconciler keeps it when persisting status. A later address replaces it and an empty one
+	// withdraws it; it is not delivered once Attempts or SystemRetries move past the ones it was
+	// reported for, or once the task is terminal.
+	// +optional
+	Address *ActionAddress `json:"address,omitempty"`
 
 	// SignalledBy identifies the principal that signalled the condition.
 	// +optional

@@ -1,0 +1,60 @@
+{{- if and .Values.ingress.create .Values.ingress.apiJwtIngress.enabled }}
+{{- $routes := include "flyte-core.ingress.apiRoutes" . | fromYamlArray }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "flyte-core.resourceName" (dict "root" . "name" "api-jwt") }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "flyte-core.labels" . | nindent 4 }}
+    {{- with .Values.ingress.labels }}
+    {{- tpl (toYaml .) $ | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.commonAnnotations .Values.ingress.commonAnnotations .Values.ingress.apiJwtIngress.annotations }}
+  annotations:
+    {{- with .Values.commonAnnotations }}
+    {{- tpl (toYaml .) $ | nindent 4 }}
+    {{- end }}
+    {{- with .Values.ingress.commonAnnotations }}
+    {{- tpl (toYaml .) $ | nindent 4 }}
+    {{- end }}
+    {{- with .Values.ingress.apiJwtIngress.annotations }}
+    {{- tpl (toYaml .) $ | nindent 4 }}
+    {{- end }}
+  {{- end }}
+spec:
+  {{- if .Values.ingress.apiJwtIngress.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.apiJwtIngress.ingressClassName | quote }}
+  {{- else if .Values.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  {{- end }}
+  {{- if .Values.ingress.apiJwtIngress.tls }}
+  tls:
+    {{- tpl (toYaml .Values.ingress.apiJwtIngress.tls) . | nindent 4 }}
+  {{- else if .Values.ingress.tls }}
+  tls:
+    {{- tpl (toYaml .Values.ingress.tls) . | nindent 4 }}
+  {{- end }}
+  rules:
+    - {{- if .Values.ingress.apiJwtIngress.host }}
+      host: {{ tpl .Values.ingress.apiJwtIngress.host . | quote }}
+      {{- else if .Values.ingress.host }}
+      host: {{ tpl .Values.ingress.host . | quote }}
+      {{- end }}
+      http:
+        paths:
+          {{- range $route := $routes }}
+          {{- $component := index $.Values.components $route.component }}
+          {{- if $component.enabled }}
+          {{- range $path := $route.paths }}
+          - path: {{ $path }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "flyte-core.componentName" (dict "root" $ "component" $route.component) }}
+                port:
+                  number: {{ include "flyte-core.componentPort" (dict "root" $ "component" $route.component) }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
+{{- end }}

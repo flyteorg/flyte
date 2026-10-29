@@ -189,6 +189,35 @@ func (m *Image) validate(all bool) error {
 
 	// no validation rules for Fqin
 
+	if all {
+		switch v := interface{}(m.GetBuildRun()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ImageValidationError{
+					field:  "BuildRun",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ImageValidationError{
+					field:  "BuildRun",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetBuildRun()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ImageValidationError{
+				field:  "BuildRun",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return ImageMultiError(errors)
 	}

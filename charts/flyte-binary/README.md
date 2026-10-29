@@ -141,7 +141,7 @@ Chart for basic single Flyte executable deployment
 | flyte-core-components.secret.kubernetes.namespace | string | `"{{ .Release.Namespace }}"` |  |
 | flyte-core-components.secret.kubernetes.qps | int | `100` |  |
 | flyte-core-components.secret.kubernetes.timeout | string | `"30s"` |  |
-| flyte-core-components.secret.webhookURL | string | `"http://{{ include \"flyte-binary.webhook.headlessServiceName\" . }}.{{ .Release.Namespace }}.svc:9444"` |  |
+| flyte-core-components.secret.webhook.url | string | `"http://{{ include \"flyte-binary.webhook.headlessServiceName\" . }}.{{ .Release.Namespace }}.svc:9444"` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.apiJwtIngress.annotations | object | `{}` |  |
 | ingress.apiJwtIngress.enabled | bool | `false` |  |
@@ -185,4 +185,5 @@ Chart for basic single Flyte executable deployment
 | serviceAccount.imagePullSecrets | list | `[]` |  |
 | serviceAccount.labels | object | `{}` |  |
 | serviceAccount.name | string | `""` |  |
+| telemetry.enabled | bool | `true` | Set to false to opt out. Sets DO_NOT_TRACK=1 (https://donottrack.sh) on the backend and the console; the backend passes it on to the task and app pods it creates. |
 

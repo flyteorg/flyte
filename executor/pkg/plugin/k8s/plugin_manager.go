@@ -3,12 +3,15 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"sort"
 	"sync"
 	"time"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"google.golang.org/protobuf/proto"
+	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8stypes "k8s.io/apimachinery/pkg/types"
@@ -17,7 +20,9 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/gpufault"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	pluginsUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
@@ -25,6 +30,21 @@ import (
 )
 
 const pluginStateVersion = 1
+
+const (
+	// codeResourceDeletedExternally is the failure reported when the plugin's resource is
+	// gone from the cluster before the plugin saw it end.
+	codeResourceDeletedExternally = "ResourceDeletedExternally"
+	// codeUnexpectedObjectDeletion is the failure reported when the plugin's resource is
+	// being deleted while the plugin still considers it running.
+	codeUnexpectedObjectDeletion = "UnexpectedObjectDeletion"
+	// codePreviousResourceStuckTerminating is the failure reported when a launch has waited
+	// too long for the previous incarnation of its resource to finish terminating.
+	codePreviousResourceStuckTerminating = "PreviousResourceStuckTerminating"
+	// stoppedEventReason is the reason of the event Kueue's job framework records on a pod
+	// it stops, carrying the same message it puts on the pod's TerminationTarget condition.
+	stoppedEventReason = "Stopped"
+)
 
 // PluginPhase tracks the high-level phase of the PluginManager's state machine.
 type PluginPhase uint8
@@ -112,6 +132,25 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 	logger.Infof(ctx, "Creating Object: Type:[%v], Object:[%v/%v]", o.GetObjectKind().GroupVersionKind(), o.GetNamespace(), o.GetName())
 
 	err = pm.kubeClient.GetClient().Create(ctx, o)
+	if k8serrors.IsAlreadyExists(err) && !pm.canAdoptExisting(ctx, o) {
+		// The name is taken by the previous incarnation of this resource, still draining
+		// its grace period after a system retry aborted it. It is not this launch's
+		// resource: adopting it would only rediscover its deletion next round, abort and
+		// reset again, and land back here, once per reconcile until it is gone, reporting
+		// the same failure to the user each time. Wait for the name to free up instead,
+		// but not forever: a resource stuck terminating well past its grace period (an
+		// unreachable node, a finalizer that never clears) may never free it, so fail the
+		// launch and let the system-retry budget bound it.
+		if stuckFor, stuck := stuckTerminating(o, config.GetK8sPluginConfig().TerminatingResourceGracePeriod.Duration); stuck {
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(
+				codePreviousResourceStuckTerminating,
+				fmt.Sprintf("previous resource [%s] is still terminating %s past its deletion grace period",
+					client.ObjectKeyFromObject(o), stuckFor.Round(time.Second)),
+				nil)), nil
+		}
+		return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResources(
+			time.Now(), pluginsCore.DefaultPhaseVersion, "waiting for the previous resource to be deleted")), nil
+	}
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
 		if k8serrors.IsForbidden(err) {
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil)), nil
@@ -140,6 +179,30 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 	return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "task submitted to K8s")), nil
 }
 
+// canAdoptExisting reports whether the resource a launch collided with can stand in for
+// the one it meant to create: it is there and not being deleted. That is the resource of
+// a launch whose state did not persist. A resource on its way out is not, and neither is
+// one that cannot be read; the next round can tell. o is overwritten with what the
+// cluster holds under its name.
+func (pm *PluginManager) canAdoptExisting(ctx context.Context, o client.Object) bool {
+	if err := pm.kubeClient.GetClient().Get(ctx, client.ObjectKeyFromObject(o), o); err != nil {
+		return false
+	}
+	return o.GetDeletionTimestamp() == nil
+}
+
+// stuckTerminating reports how long o has been terminating past the end of its deletion
+// grace period, and whether that exceeds gracePeriod. A resource that could not be read
+// carries no deletion timestamp and is never stuck; a zero gracePeriod disables the bound.
+func stuckTerminating(o client.Object, gracePeriod time.Duration) (time.Duration, bool) {
+	deletion := o.GetDeletionTimestamp()
+	if gracePeriod <= 0 || deletion == nil {
+		return 0, false
+	}
+	stuckFor := time.Since(deletion.Time)
+	return stuckFor, stuckFor > gracePeriod
+}
+
 func (pm *PluginManager) getResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
 	o, err := pm.plugin.BuildIdentityResource(ctx, tCtx.TaskExecutionMetadata())
 	if err != nil {
@@ -158,13 +221,18 @@ func (pm *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCor
 		if k8serrors.IsNotFound(err) || k8serrors.IsGone(err) || k8serrors.IsResourceExpired(err) {
 			logger.Warningf(ctx, "Failed to find the Resource with name: %v. Error: %v", nsName, err)
 			failureReason := fmt.Sprintf("resource not found, name [%s]. reason: %s", nsName.String(), err.Error())
-			return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure("ResourceDeletedExternally", failureReason, nil)), nil
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(codeResourceDeletedExternally, failureReason, nil)), nil
 		}
 		logger.Warningf(ctx, "Failed to retrieve Resource Details with name: %v. Error: %v", nsName, err)
 		return pluginsCore.UnknownTransition, err
 	}
 
-	pCtx := newPluginContext(tCtx, k8sPluginState, pm.kubeClient.GetClient())
+	reader := actionReader{
+		Reader:    pm.kubeClient.GetClient(),
+		namespace: o.GetNamespace(),
+		podLabels: flytek8s.AttemptIdentityLabels(tCtx.TaskExecutionMetadata()),
+	}
+	pCtx := newPluginContext(tCtx, k8sPluginState, reader)
 	p, err := pm.plugin.GetTaskPhase(ctx, pCtx, o)
 	if err != nil {
 		logger.Warnf(ctx, "failed to check status of resource in plugin [%s], with error: %s", pm.GetID(), err.Error())
@@ -211,11 +279,6 @@ func (pm *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCor
 			return pluginsCore.UnknownTransition, err
 		}
 		return pluginsCore.DoTransition(p), nil
-	}
-
-	if !p.Phase().IsTerminal() && o.GetDeletionTimestamp() != nil {
-		failureReason := fmt.Sprintf("object [%s] terminated unexpectedly in the background", nsName.String())
-		return pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure("UnexpectedObjectDeletion", failureReason, nil)), nil
 	}
 
 	return pluginsCore.DoTransition(p), nil
@@ -270,6 +333,8 @@ func (pm *PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecut
 			lastEventUpdate,
 			lastEventRecordedAt,
 		)
+		phaseInfo = pm.classifyExternalTermination(resource, phaseInfo)
+		phaseInfo = pm.classifyGpuFailure(ctx, tCtx, resource, phaseInfo)
 		transition.SetInfo(phaseInfo)
 	}
 
@@ -331,21 +396,23 @@ func (pm *PluginManager) attachRecentObjectEvents(
 		return phaseInfo, lastEventUpdate, lastEventRecordedAt
 	}
 
-	objectKey := watchedObjectKey{
-		Namespace: resource.GetNamespace(),
-		Name:      resource.GetName(),
-		Kind:      resource.GetObjectKind().GroupVersionKind().Kind,
-	}
-	recentEvents := pm.eventWatcher.List(objectKey, lastEventUpdate, lastEventRecordedAt)
+	recentEvents := pm.eventWatcher.List(objectKeyFor(resource), lastEventUpdate, lastEventRecordedAt)
 	if len(recentEvents) == 0 {
 		return phaseInfo, lastEventUpdate, lastEventRecordedAt
 	}
 
+	// A reason carries its GPU fault as data only when the event passes the same trust
+	// rule classification applies, so nobody downstream has to read it out of the text.
+	pod, isPod := gpuFaultPod(resource)
 	for _, event := range recentEvents {
-		info.AdditionalReasons = append(info.AdditionalReasons, pluginsCore.ReasonInfo{
+		reason := pluginsCore.ReasonInfo{
 			Reason:     event.Message,
 			OccurredAt: &event.CreatedAt,
-		})
+		}
+		if isPod {
+			reason.GpuFault = gpufault.FromPodEvent(asPodEvent(event), pod)
+		}
+		info.AdditionalReasons = append(info.AdditionalReasons, reason)
 		lastEventUpdate = event.CreatedAt
 		lastEventRecordedAt = event.RecordedAt
 	}
@@ -355,6 +422,433 @@ func (pm *PluginManager) attachRecentObjectEvents(
 	}
 
 	return phaseInfo, lastEventUpdate, lastEventRecordedAt
+}
+
+func objectKeyFor(resource client.Object) watchedObjectKey {
+	return watchedObjectKey{
+		Namespace: resource.GetNamespace(),
+		Name:      resource.GetName(),
+		Kind:      resource.GetObjectKind().GroupVersionKind().Kind,
+	}
+}
+
+// observedFault is a fault recorded against one pod, kept with the times that order it and
+// the pod it was observed on. The pod name is what tells the user which worker of a
+// distributed job the fault happened on.
+type observedFault struct {
+	fault *core.GpuFault
+	// createdAt is when the fault was first recorded, which is when it happened. It is
+	// what orders faults gathered from several pods into the single sequence
+	// ClassifyFailure expects, so that the first fault of a severity is the earliest.
+	createdAt time.Time
+	podName   string
+}
+
+// classifyGpuFailure folds the GPU faults recorded against a failed attempt's pods into
+// the failure the plugin reported, so that a fault the node saw becomes the code and the
+// message the user reads. Anything that is not a failure is left alone.
+//
+// The pods it looks at are the tracked resource itself when the plugin tracks a Pod, and
+// otherwise the child pods the plugin names through k8s.ChildPodDiscovery. A plugin that
+// tracks a CRD and does not implement that interface contributes no pods and so no faults,
+// which is exactly what it did before the interface existed.
+func (pm *PluginManager) classifyGpuFailure(
+	ctx context.Context,
+	tCtx pluginsCore.TaskExecutionContext,
+	resource client.Object,
+	phaseInfo pluginsCore.PhaseInfo,
+) pluginsCore.PhaseInfo {
+	if pm.eventWatcher == nil || resource == nil || !phaseInfo.Phase().IsFailure() {
+		return phaseInfo
+	}
+
+	// Every event cached for a pod, not only the ones since the last watermark: the Xid
+	// that killed the task is usually recorded rounds before the pod's status catches up
+	// with it, and by then the watermark has moved past it. What bounds the search is the
+	// identity and the recency of each event.
+	//
+	// The attempt's own failure time is what a child pod's anchor is bounded by, and what
+	// stands in for a pod that offers nothing better. Every CRD plugin stamps it with the
+	// time of the reconcile that noticed the failure rather than with anything the kubelet
+	// recorded, which is why each pod is anchored on itself below.
+	attemptFailedAt := phaseInfoOccurredAt(phaseInfo)
+
+	// A plugin that tracks the Pod is looking at the pod the failure is already reported
+	// against, so naming it again would tell the user nothing. Only a CRD's child pods
+	// need naming, which is what namesTheFaultingPod tracks.
+	var observed []observedFault
+	namesTheFaultingPod := false
+	if pod, isPod := resource.(*v1.Pod); isPod {
+		observed = pm.faultsOnPod(
+			ctx, objectKeyFor(resource), gpufault.Pod{UID: string(pod.UID), NodeName: pod.Spec.NodeName}, flytek8s.PodFailureTime(pod, attemptFailedAt))
+	} else {
+		observed = pm.faultsOnChildPods(ctx, tCtx, resource, attemptFailedAt)
+		namesTheFaultingPod = true
+	}
+	if len(observed) == 0 {
+		return phaseInfo
+	}
+
+	// ClassifyFailure reads the list as a sequence in time, taking the first fault of the
+	// severity it settles on. Faults gathered from several pods arrive grouped by pod, so
+	// they have to be put back in order for first to mean earliest. The order is on when
+	// each fault was first recorded, not on when it was last seen: a fault that is still
+	// repeating has a later last observation than a one-shot fault that followed it, and
+	// ordering on that would let a downstream symptom outrank the root cause.
+	sort.SliceStable(observed, func(i, j int) bool {
+		return observed[i].createdAt.Before(observed[j].createdAt)
+	})
+
+	faults := make([]*core.GpuFault, 0, len(observed))
+	for _, o := range observed {
+		faults = append(faults, o.fault)
+	}
+
+	classified := gpufault.ClassifyFailure(phaseInfo, faults)
+	if namesTheFaultingPod {
+		classified = attachFaultingPod(ctx, classified, observed)
+	}
+	return classified
+}
+
+// attachFaultingPod names the one pod whose fault the classification settled on. The fault
+// sentence carries the Xid, the GPU and the node but not the pod, which on a job with many
+// workers is not enough to act on, and the pod is not part of the fault contract itself
+// because a fault reported as an event on a pod already says which pod it is about to
+// anyone reading the event.
+//
+// Only the fault that decided the verdict is named. Naming every pod that saw any fault
+// would put a misleading reason on a failure the faults did not explain, for example a
+// plain OOMKilled that a warning happened to coincide with, and would emit one cluster
+// event per pod when a whole node's worth of GPUs faults at once.
+func attachFaultingPod(
+	ctx context.Context,
+	phaseInfo pluginsCore.PhaseInfo,
+	observed []observedFault,
+) pluginsCore.PhaseInfo {
+	info := phaseInfo.Info()
+
+	// The fault the classification settled on is the one it put on the error. Its presence
+	// is the only reliable sign that a fault was folded in: the code is not, because
+	// ClassifyFailure only replaces a code the plugin had no real opinion about, and the
+	// CRD plugins all report codes of their own (TaskFailedWithError, DownstreamSystemError,
+	// a JobSet condition reason) which it correctly leaves alone.
+	settled := phaseInfo.Err().GetGpuFault()
+	if info == nil || settled == nil {
+		return phaseInfo
+	}
+
+	// A warning rides along as data without deciding anything, so the failure is still
+	// whatever the plugin said it was. Pointing at a pod there would send the user after
+	// hardware that did not cause their failure.
+	if fault, _ := gpufault.FromProto(settled); fault.Severity == gpufault.SeverityWarn {
+		return phaseInfo
+	}
+
+	// Matching the settled fault back by identity finds the pod it came from without
+	// repeating the precedence rules. It holds only while ClassifyFailure passes the very
+	// same fault through rather than a copy of it, which is pinned by a test.
+	for _, o := range observed {
+		if o.fault != settled || o.podName == "" {
+			continue
+		}
+		occurredAt := o.createdAt
+		info.AdditionalReasons = append(info.AdditionalReasons, pluginsCore.ReasonInfo{
+			Reason:     fmt.Sprintf("GPU fault recorded on pod %s", o.podName),
+			OccurredAt: &occurredAt,
+		})
+		return phaseInfo
+	}
+
+	// The fault came from one of these pods, so failing to find it again means the identity
+	// the match relies on has been broken upstream. Say so rather than quietly dropping the
+	// one piece of information that tells the user which worker to look at.
+	logger.Warnf(ctx, "GPU fault classified for %s but no observed pod matched it; the faulting pod cannot be named",
+		phaseInfo.Err().GetCode())
+	return phaseInfo
+}
+
+// faultsOnChildPods gathers the faults recorded against the pods an operator expanded from
+// the resource this plugin tracks. A plugin that cannot name its child pods, either because
+// it does not implement the interface or because it declined for this resource, contributes
+// nothing: there is no safe wider search, since an operator's child pod names carry a random
+// suffix and the events are cached under those names.
+func (pm *PluginManager) faultsOnChildPods(
+	ctx context.Context,
+	tCtx pluginsCore.TaskExecutionContext,
+	resource client.Object,
+	failureAt time.Time,
+) []observedFault {
+	discovery, ok := pm.plugin.(k8s.ChildPodDiscovery)
+	if !ok || tCtx == nil {
+		return nil
+	}
+
+	tracked := fmt.Sprintf("%s/%s", resource.GetNamespace(), resource.GetName())
+
+	selector, err := discovery.ChildPods(ctx, tCtx.TaskExecutionMetadata(), resource)
+	if err != nil {
+		logger.Warnf(ctx, "plugin [%s] failed to name the child pods of %s: %v", pm.GetID(), tracked, err)
+		return nil
+	}
+	if selector == nil {
+		logger.Debugf(ctx, "plugin [%s] did not name the child pods of %s, so its GPU faults are not classified",
+			pm.GetID(), tracked)
+		return nil
+	}
+
+	podList := &v1.PodList{}
+	listOptions := []client.ListOption{
+		client.InNamespace(resource.GetNamespace()),
+		client.MatchingLabelsSelector{Selector: selector},
+	}
+	if err := pm.kubeClient.GetClient().List(ctx, podList, listOptions...); err != nil {
+		logger.Warnf(ctx, "failed to list the child pods of %s for GPU fault classification: %v", tracked, err)
+		return nil
+	}
+	if len(podList.Items) == 0 {
+		// The pods are gone by the time the failure is classified, most often because the
+		// operator tore them down with the job. Nothing can be recovered: the events are
+		// cached under pod names that are not derivable without the pods.
+		logger.Debugf(ctx, "no child pods left for %s matching %s, so any GPU fault on them is not classified",
+			tracked, selector.String())
+		return nil
+	}
+
+	var observed []observedFault
+	for i := range podList.Items {
+		pod := &podList.Items[i]
+		// A worker that finished its work cannot be the reason the job failed. It may
+		// still have logged a fault mid-run, and crediting that to another pod's failure
+		// would turn a plain user error into a hardware one. A pod that is still running
+		// is kept: a worker wedged on a GPU that fell off the bus is exactly the case
+		// this path exists for.
+		if podSucceeded(pod) {
+			continue
+		}
+		podKey := watchedObjectKey{Namespace: pod.Namespace, Name: pod.Name, Kind: "Pod"}
+		observed = append(observed, pm.faultsOnPod(ctx, podKey, gpufault.Pod{UID: string(pod.UID), NodeName: pod.Spec.NodeName}, childPodFailureTime(pod, failureAt))...)
+	}
+	return observed
+}
+
+// podSucceeded reports whether this pod finished its work. The phase is the kubelet's own
+// verdict; the container checks below catch the pod whose work is done but whose phase has
+// not caught up, or never will.
+//
+// What settles it is the container running the task's own work. A worker that finished
+// cleanly can be held Running indefinitely by a sidecar that does not know to stop, which
+// is what a legacy-injected service mesh proxy does, and judging such a pod by all its
+// containers would call it unfinished forever. The reverse matters just as much: a helper
+// container that exited first must not make a pod look finished while the real work is
+// still running, or still crash-looping.
+//
+// Only a declared primary container counts. When nobody declared one there is nothing to
+// tell the work apart from its helpers, so the older rule stands: every container has to
+// have exited cleanly.
+func podSucceeded(pod *v1.Pod) bool {
+	if pod.Status.Phase == v1.PodSucceeded {
+		return true
+	}
+	if pod.Status.Phase != v1.PodRunning || len(pod.Status.ContainerStatuses) == 0 {
+		return false
+	}
+
+	if primary := flytek8s.DeclaredPrimaryContainerName(pod); primary != "" {
+		for _, status := range pod.Status.ContainerStatuses {
+			if status.Name != primary {
+				continue
+			}
+			terminated := status.State.Terminated
+			return terminated != nil && terminated.ExitCode == 0
+		}
+		// The declared primary is not among the statuses yet. Nothing is known about the
+		// work, so fall through rather than guess.
+	}
+
+	for _, status := range pod.Status.ContainerStatuses {
+		terminated := status.State.Terminated
+		if terminated == nil || terminated.ExitCode != 0 {
+			return false
+		}
+	}
+	return true
+}
+
+// childPodFailureTime is podFailureTime bounded by the attempt's own failure.
+//
+// A child pod is anchored on itself, so a worker that died an hour before the operator
+// admitted the job had failed is judged against its own death, which is the whole point of
+// anchoring per pod. What it must not do is anchor later than the failure: an operator
+// tearing its pods down long after the job failed would otherwise let faults recorded in
+// the meantime explain it, and the slack after the failure is deliberately small. The risk
+// the earlier direction leaves, a fault from a pod's earlier life explaining an unrelated
+// failure, is what excluding succeeded pods above bounds.
+func childPodFailureTime(pod *v1.Pod, failureAt time.Time) time.Time {
+	anchor := flytek8s.PodFailureTime(pod, failureAt)
+
+	// A plugin that reported no failure time at all still has to be bounded, or a pod the
+	// operator has not finished tearing down anchors at the moment of this reconcile and
+	// sweeps in every fault the node has recorded since. Now is the closest thing to the
+	// failure there is in that case, and PodFailureTime has already used it as its own last
+	// resort, so the two agree.
+	bound := failureAt
+	if bound.IsZero() {
+		bound = time.Now()
+	}
+	if anchor.After(bound) {
+		return bound
+	}
+	return anchor
+}
+
+// faultsOnPod reads the faults recorded against one pod.
+//
+// It takes every event cached for the pod, not only the ones since the last watermark: the
+// Xid that killed the task is usually recorded rounds before the pod's status catches up
+// with it, and by then the watermark has moved past it. What bounds the search is the
+// identity and the recency of each event, checked below.
+func (pm *PluginManager) faultsOnPod(
+	ctx context.Context,
+	podKey watchedObjectKey,
+	pod gpufault.Pod,
+	failureAt time.Time,
+) []observedFault {
+	events := pm.eventWatcher.List(podKey, time.Time{}, time.Time{})
+	if len(events) == 0 {
+		return nil
+	}
+
+	observed := make([]observedFault, 0, len(events))
+	for _, event := range events {
+		// Only events the GPU fault emitter wrote, recognized by their reason, are
+		// considered; the message prefix alone is free text anyone can put in an event.
+		if !gpufault.IsFaultReason(event.Reason) {
+			continue
+		}
+		// Events are cached under the pod's namespace and name, which a recreated pod
+		// reuses, so the fault has to have been recorded against this very pod, and
+		// from the node the pod ran on. FromPodEvent is where those checks live, along
+		// with what is accepted when the pod is gone and its UID and node are unknown.
+		fault := gpufault.FromPodEvent(asPodEvent(event), pod)
+		if fault == nil {
+			if pod.NodeName != "" && event.ReportingNode != pod.NodeName {
+				logger.Debugf(context.TODO(),
+					"ignoring GPU fault event %q on %s: reported from node %q, not the pod's node %q",
+					event.Reason, podKey.Name, event.ReportingNode, pod.NodeName)
+			}
+			continue
+		}
+		if !gpufault.RelevantToFailure(event.CreatedAt, event.LastObservedAt, failureAt) {
+			logger.Debugf(ctx,
+				"ignoring GPU fault event %q on %s: active %s to %s, which does not reach the failure at %s",
+				event.Reason, podKey.Name, event.CreatedAt, event.LastObservedAt, failureAt)
+			continue
+		}
+		observed = append(observed, observedFault{fault: fault, createdAt: event.CreatedAt, podName: podKey.Name})
+	}
+
+	return observed
+}
+
+// gpuFaultPod is the pod a GPU fault event would be credited to, as gpufault needs it.
+// It reports false for anything that is not a pod, which never has faults of its own.
+func gpuFaultPod(resource client.Object) (gpufault.Pod, bool) {
+	pod, isPod := resource.(*v1.Pod)
+	if !isPod {
+		return gpufault.Pod{}, false
+	}
+	return gpufault.Pod{UID: string(pod.GetUID()), NodeName: pod.Spec.NodeName}, true
+}
+
+// asPodEvent is the part of a cached event the GPU fault trust rule reads.
+func asPodEvent(event *eventInfo) gpufault.PodEvent {
+	return gpufault.PodEvent{
+		Reason:        event.Reason,
+		Message:       event.Message,
+		RegardingUID:  string(event.RegardingUID),
+		ReportingNode: event.ReportingNode,
+	}
+}
+
+// classifyExternalTermination folds what an external controller left behind on a pod it
+// stopped into the failure this manager reported for the pod's disappearance, so the user
+// reads that controller's reason (for Kueue, why the Workload was preempted) instead of a
+// bare deletion. Only the two failures the manager reports without looking at the pod are
+// touched; a pod the plugin itself classified is left alone, and so is anything that is
+// not a failed pod.
+//
+// A pod caught on its way out still carries the reason as its TerminationTarget
+// condition. A pod that is already gone left only its events behind, cached under a name
+// a replacement pod reuses, so its Stopped event is credited only when the event's
+// regarding UID is the pod's, or when the pod's UID is unknown because it vanished before
+// this round reached it (the same trade gpufault.FromPodEvent makes for a fault).
+func (pm *PluginManager) classifyExternalTermination(
+	resource client.Object,
+	phaseInfo pluginsCore.PhaseInfo,
+) pluginsCore.PhaseInfo {
+	if resource == nil || !phaseInfo.Phase().IsFailure() || phaseInfo.Err() == nil {
+		return phaseInfo
+	}
+	pod, isPod := resource.(*v1.Pod)
+	if !isPod {
+		return phaseInfo
+	}
+
+	switch phaseInfo.Err().GetCode() {
+	case codeUnexpectedObjectDeletion:
+		c := flytek8s.GetTerminationTarget(pod.Status)
+		if c == nil {
+			return phaseInfo
+		}
+		return pluginsCore.PhaseInfoSystemRetryableFailure(
+			flytek8s.ExternalTerminationCode(c),
+			flytek8s.ExternalTerminationMessage(c),
+			phaseInfo.Info(),
+		)
+	case codeResourceDeletedExternally:
+		message, found := pm.stoppedEventMessage(pod)
+		if !found {
+			return phaseInfo
+		}
+		execErr := proto.Clone(phaseInfo.Err()).(*core.ExecutionError)
+		execErr.Message = fmt.Sprintf("%s; last event [%s]: %s", execErr.GetMessage(), stoppedEventReason, message)
+		return pluginsCore.PhaseInfoFailed(phaseInfo.Phase(), execErr, phaseInfo.Info())
+	}
+	return phaseInfo
+}
+
+// stoppedEventMessage is the message of the latest Stopped event recorded against the pod,
+// when there is one that can be credited to this pod.
+func (pm *PluginManager) stoppedEventMessage(pod *v1.Pod) (string, bool) {
+	if pm.eventWatcher == nil {
+		return "", false
+	}
+	var latest *eventInfo
+	for _, event := range pm.eventWatcher.List(objectKeyFor(pod), time.Time{}, time.Time{}) {
+		if event.Reason != stoppedEventReason || event.RegardingUID == "" {
+			continue
+		}
+		if pod.GetUID() != "" && event.RegardingUID != pod.GetUID() {
+			continue
+		}
+		if latest == nil || event.CreatedAt.After(latest.CreatedAt) {
+			latest = event
+		}
+	}
+	if latest == nil {
+		return "", false
+	}
+	return latest.Message, true
+}
+
+// phaseInfoOccurredAt is the time the plugin put on the failure, or the zero time when it
+// put none there.
+func phaseInfoOccurredAt(phaseInfo pluginsCore.PhaseInfo) time.Time {
+	if info := phaseInfo.Info(); info != nil && info.OccurredAt != nil {
+		return *info.OccurredAt
+	}
+	return time.Time{}
 }
 
 // Abort implements pluginsCore.Plugin. Called when the task should be killed/aborted.

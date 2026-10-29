@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/flyteorg/flyte/v2/dataproxy"
+	dataproxyconfig "github.com/flyteorg/flyte/v2/dataproxy/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
@@ -18,8 +19,9 @@ func main() {
 		Name:  "dataproxy-service",
 		Short: "Data Proxy Service for Flyte",
 		Setup: func(ctx context.Context, sc *app.SetupContext) error {
-			sc.Host = "0.0.0.0"
-			sc.Port = 8088
+			cfg := dataproxyconfig.GetConfig()
+			sc.Host = cfg.Server.Host
+			sc.Port = cfg.Server.Port
 
 			labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
 			dataStore, err := storage.NewDataStore(storage.GetConfig(), promutils.NewTestScope())

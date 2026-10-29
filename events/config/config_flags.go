@@ -52,6 +52,13 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "server.port"), defaultConfig.Server.Port, "Port to bind the HTTP server")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "server.host"), defaultConfig.Server.Host, "Host to bind the HTTP server")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runServiceUrl"), defaultConfig.RunServiceURL, "Base URL of the internal run service")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.url"), defaultConfig.RunService.URL, "Internal run service base URL")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.type"), string(defaultConfig.RunService.Auth.Type), "Internal run service authentication type")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.issuerUrl"), defaultConfig.RunService.Auth.IssuerURL, "Internal run service OAuth 2.0 issuer URL")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.clientId"), defaultConfig.RunService.Auth.ClientID, "Internal run service OAuth 2.0 client ID")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.clientSecret"), defaultConfig.RunService.Auth.ClientSecret, "Internal run service OAuth 2.0 client secret")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.clientSecretFile"), defaultConfig.RunService.Auth.ClientSecretFile, "File containing the internal run service OAuth 2.0 client secret")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "runService.auth.scopes"), defaultConfig.RunService.Auth.Scopes, "Internal run service OAuth 2.0 scopes")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.audience"), defaultConfig.RunService.Auth.Audience, "Internal run service OAuth 2.0 token audience")
 	return cmdFlags
 }

@@ -193,6 +193,49 @@ func TestGetNormalizedAcceleratorDevice(t *testing.T) {
 	})
 }
 
+func TestGetNormalizedAcceleratorDevice_MergesDefaults(t *testing.T) {
+	t.Run("partial override keeps defaults", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratorDevices: map[string]string{
+				"T4": "custom-t4",
+			},
+		}))
+		assert.Equal(t, "custom-t4", GetNormalizedAcceleratorDevice("T4"))
+		assert.Equal(t, "nvidia-tesla-a100", GetNormalizedAcceleratorDevice("A100"))
+		assert.Equal(t, "nvidia-l4", GetNormalizedAcceleratorDevice("L4"))
+		assert.Equal(t, "tpu-v5p-slice", GetNormalizedAcceleratorDevice("V5P"))
+	})
+
+	t.Run("lowercase configured key resolves", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+			AcceleratorDevices: map[string]string{
+				"my-gpu": "custom-label",
+				"l4":     "custom-l4",
+			},
+		}))
+		assert.Equal(t, "custom-label", GetNormalizedAcceleratorDevice("my-gpu"))
+		assert.Equal(t, "custom-label", GetNormalizedAcceleratorDevice("MY-GPU"))
+		assert.Equal(t, "custom-l4", GetNormalizedAcceleratorDevice("L4"))
+		assert.Equal(t, "nvidia-tesla-t4", GetNormalizedAcceleratorDevice("T4"))
+	})
+
+	t.Run("mixed case default key resolves", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+		assert.Equal(t, "nvidia-l40s", GetNormalizedAcceleratorDevice("L40s"))
+		assert.Equal(t, "nvidia-l40s", GetNormalizedAcceleratorDevice("L40S"))
+	})
+
+	t.Run("shared device resolves to shared label", func(t *testing.T) {
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+		assert.Equal(t, "nvidia-tesla-t4-shared", GetNormalizedAcceleratorDevice("T4 shared"))
+		assert.Equal(t, "nvidia-l4-shared", GetNormalizedAcceleratorDevice("L4 SHARED"))
+		assert.Equal(t, "nvidia-a10g-shared", GetNormalizedAcceleratorDevice("A10G shared"))
+		assert.Equal(t, "nvidia-a10-shared", GetNormalizedAcceleratorDevice("a10 shared"))
+		assert.Equal(t, "nvidia-l40s-shared", GetNormalizedAcceleratorDevice("L40S shared"))
+		assert.Equal(t, "nvidia-tesla-t4", GetNormalizedAcceleratorDevice("T4"))
+	})
+}
+
 func TestGetAcceleratorResourceName(t *testing.T) {
 	t.Run("returns device class specific resource name", func(t *testing.T) {
 		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
@@ -525,5 +568,55 @@ func TestPodRequiresAccelerator(t *testing.T) {
 	t.Run("empty pod spec returns false", func(t *testing.T) {
 		podSpec := &v1.PodSpec{}
 		assert.False(t, podRequiresAccelerator(podSpec))
+	})
+}
+
+func TestPartitionResourceNames(t *testing.T) {
+	migMixedConfig(t, "nvidia.com/mig-{partition}")
+	partitioned := &core.GPUAccelerator{
+		DeviceClass:        core.GPUAccelerator_NVIDIA_GPU,
+		PartitionSizeValue: &core.GPUAccelerator_PartitionSize{PartitionSize: "1g.24gb"},
+	}
+
+	t.Run("renders the template for a partition", func(t *testing.T) {
+		assert.Equal(t, v1.ResourceName("nvidia.com/mig-1g.24gb"), getAcceleratorResourceName(partitioned))
+		assert.Equal(t, v1.ResourceName("nvidia.com/gpu"), getAcceleratorResourceName(&core.GPUAccelerator{}))
+	})
+
+	t.Run("matches rendered names only", func(t *testing.T) {
+		assert.True(t, matchesPartitionResourceName("nvidia.com/mig-{partition}", "nvidia.com/mig-1g.5gb"))
+		assert.False(t, matchesPartitionResourceName("nvidia.com/mig-{partition}", "nvidia.com/mig-"))
+		assert.False(t, matchesPartitionResourceName("nvidia.com/mig-{partition}", "nvidia.com/gpu"))
+		assert.True(t, matchesPartitionResourceName("example.com/{partition}-slice", "example.com/2x2-slice"))
+		assert.False(t, matchesPartitionResourceName("example.com/{partition}-slice", "example.com/2x2"))
+		assert.True(t, matchesPartitionResourceName("example.com/slice", "example.com/slice"))
+		assert.True(t, matchesPartitionResourceName("example.com/{partition}-{partition}", "example.com/1g-1g"))
+		assert.False(t, matchesPartitionResourceName("example.com/{partition}-{partition}", "example.com/1g-2g"))
+	})
+
+	t.Run("maps partition resources to the device class resource", func(t *testing.T) {
+		base, ok := acceleratorBaseResourceName("nvidia.com/mig-1g.5gb")
+		assert.True(t, ok)
+		assert.Equal(t, v1.ResourceName("nvidia.com/gpu"), base)
+
+		base, ok = acceleratorBaseResourceName("nvidia.com/gpu")
+		assert.True(t, ok)
+		assert.Equal(t, v1.ResourceName("nvidia.com/gpu"), base)
+
+		_, ok = acceleratorBaseResourceName(v1.ResourceCPU)
+		assert.False(t, ok)
+	})
+
+	t.Run("pod with a partition resource requires an accelerator", func(t *testing.T) {
+		assert.True(t, podRequiresAccelerator(&v1.PodSpec{Containers: []v1.Container{{
+			Resources: v1.ResourceRequirements{Limits: v1.ResourceList{"nvidia.com/mig-1g.5gb": resource.MustParse("1")}},
+		}}}))
+	})
+
+	t.Run("no template leaves partition names unrecognized", func(t *testing.T) {
+		migMixedConfig(t, "")
+		assert.Equal(t, v1.ResourceName("nvidia.com/gpu"), getAcceleratorResourceName(partitioned))
+		_, ok := acceleratorBaseResourceName("nvidia.com/mig-1g.5gb")
+		assert.False(t, ok)
 	})
 }

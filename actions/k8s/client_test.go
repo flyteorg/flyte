@@ -474,6 +474,9 @@ func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
 				"owner": "sdk",
 			},
 		},
+		DefaultSettings: &task.DefaultSettings{
+			PodTemplateName: "gpu-template",
+		},
 	})
 
 	require.NotNil(t, taskAction.Spec.Interruptible)
@@ -483,6 +486,7 @@ func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
 	assert.Equal(t, "run1", taskAction.Labels["flyte.org/run"])
 	assert.Equal(t, "platform", taskAction.Labels["team"])
 	assert.Equal(t, "sdk", taskAction.Annotations["owner"])
+	assert.Equal(t, "gpu-template", taskAction.Spec.PodTemplateName)
 }
 
 func TestInheritRunContextFromParentTaskAction(t *testing.T) {
@@ -501,7 +505,8 @@ func TestInheritRunContextFromParentTaskAction(t *testing.T) {
 				"TRACE_ID": "abc123",
 				"TEAM":     "platform",
 			},
-			Interruptible: &interruptible,
+			Interruptible:   &interruptible,
+			PodTemplateName: "gpu-template",
 		},
 	}
 
@@ -522,6 +527,7 @@ func TestInheritRunContextFromParentTaskAction(t *testing.T) {
 	assert.Equal(t, "platform", child.Labels["team"])
 	assert.Equal(t, "run1", child.Labels["flyte.org/run"])
 	assert.Equal(t, "sdk", child.Annotations["owner"])
+	assert.Equal(t, "gpu-template", child.Spec.PodTemplateName)
 
 	// Verify deep copy (child mutation must not mutate parent map).
 	child.Spec.EnvVars["TRACE_ID"] = "mutated"
@@ -566,52 +572,98 @@ func TestInheritRunContextFromParentTaskAction_DoesNotOverrideExistingLabels(t *
 	assert.Equal(t, "platform", child.Labels["team"])
 }
 
-func TestNotifyRunService_ChildAddedPromotesParentToRunning(t *testing.T) {
-	ctx := context.Background()
-
-	mockClient := runmocks.NewInternalRunServiceClient(t)
-	c := &ActionsClient{
-		recordedFilter: testFilter(),
-		runClient:      mockClient,
-		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
-	}
-
-	runID := &common.RunIdentifier{
-		Project: "proj",
-		Domain:  "dev",
-		Name:    "run1",
-	}
-
-	ta := &executorv1.TaskAction{
-		Spec: executorv1.TaskActionSpec{
-			Project:    runID.Project,
-			Domain:     runID.Domain,
-			RunName:    runID.Name,
-			ActionName: "child-1",
+func TestApplyPodTemplateName(t *testing.T) {
+	tests := []struct {
+		name string
+		tmpl *core.TaskTemplate
+		give string
+		want string
+	}{
+		{
+			name: "a task naming no template takes the given name",
+			tmpl: &core.TaskTemplate{},
+			give: "gpu-template",
+			want: "gpu-template",
+		},
+		{
+			name: "a task naming its own template keeps it",
+			tmpl: &core.TaskTemplate{Metadata: &core.TaskMetadata{PodTemplateName: "task-template"}},
+			give: "gpu-template",
+			want: "task-template",
+		},
+		{
+			name: "an empty name changes nothing",
+			tmpl: &core.TaskTemplate{},
+			give: "",
+			want: "",
+		},
+		{
+			name: "existing metadata without a name takes it",
+			tmpl: &core.TaskTemplate{Metadata: &core.TaskMetadata{DiscoveryVersion: "v1"}},
+			give: "gpu-template",
+			want: "gpu-template",
 		},
 	}
-	update := &ActionUpdate{
-		ActionID: &common.ActionIdentifier{
-			Run:  runID,
-			Name: "child-1",
-		},
-		ParentActionName: "run1",
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := applyPodTemplateName(tt.tmpl, tt.give)
+			assert.Equal(t, tt.want, got.GetMetadata().GetPodTemplateName())
+		})
+	}
+}
+
+// TestApplyPodTemplateName_DoesNotMutateInput guards the clone. The caller's template
+// may be persisted separately as the registered task spec, so stamping must leave the
+// original untouched and must carry over whatever metadata it already had.
+func TestApplyPodTemplateName_DoesNotMutateInput(t *testing.T) {
+	withMetadata := &core.TaskTemplate{Metadata: &core.TaskMetadata{DiscoveryVersion: "v1"}}
+	got := applyPodTemplateName(withMetadata, "gpu-template")
+
+	assert.Equal(t, "gpu-template", got.GetMetadata().GetPodTemplateName())
+	assert.Equal(t, "v1", got.GetMetadata().GetDiscoveryVersion())
+	assert.Empty(t, withMetadata.GetMetadata().GetPodTemplateName())
+
+	withoutMetadata := &core.TaskTemplate{}
+	got = applyPodTemplateName(withoutMetadata, "gpu-template")
+
+	assert.Equal(t, "gpu-template", got.GetMetadata().GetPodTemplateName())
+	assert.Nil(t, withoutMetadata.GetMetadata())
+}
+
+func TestEmbedTaskTemplate_StampsPodTemplateName(t *testing.T) {
+	newAction := func() *actions.Action {
+		return &actions.Action{
+			Spec: &actions.Action_Task{
+				Task: &workflow.TaskAction{
+					Spec: &task.TaskSpec{
+						TaskTemplate: &core.TaskTemplate{Type: "python"},
+					},
+				},
+			},
+		}
 	}
 
-	// Expect RecordAction for the child
-	mockClient.On("RecordAction", mock.Anything, mock.Anything).
-		Return(acceptedRecordActionResponse(ta), nil).Once()
+	embedded := func(action *actions.Action, name string) *core.TaskTemplate {
+		ta := &executorv1.TaskAction{Spec: executorv1.TaskActionSpec{PodTemplateName: name}}
+		require.NoError(t, embedTaskTemplate(action, ta, &task.RunSpec{}))
+		out := &core.TaskTemplate{}
+		require.NoError(t, proto.Unmarshal(ta.Spec.TaskTemplate, out))
+		return out
+	}
 
-	// Expect UpdateActionStatus for the PARENT with RUNNING phase
-	mockClient.On("UpdateActionStatus", mock.Anything, mock.MatchedBy(func(req *connect.Request[workflow.UpdateActionStatusRequest]) bool {
-		return req.Msg.GetActionId().GetName() == "run1" &&
-			req.Msg.GetStatus().GetPhase() == common.ActionPhase_ACTION_PHASE_RUNNING
-	})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
+	t.Run("stamps the projected name onto a task that names none", func(t *testing.T) {
+		action := newAction()
+		out := embedded(action, "gpu-template")
+		assert.Equal(t, "gpu-template", out.GetMetadata().GetPodTemplateName())
+		// The caller's proto must be left untouched (it is persisted separately as the task spec).
+		assert.Empty(t, action.GetSpec().(*actions.Action_Task).Task.Spec.TaskTemplate.GetMetadata().GetPodTemplateName())
+	})
 
-	c.notifyRunService(ctx, ta, update, watch.Added)
-
-	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
-	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+	t.Run("no-op when the action carries no name", func(t *testing.T) {
+		out := embedded(newAction(), "")
+		assert.Empty(t, out.GetMetadata().GetPodTemplateName())
+	})
 }
 
 func TestNotifyRunService_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testing.T) {

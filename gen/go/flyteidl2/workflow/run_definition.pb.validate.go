@@ -1121,6 +1121,10 @@ func (m *TaskActionMetadata) validate(all bool) error {
 
 	// no validation rules for ShortName
 
+	if m.Queue != nil {
+		// no validation rules for Queue
+	}
+
 	if len(errors) > 0 {
 		return TaskActionMetadataMultiError(errors)
 	}
@@ -1882,6 +1886,64 @@ func (m *ActionStatus) validate(all bool) error {
 
 	// no validation rules for CacheStatus
 
+	if all {
+		switch v := interface{}(m.GetQueuedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionStatusValidationError{
+					field:  "QueuedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionStatusValidationError{
+					field:  "QueuedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetQueuedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionStatusValidationError{
+				field:  "QueuedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetWorkerAssignedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionStatusValidationError{
+					field:  "WorkerAssignedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionStatusValidationError{
+					field:  "WorkerAssignedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetWorkerAssignedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionStatusValidationError{
+				field:  "WorkerAssignedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if m.EndTime != nil {
 
 		if all {
@@ -2339,6 +2401,37 @@ func (m *ErrorInfo) validate(all bool) error {
 	// no validation rules for Message
 
 	// no validation rules for Kind
+
+	// no validation rules for Code
+
+	if all {
+		switch v := interface{}(m.GetGpuFault()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ErrorInfoValidationError{
+					field:  "GpuFault",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ErrorInfoValidationError{
+					field:  "GpuFault",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetGpuFault()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ErrorInfoValidationError{
+				field:  "GpuFault",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return ErrorInfoMultiError(errors)
@@ -3634,6 +3727,35 @@ func (m *ClusterEvent) validate(all bool) error {
 	// no validation rules for SourceComponent
 
 	// no validation rules for Count
+
+	if all {
+		switch v := interface{}(m.GetGpuFault()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClusterEventValidationError{
+					field:  "GpuFault",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClusterEventValidationError{
+					field:  "GpuFault",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetGpuFault()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterEventValidationError{
+				field:  "GpuFault",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return ClusterEventMultiError(errors)

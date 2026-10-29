@@ -15,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	stdutils "github.com/flyteorg/flyte/v2/flytestdlib/utils"
 	clusteredpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
 
@@ -28,7 +29,7 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	}
 
 	var spec clusteredpb.ClusteredTaskSpec
-	if err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &spec); err != nil { //nolint:staticcheck
+	if err = stdutils.UnmarshalStructToPb(taskTemplate.GetCustom(), &spec); err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid ClusteredTaskSpec: %v", err)
 	}
 
@@ -62,7 +63,10 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	objectMeta.Labels = utils.UnionMaps(cfg.DefaultLabels, objectMeta.Labels,
 		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 	objectMeta.Annotations = utils.UnionMaps(cfg.DefaultAnnotations, objectMeta.Annotations,
-		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
+		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()),
+		// Applied last, naming the container doing the task's own work on every child pod,
+		// so a reader can tell it from an injected sidecar that may outlive it.
+		map[string]string{flytek8s.PrimaryContainerKey: primaryContainerName})
 
 	// The SDK is responsible for setting container.Command to the entrypoint module
 	// (python -m flyte.distributed._entrypoint) at serde time. The plugin stays
@@ -110,6 +114,23 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 		},
 	}
 
+	if spec.GetFailurePolicy().GetRestartOnHostMaintenance() {
+		// Fail the Job with reason PodFailurePolicy when a pod is terminated by an
+		// involuntary disruption (DisruptionTarget: drain, eviction API, preemption,
+		// taint eviction). The net effect matches backoffLimit=0, but the distinct
+		// failure reason lets the JobSet failurePolicy rule (failure.go) restart the
+		// set without charging maxRestarts. Requires RestartPolicyNever (set above).
+		jobSpec.PodFailurePolicy = &batchv1.PodFailurePolicy{
+			Rules: []batchv1.PodFailurePolicyRule{{
+				Action: batchv1.PodFailurePolicyActionFailJob,
+				OnPodConditions: []batchv1.PodFailurePolicyOnPodConditionsPattern{{
+					Type:   corev1.DisruptionTarget,
+					Status: corev1.ConditionTrue,
+				}},
+			}},
+		}
+	}
+
 	failurePolicy, err := buildFailurePolicy(&spec)
 	if err != nil {
 		return nil, err
@@ -126,13 +147,13 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      jobSetName,
 			Namespace: taskCtx.TaskExecutionMetadata().GetNamespace(),
-			Labels: map[string]string{
+			Labels: utils.UnionMaps(objectMeta.Labels, map[string]string{
 				"flyte.org/execution": sanitizeLabelValue(taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().GetNodeExecutionId().GetExecutionId().GetName()),
-			},
-			Annotations: map[string]string{
+			}),
+			Annotations: utils.UnionMaps(objectMeta.Annotations, map[string]string{
 				"flyte.org/task-type":      taskType,
 				primaryContainerAnnotation: primaryContainerName,
-			},
+			}),
 		},
 		Spec: jobsetv1alpha2.JobSetSpec{
 			Network: &jobsetv1alpha2.Network{

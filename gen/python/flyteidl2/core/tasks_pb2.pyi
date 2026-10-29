@@ -5,6 +5,7 @@ from flyteidl2.core import identifier_pb2 as _identifier_pb2_1
 from flyteidl2.core import interface_pb2 as _interface_pb2
 from flyteidl2.core import literals_pb2 as _literals_pb2
 from flyteidl2.core import security_pb2 as _security_pb2
+from google.protobuf import descriptor_pb2 as _descriptor_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import struct_pb2 as _struct_pb2
 from google.protobuf import wrappers_pb2 as _wrappers_pb2
@@ -15,6 +16,104 @@ from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
+
+class AcceleratorModel(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    ACCELERATOR_MODEL_UNSPECIFIED: _ClassVar[AcceleratorModel]
+    NVIDIA_K80: _ClassVar[AcceleratorModel]
+    NVIDIA_M60: _ClassVar[AcceleratorModel]
+    NVIDIA_P4: _ClassVar[AcceleratorModel]
+    NVIDIA_P100: _ClassVar[AcceleratorModel]
+    NVIDIA_V100: _ClassVar[AcceleratorModel]
+    NVIDIA_T4: _ClassVar[AcceleratorModel]
+    NVIDIA_A10: _ClassVar[AcceleratorModel]
+    NVIDIA_A10G: _ClassVar[AcceleratorModel]
+    NVIDIA_A100: _ClassVar[AcceleratorModel]
+    NVIDIA_A100_80GB: _ClassVar[AcceleratorModel]
+    NVIDIA_L4: _ClassVar[AcceleratorModel]
+    NVIDIA_L40S: _ClassVar[AcceleratorModel]
+    NVIDIA_H100: _ClassVar[AcceleratorModel]
+    NVIDIA_H100_MEGA_80GB: _ClassVar[AcceleratorModel]
+    NVIDIA_H200: _ClassVar[AcceleratorModel]
+    NVIDIA_B200: _ClassVar[AcceleratorModel]
+    NVIDIA_GB200: _ClassVar[AcceleratorModel]
+    NVIDIA_GB10: _ClassVar[AcceleratorModel]
+    NVIDIA_RTX_PRO_6000: _ClassVar[AcceleratorModel]
+    NVIDIA_RTX_PRO_4500: _ClassVar[AcceleratorModel]
+    GOOGLE_TPU_V5E: _ClassVar[AcceleratorModel]
+    GOOGLE_TPU_V5P: _ClassVar[AcceleratorModel]
+    GOOGLE_TPU_V6E: _ClassVar[AcceleratorModel]
+    AMAZON_INF1: _ClassVar[AcceleratorModel]
+    AMAZON_INF2: _ClassVar[AcceleratorModel]
+    AMAZON_TRN1: _ClassVar[AcceleratorModel]
+    AMAZON_TRN1N: _ClassVar[AcceleratorModel]
+    AMAZON_TRN2: _ClassVar[AcceleratorModel]
+    AMAZON_TRN2U: _ClassVar[AcceleratorModel]
+    AMD_MI100: _ClassVar[AcceleratorModel]
+    AMD_MI210: _ClassVar[AcceleratorModel]
+    AMD_MI250: _ClassVar[AcceleratorModel]
+    AMD_MI250X: _ClassVar[AcceleratorModel]
+    AMD_MI300A: _ClassVar[AcceleratorModel]
+    AMD_MI300X: _ClassVar[AcceleratorModel]
+    AMD_MI325X: _ClassVar[AcceleratorModel]
+    AMD_MI350X: _ClassVar[AcceleratorModel]
+    AMD_MI355X: _ClassVar[AcceleratorModel]
+    HABANA_GAUDI1: _ClassVar[AcceleratorModel]
+    APPLE_SILICON_GPU: _ClassVar[AcceleratorModel]
+
+class WorkerKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    WORKER_KIND_UNSPECIFIED: _ClassVar[WorkerKind]
+    WORKER_KIND_SANDBOX: _ClassVar[WorkerKind]
+    WORKER_KIND_MICROVM: _ClassVar[WorkerKind]
+    WORKER_KIND_REUSABLE: _ClassVar[WorkerKind]
+ACCELERATOR_MODEL_UNSPECIFIED: AcceleratorModel
+NVIDIA_K80: AcceleratorModel
+NVIDIA_M60: AcceleratorModel
+NVIDIA_P4: AcceleratorModel
+NVIDIA_P100: AcceleratorModel
+NVIDIA_V100: AcceleratorModel
+NVIDIA_T4: AcceleratorModel
+NVIDIA_A10: AcceleratorModel
+NVIDIA_A10G: AcceleratorModel
+NVIDIA_A100: AcceleratorModel
+NVIDIA_A100_80GB: AcceleratorModel
+NVIDIA_L4: AcceleratorModel
+NVIDIA_L40S: AcceleratorModel
+NVIDIA_H100: AcceleratorModel
+NVIDIA_H100_MEGA_80GB: AcceleratorModel
+NVIDIA_H200: AcceleratorModel
+NVIDIA_B200: AcceleratorModel
+NVIDIA_GB200: AcceleratorModel
+NVIDIA_GB10: AcceleratorModel
+NVIDIA_RTX_PRO_6000: AcceleratorModel
+NVIDIA_RTX_PRO_4500: AcceleratorModel
+GOOGLE_TPU_V5E: AcceleratorModel
+GOOGLE_TPU_V5P: AcceleratorModel
+GOOGLE_TPU_V6E: AcceleratorModel
+AMAZON_INF1: AcceleratorModel
+AMAZON_INF2: AcceleratorModel
+AMAZON_TRN1: AcceleratorModel
+AMAZON_TRN1N: AcceleratorModel
+AMAZON_TRN2: AcceleratorModel
+AMAZON_TRN2U: AcceleratorModel
+AMD_MI100: AcceleratorModel
+AMD_MI210: AcceleratorModel
+AMD_MI250: AcceleratorModel
+AMD_MI250X: AcceleratorModel
+AMD_MI300A: AcceleratorModel
+AMD_MI300X: AcceleratorModel
+AMD_MI325X: AcceleratorModel
+AMD_MI350X: AcceleratorModel
+AMD_MI355X: AcceleratorModel
+HABANA_GAUDI1: AcceleratorModel
+APPLE_SILICON_GPU: AcceleratorModel
+WORKER_KIND_UNSPECIFIED: WorkerKind
+WORKER_KIND_SANDBOX: WorkerKind
+WORKER_KIND_MICROVM: WorkerKind
+WORKER_KIND_REUSABLE: WorkerKind
+ACCELERATOR_NAME_FIELD_NUMBER: _ClassVar[int]
+accelerator_name: _descriptor.FieldDescriptor
 
 class Resources(_message.Message):
     __slots__ = ["requests", "limits"]
@@ -46,7 +145,7 @@ class Resources(_message.Message):
     def __init__(self, requests: _Optional[_Iterable[_Union[Resources.ResourceEntry, _Mapping]]] = ..., limits: _Optional[_Iterable[_Union[Resources.ResourceEntry, _Mapping]]] = ...) -> None: ...
 
 class GPUAccelerator(_message.Message):
-    __slots__ = ["device", "unpartitioned", "partition_size", "device_class"]
+    __slots__ = ["device", "unpartitioned", "partition_size", "device_class", "accelerator_model"]
     class DeviceClass(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         NVIDIA_GPU: _ClassVar[GPUAccelerator.DeviceClass]
@@ -54,20 +153,24 @@ class GPUAccelerator(_message.Message):
         AMAZON_NEURON: _ClassVar[GPUAccelerator.DeviceClass]
         AMD_GPU: _ClassVar[GPUAccelerator.DeviceClass]
         HABANA_GAUDI: _ClassVar[GPUAccelerator.DeviceClass]
+        APPLE_SILICON: _ClassVar[GPUAccelerator.DeviceClass]
     NVIDIA_GPU: GPUAccelerator.DeviceClass
     GOOGLE_TPU: GPUAccelerator.DeviceClass
     AMAZON_NEURON: GPUAccelerator.DeviceClass
     AMD_GPU: GPUAccelerator.DeviceClass
     HABANA_GAUDI: GPUAccelerator.DeviceClass
+    APPLE_SILICON: GPUAccelerator.DeviceClass
     DEVICE_FIELD_NUMBER: _ClassVar[int]
     UNPARTITIONED_FIELD_NUMBER: _ClassVar[int]
     PARTITION_SIZE_FIELD_NUMBER: _ClassVar[int]
     DEVICE_CLASS_FIELD_NUMBER: _ClassVar[int]
+    ACCELERATOR_MODEL_FIELD_NUMBER: _ClassVar[int]
     device: str
     unpartitioned: bool
     partition_size: str
     device_class: GPUAccelerator.DeviceClass
-    def __init__(self, device: _Optional[str] = ..., unpartitioned: bool = ..., partition_size: _Optional[str] = ..., device_class: _Optional[_Union[GPUAccelerator.DeviceClass, str]] = ...) -> None: ...
+    accelerator_model: AcceleratorModel
+    def __init__(self, device: _Optional[str] = ..., unpartitioned: bool = ..., partition_size: _Optional[str] = ..., device_class: _Optional[_Union[GPUAccelerator.DeviceClass, str]] = ..., accelerator_model: _Optional[_Union[AcceleratorModel, str]] = ...) -> None: ...
 
 class SharedMemory(_message.Message):
     __slots__ = ["mount_path", "mount_name", "size_limit"]
@@ -104,7 +207,7 @@ class RuntimeMetadata(_message.Message):
     def __init__(self, type: _Optional[_Union[RuntimeMetadata.RuntimeType, str]] = ..., version: _Optional[str] = ..., flavor: _Optional[str] = ...) -> None: ...
 
 class TaskMetadata(_message.Message):
-    __slots__ = ["discoverable", "runtime", "timeout", "retries", "discovery_version", "deprecated_error_message", "interruptible", "cache_serializable", "tags", "pod_template_name", "cache_ignore_input_vars", "is_eager", "generates_deck", "metadata", "debuggable", "log_links", "image_build_run", "is_entrypoint", "code_bundle_uri", "timeouts", "produces_artifacts"]
+    __slots__ = ["discoverable", "runtime", "timeout", "retries", "discovery_version", "deprecated_error_message", "interruptible", "cache_serializable", "tags", "pod_template_name", "cache_ignore_input_vars", "is_eager", "generates_deck", "metadata", "debuggable", "log_links", "image_build_run", "is_entrypoint", "code_bundle_uri", "timeouts", "produces_artifacts", "cache_max_age"]
     class TagsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -133,6 +236,7 @@ class TaskMetadata(_message.Message):
     CODE_BUNDLE_URI_FIELD_NUMBER: _ClassVar[int]
     TIMEOUTS_FIELD_NUMBER: _ClassVar[int]
     PRODUCES_ARTIFACTS_FIELD_NUMBER: _ClassVar[int]
+    CACHE_MAX_AGE_FIELD_NUMBER: _ClassVar[int]
     discoverable: bool
     runtime: RuntimeMetadata
     timeout: _duration_pb2.Duration
@@ -154,10 +258,11 @@ class TaskMetadata(_message.Message):
     code_bundle_uri: str
     timeouts: _literals_pb2.TimeoutStrategy
     produces_artifacts: bool
-    def __init__(self, discoverable: bool = ..., runtime: _Optional[_Union[RuntimeMetadata, _Mapping]] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., discovery_version: _Optional[str] = ..., deprecated_error_message: _Optional[str] = ..., interruptible: bool = ..., cache_serializable: bool = ..., tags: _Optional[_Mapping[str, str]] = ..., pod_template_name: _Optional[str] = ..., cache_ignore_input_vars: _Optional[_Iterable[str]] = ..., is_eager: bool = ..., generates_deck: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., metadata: _Optional[_Union[K8sObjectMetadata, _Mapping]] = ..., debuggable: bool = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., image_build_run: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., is_entrypoint: bool = ..., code_bundle_uri: _Optional[str] = ..., timeouts: _Optional[_Union[_literals_pb2.TimeoutStrategy, _Mapping]] = ..., produces_artifacts: bool = ...) -> None: ...
+    cache_max_age: _duration_pb2.Duration
+    def __init__(self, discoverable: bool = ..., runtime: _Optional[_Union[RuntimeMetadata, _Mapping]] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., discovery_version: _Optional[str] = ..., deprecated_error_message: _Optional[str] = ..., interruptible: bool = ..., cache_serializable: bool = ..., tags: _Optional[_Mapping[str, str]] = ..., pod_template_name: _Optional[str] = ..., cache_ignore_input_vars: _Optional[_Iterable[str]] = ..., is_eager: bool = ..., generates_deck: _Optional[_Union[_wrappers_pb2.BoolValue, _Mapping]] = ..., metadata: _Optional[_Union[K8sObjectMetadata, _Mapping]] = ..., debuggable: bool = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., image_build_run: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., is_entrypoint: bool = ..., code_bundle_uri: _Optional[str] = ..., timeouts: _Optional[_Union[_literals_pb2.TimeoutStrategy, _Mapping]] = ..., produces_artifacts: bool = ..., cache_max_age: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
 
 class ReusePolicy(_message.Message):
-    __slots__ = ["min_replicas", "max_replicas", "concurrency", "idle_ttl", "scaledown_ttl", "scope"]
+    __slots__ = ["min_replicas", "max_replicas", "concurrency", "idle_ttl", "scaledown_ttl", "scope", "name", "version"]
     class Scope(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         GLOBAL: _ClassVar[ReusePolicy.Scope]
@@ -170,16 +275,20 @@ class ReusePolicy(_message.Message):
     IDLE_TTL_FIELD_NUMBER: _ClassVar[int]
     SCALEDOWN_TTL_FIELD_NUMBER: _ClassVar[int]
     SCOPE_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
     min_replicas: int
     max_replicas: int
     concurrency: int
     idle_ttl: _duration_pb2.Duration
     scaledown_ttl: _duration_pb2.Duration
     scope: ReusePolicy.Scope
-    def __init__(self, min_replicas: _Optional[int] = ..., max_replicas: _Optional[int] = ..., concurrency: _Optional[int] = ..., idle_ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., scaledown_ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., scope: _Optional[_Union[ReusePolicy.Scope, str]] = ...) -> None: ...
+    name: str
+    version: str
+    def __init__(self, min_replicas: _Optional[int] = ..., max_replicas: _Optional[int] = ..., concurrency: _Optional[int] = ..., idle_ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., scaledown_ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., scope: _Optional[_Union[ReusePolicy.Scope, str]] = ..., name: _Optional[str] = ..., version: _Optional[str] = ...) -> None: ...
 
 class TaskTemplate(_message.Message):
-    __slots__ = ["id", "type", "metadata", "interface", "custom", "container", "k8s_pod", "sql", "task_type_version", "security_context", "extended_resources", "config", "reuse_policy"]
+    __slots__ = ["id", "type", "metadata", "interface", "custom", "container", "k8s_pod", "sql", "task_type_version", "security_context", "extended_resources", "config", "reuse_policy", "worker_kind"]
     class ConfigEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -200,6 +309,7 @@ class TaskTemplate(_message.Message):
     EXTENDED_RESOURCES_FIELD_NUMBER: _ClassVar[int]
     CONFIG_FIELD_NUMBER: _ClassVar[int]
     REUSE_POLICY_FIELD_NUMBER: _ClassVar[int]
+    WORKER_KIND_FIELD_NUMBER: _ClassVar[int]
     id: _identifier_pb2_1.Identifier
     type: str
     metadata: TaskMetadata
@@ -213,7 +323,8 @@ class TaskTemplate(_message.Message):
     extended_resources: ExtendedResources
     config: _containers.ScalarMap[str, str]
     reuse_policy: ReusePolicy
-    def __init__(self, id: _Optional[_Union[_identifier_pb2_1.Identifier, _Mapping]] = ..., type: _Optional[str] = ..., metadata: _Optional[_Union[TaskMetadata, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., custom: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., container: _Optional[_Union[Container, _Mapping]] = ..., k8s_pod: _Optional[_Union[K8sPod, _Mapping]] = ..., sql: _Optional[_Union[Sql, _Mapping]] = ..., task_type_version: _Optional[int] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., extended_resources: _Optional[_Union[ExtendedResources, _Mapping]] = ..., config: _Optional[_Mapping[str, str]] = ..., reuse_policy: _Optional[_Union[ReusePolicy, _Mapping]] = ...) -> None: ...
+    worker_kind: WorkerKind
+    def __init__(self, id: _Optional[_Union[_identifier_pb2_1.Identifier, _Mapping]] = ..., type: _Optional[str] = ..., metadata: _Optional[_Union[TaskMetadata, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., custom: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., container: _Optional[_Union[Container, _Mapping]] = ..., k8s_pod: _Optional[_Union[K8sPod, _Mapping]] = ..., sql: _Optional[_Union[Sql, _Mapping]] = ..., task_type_version: _Optional[int] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., extended_resources: _Optional[_Union[ExtendedResources, _Mapping]] = ..., config: _Optional[_Mapping[str, str]] = ..., reuse_policy: _Optional[_Union[ReusePolicy, _Mapping]] = ..., worker_kind: _Optional[_Union[WorkerKind, str]] = ...) -> None: ...
 
 class ContainerPort(_message.Message):
     __slots__ = ["container_port", "name"]

@@ -87,7 +87,7 @@ class TaskExecution(_message.Message):
     def __init__(self) -> None: ...
 
 class ExecutionError(_message.Message):
-    __slots__ = ["code", "message", "error_uri", "kind", "timestamp", "worker", "recoverability"]
+    __slots__ = ["code", "message", "error_uri", "kind", "timestamp", "worker", "recoverability", "gpu_fault"]
     class ErrorKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         UNKNOWN: _ClassVar[ExecutionError.ErrorKind]
@@ -103,6 +103,7 @@ class ExecutionError(_message.Message):
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     WORKER_FIELD_NUMBER: _ClassVar[int]
     RECOVERABILITY_FIELD_NUMBER: _ClassVar[int]
+    GPU_FAULT_FIELD_NUMBER: _ClassVar[int]
     code: str
     message: str
     error_uri: str
@@ -110,7 +111,50 @@ class ExecutionError(_message.Message):
     timestamp: _timestamp_pb2.Timestamp
     worker: str
     recoverability: ContainerError.Kind
-    def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., error_uri: _Optional[str] = ..., kind: _Optional[_Union[ExecutionError.ErrorKind, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., worker: _Optional[str] = ..., recoverability: _Optional[_Union[ContainerError.Kind, str]] = ...) -> None: ...
+    gpu_fault: GpuFault
+    def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., error_uri: _Optional[str] = ..., kind: _Optional[_Union[ExecutionError.ErrorKind, str]] = ..., timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., worker: _Optional[str] = ..., recoverability: _Optional[_Union[ContainerError.Kind, str]] = ..., gpu_fault: _Optional[_Union[GpuFault, _Mapping]] = ...) -> None: ...
+
+class GpuFault(_message.Message):
+    __slots__ = ["kind", "code", "name", "severity", "gpu_uuid", "gpu_index", "pci_bus_id", "node", "pid", "process"]
+    class Kind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        KIND_UNSPECIFIED: _ClassVar[GpuFault.Kind]
+        KIND_XID: _ClassVar[GpuFault.Kind]
+        KIND_SXID: _ClassVar[GpuFault.Kind]
+    KIND_UNSPECIFIED: GpuFault.Kind
+    KIND_XID: GpuFault.Kind
+    KIND_SXID: GpuFault.Kind
+    class Severity(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        SEVERITY_UNSPECIFIED: _ClassVar[GpuFault.Severity]
+        SEVERITY_USER: _ClassVar[GpuFault.Severity]
+        SEVERITY_WARN: _ClassVar[GpuFault.Severity]
+        SEVERITY_CRITICAL: _ClassVar[GpuFault.Severity]
+    SEVERITY_UNSPECIFIED: GpuFault.Severity
+    SEVERITY_USER: GpuFault.Severity
+    SEVERITY_WARN: GpuFault.Severity
+    SEVERITY_CRITICAL: GpuFault.Severity
+    KIND_FIELD_NUMBER: _ClassVar[int]
+    CODE_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    SEVERITY_FIELD_NUMBER: _ClassVar[int]
+    GPU_UUID_FIELD_NUMBER: _ClassVar[int]
+    GPU_INDEX_FIELD_NUMBER: _ClassVar[int]
+    PCI_BUS_ID_FIELD_NUMBER: _ClassVar[int]
+    NODE_FIELD_NUMBER: _ClassVar[int]
+    PID_FIELD_NUMBER: _ClassVar[int]
+    PROCESS_FIELD_NUMBER: _ClassVar[int]
+    kind: GpuFault.Kind
+    code: int
+    name: str
+    severity: GpuFault.Severity
+    gpu_uuid: str
+    gpu_index: int
+    pci_bus_id: str
+    node: str
+    pid: int
+    process: str
+    def __init__(self, kind: _Optional[_Union[GpuFault.Kind, str]] = ..., code: _Optional[int] = ..., name: _Optional[str] = ..., severity: _Optional[_Union[GpuFault.Severity, str]] = ..., gpu_uuid: _Optional[str] = ..., gpu_index: _Optional[int] = ..., pci_bus_id: _Optional[str] = ..., node: _Optional[str] = ..., pid: _Optional[int] = ..., process: _Optional[str] = ...) -> None: ...
 
 class ContainerError(_message.Message):
     __slots__ = ["code", "message", "kind", "origin"]

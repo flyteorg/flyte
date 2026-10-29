@@ -4,6 +4,7 @@ import (
 	"time"
 
 	stdconfig "github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 )
 
 const configSectionKey = "executor"
@@ -21,8 +22,8 @@ var (
 		MetricsCertName:         "tls.crt",
 		MetricsCertKey:          "tls.key",
 		EnableHTTP2:             false,
-		EventsServiceURL:        "http://localhost:8090",
-		CacheServiceURL:         "http://localhost:8094",
+		EventsService:           serviceclient.ServiceConfig{URL: "http://localhost:8090"},
+		CacheService:            serviceclient.ServiceConfig{URL: "http://localhost:8094"},
 		Cluster:                 "",
 		MaxSystemFailures:       3,
 		MaxConcurrentReconciles: 512,
@@ -72,11 +73,11 @@ type Config struct {
 	// EnableHTTP2 enables HTTP/2 for the metrics and webhook servers.
 	EnableHTTP2 bool `json:"enableHTTP2" pflag:",Enable HTTP/2 for metrics and webhook servers"`
 
-	// EventsServiceURL is the URL of the event Service for reporting action state updates.
-	EventsServiceURL string `json:"EventsServiceURL" pflag:",URL of the Event Service for action event updates"`
+	// EventsService configures the event service used for action state updates.
+	EventsService serviceclient.ServiceConfig `json:"eventsService" pflag:",Event service client configuration"`
 
-	// CacheServiceURL is the URL of the cache service for catalog operations.
-	CacheServiceURL string `json:"cacheServiceURL" pflag:",URL of the cache service for task cache operations"`
+	// CacheService configures the cache service used for catalog operations.
+	CacheService serviceclient.ServiceConfig `json:"cacheService" pflag:",Cache service client configuration"`
 
 	// Cluster is the cluster identifier attached to action events.
 	Cluster string `json:"cluster" pflag:",Cluster identifier for action events"`
@@ -86,10 +87,10 @@ type Config struct {
 	// assigns the `default` ServiceAccount of the pod's own namespace.
 	DefaultK8sServiceAccount string `json:"defaultK8sServiceAccount" pflag:",Default Kubernetes service account for task pods when the task does not set one"`
 
-	// MaxSystemFailures bounds consecutive system-level failures (Plugin.Handle Go
-	// errors and plugin-reported system-retryable failures) before a TaskAction is
-	// converted to a permanent failure.
-	MaxSystemFailures int32 `json:"maxSystemFailures" pflag:",Max consecutive system-level failures before forcing permanent failure"`
+	// MaxSystemFailures bounds the system-level failures (Plugin.Handle Go errors and
+	// plugin-reported system-retryable failures) one attempt may take before the
+	// TaskAction is converted to a permanent failure.
+	MaxSystemFailures int32 `json:"maxSystemFailures" pflag:",Max system-level failures per attempt before forcing permanent failure"`
 
 	// MaxConcurrentReconciles is the maximum number of concurrent reconcile loops for TaskActions.
 	MaxConcurrentReconciles int `json:"maxConcurrentReconciles" pflag:",Max concurrent reconcile loops for TaskActions"`

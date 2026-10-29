@@ -6865,6 +6865,12 @@ spec:
                 maxLength: 30
                 minLength: 1
                 type: string
+              podTemplateName:
+                description: |-
+                  PodTemplateName is the run-scoped pod template name projected from RunSpec.DefaultSettings.
+                  Stamped onto tasks that do not name one themselves.
+                maxLength: 253
+                type: string
               project:
                 description: Project this action belongs to
                 maxLength: 63
@@ -6906,6 +6912,63 @@ spec:
           status:
             description: status defines the observed state of TaskAction
             properties:
+              address:
+                description: |-
+                  Address is where the running task can be reached, as reported by its worker with
+                  actions.UpdateRequest.address (e.g. an interactive sandbox session). Watchers of the parent
+                  receive it on ActionUpdate.address while the task runs. The actions service owns it: the
+                  reconciler keeps it when persisting status. A later address replaces it and an empty one
+                  withdraws it; it is not delivered once Attempts or SystemRetries move past the ones it was
+                  reported for, or once the task is terminal.
+                properties:
+                  attempt:
+                    description: |-
+                      Attempt is the attempt that reported the address, and SystemRetries the TaskAction's
+                      system-retry count when it did. The address is delivered only while both are still the
+                      TaskAction's own, so a new attempt or an in-place relaunch never exposes a dead pod.
+                    format: int32
+                    type: integer
+                  cluster:
+                    description: Cluster is the cluster the action runs in.
+                    type: string
+                  path:
+                    description: |-
+                      Path is the path on Pod that reaches this action (e.g. /s/<session>); empty when the whole
+                      pod serves it.
+                    type: string
+                  pod:
+                    description: 'Pod is the pod serving the action: its own, or that
+                      of a worker serving many actions.'
+                    properties:
+                      ip:
+                        description: IP is the pod's IP, reachable from inside the
+                          cluster.
+                        type: string
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                      port:
+                        description: Port is the port the action serves on.
+                        format: int32
+                        type: integer
+                    type: object
+                  systemRetries:
+                    format: int32
+                    type: integer
+                  url:
+                    description: |-
+                      URL is an endpoint that cannot be derived from Pod (a gateway or tunnel); it takes
+                      precedence when set.
+                    type: string
+                type: object
+              attemptStartedAt:
+                description: |-
+                  AttemptStartedAt is when the current user attempt first entered the Running phase.
+                  It is persisted independently from ActionEvent publication so max-runtime
+                  enforcement survives controller and event-service outages.
+                format: date-time
+                type: string
               attempts:
                 description: Attempts is the latest observed action attempt number,
                   starting from 1.
@@ -7004,6 +7067,13 @@ spec:
                     description: Message is the human-readable error message.
                     type: string
                 type: object
+              nextAttemptAt:
+                description: |-
+                  NextAttemptAt is the earliest time the next user attempt may launch, set when a
+                  failed attempt is retried under a RetryStrategy with a backoff. While it lies in
+                  the future the plugin is not handled; it is cleared when the attempt launches.
+                format: date-time
+                type: string
               phaseHistory:
                 description: |-
                   PhaseHistory is an append-only log of phase transitions. Unlike conditions
@@ -7075,6 +7145,20 @@ spec:
                   maximum, the TaskAction is converted to a permanent failure.
                 format: int32
                 type: integer
+              systemRetries:
+                description: |-
+                  SystemRetries counts the times this TaskAction was relaunched in place after a
+                  system-retryable failure. Unlike SystemFailures it is never reset, so it gives
+                  each system-retry event a version no earlier one used.
+                format: int32
+                type: integer
+              timeoutAt:
+                description: |-
+                  TimeoutAt is the max-runtime deadline for an expired current attempt.
+                  While set on a non-terminal action, timeout cleanup is pending and the
+                  plugin resource must not be handled or recreated.
+                format: date-time
+                type: string
             type: object
         required:
         - spec
@@ -7093,17 +7177,6 @@ metadata:
     app.kubernetes.io/name: flyte-binary
     helm.sh/chart: flyte-binary-v0.2.0
   name: flyte-binary
-  namespace: flyte
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyteconnector
-    helm.sh/chart: flyteconnector-v2.0.0
-  name: flyteconnector
   namespace: flyte
 ---
 apiVersion: v1
@@ -7779,6 +7852,7 @@ data:
         maxSize: 100Mi
         storagePrefix: uploads
     runs:
+      notificationBufferLimit: 65000
       server:
         host: 0.0.0.0
         port: 8090
@@ -7792,7 +7866,8 @@ data:
         namespace: 'flyte'
         qps: 100
         timeout: 30s
-      webhookURL: http://flyte-binary-webhook-headless.flyte.svc:9444
+      webhook:
+        url: http://flyte-binary-webhook-headless.flyte.svc:9444
   001-plugins.yaml: |
     tasks:
       task-plugins:
@@ -7873,6 +7948,10 @@ data:
       scheme: http
     plugins:
       k8s:
+        apple-silicon-bridge:
+          endpoint: '%{APPLE_SILICON_BRIDGE_ENDPOINT}%'
+          host-platform: '%{DEVBOX_HOST_PLATFORM}%'
+          token-secret: '%{APPLE_SILICON_BRIDGE_TOKEN_SECRET}%'
         default-env-vars:
         - FLYTE_AWS_ENDPOINT: http://rustfs-svc.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: rustfs
@@ -8358,30 +8437,6 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    projectcontour.io/upstream-protocol.h2c: grpc
-  labels:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyteconnector
-    helm.sh/chart: flyteconnector-v2.0.0
-  name: flyteconnector
-  namespace: flyte
-spec:
-  ports:
-  - appProtocol: TCP
-    name: connector-grpc
-    port: 8000
-    protocol: TCP
-    targetPort: connector-grpc
-  selector:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/name: flyteconnector
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
   labels:
     app.kubernetes.io/name: embedded-postgresql
   name: postgresql
@@ -8735,7 +8790,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: 73498ed48a4a737de04a3c1297e3c0e172b0919cdf6d6bfc7dc43bd102f4d1e8
+        checksum/configuration: a0401c9392460d1e527456d213b4ab1bda9b9bf2731750f219ef262f147efdbb
         checksum/configuration-secret: ff95a9986cc42dff0a114449c9b8e9a95c781b7bdd9832b31ca461423ae0b678
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -8859,59 +8914,6 @@ spec:
             port: http
           initialDelaySeconds: 5
           periodSeconds: 10
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app.kubernetes.io/instance: flyte-devbox
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: flyteconnector
-    helm.sh/chart: flyteconnector-v2.0.0
-  name: flyteconnector
-  namespace: flyte
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/instance: flyte-devbox
-      app.kubernetes.io/name: flyteconnector
-  template:
-    metadata:
-      annotations: null
-      labels:
-        app.kubernetes.io/instance: flyte-devbox
-        app.kubernetes.io/managed-by: Helm
-        app.kubernetes.io/name: flyteconnector
-        helm.sh/chart: flyteconnector-v2.0.0
-    spec:
-      containers:
-      - command:
-        - c0
-        image: ghcr.io/flyteorg/flyte-connectors:py3.12-v2.3.6
-        imagePullPolicy: IfNotPresent
-        name: flyteconnector
-        ports:
-        - containerPort: 8000
-          name: connector-grpc
-        readinessProbe:
-          grpc:
-            port: 8000
-          initialDelaySeconds: 1
-          periodSeconds: 3
-        resources:
-          limits:
-            cpu: 500m
-            ephemeral-storage: 200Mi
-            memory: 300Mi
-          requests:
-            cpu: 500m
-            ephemeral-storage: 200Mi
-            memory: 200Mi
-        securityContext:
-          allowPrivilegeEscalation: false
-      securityContext: {}
-      serviceAccountName: flyteconnector
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -9743,8 +9745,8 @@ metadata:
 spec:
   redirectRegex:
     permanent: false
-    regex: ^(https?://[^/]+)/?$
-    replacement: ${1}/v2
+    regex: ^https?://[^/]+/?$
+    replacement: /v2
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration

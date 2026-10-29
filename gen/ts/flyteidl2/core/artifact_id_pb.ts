@@ -13,14 +13,18 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/core/artifact_id.proto.
  */
 export const file_flyteidl2_core_artifact_id: GenFile = /*@__PURE__*/
-  fileDesc("CiBmbHl0ZWlkbDIvY29yZS9hcnRpZmFjdF9pZC5wcm90bxIOZmx5dGVpZGwyLmNvcmUiSQoLQXJ0aWZhY3RLZXkSDwoHcHJvamVjdBgBIAEoCRIOCgZkb21haW4YAiABKAkSDAoEbmFtZRgDIAEoCRILCgNvcmcYBCABKAkiTgoRQXJ0aWZhY3RWZXJzaW9uSWQSKAoDa2V5GAEgASgLMhsuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RLZXkSDwoHdmVyc2lvbhgCIAEoCSJVCgxBcnRpZmFjdENhcmQSFQoDdXJpGAEgASgJQgi6SAVyAxiACBIXCgZmb3JtYXQYAiABKAlCB7pIBHICGBASFQoEdHlwZRgDIAEoCUIHukgEcgIYECLVAQoMQXJ0aWZhY3RJbmZvEh0KC2Rlc2NyaXB0aW9uGAEgASgJQgi6SAVyAxj/ARJFCg11c2VyX21ldGFkYXRhGAIgAygLMi4uZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RJbmZvLlVzZXJNZXRhZGF0YUVudHJ5EioKBGNhcmQYAyABKAsyHC5mbHl0ZWlkbDIuY29yZS5BcnRpZmFjdENhcmQaMwoRVXNlck1ldGFkYXRhRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASKfAQoTQXJ0aWZhY3RCaW5kaW5nRGF0YRIXCg1wYXJ0aXRpb25fa2V5GAUgASgJSAASIAoWYmluZF90b190aW1lX3BhcnRpdGlvbhgGIAEoCEgAEjUKDnRpbWVfdHJhbnNmb3JtGAcgASgLMh0uZmx5dGVpZGwyLmNvcmUuVGltZVRyYW5zZm9ybUIQCg5wYXJ0aXRpb25fZGF0YUoECAEQBSJICg1UaW1lVHJhbnNmb3JtEhEKCXRyYW5zZm9ybRgBIAEoCRIkCgJvcBgCIAEoDjIYLmZseXRlaWRsMi5jb3JlLk9wZXJhdG9yIh8KEElucHV0QmluZGluZ0RhdGESCwoDdmFyGAEgASgJIhAKDlJ1bnRpbWVCaW5kaW5nIpcCCgpMYWJlbFZhbHVlEhYKDHN0YXRpY192YWx1ZRgBIAEoCUgAEjAKCnRpbWVfdmFsdWUYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSAASQAoRdHJpZ2dlcmVkX2JpbmRpbmcYAyABKAsyIy5mbHl0ZWlkbDIuY29yZS5BcnRpZmFjdEJpbmRpbmdEYXRhSAASOQoNaW5wdXRfYmluZGluZxgEIAEoCzIgLmZseXRlaWRsMi5jb3JlLklucHV0QmluZGluZ0RhdGFIABI5Cg9ydW50aW1lX2JpbmRpbmcYBSABKAsyHi5mbHl0ZWlkbDIuY29yZS5SdW50aW1lQmluZGluZ0gAQgcKBXZhbHVlIowBCgpQYXJ0aXRpb25zEjQKBXZhbHVlGAEgAygLMiUuZmx5dGVpZGwyLmNvcmUuUGFydGl0aW9ucy5WYWx1ZUVudHJ5GkgKClZhbHVlRW50cnkSCwoDa2V5GAEgASgJEikKBXZhbHVlGAIgASgLMhouZmx5dGVpZGwyLmNvcmUuTGFiZWxWYWx1ZToCOAEibAoNVGltZVBhcnRpdGlvbhIpCgV2YWx1ZRgBIAEoCzIaLmZseXRlaWRsMi5jb3JlLkxhYmVsVmFsdWUSMAoLZ3JhbnVsYXJpdHkYAiABKA4yGy5mbHl0ZWlkbDIuY29yZS5HcmFudWxhcml0eSK3AQoKQXJ0aWZhY3RJRBIxCgxhcnRpZmFjdF9rZXkYASABKAsyGy5mbHl0ZWlkbDIuY29yZS5BcnRpZmFjdEtleRIPCgd2ZXJzaW9uGAIgASgJEi4KCnBhcnRpdGlvbnMYAyABKAsyGi5mbHl0ZWlkbDIuY29yZS5QYXJ0aXRpb25zEjUKDnRpbWVfcGFydGl0aW9uGAQgASgLMh0uZmx5dGVpZGwyLmNvcmUuVGltZVBhcnRpdGlvbiJrCgtBcnRpZmFjdFRhZxIxCgxhcnRpZmFjdF9rZXkYASABKAsyGy5mbHl0ZWlkbDIuY29yZS5BcnRpZmFjdEtleRIpCgV2YWx1ZRgCIAEoCzIaLmZseXRlaWRsMi5jb3JlLkxhYmVsVmFsdWUizAEKDUFydGlmYWN0UXVlcnkSMQoLYXJ0aWZhY3RfaWQYASABKAsyGi5mbHl0ZWlkbDIuY29yZS5BcnRpZmFjdElESAASMwoMYXJ0aWZhY3RfdGFnGAIgASgLMhsuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RUYWdIABINCgN1cmkYAyABKAlIABI2CgdiaW5kaW5nGAQgASgLMiMuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RCaW5kaW5nRGF0YUgAQgwKCmlkZW50aWZpZXIqQgoLR3JhbnVsYXJpdHkSCQoFVU5TRVQQABIKCgZNSU5VVEUQARIICgRIT1VSEAISBwoDREFZEAMSCQoFTU9OVEgQBCofCghPcGVyYXRvchIJCgVNSU5VUxAAEggKBFBMVVMQAUK0AQoSY29tLmZseXRlaWRsMi5jb3JlQg9BcnRpZmFjdElkUHJvdG9IAlABWjJnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvY29yZaICA0ZDWKoCDkZseXRlaWRsMi5Db3JlygIORmx5dGVpZGwyXENvcmXiAhpGbHl0ZWlkbDJcQ29yZVxHUEJNZXRhZGF0YeoCD0ZseXRlaWRsMjo6Q29yZWIGcHJvdG8z", [file_buf_validate_validate, file_google_protobuf_timestamp]);
+  fileDesc("CiBmbHl0ZWlkbDIvY29yZS9hcnRpZmFjdF9pZC5wcm90bxIOZmx5dGVpZGwyLmNvcmUigQEKC0FydGlmYWN0S2V5EhgKB3Byb2plY3QYASABKAlCB7pIBHICGEASFwoGZG9tYWluGAIgASgJQge6SARyAhhAEikKBG5hbWUYAyABKAlCG7pIGHIWGP8BMhFeW0EtWmEtejAtOS5fLV0qJBIUCgNvcmcYBCABKAlCB7pIBHICGD8iawoRQXJ0aWZhY3RWZXJzaW9uSWQSKAoDa2V5GAEgASgLMhsuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RLZXkSLAoHdmVyc2lvbhgCIAEoCUIbukgYchYY/wEyEV5bQS1aYS16MC05Ll8tXSokIlUKDEFydGlmYWN0Q2FyZBIVCgN1cmkYASABKAlCCLpIBXIDGIAIEhcKBmZvcm1hdBgCIAEoCUIHukgEcgIYEBIVCgR0eXBlGAMgASgJQge6SARyAhgQItUBCgxBcnRpZmFjdEluZm8SHQoLZGVzY3JpcHRpb24YASABKAlCCLpIBXIDGP8BEkUKDXVzZXJfbWV0YWRhdGEYAiADKAsyLi5mbHl0ZWlkbDIuY29yZS5BcnRpZmFjdEluZm8uVXNlck1ldGFkYXRhRW50cnkSKgoEY2FyZBgDIAEoCzIcLmZseXRlaWRsMi5jb3JlLkFydGlmYWN0Q2FyZBozChFVc2VyTWV0YWRhdGFFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIp8BChNBcnRpZmFjdEJpbmRpbmdEYXRhEhcKDXBhcnRpdGlvbl9rZXkYBSABKAlIABIgChZiaW5kX3RvX3RpbWVfcGFydGl0aW9uGAYgASgISAASNQoOdGltZV90cmFuc2Zvcm0YByABKAsyHS5mbHl0ZWlkbDIuY29yZS5UaW1lVHJhbnNmb3JtQhAKDnBhcnRpdGlvbl9kYXRhSgQIARAFIkgKDVRpbWVUcmFuc2Zvcm0SEQoJdHJhbnNmb3JtGAEgASgJEiQKAm9wGAIgASgOMhguZmx5dGVpZGwyLmNvcmUuT3BlcmF0b3IiHwoQSW5wdXRCaW5kaW5nRGF0YRILCgN2YXIYASABKAkiEAoOUnVudGltZUJpbmRpbmcilwIKCkxhYmVsVmFsdWUSFgoMc3RhdGljX3ZhbHVlGAEgASgJSAASMAoKdGltZV92YWx1ZRgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBIABJAChF0cmlnZ2VyZWRfYmluZGluZxgDIAEoCzIjLmZseXRlaWRsMi5jb3JlLkFydGlmYWN0QmluZGluZ0RhdGFIABI5Cg1pbnB1dF9iaW5kaW5nGAQgASgLMiAuZmx5dGVpZGwyLmNvcmUuSW5wdXRCaW5kaW5nRGF0YUgAEjkKD3J1bnRpbWVfYmluZGluZxgFIAEoCzIeLmZseXRlaWRsMi5jb3JlLlJ1bnRpbWVCaW5kaW5nSABCBwoFdmFsdWUijAEKClBhcnRpdGlvbnMSNAoFdmFsdWUYASADKAsyJS5mbHl0ZWlkbDIuY29yZS5QYXJ0aXRpb25zLlZhbHVlRW50cnkaSAoKVmFsdWVFbnRyeRILCgNrZXkYASABKAkSKQoFdmFsdWUYAiABKAsyGi5mbHl0ZWlkbDIuY29yZS5MYWJlbFZhbHVlOgI4ASKCAQoNVGltZVBhcnRpdGlvbhIpCgV2YWx1ZRgBIAEoCzIaLmZseXRlaWRsMi5jb3JlLkxhYmVsVmFsdWUSMAoLZ3JhbnVsYXJpdHkYAiABKA4yGy5mbHl0ZWlkbDIuY29yZS5HcmFudWxhcml0eRIUCgNrZXkYAyABKAlCB7pIBHICGEAitwEKCkFydGlmYWN0SUQSMQoMYXJ0aWZhY3Rfa2V5GAEgASgLMhsuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RLZXkSDwoHdmVyc2lvbhgCIAEoCRIuCgpwYXJ0aXRpb25zGAMgASgLMhouZmx5dGVpZGwyLmNvcmUuUGFydGl0aW9ucxI1Cg50aW1lX3BhcnRpdGlvbhgEIAEoCzIdLmZseXRlaWRsMi5jb3JlLlRpbWVQYXJ0aXRpb24iawoLQXJ0aWZhY3RUYWcSMQoMYXJ0aWZhY3Rfa2V5GAEgASgLMhsuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RLZXkSKQoFdmFsdWUYAiABKAsyGi5mbHl0ZWlkbDIuY29yZS5MYWJlbFZhbHVlIswBCg1BcnRpZmFjdFF1ZXJ5EjEKC2FydGlmYWN0X2lkGAEgASgLMhouZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RJREgAEjMKDGFydGlmYWN0X3RhZxgCIAEoCzIbLmZseXRlaWRsMi5jb3JlLkFydGlmYWN0VGFnSAASDQoDdXJpGAMgASgJSAASNgoHYmluZGluZxgEIAEoCzIjLmZseXRlaWRsMi5jb3JlLkFydGlmYWN0QmluZGluZ0RhdGFIAEIMCgppZGVudGlmaWVyKkwKC0dyYW51bGFyaXR5EgkKBVVOU0VUEAASCgoGTUlOVVRFEAESCAoESE9VUhACEgcKA0RBWRADEgkKBU1PTlRIEAQSCAoEV0VFSxAFKh8KCE9wZXJhdG9yEgkKBU1JTlVTEAASCAoEUExVUxABQrQBChJjb20uZmx5dGVpZGwyLmNvcmVCD0FydGlmYWN0SWRQcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9jb3JlogIDRkNYqgIORmx5dGVpZGwyLkNvcmXKAg5GbHl0ZWlkbDJcQ29yZeICGkZseXRlaWRsMlxDb3JlXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpDb3JlYgZwcm90bzM", [file_buf_validate_validate, file_google_protobuf_timestamp]);
 
 /**
  * @generated from message flyteidl2.core.ArtifactKey
  */
 export type ArtifactKey = Message<"flyteidl2.core.ArtifactKey"> & {
   /**
-   * Project and domain and suffix needs to be unique across a given artifact store.
+   * Identifies one artifact within an artifact store: the (org, project,
+   * domain, name) tuple must be unique. Length bounds match
+   * artifact.ArtifactName; fields stay optional because an empty field means
+   * "inherit from context" in several uses (e.g.
+   * artifact.ArtifactSpec.parent_artifacts).
    *
    * @generated from field: string project = 1;
    */
@@ -32,6 +36,9 @@ export type ArtifactKey = Message<"flyteidl2.core.ArtifactKey"> & {
   domain: string;
 
   /**
+   * Characters are restricted so a (name, version) pair can be encoded
+   * unambiguously into one scalar — see ArtifactVersionId.version.
+   *
    * @generated from field: string name = 3;
    */
   name: string;
@@ -63,6 +70,13 @@ export type ArtifactVersionId = Message<"flyteidl2.core.ArtifactVersionId"> & {
   key?: ArtifactKey;
 
   /**
+   * A (name, version) pair identifies a parent in
+   * artifact.ArtifactSpec.parent_artifacts, and storage encodes that pair
+   * into a single scalar to index it. Restricting the character set is what
+   * makes that encoding injective: without it, name="a@v1"/version="b" and
+   * name="a"/version="v1@b" collide and a lineage query returns the wrong
+   * children. Empty is still allowed (it means "inherit").
+   *
    * @generated from field: string version = 2;
    */
   version: string;
@@ -322,6 +336,16 @@ export type TimePartition = Message<"flyteidl2.core.TimePartition"> & {
    * @generated from field: flyteidl2.core.Granularity granularity = 2;
    */
   granularity: Granularity;
+
+  /**
+   * Name of the time dimension, e.g. "date". When empty on an artifact
+   * version, the artifact service defaults it from the granularity: "hour"
+   * for HOUR, "date" otherwise, so artifacts agree on the name without
+   * coordination.
+   *
+   * @generated from field: string key = 3;
+   */
+  key: string;
 };
 
 /**
@@ -470,6 +494,11 @@ export enum Granularity {
    * @generated from enum value: MONTH = 4;
    */
   MONTH = 4,
+
+  /**
+   * @generated from enum value: WEEK = 5;
+   */
+  WEEK = 5,
 }
 
 /**

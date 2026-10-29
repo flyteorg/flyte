@@ -457,10 +457,11 @@
         "GOOGLE_TPU",
         "AMAZON_NEURON",
         "AMD_GPU",
-        "HABANA_GAUDI"
+        "HABANA_GAUDI",
+        "APPLE_SILICON"
       ],
       "default": "NVIDIA_GPU",
-      "description": "Specifies the class of accelerator device.\n\n - NVIDIA_GPU: NVIDIA GPU devices (default for backward compatibility)\n - GOOGLE_TPU: Google TPU devices\n - AMAZON_NEURON: Amazon Neuron devices\n - AMD_GPU: AMD GPU devices\n - HABANA_GAUDI: Habana Gaudi devices"
+      "description": "Specifies the class of accelerator device.\n\n - NVIDIA_GPU: NVIDIA GPU devices (default for backward compatibility)\n - GOOGLE_TPU: Google TPU devices\n - AMAZON_NEURON: Amazon Neuron devices\n - AMD_GPU: AMD GPU devices\n - HABANA_GAUDI: Habana Gaudi devices\n - APPLE_SILICON: Apple Silicon (M-series) Metal GPU, served by a host-side MLX daemon on\na local devbox. Not schedulable on a cluster: a backend without an Apple Silicon\nbridge configured rejects it with APPLE_SILICON_NOT_AVAILABLE."
     },
     "IOStrategyDownloadMode": {
       "type": "string",
@@ -779,6 +780,54 @@
         }
       }
     },
+    "coreAcceleratorModel": {
+      "type": "string",
+      "enum": [
+        "ACCELERATOR_MODEL_UNSPECIFIED",
+        "NVIDIA_K80",
+        "NVIDIA_M60",
+        "NVIDIA_P4",
+        "NVIDIA_P100",
+        "NVIDIA_V100",
+        "NVIDIA_T4",
+        "NVIDIA_A10",
+        "NVIDIA_A10G",
+        "NVIDIA_A100",
+        "NVIDIA_A100_80GB",
+        "NVIDIA_L4",
+        "NVIDIA_L40S",
+        "NVIDIA_H100",
+        "NVIDIA_H100_MEGA_80GB",
+        "NVIDIA_H200",
+        "NVIDIA_B200",
+        "NVIDIA_GB200",
+        "NVIDIA_GB10",
+        "NVIDIA_RTX_PRO_6000",
+        "NVIDIA_RTX_PRO_4500",
+        "GOOGLE_TPU_V5E",
+        "GOOGLE_TPU_V5P",
+        "GOOGLE_TPU_V6E",
+        "AMAZON_INF1",
+        "AMAZON_INF2",
+        "AMAZON_TRN1",
+        "AMAZON_TRN1N",
+        "AMAZON_TRN2",
+        "AMAZON_TRN2U",
+        "AMD_MI100",
+        "AMD_MI210",
+        "AMD_MI250",
+        "AMD_MI250X",
+        "AMD_MI300A",
+        "AMD_MI300X",
+        "AMD_MI325X",
+        "AMD_MI350X",
+        "AMD_MI355X",
+        "HABANA_GAUDI1",
+        "APPLE_SILICON_GPU"
+      ],
+      "default": "ACCELERATOR_MODEL_UNSPECIFIED",
+      "description": "The canonical list of accelerators. One value per concrete device,\nmatched by exact equality: NVIDIA_A100 (40GB) and NVIDIA_A100_80GB are\ntwo devices. Strings are lower-case, vendor first, dashes only:\n\u003cvendor\u003e-\u003cmodel\u003e[-\u003cmemory\u003e][-\u003cvariant\u003e]. Numbered in blocks of 100 per\nDeviceClass so each block can grow.\n\n - NVIDIA_K80: NVIDIA_GPU\n - GOOGLE_TPU_V5E: GOOGLE_TPU\n - AMAZON_INF1: AMAZON_NEURON\n - AMD_MI100: AMD_GPU\n - HABANA_GAUDI1: HABANA_GAUDI\n - APPLE_SILICON_GPU: APPLE_SILICON\nThe Metal GPU of an Apple Silicon (M-series) host, reached through the\ndevbox's host-side Apple Silicon bridge. Devbox-local: never cluster-schedulable."
+    },
     "coreArtifactBindingData": {
       "type": "object",
       "properties": {
@@ -858,13 +907,14 @@
       "properties": {
         "project": {
           "type": "string",
-          "description": "Project and domain and suffix needs to be unique across a given artifact store."
+          "description": "Identifies one artifact within an artifact store: the (org, project,\ndomain, name) tuple must be unique. Length bounds match\nartifact.ArtifactName; fields stay optional because an empty field means\n\"inherit from context\" in several uses (e.g.\nartifact.ArtifactSpec.parent_artifacts)."
         },
         "domain": {
           "type": "string"
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Characters are restricted so a (name, version) pair can be encoded\nunambiguously into one scalar — see ArtifactVersionId.version."
         },
         "org": {
           "type": "string"
@@ -889,7 +939,8 @@
           "$ref": "#/definitions/coreArtifactKey"
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "description": "A (name, version) pair identifies a parent in\nartifact.ArtifactSpec.parent_artifacts, and storage encodes that pair\ninto a single scalar to index it. Restricting the character set is what\nmakes that encoding injective: without it, name=\"a@v1\"/version=\"b\" and\nname=\"a\"/version=\"v1@b\" collide and a lineage query returns the wrong\nchildren. Empty is still allowed (it means \"inherit\")."
         }
       },
       "description": "Identity of one artifact version. Unlike the legacy ArtifactID below, this\ncarries no partition machinery — it is the minimal identity stamped onto\nvalues (core.Literal.artifact_id) and referenced by v2 artifact APIs."
@@ -1144,6 +1195,10 @@
         "device_class": {
           "$ref": "#/definitions/GPUAcceleratorDeviceClass",
           "description": "The class of accelerator device. Defaults to NVIDIA_GPU if not specified."
+        },
+        "accelerator_model": {
+          "$ref": "#/definitions/coreAcceleratorModel",
+          "description": "The accelerator as a value of the canonical list. When set, readers use\nit instead of device; device stays for SDKs and stored tasks that predate\nthis field."
         }
       },
       "description": "Metadata associated with the GPU accelerator to allocate to a task. Contains\ninformation about device type, and for multi-instance GPUs, the partition size to\nuse."
@@ -1155,7 +1210,8 @@
         "MINUTE",
         "HOUR",
         "DAY",
-        "MONTH"
+        "MONTH",
+        "WEEK"
       ],
       "default": "UNSET",
       "title": "- DAY: default"
@@ -1576,6 +1632,14 @@
         "scope": {
           "$ref": "#/definitions/ReusePolicyScope",
           "description": "How widely the reusable environment may be shared. Defaults to GLOBAL (reuse across all runs)."
+        },
+        "name": {
+          "type": "string",
+          "description": "The environment's name: tasks that share a name and version share one pool of replicas.\nFor a container pool this is the SDK's environment name."
+        },
+        "version": {
+          "type": "string",
+          "description": "The environment's version: changes whenever anything that shapes a replica does (image,\nresources, replicas, TTLs, code bundle), so replicas of one version are interchangeable.\nTogether with the run's org, project and domain and the name, it identifies the pool a\nreusable worker leases this task's actions for."
         }
       },
       "description": "ReusePolicy configures reuse of a task's execution environment across invocations, so\nenvironment creation cost is paid once and amortized: a warm container pool for reusable\ncontainer tasks or a shared long-lived cluster for cluster-backed plugins (e.g. Ray).\nTotal concurrent capacity is max_replicas * concurrency."
@@ -1856,6 +1920,10 @@
         "reuse_policy": {
           "$ref": "#/definitions/coreReusePolicy",
           "description": "Reuse policy for the task's execution environment (a warm container pool, or a shared,\nlong-lived cluster for cluster-backed plugins like Ray). When unset, no reuse is configured."
+        },
+        "worker_kind": {
+          "$ref": "#/definitions/coreWorkerKind",
+          "description": "The kind of worker that runs this task. The scheduler sends the task only to workers of\nthis kind; while none has room it waits. Unspecified is the default worker, which runs\ncontainers and plugin tasks."
         }
       },
       "description": "A Task structure that uniquely identifies a task in the system\nTasks are registered as a first step in the system."
@@ -1868,6 +1936,10 @@
         },
         "granularity": {
           "$ref": "#/definitions/coreGranularity"
+        },
+        "key": {
+          "type": "string",
+          "description": "Name of the time dimension, e.g. \"date\". When empty on an artifact\nversion, the artifact service defaults it from the granularity: \"hour\"\nfor HOUR, \"date\" otherwise, so artifacts agree on the name without\ncoordination."
         }
       }
     },
@@ -2011,6 +2083,17 @@
     "coreVoid": {
       "type": "object",
       "description": "Used to denote a nil/null/None assignment to a scalar value. The underlying LiteralType for Void is intentionally\nundefined since it can be assigned to a scalar of any LiteralType."
+    },
+    "coreWorkerKind": {
+      "type": "string",
+      "enum": [
+        "WORKER_KIND_UNSPECIFIED",
+        "WORKER_KIND_SANDBOX",
+        "WORKER_KIND_MICROVM",
+        "WORKER_KIND_REUSABLE"
+      ],
+      "default": "WORKER_KIND_UNSPECIFIED",
+      "description": "The kinds of worker that run tasks. A worker of a kind may further limit itself to some task\ntypes and versions of that kind.\n\n - WORKER_KIND_UNSPECIFIED: The default worker: runs containers, and plugin and connector tasks.\n - WORKER_KIND_SANDBOX: Runs sandboxed orchestrator source in an interpreter, with no container\n(flyte.sandbox.orchestrator).\n - WORKER_KIND_MICROVM: Runs each task in its own microVM, such as an interactive sandbox session, rather than a pod.\nIt needs a scheduler and workers that support this kind; the open-source executor does not\ntreat it specially. Schedulers that support it should not retry such a task: a retry would\nstart a fresh VM at a new address while callers still hold the old one.\n - WORKER_KIND_REUSABLE: Runs the task in a long-lived replica of its reusable environment (ReusePolicy), alongside\nup to ReusePolicy.concurrency other actions of the same environment. A replica serves one\nenvironment, identified by ReusePolicy.name and ReusePolicy.version, and the scheduler sends\nit only that environment's actions."
     },
     "coreWorkflowExecutionIdentifier": {
       "type": "object",
@@ -2387,6 +2470,10 @@
         "produces_artifacts": {
           "type": "boolean",
           "description": "If true, the backend extracts artifact metadata stamped on this task's\noutput literals and records them as generated artifacts on the action."
+        },
+        "cache_max_age": {
+          "type": "string",
+          "description": "Maximum age of a cached result that this task will reuse.\nIf unset, the platform default is used. Zero allows cached results to be\nreused regardless of age. This policy is not stored with cached results."
         }
       },
       "title": "Task Metadata"
@@ -2513,6 +2600,22 @@
         "type": {
           "$ref": "#/definitions/coreLiteralType",
           "description": "The declared Flyte type of the output, copied into ArtifactSpec.type.\nThe producing SDK is authoritative for this."
+        },
+        "parent_artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreArtifactVersionId"
+          },
+          "description": "Optional artifact versions the produced version was derived from, copied\nverbatim into ArtifactSpec.parent_artifacts. Set by the producing task\nwhen it derives a new version from versions it consumed; one entry is\nplain derivation, several record a merge, so the resulting lineage forms\na DAG instead of reading as a linear chain. Order is preserved: the first\nentry is the primary parent. Empty key fields inherit the produced\nartifact's own scope and name, so a bare {version: \"v1\"} declares the\nprevious version of this same artifact as a parent; a set name records\ncross-artifact derivation. Only the name may differ: non-empty scope\nfields (org/project/domain) must match the produced artifact's own scope."
+        },
+        "partitions": {
+          "$ref": "#/definitions/corePartitions",
+          "description": "String partitions of the produced version, copied verbatim into\nArtifactSpec.partitions."
+        },
+        "time_partition": {
+          "$ref": "#/definitions/coreTimePartition",
+          "description": "Time partition of the produced version, copied verbatim into\nArtifactSpec.time_partition."
         }
       },
       "description": "Declares that a named output of the producing action is a new artifact\nversion. The output's literal (in Outputs.literals) is the artifact's value;\norg/project/domain come from the producing action's scope at registration."

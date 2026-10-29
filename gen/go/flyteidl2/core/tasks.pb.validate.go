@@ -228,6 +228,8 @@ func (m *GPUAccelerator) validate(all bool) error {
 
 	// no validation rules for DeviceClass
 
+	// no validation rules for AcceleratorModel
+
 	switch v := m.PartitionSizeValue.(type) {
 	case *GPUAccelerator_Unpartitioned:
 		if v == nil {
@@ -987,6 +989,35 @@ func (m *TaskMetadata) validate(all bool) error {
 
 	// no validation rules for ProducesArtifacts
 
+	if all {
+		switch v := interface{}(m.GetCacheMaxAge()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, TaskMetadataValidationError{
+					field:  "CacheMaxAge",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, TaskMetadataValidationError{
+					field:  "CacheMaxAge",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCacheMaxAge()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskMetadataValidationError{
+				field:  "CacheMaxAge",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch v := m.InterruptibleValue.(type) {
 	case *TaskMetadata_Interruptible:
 		if v == nil {
@@ -1168,6 +1199,10 @@ func (m *ReusePolicy) validate(all bool) error {
 	}
 
 	// no validation rules for Scope
+
+	// no validation rules for Name
+
+	// no validation rules for Version
 
 	if len(errors) > 0 {
 		return ReusePolicyMultiError(errors)
@@ -1476,6 +1511,8 @@ func (m *TaskTemplate) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for WorkerKind
 
 	switch v := m.Target.(type) {
 	case *TaskTemplate_Container:

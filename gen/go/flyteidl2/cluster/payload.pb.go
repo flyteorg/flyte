@@ -122,6 +122,7 @@ type SelectClusterRequest struct {
 	//	*SelectClusterRequest_ClusterPoolId
 	//	*SelectClusterRequest_DomainId
 	//	*SelectClusterRequest_ClusterId
+	//	*SelectClusterRequest_QueueId
 	Resource  isSelectClusterRequest_Resource `protobuf_oneof:"resource"`
 	Operation SelectClusterRequest_Operation  `protobuf:"varint,8,opt,name=operation,proto3,enum=flyteidl2.cluster.SelectClusterRequest_Operation" json:"operation,omitempty"`
 }
@@ -228,6 +229,13 @@ func (x *SelectClusterRequest) GetClusterId() *common.ClusterIdentifier {
 	return nil
 }
 
+func (x *SelectClusterRequest) GetQueueId() *common.QueueIdentifier {
+	if x, ok := x.GetResource().(*SelectClusterRequest_QueueId); ok {
+		return x.QueueId
+	}
+	return nil
+}
+
 func (x *SelectClusterRequest) GetOperation() SelectClusterRequest_Operation {
 	if x != nil {
 		return x.Operation
@@ -277,6 +285,14 @@ type SelectClusterRequest_ClusterId struct {
 	ClusterId *common.ClusterIdentifier `protobuf:"bytes,10,opt,name=cluster_id,json=clusterId,proto3,oneof"`
 }
 
+type SelectClusterRequest_QueueId struct {
+	// Names a queue. The queue resolves to its cluster pool and the request routes
+	// to a cluster in that pool, e.g. to upload a run's inputs where the queue's
+	// work runs. With OPERATION_USE_SECRETS it is handled exactly as if that pool
+	// had been passed as cluster_pool_id.
+	QueueId *common.QueueIdentifier `protobuf:"bytes,11,opt,name=queue_id,json=queueId,proto3,oneof"`
+}
+
 func (*SelectClusterRequest_OrgId) isSelectClusterRequest_Resource() {}
 
 func (*SelectClusterRequest_ProjectId) isSelectClusterRequest_Resource() {}
@@ -294,6 +310,8 @@ func (*SelectClusterRequest_ClusterPoolId) isSelectClusterRequest_Resource() {}
 func (*SelectClusterRequest_DomainId) isSelectClusterRequest_Resource() {}
 
 func (*SelectClusterRequest_ClusterId) isSelectClusterRequest_Resource() {}
+
+func (*SelectClusterRequest_QueueId) isSelectClusterRequest_Resource() {}
 
 type SelectClusterResponse struct {
 	state         protoimpl.MessageState
@@ -367,7 +385,7 @@ var file_flyteidl2_cluster_payload_proto_rawDesc = []byte{
 	0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2f, 0x69, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x69,
 	0x65, 0x72, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x24, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69,
 	0x64, 0x6c, 0x32, 0x2f, 0x74, 0x61, 0x73, 0x6b, 0x2f, 0x74, 0x61, 0x73, 0x6b, 0x5f, 0x64, 0x65,
-	0x66, 0x69, 0x6e, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x94,
+	0x66, 0x69, 0x6e, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xd4,
 	0x09, 0x0a, 0x14, 0x53, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72,
 	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x38, 0x0a, 0x06, 0x6f, 0x72, 0x67, 0x5f, 0x69,
 	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69,
@@ -407,7 +425,11 @@ var file_flyteidl2_cluster_payload_proto_rawDesc = []byte{
 	0x74, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x66,
 	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x6f, 0x6e, 0x2e,
 	0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x69, 0x65,
-	0x72, 0x48, 0x00, 0x52, 0x09, 0x63, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x49, 0x64, 0x12, 0x59,
+	0x72, 0x48, 0x00, 0x52, 0x09, 0x63, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x49, 0x64, 0x12, 0x3e,
+	0x0a, 0x08, 0x71, 0x75, 0x65, 0x75, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x21, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x63, 0x6f, 0x6d,
+	0x6d, 0x6f, 0x6e, 0x2e, 0x51, 0x75, 0x65, 0x75, 0x65, 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66,
+	0x69, 0x65, 0x72, 0x48, 0x00, 0x52, 0x07, 0x71, 0x75, 0x65, 0x75, 0x65, 0x49, 0x64, 0x12, 0x59,
 	0x0a, 0x09, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x08, 0x20, 0x01, 0x28,
 	0x0e, 0x32, 0x31, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x32, 0x2e, 0x63, 0x6c,
 	0x75, 0x73, 0x74, 0x65, 0x72, 0x2e, 0x53, 0x65, 0x6c, 0x65, 0x63, 0x74, 0x43, 0x6c, 0x75, 0x73,
@@ -490,6 +512,7 @@ var file_flyteidl2_cluster_payload_proto_goTypes = []interface{}{
 	(*common.ClusterPoolIdentifier)(nil),   // 9: flyteidl2.common.ClusterPoolIdentifier
 	(*common.DomainIdentifier)(nil),        // 10: flyteidl2.common.DomainIdentifier
 	(*common.ClusterIdentifier)(nil),       // 11: flyteidl2.common.ClusterIdentifier
+	(*common.QueueIdentifier)(nil),         // 12: flyteidl2.common.QueueIdentifier
 }
 var file_flyteidl2_cluster_payload_proto_depIdxs = []int32{
 	3,  // 0: flyteidl2.cluster.SelectClusterRequest.org_id:type_name -> flyteidl2.common.OrgIdentifier
@@ -501,12 +524,13 @@ var file_flyteidl2_cluster_payload_proto_depIdxs = []int32{
 	9,  // 6: flyteidl2.cluster.SelectClusterRequest.cluster_pool_id:type_name -> flyteidl2.common.ClusterPoolIdentifier
 	10, // 7: flyteidl2.cluster.SelectClusterRequest.domain_id:type_name -> flyteidl2.common.DomainIdentifier
 	11, // 8: flyteidl2.cluster.SelectClusterRequest.cluster_id:type_name -> flyteidl2.common.ClusterIdentifier
-	0,  // 9: flyteidl2.cluster.SelectClusterRequest.operation:type_name -> flyteidl2.cluster.SelectClusterRequest.Operation
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	12, // 9: flyteidl2.cluster.SelectClusterRequest.queue_id:type_name -> flyteidl2.common.QueueIdentifier
+	0,  // 10: flyteidl2.cluster.SelectClusterRequest.operation:type_name -> flyteidl2.cluster.SelectClusterRequest.Operation
+	11, // [11:11] is the sub-list for method output_type
+	11, // [11:11] is the sub-list for method input_type
+	11, // [11:11] is the sub-list for extension type_name
+	11, // [11:11] is the sub-list for extension extendee
+	0,  // [0:11] is the sub-list for field type_name
 }
 
 func init() { file_flyteidl2_cluster_payload_proto_init() }
@@ -550,6 +574,7 @@ func file_flyteidl2_cluster_payload_proto_init() {
 		(*SelectClusterRequest_ClusterPoolId)(nil),
 		(*SelectClusterRequest_DomainId)(nil),
 		(*SelectClusterRequest_ClusterId)(nil),
+		(*SelectClusterRequest_QueueId)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

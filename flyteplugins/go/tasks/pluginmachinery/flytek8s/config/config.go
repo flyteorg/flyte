@@ -6,6 +6,7 @@
 package config
 
 import (
+	"maps"
 	"strings"
 	"time"
 
@@ -64,11 +65,15 @@ var (
 		PodPendingTimeout: config2.Duration{
 			Duration: 0,
 		},
+		TerminatingResourceGracePeriod: config2.Duration{
+			Duration: time.Minute * 5,
+		},
 		GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
 		GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
 		GpuResourceName:           ResourceNvidiaGPU,
 		AcceleratorDevices: map[string]string{
 			// NVIDIA GPUs
+			"A2":            "nvidia-a2",
 			"A10":           "nvidia-a10",
 			"A10G":          "nvidia-a10g",
 			"A100":          "nvidia-tesla-a100",
@@ -87,9 +92,19 @@ var (
 			"M60":           "nvidia-tesla-m60",
 			"P4":            "nvidia-tesla-p4",
 			"P100":          "nvidia-tesla-p100",
+			"RTX PRO 4500":  "nvidia-rtx-pro-4500",
 			"RTX PRO 6000":  "nvidia-rtx-pro-6000",
 			"T4":            "nvidia-tesla-t4",
 			"V100":          "nvidia-tesla-v100",
+
+			// Time-sliced or MPS-shared NVIDIA GPUs. Nodes in a shared pool carry
+			// the plain model's label with a "-shared" suffix, so a task asking
+			// for a shared device lands only on those nodes.
+			"A10 SHARED":  "nvidia-a10-shared",
+			"A10G SHARED": "nvidia-a10g-shared",
+			"L4 SHARED":   "nvidia-l4-shared",
+			"L40S SHARED": "nvidia-l40s-shared",
+			"T4 SHARED":   "nvidia-tesla-t4-shared",
 
 			// Google Cloud TPUs
 			"V5E": "tpu-v5-lite-podslice",
@@ -117,6 +132,90 @@ var (
 
 			// Habana Gaudi (Intel)
 			"GAUDI1": "habana-gaudi-dl1",
+
+			// Canonical AcceleratorModel accelerator_name strings (flyteidl2
+			// core/tasks.proto). Each maps to the node label the SDK's current
+			// spelling of the same device resolves to above, so a task carrying the
+			// canonical string is placed exactly as one carrying the old spelling.
+			// Listed upper- and lower-cased; the lookup upper-cases its input.
+			"NVIDIA-K80":            "nvidia-tesla-k80",
+			"nvidia-k80":            "nvidia-tesla-k80",
+			"NVIDIA-M60":            "nvidia-tesla-m60",
+			"nvidia-m60":            "nvidia-tesla-m60",
+			"NVIDIA-P4":             "nvidia-tesla-p4",
+			"nvidia-p4":             "nvidia-tesla-p4",
+			"NVIDIA-P100":           "nvidia-tesla-p100",
+			"nvidia-p100":           "nvidia-tesla-p100",
+			"NVIDIA-V100":           "nvidia-tesla-v100",
+			"nvidia-v100":           "nvidia-tesla-v100",
+			"NVIDIA-T4":             "nvidia-tesla-t4",
+			"nvidia-t4":             "nvidia-tesla-t4",
+			"NVIDIA-A10":            "nvidia-a10",
+			"nvidia-a10":            "nvidia-a10",
+			"NVIDIA-A10G":           "nvidia-a10g",
+			"nvidia-a10g":           "nvidia-a10g",
+			"NVIDIA-A100":           "nvidia-tesla-a100",
+			"nvidia-a100":           "nvidia-tesla-a100",
+			"NVIDIA-A100-80GB":      "nvidia-a100-80gb",
+			"nvidia-a100-80gb":      "nvidia-a100-80gb",
+			"NVIDIA-L4":             "nvidia-l4",
+			"nvidia-l4":             "nvidia-l4",
+			"NVIDIA-L40S":           "nvidia-l40s",
+			"nvidia-l40s":           "nvidia-l40s",
+			"NVIDIA-H100":           "nvidia-tesla-h100",
+			"nvidia-h100":           "nvidia-tesla-h100",
+			"NVIDIA-H100-MEGA-80GB": "nvidia-h100-mega-80gb",
+			"nvidia-h100-mega-80gb": "nvidia-h100-mega-80gb",
+			"NVIDIA-H200":           "nvidia-h200",
+			"nvidia-h200":           "nvidia-h200",
+			"NVIDIA-B200":           "nvidia-b200",
+			"nvidia-b200":           "nvidia-b200",
+			"NVIDIA-GB200":          "nvidia-gb200",
+			"nvidia-gb200":          "nvidia-gb200",
+			"NVIDIA-GB10":           "GB10",
+			"nvidia-gb10":           "GB10",
+			"NVIDIA-RTX-PRO-6000":   "nvidia-rtx-pro-6000",
+			"nvidia-rtx-pro-6000":   "nvidia-rtx-pro-6000",
+			"NVIDIA-RTX-PRO-4500":   "nvidia-rtx-pro-4500",
+			"nvidia-rtx-pro-4500":   "nvidia-rtx-pro-4500",
+			"GOOGLE-TPU-V5E":        "tpu-v5-lite-podslice",
+			"google-tpu-v5e":        "tpu-v5-lite-podslice",
+			"GOOGLE-TPU-V5P":        "tpu-v5p-slice",
+			"google-tpu-v5p":        "tpu-v5p-slice",
+			"GOOGLE-TPU-V6E":        "tpu-v6e-slice",
+			"google-tpu-v6e":        "tpu-v6e-slice",
+			"AWS-INF1":              "aws-neuron-inf1",
+			"aws-inf1":              "aws-neuron-inf1",
+			"AWS-INF2":              "aws-neuron-inf2",
+			"aws-inf2":              "aws-neuron-inf2",
+			"AWS-TRN1":              "aws-neuron-trn1",
+			"aws-trn1":              "aws-neuron-trn1",
+			"AWS-TRN1N":             "aws-neuron-trn1n",
+			"aws-trn1n":             "aws-neuron-trn1n",
+			"AWS-TRN2":              "aws-neuron-trn2",
+			"aws-trn2":              "aws-neuron-trn2",
+			"AWS-TRN2U":             "aws-neuron-trn2u",
+			"aws-trn2u":             "aws-neuron-trn2u",
+			"AMD-MI100":             "amd-mi100",
+			"amd-mi100":             "amd-mi100",
+			"AMD-MI210":             "amd-mi210",
+			"amd-mi210":             "amd-mi210",
+			"AMD-MI250":             "amd-mi250",
+			"amd-mi250":             "amd-mi250",
+			"AMD-MI250X":            "amd-mi250x",
+			"amd-mi250x":            "amd-mi250x",
+			"AMD-MI300A":            "amd-mi300a",
+			"amd-mi300a":            "amd-mi300a",
+			"AMD-MI300X":            "amd-mi300x",
+			"amd-mi300x":            "amd-mi300x",
+			"AMD-MI325X":            "amd-mi325x",
+			"amd-mi325x":            "amd-mi325x",
+			"AMD-MI350X":            "amd-mi350x",
+			"amd-mi350x":            "amd-mi350x",
+			"AMD-MI355X":            "amd-mi355x",
+			"amd-mi355x":            "amd-mi355x",
+			"HABANA-GAUDI1":         "habana-gaudi-dl1",
+			"habana-gaudi1":         "habana-gaudi-dl1",
 		},
 		AcceleratorDeviceClasses: map[string]AcceleratorDeviceClassConfig{
 			core.GPUAccelerator_NVIDIA_GPU.String(): {
@@ -136,6 +235,9 @@ var (
 			core.GPUAccelerator_HABANA_GAUDI.String(): {
 				ResourceName: "habana.ai/gaudi",
 			},
+			// No resource name: the Apple Silicon GPU is reached through the devbox's host
+			// Apple Silicon bridge (see AppleSiliconBridge), never through a device plugin.
+			core.GPUAccelerator_APPLE_SILICON.String(): {},
 		},
 		DefaultPodTemplateResync: config2.Duration{
 			Duration: 30 * time.Second,
@@ -148,6 +250,10 @@ var (
 	// K8sPluginConfigSection provides a singular top level config section for all plugins.
 	// If you are a plugin developer writing a k8s plugin, register your config section as a subsection to this.
 	K8sPluginConfigSection = config.MustRegisterSubSection(k8sPluginConfigSectionKey, &defaultK8sConfig)
+
+	// defaultAcceleratorDevices is the built-in accelerator device map with upper-cased keys. Configured
+	// accelerator devices are merged over it, so setting one entry does not drop the rest.
+	defaultAcceleratorDevices = upperCaseKeys(defaultK8sConfig.AcceleratorDevices)
 )
 
 // K8sPluginConfig should be used to configure per-pod defaults for the entire platform. This allows adding global defaults
@@ -243,6 +349,13 @@ type K8sPluginConfig struct {
 	// issue, and the corresponding task marked as failed
 	PodPendingTimeout config2.Duration `json:"pod-pending-timeout" pflag:"-,Time to wait while pod is stuck in pending."`
 
+	// Time a relaunch waits, past the end of its deletion grace period, for a previous
+	// incarnation of the resource still holding its name to go away. A resource stuck
+	// terminating longer than this (an unreachable node, a finalizer that never clears)
+	// fails the launch with a system-retryable error instead of waiting forever. Zero
+	// waits indefinitely.
+	TerminatingResourceGracePeriod config2.Duration `json:"terminating-resource-grace-period" pflag:"-,Time to wait past its deletion grace period for a previous resource stuck terminating before failing the launch."`
+
 	// The node label that specifies the attached GPU device.
 	GpuDeviceNodeLabel string `json:"gpu-device-node-label" pflag:"-,The node label that specifies the attached GPU device."`
 
@@ -304,6 +417,25 @@ type K8sPluginConfig struct {
 
 	// DisableInjectOwnerReferences is a boolean flag that indicates if owner references should be injected into the k8s resources.
 	DisableInjectOwnerReferences bool `json:"disable-inject-owner-references" pflag:",Override to not set owner references on k8s resources. This is useful for V2 node execution"`
+
+	// AppleSiliconBridge configures the devbox-local Apple Silicon accelerator. It is only
+	// set by a devbox running on an Apple Silicon host; everywhere else it stays empty and a
+	// workload requesting the APPLE_SILICON device class fails with APPLE_SILICON_NOT_AVAILABLE.
+	AppleSiliconBridge AppleSiliconBridgeConfig `json:"apple-silicon-bridge" pflag:"-,Devbox-local Apple Silicon bridge configuration."`
+}
+
+// AppleSiliconBridgeConfig points Apple Silicon workloads at the host-side Apple Silicon bridge a devbox runs on an
+// Apple Silicon Mac. Pods cannot reach the host's Metal GPU, so instead of scheduling against a
+// device plugin they are handed the bridge's OpenAI-compatible endpoint and a per-workload token.
+type AppleSiliconBridgeConfig struct {
+	// Endpoint is the bridge's base URL as reachable from pods, e.g. http://192.168.65.254:30090.
+	// Empty means this backend has no Apple Silicon bridge.
+	Endpoint string `json:"endpoint"`
+	// TokenSecret is the HMAC key shared with the bridge, used to mint each workload's credential.
+	TokenSecret string `json:"token-secret"`
+	// HostPlatform is the devbox host's os/arch (e.g. darwin/arm64, linux/amd64), quoted in the
+	// APPLE_SILICON_NOT_AVAILABLE message so the user sees why their host cannot provide Apple Silicon.
+	HostPlatform string `json:"host-platform"`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers
@@ -348,6 +480,16 @@ type AcceleratorDeviceClassConfig struct {
 
 	// The node label that specifies the attached accelerator partition size.
 	PartitionSizeNodeLabel string `json:"partition-size-node-label" pflag:"-,The node label that specifies the attached partition size."`
+
+	// Optional template for the Kubernetes resource name a task requests when it asks for a
+	// specific partition of this device class. Every "{partition}" in the template is replaced
+	// with the task's partition size, so "nvidia.com/mig-{partition}" turns a 1g.5gb partition
+	// into a request for nvidia.com/mig-1g.5gb. Set it on clusters whose NVIDIA device plugin runs
+	// with migStrategy=mixed, which offers each MIG profile as its own resource. A partitioned
+	// request then asks for the rendered name in place of ResourceName, with the same count, and
+	// gets no partition size node affinity or toleration, because only nodes that offer that
+	// profile can satisfy the resource. Requests without a partition size still use ResourceName.
+	PartitionResourceName string `json:"partition-resource-name" pflag:"-,Template for the resource name requested for a partition, such as nvidia.com/mig-{partition}."`
 
 	// Override for node selector requirement added to pods intended for unpartitioned nodes.
 	UnpartitionedNodeSelectorRequirement *v1.NodeSelectorRequirement `json:"unpartitioned-node-selector-requirement" pflag:"-,Override for node selector requirement added to pods intended for unpartitioned nodes."`
@@ -394,7 +536,23 @@ func GetK8sPluginConfig() *K8sPluginConfig {
 	}
 	cfg.AcceleratorDeviceClasses = acceleratorDeviceClasses
 
+	// The config loader replaces the default accelerator device map instead of merging into it, and viper lowercases
+	// its keys. Merge the configured entries over the defaults with upper-cased keys to match the lookup.
+	acceleratorDevices := maps.Clone(defaultAcceleratorDevices)
+	for name, label := range cfg.AcceleratorDevices {
+		acceleratorDevices[strings.ToUpper(name)] = label
+	}
+	cfg.AcceleratorDevices = acceleratorDevices
+
 	return cfg
+}
+
+func upperCaseKeys(m map[string]string) map[string]string {
+	upper := make(map[string]string, len(m))
+	for key, value := range m {
+		upper[strings.ToUpper(key)] = value
+	}
+	return upper
 }
 
 // SetK8sPluginConfig should be used for TESTING ONLY, It Sets current value for the config.

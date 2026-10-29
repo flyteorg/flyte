@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"math"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -1134,7 +1135,7 @@ func literalToJsonValues(ctx context.Context, literal *core.Literal) (any, error
 				return p.Boolean, nil
 			case *core.Primitive_Datetime:
 				if p.Datetime != nil {
-					return p.Datetime.AsTime().Format(time.RFC3339), nil
+					return p.Datetime.AsTime().Format(time.RFC3339Nano), nil
 				}
 				logger.Errorf(ctx, "datetime cannot be nil")
 				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("datetime cannot be nil"))
@@ -1547,6 +1548,12 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 			if num, ok := value.(int64); ok {
 				intNum = num
 			} else if num, ok := value.(float64); ok {
+				// JSON numbers decode as float64. Reject a fractional value instead of
+				// truncating it, so that a union such as int | float picks the float variant.
+				if num != math.Trunc(num) {
+					logger.Errorf(ctx, "invalid integer value: %v is not a whole number", num)
+					return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid integer value: %v is not a whole number", num))
+				}
 				intNum = int64(num)
 			} else if num, ok := value.(int); ok {
 				intNum = int64(num)

@@ -12,7 +12,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/core/execution.proto.
  */
 export const file_flyteidl2_core_execution: GenFile = /*@__PURE__*/
-  fileDesc("Ch5mbHl0ZWlkbDIvY29yZS9leGVjdXRpb24ucHJvdG8SDmZseXRlaWRsMi5jb3JlIqcBChFXb3JrZmxvd0V4ZWN1dGlvbiKRAQoFUGhhc2USDQoJVU5ERUZJTkVEEAASCgoGUVVFVUVEEAESCwoHUlVOTklORxACEg4KClNVQ0NFRURJTkcQAxINCglTVUNDRUVERUQQBBILCgdGQUlMSU5HEAUSCgoGRkFJTEVEEAYSCwoHQUJPUlRFRBAHEg0KCVRJTUVEX09VVBAIEgwKCEFCT1JUSU5HEAkitgEKDU5vZGVFeGVjdXRpb24ipAEKBVBoYXNlEg0KCVVOREVGSU5FRBAAEgoKBlFVRVVFRBABEgsKB1JVTk5JTkcQAhINCglTVUNDRUVERUQQAxILCgdGQUlMSU5HEAQSCgoGRkFJTEVEEAUSCwoHQUJPUlRFRBAGEgsKB1NLSVBQRUQQBxINCglUSU1FRF9PVVQQCBITCg9EWU5BTUlDX1JVTk5JTkcQCRINCglSRUNPVkVSRUQQCiKsAQoNVGFza0V4ZWN1dGlvbiKaAQoFUGhhc2USDQoJVU5ERUZJTkVEEAASCgoGUVVFVUVEEAESCwoHUlVOTklORxACEg0KCVNVQ0NFRURFRBADEgsKB0FCT1JURUQQBBIKCgZGQUlMRUQQBRIQCgxJTklUSUFMSVpJTkcQBhIZChVXQUlUSU5HX0ZPUl9SRVNPVVJDRVMQBxIUChBSRVRSWUFCTEVfRkFJTEVEEAgipgIKDkV4ZWN1dGlvbkVycm9yEgwKBGNvZGUYASABKAkSDwoHbWVzc2FnZRgCIAEoCRIRCgllcnJvcl91cmkYAyABKAkSNgoEa2luZBgEIAEoDjIoLmZseXRlaWRsMi5jb3JlLkV4ZWN1dGlvbkVycm9yLkVycm9yS2luZBItCgl0aW1lc3RhbXAYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEg4KBndvcmtlchgGIAEoCRI7Cg5yZWNvdmVyYWJpbGl0eRgHIAEoDjIjLmZseXRlaWRsMi5jb3JlLkNvbnRhaW5lckVycm9yLktpbmQiLgoJRXJyb3JLaW5kEgsKB1VOS05PV04QABIICgRVU0VSEAESCgoGU1lTVEVNEAIiygEKDkNvbnRhaW5lckVycm9yEgwKBGNvZGUYASABKAkSDwoHbWVzc2FnZRgCIAEoCRIxCgRraW5kGAMgASgOMiMuZmx5dGVpZGwyLmNvcmUuQ29udGFpbmVyRXJyb3IuS2luZBI4CgZvcmlnaW4YBCABKA4yKC5mbHl0ZWlkbDIuY29yZS5FeGVjdXRpb25FcnJvci5FcnJvcktpbmQiLAoES2luZBITCg9OT05fUkVDT1ZFUkFCTEUQABIPCgtSRUNPVkVSQUJMRRABIj4KDUVycm9yRG9jdW1lbnQSLQoFZXJyb3IYASABKAsyHi5mbHl0ZWlkbDIuY29yZS5Db250YWluZXJFcnJvciL4AgoHVGFza0xvZxILCgN1cmkYASABKAkSDAoEbmFtZRgCIAEoCRI9Cg5tZXNzYWdlX2Zvcm1hdBgDIAEoDjIlLmZseXRlaWRsMi5jb3JlLlRhc2tMb2cuTWVzc2FnZUZvcm1hdBImCgN0dGwYBCABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SGAoQU2hvd1doaWxlUGVuZGluZxgFIAEoCBIYChBIaWRlT25jZUZpbmlzaGVkGAYgASgIEjMKCWxpbmtfdHlwZRgHIAEoDjIgLmZseXRlaWRsMi5jb3JlLlRhc2tMb2cuTGlua1R5cGUSDQoFcmVhZHkYCCABKAgSEAoIaWNvbl91cmkYCSABKAkiLwoNTWVzc2FnZUZvcm1hdBILCgdVTktOT1dOEAASBwoDQ1NWEAESCAoESlNPThACIjAKCExpbmtUeXBlEgwKCEVYVEVSTkFMEAASDQoJREFTSEJPQVJEEAESBwoDSURFEAIiwwEKCkxvZ0NvbnRleHQSKwoEcG9kcxgBIAMoCzIdLmZseXRlaWRsMi5jb3JlLlBvZExvZ0NvbnRleHQSGAoQcHJpbWFyeV9wb2RfbmFtZRgCIAEoCRI2Cgljb25uZWN0b3IYAyABKAsyIy5mbHl0ZWlkbDIuY29yZS5Db25uZWN0b3JMb2dDb250ZXh0EhsKD3BvZF9uYW1lX3ByZWZpeBgEIAEoCUICGAESGQoRcG9kX25hbWVfcHJlZml4ZXMYBSADKAkiJwoTQ29ubmVjdG9yTG9nQ29udGV4dBIQCghlbmRwb2ludBgBIAEoCSLFAQoNUG9kTG9nQ29udGV4dBIRCgluYW1lc3BhY2UYASABKAkSEAoIcG9kX25hbWUYAiABKAkSNAoKY29udGFpbmVycxgDIAMoCzIgLmZseXRlaWRsMi5jb3JlLkNvbnRhaW5lckNvbnRleHQSHgoWcHJpbWFyeV9jb250YWluZXJfbmFtZRgEIAEoCRI5Cg9pbml0X2NvbnRhaW5lcnMYBSADKAsyIC5mbHl0ZWlkbDIuY29yZS5Db250YWluZXJDb250ZXh0IvEBChBDb250YWluZXJDb250ZXh0EhYKDmNvbnRhaW5lcl9uYW1lGAEgASgJEkAKB3Byb2Nlc3MYAiABKAsyLy5mbHl0ZWlkbDIuY29yZS5Db250YWluZXJDb250ZXh0LlByb2Nlc3NDb250ZXh0GoIBCg5Qcm9jZXNzQ29udGV4dBI4ChRjb250YWluZXJfc3RhcnRfdGltZRgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASNgoSY29udGFpbmVyX2VuZF90aW1lGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJKChRRdWFsaXR5T2ZTZXJ2aWNlU3BlYxIyCg9xdWV1ZWluZ19idWRnZXQYASABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24ixAEKEFF1YWxpdHlPZlNlcnZpY2USNQoEdGllchgBIAEoDjIlLmZseXRlaWRsMi5jb3JlLlF1YWxpdHlPZlNlcnZpY2UuVGllckgAEjQKBHNwZWMYAiABKAsyJC5mbHl0ZWlkbDIuY29yZS5RdWFsaXR5T2ZTZXJ2aWNlU3BlY0gAIjQKBFRpZXISDQoJVU5ERUZJTkVEEAASCAoESElHSBABEgoKBk1FRElVTRACEgcKA0xPVxADQg0KC2Rlc2lnbmF0aW9uQrMBChJjb20uZmx5dGVpZGwyLmNvcmVCDkV4ZWN1dGlvblByb3RvSAJQAVoyZ2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2NvcmWiAgNGQ1iqAg5GbHl0ZWlkbDIuQ29yZcoCDkZseXRlaWRsMlxDb3Jl4gIaRmx5dGVpZGwyXENvcmVcR1BCTWV0YWRhdGHqAg9GbHl0ZWlkbDI6OkNvcmViBnByb3RvMw", [file_google_protobuf_duration, file_google_protobuf_timestamp]);
+  fileDesc("Ch5mbHl0ZWlkbDIvY29yZS9leGVjdXRpb24ucHJvdG8SDmZseXRlaWRsMi5jb3JlIqcBChFXb3JrZmxvd0V4ZWN1dGlvbiKRAQoFUGhhc2USDQoJVU5ERUZJTkVEEAASCgoGUVVFVUVEEAESCwoHUlVOTklORxACEg4KClNVQ0NFRURJTkcQAxINCglTVUNDRUVERUQQBBILCgdGQUlMSU5HEAUSCgoGRkFJTEVEEAYSCwoHQUJPUlRFRBAHEg0KCVRJTUVEX09VVBAIEgwKCEFCT1JUSU5HEAkitgEKDU5vZGVFeGVjdXRpb24ipAEKBVBoYXNlEg0KCVVOREVGSU5FRBAAEgoKBlFVRVVFRBABEgsKB1JVTk5JTkcQAhINCglTVUNDRUVERUQQAxILCgdGQUlMSU5HEAQSCgoGRkFJTEVEEAUSCwoHQUJPUlRFRBAGEgsKB1NLSVBQRUQQBxINCglUSU1FRF9PVVQQCBITCg9EWU5BTUlDX1JVTk5JTkcQCRINCglSRUNPVkVSRUQQCiKsAQoNVGFza0V4ZWN1dGlvbiKaAQoFUGhhc2USDQoJVU5ERUZJTkVEEAASCgoGUVVFVUVEEAESCwoHUlVOTklORxACEg0KCVNVQ0NFRURFRBADEgsKB0FCT1JURUQQBBIKCgZGQUlMRUQQBRIQCgxJTklUSUFMSVpJTkcQBhIZChVXQUlUSU5HX0ZPUl9SRVNPVVJDRVMQBxIUChBSRVRSWUFCTEVfRkFJTEVEEAgi0wIKDkV4ZWN1dGlvbkVycm9yEgwKBGNvZGUYASABKAkSDwoHbWVzc2FnZRgCIAEoCRIRCgllcnJvcl91cmkYAyABKAkSNgoEa2luZBgEIAEoDjIoLmZseXRlaWRsMi5jb3JlLkV4ZWN1dGlvbkVycm9yLkVycm9yS2luZBItCgl0aW1lc3RhbXAYBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEg4KBndvcmtlchgGIAEoCRI7Cg5yZWNvdmVyYWJpbGl0eRgHIAEoDjIjLmZseXRlaWRsMi5jb3JlLkNvbnRhaW5lckVycm9yLktpbmQSKwoJZ3B1X2ZhdWx0GAggASgLMhguZmx5dGVpZGwyLmNvcmUuR3B1RmF1bHQiLgoJRXJyb3JLaW5kEgsKB1VOS05PV04QABIICgRVU0VSEAESCgoGU1lTVEVNEAIingMKCEdwdUZhdWx0EisKBGtpbmQYASABKA4yHS5mbHl0ZWlkbDIuY29yZS5HcHVGYXVsdC5LaW5kEgwKBGNvZGUYAiABKA0SDAoEbmFtZRgDIAEoCRIzCghzZXZlcml0eRgEIAEoDjIhLmZseXRlaWRsMi5jb3JlLkdwdUZhdWx0LlNldmVyaXR5EhAKCGdwdV91dWlkGAUgASgJEhYKCWdwdV9pbmRleBgGIAEoDUgAiAEBEhIKCnBjaV9idXNfaWQYByABKAkSDAoEbm9kZRgIIAEoCRILCgNwaWQYCSABKA0SDwoHcHJvY2VzcxgKIAEoCSI5CgRLaW5kEhQKEEtJTkRfVU5TUEVDSUZJRUQQABIMCghLSU5EX1hJRBABEg0KCUtJTkRfU1hJRBACImEKCFNldmVyaXR5EhgKFFNFVkVSSVRZX1VOU1BFQ0lGSUVEEAASEQoNU0VWRVJJVFlfVVNFUhABEhEKDVNFVkVSSVRZX1dBUk4QAhIVChFTRVZFUklUWV9DUklUSUNBTBADQgwKCl9ncHVfaW5kZXgiygEKDkNvbnRhaW5lckVycm9yEgwKBGNvZGUYASABKAkSDwoHbWVzc2FnZRgCIAEoCRIxCgRraW5kGAMgASgOMiMuZmx5dGVpZGwyLmNvcmUuQ29udGFpbmVyRXJyb3IuS2luZBI4CgZvcmlnaW4YBCABKA4yKC5mbHl0ZWlkbDIuY29yZS5FeGVjdXRpb25FcnJvci5FcnJvcktpbmQiLAoES2luZBITCg9OT05fUkVDT1ZFUkFCTEUQABIPCgtSRUNPVkVSQUJMRRABIj4KDUVycm9yRG9jdW1lbnQSLQoFZXJyb3IYASABKAsyHi5mbHl0ZWlkbDIuY29yZS5Db250YWluZXJFcnJvciL4AgoHVGFza0xvZxILCgN1cmkYASABKAkSDAoEbmFtZRgCIAEoCRI9Cg5tZXNzYWdlX2Zvcm1hdBgDIAEoDjIlLmZseXRlaWRsMi5jb3JlLlRhc2tMb2cuTWVzc2FnZUZvcm1hdBImCgN0dGwYBCABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SGAoQU2hvd1doaWxlUGVuZGluZxgFIAEoCBIYChBIaWRlT25jZUZpbmlzaGVkGAYgASgIEjMKCWxpbmtfdHlwZRgHIAEoDjIgLmZseXRlaWRsMi5jb3JlLlRhc2tMb2cuTGlua1R5cGUSDQoFcmVhZHkYCCABKAgSEAoIaWNvbl91cmkYCSABKAkiLwoNTWVzc2FnZUZvcm1hdBILCgdVTktOT1dOEAASBwoDQ1NWEAESCAoESlNPThACIjAKCExpbmtUeXBlEgwKCEVYVEVSTkFMEAASDQoJREFTSEJPQVJEEAESBwoDSURFEAIiwwEKCkxvZ0NvbnRleHQSKwoEcG9kcxgBIAMoCzIdLmZseXRlaWRsMi5jb3JlLlBvZExvZ0NvbnRleHQSGAoQcHJpbWFyeV9wb2RfbmFtZRgCIAEoCRI2Cgljb25uZWN0b3IYAyABKAsyIy5mbHl0ZWlkbDIuY29yZS5Db25uZWN0b3JMb2dDb250ZXh0EhsKD3BvZF9uYW1lX3ByZWZpeBgEIAEoCUICGAESGQoRcG9kX25hbWVfcHJlZml4ZXMYBSADKAkiJwoTQ29ubmVjdG9yTG9nQ29udGV4dBIQCghlbmRwb2ludBgBIAEoCSLFAQoNUG9kTG9nQ29udGV4dBIRCgluYW1lc3BhY2UYASABKAkSEAoIcG9kX25hbWUYAiABKAkSNAoKY29udGFpbmVycxgDIAMoCzIgLmZseXRlaWRsMi5jb3JlLkNvbnRhaW5lckNvbnRleHQSHgoWcHJpbWFyeV9jb250YWluZXJfbmFtZRgEIAEoCRI5Cg9pbml0X2NvbnRhaW5lcnMYBSADKAsyIC5mbHl0ZWlkbDIuY29yZS5Db250YWluZXJDb250ZXh0IvEBChBDb250YWluZXJDb250ZXh0EhYKDmNvbnRhaW5lcl9uYW1lGAEgASgJEkAKB3Byb2Nlc3MYAiABKAsyLy5mbHl0ZWlkbDIuY29yZS5Db250YWluZXJDb250ZXh0LlByb2Nlc3NDb250ZXh0GoIBCg5Qcm9jZXNzQ29udGV4dBI4ChRjb250YWluZXJfc3RhcnRfdGltZRgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASNgoSY29udGFpbmVyX2VuZF90aW1lGAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJKChRRdWFsaXR5T2ZTZXJ2aWNlU3BlYxIyCg9xdWV1ZWluZ19idWRnZXQYASABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24ixAEKEFF1YWxpdHlPZlNlcnZpY2USNQoEdGllchgBIAEoDjIlLmZseXRlaWRsMi5jb3JlLlF1YWxpdHlPZlNlcnZpY2UuVGllckgAEjQKBHNwZWMYAiABKAsyJC5mbHl0ZWlkbDIuY29yZS5RdWFsaXR5T2ZTZXJ2aWNlU3BlY0gAIjQKBFRpZXISDQoJVU5ERUZJTkVEEAASCAoESElHSBABEgoKBk1FRElVTRACEgcKA0xPVxADQg0KC2Rlc2lnbmF0aW9uQrMBChJjb20uZmx5dGVpZGwyLmNvcmVCDkV4ZWN1dGlvblByb3RvSAJQAVoyZ2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2NvcmWiAgNGQ1iqAg5GbHl0ZWlkbDIuQ29yZcoCDkZseXRlaWRsMlxDb3Jl4gIaRmx5dGVpZGwyXENvcmVcR1BCTWV0YWRhdGHqAg9GbHl0ZWlkbDI6OkNvcmViBnByb3RvMw", [file_google_protobuf_duration, file_google_protobuf_timestamp]);
 
 /**
  * Indicates various phases of Workflow Execution
@@ -306,6 +306,15 @@ export type ExecutionError = Message<"flyteidl2.core.ExecutionError"> & {
    * @generated from field: flyteidl2.core.ContainerError.Kind recoverability = 7;
    */
   recoverability: ContainerError_Kind;
+
+  /**
+   * Set when the failure was classified as caused by or coincident with a GPU
+   * fault. It carries the fault as data so that consumers do not have to parse
+   * message.
+   *
+   * @generated from field: flyteidl2.core.GpuFault gpu_fault = 8;
+   */
+  gpuFault?: GpuFault;
 };
 
 /**
@@ -342,6 +351,156 @@ export enum ExecutionError_ErrorKind {
  */
 export const ExecutionError_ErrorKindSchema: GenEnum<ExecutionError_ErrorKind> = /*@__PURE__*/
   enumDesc(file_flyteidl2_core_execution, 3, 0);
+
+/**
+ * GpuFault is a GPU fault reported by the NVIDIA driver in the node kernel log
+ * and attributed to an action attempt by the data plane. Field semantics follow
+ * the driver's Xid line: which device faulted, which fault, and, when the driver
+ * could blame a process, which process.
+ *
+ * @generated from message flyteidl2.core.GpuFault
+ */
+export type GpuFault = Message<"flyteidl2.core.GpuFault"> & {
+  /**
+   * @generated from field: flyteidl2.core.GpuFault.Kind kind = 1;
+   */
+  kind: GpuFault_Kind;
+
+  /**
+   * The Xid or SXid number as printed by the driver, for example 79.
+   *
+   * @generated from field: uint32 code = 2;
+   */
+  code: number;
+
+  /**
+   * Short human-readable name of the fault, for example "GPU has fallen off the
+   * bus". Empty when the data plane does not know the code.
+   *
+   * @generated from field: string name = 3;
+   */
+  name: string;
+
+  /**
+   * @generated from field: flyteidl2.core.GpuFault.Severity severity = 4;
+   */
+  severity: GpuFault_Severity;
+
+  /**
+   * Identity of the faulting device. gpu_uuid is the NVML UUID ("GPU-..."),
+   * gpu_index is the host device index (the same index DCGM and nvidia-smi use,
+   * not an ordinal within the pod), pci_bus_id is the sysfs bus id such as
+   * "0000:3b:00.0". For an SXid only pci_bus_id is set. gpu_index is optional
+   * because 0 is a valid index.
+   *
+   * @generated from field: string gpu_uuid = 5;
+   */
+  gpuUuid: string;
+
+  /**
+   * @generated from field: optional uint32 gpu_index = 6;
+   */
+  gpuIndex?: number;
+
+  /**
+   * @generated from field: string pci_bus_id = 7;
+   */
+  pciBusId: string;
+
+  /**
+   * The Kubernetes node the device is attached to.
+   *
+   * @generated from field: string node = 8;
+   */
+  node: string;
+
+  /**
+   * The host process the driver blamed for the fault, when it named one. Only
+   * workload-caused faults carry a process; hardware faults usually do not.
+   *
+   * @generated from field: uint32 pid = 9;
+   */
+  pid: number;
+
+  /**
+   * @generated from field: string process = 10;
+   */
+  process: string;
+};
+
+/**
+ * Describes the message flyteidl2.core.GpuFault.
+ * Use `create(GpuFaultSchema)` to create a new message.
+ */
+export const GpuFaultSchema: GenMessage<GpuFault> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_core_execution, 4);
+
+/**
+ * @generated from enum flyteidl2.core.GpuFault.Kind
+ */
+export enum GpuFault_Kind {
+  /**
+   * @generated from enum value: KIND_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * An Xid: a fault on a GPU.
+   *
+   * @generated from enum value: KIND_XID = 1;
+   */
+  XID = 1,
+
+  /**
+   * An SXid: a fault on an NVSwitch, which affects every GPU attached to it.
+   *
+   * @generated from enum value: KIND_SXID = 2;
+   */
+  SXID = 2,
+}
+
+/**
+ * Describes the enum flyteidl2.core.GpuFault.Kind.
+ */
+export const GpuFault_KindSchema: GenEnum<GpuFault_Kind> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_core_execution, 4, 0);
+
+/**
+ * Severity classifies the fault for the reader. USER faults are caused by the
+ * workload (for example an out-of-bounds memory access, Xid 31) and need no
+ * node action; CRITICAL faults are hardware faults (for example Xid 79, GPU
+ * fallen off the bus) after which the device or node is not trustworthy; WARN
+ * covers everything in between and any code the data plane does not know.
+ *
+ * @generated from enum flyteidl2.core.GpuFault.Severity
+ */
+export enum GpuFault_Severity {
+  /**
+   * @generated from enum value: SEVERITY_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: SEVERITY_USER = 1;
+   */
+  USER = 1,
+
+  /**
+   * @generated from enum value: SEVERITY_WARN = 2;
+   */
+  WARN = 2,
+
+  /**
+   * @generated from enum value: SEVERITY_CRITICAL = 3;
+   */
+  CRITICAL = 3,
+}
+
+/**
+ * Describes the enum flyteidl2.core.GpuFault.Severity.
+ */
+export const GpuFault_SeveritySchema: GenEnum<GpuFault_Severity> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_core_execution, 4, 1);
 
 /**
  * Error message to propagate detailed errors from container executions to the
@@ -384,7 +543,7 @@ export type ContainerError = Message<"flyteidl2.core.ContainerError"> & {
  * Use `create(ContainerErrorSchema)` to create a new message.
  */
 export const ContainerErrorSchema: GenMessage<ContainerError> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 4);
+  messageDesc(file_flyteidl2_core_execution, 5);
 
 /**
  * Defines a generic error type that dictates the behavior of the retry strategy.
@@ -407,7 +566,7 @@ export enum ContainerError_Kind {
  * Describes the enum flyteidl2.core.ContainerError.Kind.
  */
 export const ContainerError_KindSchema: GenEnum<ContainerError_Kind> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_core_execution, 4, 0);
+  enumDesc(file_flyteidl2_core_execution, 5, 0);
 
 /**
  * Defines the errors.pb file format the container can produce to communicate
@@ -429,7 +588,7 @@ export type ErrorDocument = Message<"flyteidl2.core.ErrorDocument"> & {
  * Use `create(ErrorDocumentSchema)` to create a new message.
  */
 export const ErrorDocumentSchema: GenMessage<ErrorDocument> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 5);
+  messageDesc(file_flyteidl2_core_execution, 6);
 
 /**
  * Log information for the task that is specific to a log sink
@@ -489,7 +648,7 @@ export type TaskLog = Message<"flyteidl2.core.TaskLog"> & {
  * Use `create(TaskLogSchema)` to create a new message.
  */
 export const TaskLogSchema: GenMessage<TaskLog> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 6);
+  messageDesc(file_flyteidl2_core_execution, 7);
 
 /**
  * @generated from enum flyteidl2.core.TaskLog.MessageFormat
@@ -515,7 +674,7 @@ export enum TaskLog_MessageFormat {
  * Describes the enum flyteidl2.core.TaskLog.MessageFormat.
  */
 export const TaskLog_MessageFormatSchema: GenEnum<TaskLog_MessageFormat> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_core_execution, 6, 0);
+  enumDesc(file_flyteidl2_core_execution, 7, 0);
 
 /**
  * @generated from enum flyteidl2.core.TaskLog.LinkType
@@ -547,7 +706,7 @@ export enum TaskLog_LinkType {
  * Describes the enum flyteidl2.core.TaskLog.LinkType.
  */
 export const TaskLog_LinkTypeSchema: GenEnum<TaskLog_LinkType> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_core_execution, 6, 1);
+  enumDesc(file_flyteidl2_core_execution, 7, 1);
 
 /**
  * Contains metadata required to identify logs produces by a set of pods
@@ -592,7 +751,7 @@ export type LogContext = Message<"flyteidl2.core.LogContext"> & {
  * Use `create(LogContextSchema)` to create a new message.
  */
 export const LogContextSchema: GenMessage<LogContext> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 7);
+  messageDesc(file_flyteidl2_core_execution, 8);
 
 /**
  * ConnectorLogContext describes how to reach a connector that owns an action's logs.
@@ -614,7 +773,7 @@ export type ConnectorLogContext = Message<"flyteidl2.core.ConnectorLogContext"> 
  * Use `create(ConnectorLogContextSchema)` to create a new message.
  */
 export const ConnectorLogContextSchema: GenMessage<ConnectorLogContext> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 8);
+  messageDesc(file_flyteidl2_core_execution, 9);
 
 /**
  * Contains metadata required to identify logs produces by a single pod
@@ -653,7 +812,7 @@ export type PodLogContext = Message<"flyteidl2.core.PodLogContext"> & {
  * Use `create(PodLogContextSchema)` to create a new message.
  */
 export const PodLogContextSchema: GenMessage<PodLogContext> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 9);
+  messageDesc(file_flyteidl2_core_execution, 10);
 
 /**
  * Contains metadata required to identify logs produces by a single container
@@ -677,7 +836,7 @@ export type ContainerContext = Message<"flyteidl2.core.ContainerContext"> & {
  * Use `create(ContainerContextSchema)` to create a new message.
  */
 export const ContainerContextSchema: GenMessage<ContainerContext> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 10);
+  messageDesc(file_flyteidl2_core_execution, 11);
 
 /**
  * Contains metadata required to identify logs produces by a single light-weight process that was run inside a container
@@ -701,7 +860,7 @@ export type ContainerContext_ProcessContext = Message<"flyteidl2.core.ContainerC
  * Use `create(ContainerContext_ProcessContextSchema)` to create a new message.
  */
 export const ContainerContext_ProcessContextSchema: GenMessage<ContainerContext_ProcessContext> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 10, 0);
+  messageDesc(file_flyteidl2_core_execution, 11, 0);
 
 /**
  * Represents customized execution run-time attributes.
@@ -722,7 +881,7 @@ export type QualityOfServiceSpec = Message<"flyteidl2.core.QualityOfServiceSpec"
  * Use `create(QualityOfServiceSpecSchema)` to create a new message.
  */
 export const QualityOfServiceSpecSchema: GenMessage<QualityOfServiceSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 11);
+  messageDesc(file_flyteidl2_core_execution, 12);
 
 /**
  * Indicates the priority of an execution.
@@ -753,7 +912,7 @@ export type QualityOfService = Message<"flyteidl2.core.QualityOfService"> & {
  * Use `create(QualityOfServiceSchema)` to create a new message.
  */
 export const QualityOfServiceSchema: GenMessage<QualityOfService> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_core_execution, 12);
+  messageDesc(file_flyteidl2_core_execution, 13);
 
 /**
  * @generated from enum flyteidl2.core.QualityOfService.Tier
@@ -786,5 +945,5 @@ export enum QualityOfService_Tier {
  * Describes the enum flyteidl2.core.QualityOfService.Tier.
  */
 export const QualityOfService_TierSchema: GenEnum<QualityOfService_Tier> = /*@__PURE__*/
-  enumDesc(file_flyteidl2_core_execution, 12, 0);
+  enumDesc(file_flyteidl2_core_execution, 13, 0);
 

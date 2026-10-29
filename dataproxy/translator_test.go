@@ -189,6 +189,49 @@ func TestLiteralsToLaunchFormJson_Trigger(t *testing.T) {
 	assertHelloWorldSchema(t, resp)
 }
 
+// UploadInputs reports the *directory* as OffloadedInputData.uri (it writes the literals
+// to <dir>/inputs.pb), so this is the URI shape real triggers actually carry. Reading the
+// bare directory 404s, which left the trigger launch form falling back to task defaults.
+func TestLiteralsToLaunchFormJson_Trigger_DirectoryURI(t *testing.T) {
+	dirURI := "s3://test-bucket/uploads/proj/dev/offloaded-inputs/abc123"
+	storedInputs := &task.Inputs{Literals: testNamedLiterals()}
+
+	triggerClient := &fakeTriggerClient{
+		resp: &trigger.GetTriggerRevisionDetailsResponse{
+			Trigger: &trigger.TriggerDetails{
+				Id: testTriggerID(),
+				Spec: &trigger.TriggerSpec{
+					InputWrapper: &trigger.TriggerSpec_OffloadedInputData{
+						OffloadedInputData: &common.OffloadedInputData{
+							Uri:        dirURI,
+							InputsHash: "hash",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	mockComposedStore := storageMocks.NewComposedProtobufStore(t)
+	// The read must target <dir>/inputs.pb, not the directory itself.
+	mockComposedStore.On("ReadProtobuf", mock.Anything, storage.DataReference(dirURI+"/inputs.pb"), mock.Anything).
+		Run(func(args mock.Arguments) {
+			msg := args.Get(2).(proto.Message)
+			proto.Reset(msg)
+			proto.Merge(msg, storedInputs)
+		}).Return(nil)
+
+	svc := NewTranslatorService(&storage.DataStore{ComposedProtobufStore: mockComposedStore}, nil, triggerClient)
+
+	resp, err := svc.LiteralsToLaunchFormJson(context.Background(), connect.NewRequest(&workflow.LiteralsToLaunchFormJsonRequest{
+		Variables: testVariableMap(),
+		Owner:     &workflow.LiteralsToLaunchFormJsonRequest_TriggerId{TriggerId: testTriggerID()},
+	}))
+
+	require.NoError(t, err)
+	assertHelloWorldSchema(t, resp)
+}
+
 func TestLiteralsToLaunchFormJson_Trigger_NoOffloadedData(t *testing.T) {
 	triggerClient := &fakeTriggerClient{
 		resp: &trigger.GetTriggerRevisionDetailsResponse{

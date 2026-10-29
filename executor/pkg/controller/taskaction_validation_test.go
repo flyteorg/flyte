@@ -2,12 +2,20 @@ package controller
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
 
+	"google.golang.org/protobuf/proto"
+	"k8s.io/client-go/tools/events"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
+
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 // mockPluginResolver is a test double for pluginResolver.
@@ -32,6 +40,10 @@ func (mockPlugin) Abort(_ context.Context, _ pluginsCore.TaskExecutionContext) e
 func (mockPlugin) Finalize(_ context.Context, _ pluginsCore.TaskExecutionContext) error { return nil }
 
 func validTaskAction() *flyteorgv1.TaskAction {
+	taskTemplate, err := proto.Marshal(&core.TaskTemplate{Type: "container"})
+	if err != nil {
+		panic(err)
+	}
 	return &flyteorgv1.TaskAction{
 		Spec: flyteorgv1.TaskActionSpec{
 			RunName:       "my-run",
@@ -39,7 +51,7 @@ func validTaskAction() *flyteorgv1.TaskAction {
 			Domain:        "my-domain",
 			ActionName:    "my-action",
 			TaskType:      "container",
-			TaskTemplate:  []byte(`{}`),
+			TaskTemplate:  taskTemplate,
 			InputURI:      "s3://bucket/input",
 			RunOutputBase: "s3://bucket/output",
 		},
@@ -48,7 +60,7 @@ func validTaskAction() *flyteorgv1.TaskAction {
 
 func TestValidateTaskAction_ValidSpec(t *testing.T) {
 	resolver := &mockPluginResolver{plugin: mockPlugin{}}
-	p, reason, err := validateTaskAction(validTaskAction(), resolver)
+	p, maxRuntime, reason, err := validateTaskAction(validTaskAction(), resolver)
 	if err != nil {
 		t.Fatalf("expected no error, got: %v", err)
 	}
@@ -57,6 +69,9 @@ func TestValidateTaskAction_ValidSpec(t *testing.T) {
 	}
 	if p == nil {
 		t.Fatal("expected non-nil plugin")
+	}
+	if maxRuntime != 0 {
+		t.Fatalf("expected no max runtime for a template without a timeout, got: %v", maxRuntime)
 	}
 }
 
@@ -82,7 +97,7 @@ func TestValidateTaskAction_MissingFields(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			ta := validTaskAction()
 			tc.mutate(ta)
-			_, reason, err := validateTaskAction(ta, resolver)
+			_, _, reason, err := validateTaskAction(ta, resolver)
 			if err == nil {
 				t.Fatal("expected error, got nil")
 			}
@@ -101,11 +116,46 @@ func TestValidateTaskAction_PluginNotFound(t *testing.T) {
 		plugin: nil,
 		err:    fmt.Errorf("no plugin registered for task type %q", "container"),
 	}
-	_, reason, err := validateTaskAction(validTaskAction(), resolver)
+	_, _, reason, err := validateTaskAction(validTaskAction(), resolver)
 	if err == nil {
 		t.Fatal("expected error, got nil")
 	}
 	if reason != flyteorgv1.ConditionReasonPluginNotFound {
 		t.Errorf("expected reason %q, got %q", flyteorgv1.ConditionReasonPluginNotFound, reason)
+	}
+}
+
+func TestReconcileTask_ValidationStatusUpdate(t *testing.T) {
+	statusErr := errors.New("status update failed")
+	for _, tc := range []struct {
+		name      string
+		updateErr error
+	}{
+		{name: "success"},
+		{name: "failure", updateErr: statusErr},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			k8sClient := fake.NewClientBuilder().
+				WithInterceptorFuncs(interceptor.Funcs{
+					SubResourceUpdate: func(context.Context, client.Client, string, client.Object, ...client.SubResourceUpdateOption) error {
+						return tc.updateErr
+					},
+				}).
+				Build()
+			reconciler := &TaskActionReconciler{
+				Client:   k8sClient,
+				Recorder: events.NewFakeRecorder(1),
+			}
+			taskAction := validTaskAction()
+			taskAction.Spec.RunName = ""
+
+			_, err := reconciler.reconcileTask(context.Background(), taskAction, taskAction.DeepCopy())
+			if !errors.Is(err, tc.updateErr) {
+				t.Fatalf("expected %v, got %v", tc.updateErr, err)
+			}
+			if !isTerminal(taskAction) {
+				t.Fatal("expected validation failure to remain terminal")
+			}
+		})
 	}
 }
