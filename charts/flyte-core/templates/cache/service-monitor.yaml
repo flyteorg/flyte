@@ -1,0 +1,32 @@
+{{- $root := . -}}
+{{- $name := "cache" -}}
+{{- $component := $root.Values.components.cache -}}
+{{- $monitor := $component.serviceMonitor | default dict }}
+{{- if and $component.enabled $monitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "flyte-core.componentName" (dict "root" $root "component" $name) }}
+  namespace: {{ $root.Release.Namespace | quote }}
+  labels:
+    {{- include "flyte-core.componentLabels" (dict "root" $root "component" $name) | nindent 4 }}
+    {{- with $monitor.labels }}
+    {{- tpl (toYaml .) $root | nindent 4 }}
+    {{- end }}
+  {{- with $root.Values.commonAnnotations }}
+  annotations:
+    {{- tpl (toYaml .) $root | nindent 4 }}
+  {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ $root.Release.Namespace | quote }}
+  selector:
+    matchLabels:
+      {{- include "flyte-core.componentSelectorLabels" (dict "root" $root "component" $name) | nindent 6 }}
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: {{ $monitor.interval | quote }}
+      scrapeTimeout: {{ $monitor.scrapeTimeout | quote }}
+{{- end }}

@@ -69,6 +69,15 @@ components:
     sidecars: []
     strategy: {}
     extraPodSpec: {}
+    # -- Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image.
+    serviceMonitor:
+      enabled: false
+      # -- Interval at which Prometheus scrapes metrics.
+      interval: 60s
+      # -- Timeout for each metrics scrape.
+      scrapeTimeout: 30s
+      # -- Labels used by Prometheus to discover this monitor.
+      labels: {}
     service:
       type: ClusterIP
       annotations: {}
@@ -126,6 +135,15 @@ components:
     sidecars: []
     strategy: {}
     extraPodSpec: {}
+    # -- Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image.
+    serviceMonitor:
+      enabled: false
+      # -- Interval at which Prometheus scrapes metrics.
+      interval: 60s
+      # -- Timeout for each metrics scrape.
+      scrapeTimeout: 30s
+      # -- Labels used by Prometheus to discover this monitor.
+      labels: {}
     service:
       type: ClusterIP
       annotations: {}
@@ -183,6 +201,15 @@ components:
     sidecars: []
     strategy: {}
     extraPodSpec: {}
+    # -- Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image.
+    serviceMonitor:
+      enabled: false
+      # -- Interval at which Prometheus scrapes metrics.
+      interval: 60s
+      # -- Timeout for each metrics scrape.
+      scrapeTimeout: 30s
+      # -- Labels used by Prometheus to discover this monitor.
+      labels: {}
     service:
       type: ClusterIP
       annotations: {}
@@ -240,6 +267,15 @@ components:
     sidecars: []
     strategy: {}
     extraPodSpec: {}
+    # -- Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image.
+    serviceMonitor:
+      enabled: false
+      # -- Interval at which Prometheus scrapes metrics.
+      interval: 60s
+      # -- Timeout for each metrics scrape.
+      scrapeTimeout: 30s
+      # -- Labels used by Prometheus to discover this monitor.
+      labels: {}
     service:
       type: ClusterIP
       annotations: {}
@@ -297,6 +333,15 @@ components:
     sidecars: []
     strategy: {}
     extraPodSpec: {}
+    # -- Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image.
+    serviceMonitor:
+      enabled: false
+      # -- Interval at which Prometheus scrapes metrics.
+      interval: 60s
+      # -- Timeout for each metrics scrape.
+      scrapeTimeout: 30s
+      # -- Labels used by Prometheus to discover this monitor.
+      labels: {}
     service:
       type: ClusterIP
       annotations: {}
@@ -355,6 +400,15 @@ components:
     sidecars: []
     strategy: {}
     extraPodSpec: {}
+    # -- Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image.
+    serviceMonitor:
+      enabled: false
+      # -- Interval at which Prometheus scrapes metrics.
+      interval: 60s
+      # -- Timeout for each metrics scrape.
+      scrapeTimeout: 30s
+      # -- Labels used by Prometheus to discover this monitor.
+      labels: {}
     service:
       type: ClusterIP
       annotations: {}
@@ -412,6 +466,15 @@ components:
     sidecars: []
     strategy: {}
     extraPodSpec: {}
+    # -- Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image.
+    serviceMonitor:
+      enabled: false
+      # -- Interval at which Prometheus scrapes metrics.
+      interval: 60s
+      # -- Timeout for each metrics scrape.
+      scrapeTimeout: 30s
+      # -- Labels used by Prometheus to discover this monitor.
+      labels: {}
     service:
       type: ClusterIP
       annotations: {}
@@ -459,6 +522,15 @@ components:
     sidecars: []
     strategy: {}
     extraPodSpec: {}
+    # -- Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image.
+    serviceMonitor:
+      enabled: false
+      # -- Interval at which Prometheus scrapes metrics.
+      interval: 60s
+      # -- Timeout for each metrics scrape.
+      scrapeTimeout: 30s
+      # -- Labels used by Prometheus to discover this monitor.
+      labels: {}
     service:
       type: ClusterIP
       annotations: {}
@@ -760,6 +832,15 @@ console:
   tolerations: []
   affinity: {}
   securityContext: {}
+  # -- Opt-in Prometheus Operator ServiceMonitor. Requires the ServiceMonitor CRD and a metrics endpoint in the deployed image.
+  serviceMonitor:
+    enabled: false
+    # -- Interval at which Prometheus scrapes metrics.
+    interval: 60s
+    # -- Timeout for each metrics scrape.
+    scrapeTimeout: 30s
+    # -- Labels used by Prometheus to discover this monitor.
+    labels: {}
   service:
     type: ClusterIP
     port: 80

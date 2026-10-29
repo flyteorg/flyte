@@ -14,11 +14,13 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 )
 
 // App is the shared entry-point skeleton for Flyte services.
@@ -92,6 +94,7 @@ func (a *App) serve(ctx context.Context) error {
 	// 4. Start HTTP server (skipped when Port == 0, i.e. worker-only mode)
 	var server *http.Server
 	if sc.Port > 0 {
+		registerMetricsHandler(sc.Mux, otelutils.GetConfig())
 		sc.Mux.HandleFunc("/healthz", func(w http.ResponseWriter, _ *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			_, _ = w.Write([]byte("OK"))
@@ -243,4 +246,11 @@ func initConfig(cmd *cobra.Command) error {
 	configAccessor.InitializePflags(rootCmd.PersistentFlags())
 
 	return configAccessor.UpdateConfig(context.Background())
+}
+
+// registerMetricsHandler exposes the pull exporter only when explicitly enabled.
+func registerMetricsHandler(mux *http.ServeMux, cfg *otelutils.Config) {
+	if cfg != nil && cfg.ExporterType == otelutils.PrometheusExporter {
+		mux.Handle("/metrics", promhttp.Handler())
+	}
 }
