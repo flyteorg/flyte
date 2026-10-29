@@ -118,6 +118,7 @@ func TestMain(m *testing.M) {
 			runsConfig.NotifyRetryMinBackoff.Duration,
 			runsConfig.NotifyRetryMaxBackoff.Duration,
 			runsConfig.WatchBufferSize,
+			runsConfig.NotifyBatchSize,
 		),
 		metricnoop.NewMeterProvider(),
 	)

@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"net"
 	"sort"
+	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -49,6 +51,7 @@ var testNotificationConfig = NewNotificationConfig(
 	notifyRetryMinBackoff,
 	notifyRetryMaxBackoff,
 	defaultWatchBufferSize,
+	defaultNotifyBatchSize,
 )
 
 func setupActionDB(t *testing.T) *sqlx.DB {
@@ -1098,6 +1101,7 @@ func TestNotificationBufferLimitConfig(t *testing.T) {
 		testNotificationConfig.retryMinBackoff,
 		testNotificationConfig.retryMaxBackoff,
 		testNotificationConfig.watchBufferSize,
+		testNotificationConfig.batchSize,
 	))
 
 	for i := 0; i <= defaultNotificationBufferSize; i++ {
@@ -1116,6 +1120,7 @@ func TestNewNotificationConfig(t *testing.T) {
 		retryMinBackoff time.Duration
 		retryMaxBackoff time.Duration
 		watchBufferSize int
+		batchSize       int
 		want            NotificationConfig
 	}{
 		"valid": {
@@ -1123,11 +1128,13 @@ func TestNewNotificationConfig(t *testing.T) {
 			retryMinBackoff: time.Second,
 			retryMaxBackoff: 10 * time.Second,
 			watchBufferSize: 1_000,
+			batchSize:       500,
 			want: NotificationConfig{
 				bufferLimit:     1_000,
 				retryMinBackoff: time.Second,
 				retryMaxBackoff: 10 * time.Second,
 				watchBufferSize: 1_000,
+				batchSize:       500,
 			},
 		},
 		"zero watch buffer size": {
@@ -1144,6 +1151,7 @@ func TestNewNotificationConfig(t *testing.T) {
 				retryMinBackoff: notifyRetryMinBackoff,
 				retryMaxBackoff: notifyRetryMaxBackoff,
 				watchBufferSize: defaultWatchBufferSize,
+				batchSize:       defaultNotifyBatchSize,
 			},
 		},
 		"buffer limit below pending capacity": {
@@ -1155,6 +1163,7 @@ func TestNewNotificationConfig(t *testing.T) {
 				retryMinBackoff: notifyRetryMinBackoff,
 				retryMaxBackoff: notifyRetryMaxBackoff,
 				watchBufferSize: defaultWatchBufferSize,
+				batchSize:       defaultNotifyBatchSize,
 			},
 		},
 		"buffer limit equals pending capacity": {
@@ -1166,6 +1175,7 @@ func TestNewNotificationConfig(t *testing.T) {
 				retryMinBackoff: notifyRetryMinBackoff,
 				retryMaxBackoff: notifyRetryMaxBackoff,
 				watchBufferSize: defaultWatchBufferSize,
+				batchSize:       defaultNotifyBatchSize,
 			},
 		},
 		"zero retry min backoff": {
@@ -1184,11 +1194,52 @@ func TestNewNotificationConfig(t *testing.T) {
 			retryMaxBackoff: time.Second,
 			want:            testNotificationConfig,
 		},
+		"zero batch size": {
+			bufferLimit:     testNotificationBufferLimit,
+			retryMinBackoff: notifyRetryMinBackoff,
+			retryMaxBackoff: notifyRetryMaxBackoff,
+			want:            testNotificationConfig,
+		},
+		"negative batch size": {
+			bufferLimit:     testNotificationBufferLimit,
+			retryMinBackoff: notifyRetryMinBackoff,
+			retryMaxBackoff: notifyRetryMaxBackoff,
+			batchSize:       -1,
+			want:            testNotificationConfig,
+		},
+		"batch size at max": {
+			bufferLimit:     testNotificationBufferLimit,
+			retryMinBackoff: notifyRetryMinBackoff,
+			retryMaxBackoff: notifyRetryMaxBackoff,
+			watchBufferSize: defaultWatchBufferSize,
+			batchSize:       maxNotifyBatchSize,
+			want: NotificationConfig{
+				bufferLimit:     testNotificationBufferLimit,
+				retryMinBackoff: notifyRetryMinBackoff,
+				retryMaxBackoff: notifyRetryMaxBackoff,
+				watchBufferSize: defaultWatchBufferSize,
+				batchSize:       maxNotifyBatchSize,
+			},
+		},
+		"batch size above max": {
+			bufferLimit:     testNotificationBufferLimit,
+			retryMinBackoff: notifyRetryMinBackoff,
+			retryMaxBackoff: notifyRetryMaxBackoff,
+			watchBufferSize: defaultWatchBufferSize,
+			batchSize:       maxNotifyBatchSize + 1,
+			want: NotificationConfig{
+				bufferLimit:     testNotificationBufferLimit,
+				retryMinBackoff: notifyRetryMinBackoff,
+				retryMaxBackoff: notifyRetryMaxBackoff,
+				watchBufferSize: defaultWatchBufferSize,
+				batchSize:       maxNotifyBatchSize,
+			},
+		},
 	}
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			actual := NewNotificationConfig(tt.bufferLimit, tt.retryMinBackoff, tt.retryMaxBackoff, tt.watchBufferSize)
+			actual := NewNotificationConfig(tt.bufferLimit, tt.retryMinBackoff, tt.retryMaxBackoff, tt.watchBufferSize, tt.batchSize)
 			require.Equal(t, tt.want, actual)
 		})
 	}
@@ -1529,6 +1580,105 @@ func TestNotifyPump_DeliversPendingActionsFIFO(t *testing.T) {
 			t.Fatalf("notification %d was never delivered", i)
 		}
 	}
+}
+
+func TestNotifyPump_BatchedDeliveryAcrossChunks(t *testing.T) {
+	r, sqlDB, conn := newNotifyRepoWithDB(t)
+	const total = 2*defaultNotifyBatchSize + 5
+	delivered := subscribeActions(t, r, total)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	for i := 0; i < total; i++ {
+		r.notifyActionUpdate(ctx, notifyTestActionID(fmt.Sprintf("action-%04d", i)))
+	}
+
+	go r.runNotifyLoop(ctx, sqlDB, conn)
+
+	for i := 0; i < total; i++ {
+		select {
+		case payload := <-delivered:
+			assert.Equal(t, fmt.Sprintf("proj/domain/run/action-%04d", i), payload)
+		case <-time.After(15 * time.Second):
+			t.Fatalf("notification %d was never delivered", i)
+		}
+	}
+}
+
+// notifyCountingConnector counts pg_notify statements, i.e. NOTIFY round trips, sent through its connections.
+type notifyCountingConnector struct {
+	driver.Connector
+	notifyExecs atomic.Int64
+}
+
+func (c *notifyCountingConnector) Connect(ctx context.Context) (driver.Conn, error) {
+	conn, err := c.Connector.Connect(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &notifyCountingConn{Conn: conn, notifyExecs: &c.notifyExecs}, nil
+}
+
+type notifyCountingConn struct {
+	driver.Conn
+	notifyExecs *atomic.Int64
+}
+
+func (c *notifyCountingConn) ExecContext(ctx context.Context, query string, args []driver.NamedValue) (driver.Result, error) {
+	if strings.Contains(query, "pg_notify") {
+		c.notifyExecs.Add(1)
+	}
+	return c.Conn.(driver.ExecerContext).ExecContext(ctx, query, args)
+}
+
+func (c *notifyCountingConn) CheckNamedValue(nv *driver.NamedValue) error {
+	return c.Conn.(driver.NamedValueChecker).CheckNamedValue(nv)
+}
+
+// N pending notifications must cost one round trip per batch, not one per payload.
+func TestNotifyPump_OneRoundTripPerBatch(t *testing.T) {
+	const batchSize = 10
+	const total = 2*batchSize + 5
+
+	r, _, _ := newNotifyRepoWithDB(t)
+	r.notificationConfig = NewNotificationConfig(
+		testNotificationBufferLimit,
+		notifyRetryMinBackoff,
+		notifyRetryMaxBackoff,
+		defaultWatchBufferSize,
+		batchSize,
+	)
+	delivered := subscribeActions(t, r, total)
+
+	pqConnector, err := pq.NewConnector(r.dsn)
+	require.NoError(t, err)
+	connector := &notifyCountingConnector{Connector: pqConnector}
+	sqlDB := sql.OpenDB(connector)
+	t.Cleanup(func() { sqlDB.Close() }) //nolint:errcheck
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	conn, err := sqlDB.Conn(ctx)
+	require.NoError(t, err)
+
+	for i := 0; i < total; i++ {
+		r.notifyActionUpdate(ctx, notifyTestActionID(fmt.Sprintf("action-%04d", i)))
+	}
+
+	go r.runNotifyLoop(ctx, sqlDB, conn)
+
+	for i := 0; i < total; i++ {
+		select {
+		case payload := <-delivered:
+			assert.Equal(t, fmt.Sprintf("proj/domain/run/action-%04d", i), payload)
+		case <-time.After(15 * time.Second):
+			t.Fatalf("notification %d was never delivered", i)
+		}
+	}
+	assert.Equal(t, int64(3), connector.notifyExecs.Load(),
+		"%d notifications with batch size %d must take 3 round trips", total, batchSize)
 }
 
 func TestIsConnError(t *testing.T) {
