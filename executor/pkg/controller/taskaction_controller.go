@@ -1206,9 +1206,14 @@ func (r *TaskActionReconciler) reconcileTask(
 		if hasDeadline && !r.now().Before(deadline) {
 			return r.setAttemptTimeout(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, timeouts, deadline)
 		}
-		// A cache error cannot establish whether the resource has left the queue.
-		// Retry without using a stale queued phase to expire its deadline.
-		timeouts.queued = 0
+		// A cache error cannot establish whether a resource that may already exist has left
+		// the queue, so it cannot expire the deadline. With no saved state and no launched phase
+		// nothing has run for the attempt, and a cache that keeps failing must not hold it in the queue.
+		if len(taskAction.Status.PluginState) > 0 || isLaunchedPluginPhase(taskAction.Status.PluginPhase) {
+			timeouts.queued = 0
+		} else if queuedDeadline, ok := taskAttemptQueuedDeadline(taskAction, timeouts.queued); ok && !r.now().Before(queuedDeadline) {
+			return r.setAttemptTimeout(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, timeouts, queuedDeadline)
+		}
 		return r.timeoutAwareRequeue(taskAction, timeouts), nil
 	}
 	// Even when cache handling short-circuits execution, we still continue through the

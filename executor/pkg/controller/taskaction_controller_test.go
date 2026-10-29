@@ -1421,6 +1421,89 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(fake.handleCalls).To(BeZero(), "a task blocked on the cache is never launched")
 		})
 
+		It("ends an attempt whose cache reservation keeps failing before it launched when its queue budget runs out", func() {
+			nn := createTaskAction("qt-cache-error-unlaunched", buildSerializedCacheTemplateBytesWithQueuedTimeout())
+			base := getTaskAction(nn).CreationTimestamp.Time
+			fakeClock := testingclock.NewFakeClock(base)
+			fake := &fakePlugin{id: "timeout-plugin"}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			r.Catalog = &stubCatalogClient{
+				getFunc: func(context.Context, catalog.Key) (catalog.Entry, error) {
+					return catalog.Entry{}, grpcstatus.Error(codes.NotFound, "miss")
+				},
+				getOrExtendReservationFunc: func(
+					context.Context, catalog.Key, string, time.Duration,
+				) (*cacheservice.Reservation, error) {
+					return nil, stderrors.New("cache service unavailable")
+				},
+				releaseReservationFunc: func(context.Context, catalog.Key, string) error { return nil },
+			}
+			req := reconcile.Request{NamespacedName: nn}
+
+			result, err := r.Reconcile(ctx, req) // the reservation fails before the first Handle call
+			Expect(err).NotTo(HaveOccurred())
+			Expect(isTerminal(getTaskAction(nn))).To(BeFalse())
+			Expect(result).To(Equal(reconcile.Result{RequeueAfter: 2 * time.Second}),
+				"the requeue still follows the queue budget")
+
+			fakeClock.Step(10 * time.Second)
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.ErrorState.Message).To(ContainSubstring("queued timeout"))
+			Expect(fake.handleCalls).To(BeZero(), "a task blocked on a failing cache is never launched")
+		})
+
+		It("keeps a launched attempt whose cache reservation fails after its queue budget ran out", func() {
+			nn := createTaskAction("qt-cache-error-launched", buildSerializedCacheTemplateBytesWithQueuedTimeout())
+			base := getTaskAction(nn).CreationTimestamp.Time
+			fakeClock := testingclock.NewFakeClock(base)
+			failing := false
+			fake := &fakePlugin{id: "timeout-plugin"}
+			fake.handleFunc = launchThenPoll(fakeClock.Now, func() pluginsCore.Transition {
+				return runningTransition(base.Add(time.Second))
+			})
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			r.Catalog = &stubCatalogClient{
+				getFunc: func(context.Context, catalog.Key) (catalog.Entry, error) {
+					return catalog.Entry{}, grpcstatus.Error(codes.NotFound, "miss")
+				},
+				getOrExtendReservationFunc: func(
+					context.Context, catalog.Key, string, time.Duration,
+				) (*cacheservice.Reservation, error) {
+					if failing {
+						return nil, stderrors.New("cache service unavailable")
+					}
+					return &cacheservice.Reservation{OwnerId: nn.String()}, nil
+				},
+				releaseReservationFunc: func(context.Context, catalog.Key, string) error { return nil },
+			}
+			req := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, req) // launches the resource inside the budget
+			Expect(err).NotTo(HaveOccurred())
+			Expect(getTaskAction(nn).Status.PluginState).NotTo(BeEmpty())
+
+			// A failing cache says nothing about a resource that already exists.
+			failing = true
+			fakeClock.Step(10 * time.Second)
+			result, err := r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			persisted := getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeFalse())
+			Expect(persisted.Status.TimeoutAt).To(BeNil())
+			Expect(fake.abortCalls).To(BeZero())
+			Expect(result).To(Equal(reconcile.Result{RequeueAfter: TaskActionDefaultRequeueDuration}),
+				"an expired deadline that cannot be enforced must not spin the queue")
+
+			failing = false
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(getTaskAction(nn).Status.PluginPhase).To(Equal(pluginsCore.PhaseRunning.String()))
+			Expect(fake.abortCalls).To(BeZero())
+		})
+
 		DescribeTable("judges a launched attempt on its next poll while its events keep failing",
 			func(name string, poll func(time.Time) pluginsCore.Transition, wantTimedOut bool) {
 				nn := createTaskAction(name, buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
