@@ -60,18 +60,58 @@ const terminationMessageReadFailure = "Error on reading termination message from
 // place that reason survives: to the kubelet the deletion looks like any other.
 const TerminationTargetCondition v1.PodConditionType = "TerminationTarget"
 
+// disruptionTargetReasons are the reasons of the Kubernetes DisruptionTarget condition that mark a
+// pod the cluster removed: preempted by a scheduler (kube-scheduler, or KAI with
+// --update-pod-eviction-condition), evicted through the eviction API (a drain), deleted by the
+// taint manager or the pod garbage collector. TerminationByKubelet is left out: it also marks a
+// node-pressure eviction, which the task's own memory use can cause.
+var disruptionTargetReasons = sets.NewString(
+	v1.PodReasonPreemptionByScheduler,
+	// Set by Kubernetes components, but not exported by k8s.io/api.
+	"EvictionByEvictionAPI",
+	"DeletionByTaintManager",
+	"DeletionByPodGC",
+)
+
 // GetTerminationTarget returns the TerminationTarget condition when an external controller marked
-// the pod for termination, nil otherwise. Only the condition type is matched: the reason Kueue
-// writes there has changed across its releases (StoppedByKueue, WorkloadEvicted,
+// the pod for termination, or the DisruptionTarget condition when the cluster removed it for one of
+// disruptionTargetReasons, nil otherwise. For TerminationTarget only the condition type is matched:
+// the reason Kueue writes there has changed across its releases (StoppedByKueue, WorkloadEvicted,
 // WorkloadEvictedDueToPreempted) and is reported as it is.
-func GetTerminationTarget(status v1.PodStatus) *v1.PodCondition {
+//
+// A DisruptionTarget stamped after the primary container had already finished is ignored: the pod
+// died on its own (a drain reaching a pod that had already failed, or pod GC cleaning it up), and
+// its exit code, not the disruption, is the verdict.
+func GetTerminationTarget(status v1.PodStatus, primaryContainerName string) *v1.PodCondition {
 	for i := range status.Conditions {
 		c := &status.Conditions[i]
-		if c.Type == TerminationTargetCondition && c.Status == v1.ConditionTrue {
+		if c.Status != v1.ConditionTrue {
+			continue
+		}
+		if c.Type == TerminationTargetCondition ||
+			(c.Type == v1.DisruptionTarget && disruptionTargetReasons.Has(c.Reason) &&
+				!disruptedAfterFinish(status, c, primaryContainerName)) {
 			return c
 		}
 	}
 	return nil
+}
+
+// disruptedAfterFinish reports whether the condition was stamped strictly after the primary
+// container terminated. Both timestamps have one-second resolution, so a disruption within the
+// same second as the exit still counts as its cause.
+func disruptedAfterFinish(status v1.PodStatus, c *v1.PodCondition, primaryContainerName string) bool {
+	if c.LastTransitionTime.IsZero() {
+		return false
+	}
+	for _, s := range status.ContainerStatuses {
+		if s.Name != primaryContainerName {
+			continue
+		}
+		t := s.State.Terminated
+		return t != nil && !t.FinishedAt.IsZero() && c.LastTransitionTime.After(t.FinishedAt.Time)
+	}
+	return false
 }
 
 // ExternalTerminationCode is the error code for a pod an external controller terminated: the
@@ -1755,7 +1795,7 @@ func DemystifyFailure(ctx context.Context, status v1.PodStatus, info pluginsCore
 	// A controller that stopped the pod on purpose, such as Kueue preempting its Workload, says
 	// so on the pod itself. Its reason is the code and its message the explanation; the container
 	// exit codes below still add detail, but do not get to rename the failure.
-	terminationTarget := GetTerminationTarget(status)
+	terminationTarget := GetTerminationTarget(status, primaryContainerName)
 	if terminationTarget != nil {
 		code = ExternalTerminationCode(terminationTarget)
 		message = ExternalTerminationMessage(terminationTarget)

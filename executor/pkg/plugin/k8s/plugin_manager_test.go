@@ -1068,6 +1068,44 @@ func TestClassifyExternalTermination(t *testing.T) {
 			wantInfo:    deletedInfo,
 		},
 		{
+			name: "a pod a scheduler preempted reports the preemption",
+			resource: func() *v1.Pod {
+				pod := failedPod()
+				pod.Status.Conditions = []v1.PodCondition{{
+					Type:    v1.DisruptionTarget,
+					Status:  v1.ConditionTrue,
+					Reason:  v1.PodReasonPreemptionByScheduler,
+					Message: "Pod ns/pod was preempted by higher priority workload ns/other",
+				}}
+				return pod
+			}(),
+			phaseInfo:   deleted(),
+			wantCode:    v1.PodReasonPreemptionByScheduler,
+			wantMessage: "Pod was terminated by an external controller: Pod ns/pod was preempted by higher priority workload ns/other",
+			wantInfo:    deletedInfo,
+		},
+		{
+			name: "a pod that had failed before a drain reached it is left alone",
+			resource: func() *v1.Pod {
+				pod := failedPod()
+				pod.Annotations = map[string]string{flytek8s.PrimaryContainerKey: "primary"}
+				pod.Status.ContainerStatuses = []v1.ContainerStatus{{
+					Name: "primary",
+					State: v1.ContainerState{Terminated: &v1.ContainerStateTerminated{
+						ExitCode: 1, FinishedAt: metav1.NewTime(base),
+					}},
+				}}
+				pod.Status.Conditions = []v1.PodCondition{{
+					Type:               v1.DisruptionTarget,
+					Status:             v1.ConditionTrue,
+					Reason:             "EvictionByEvictionAPI",
+					LastTransitionTime: metav1.NewTime(base.Add(time.Minute)),
+				}}
+				return pod
+			}(),
+			phaseInfo: deleted(),
+		},
+		{
 			name:      "a pod mid-deletion without the condition is left alone",
 			resource:  failedPod(),
 			phaseInfo: deleted(),
