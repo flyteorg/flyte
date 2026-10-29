@@ -4,7 +4,7 @@ go 1.27.3
 
 require (
 	buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go v1.36.12-20260825204119-511051f7f437.2
-	cloud.google.com/go/secretmanager v1.22.0
+	cloud.google.com/go/secretmanager v1.23.0
 	connectrpc.com/connect v1.21.1
 	connectrpc.com/otelconnect v0.12.0
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.3
