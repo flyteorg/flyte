@@ -89,8 +89,9 @@ const (
 	ConditionReasonSignaled TaskActionConditionReason = "Signaled"
 
 	// ConditionReasonTimedOut indicates the action reached its deadline (Failed=True).
-	// This applies to both condition actions that were not signalled in time and to
-	// task actions whose per-attempt max-runtime was exhausted.
+	// This applies to condition actions that were not signalled in time, to task
+	// actions whose per-attempt max-runtime was exhausted, and to task actions that
+	// did not finish within their deadline.
 	ConditionReasonTimedOut TaskActionConditionReason = "TimedOut"
 )
 
@@ -348,7 +349,8 @@ type TaskActionStatus struct {
 	// +optional
 	AttemptStartedAt *metav1.Time `json:"attemptStartedAt,omitempty"`
 
-	// TimeoutAt is the max-runtime deadline for an expired current attempt.
+	// TimeoutAt is the expired deadline that ended the current attempt: the earlier
+	// of the attempt's max runtime and the action's deadline across all attempts.
 	// While set on a non-terminal action, timeout cleanup is pending and the
 	// plugin resource must not be handled or recreated.
 	// +optional

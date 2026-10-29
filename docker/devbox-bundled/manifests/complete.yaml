@@ -7154,7 +7154,8 @@ spec:
                 type: integer
               timeoutAt:
                 description: |-
-                  TimeoutAt is the max-runtime deadline for an expired current attempt.
+                  TimeoutAt is the expired deadline that ended the current attempt: the earlier
+                  of the attempt's max runtime and the action's deadline across all attempts.
                   While set on a non-terminal action, timeout cleanup is pending and the
                   plugin resource must not be handled or recreated.
                 format: date-time
