@@ -1489,8 +1489,8 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 
 // keepLaunchProgress saves the plugin state and phase of a launch or adoption whose event could not be
 // published. Forgotten, the next reconcile would launch or adopt the resource again and take its report
-// for the first one again, for as long as publishing keeps failing. Nothing that drives the event is
-// saved, so the event is still retried.
+// for the first one again, for as long as publishing keeps failing. The conditions and phase history that
+// mark the event as unpublished are left alone, so it is still retried.
 func (r *TaskActionReconciler) keepLaunchProgress(ctx context.Context, taskAction *flyteorgv1.TaskAction) {
 	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
 		latest.Status.PluginState = taskAction.Status.PluginState
