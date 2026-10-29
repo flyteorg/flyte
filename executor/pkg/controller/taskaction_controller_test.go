@@ -104,8 +104,8 @@ func (f *fakePlugin) Finalize(_ context.Context, _ pluginsCore.TaskExecutionCont
 	return nil
 }
 
-// fakeLaunchState is the plugin state of a fake that records whether it launched its resource.
-type fakeLaunchState struct{ Launched bool }
+// fakeLaunchState is the plugin state of a fake that records whether it waits to launch or launched its resource.
+type fakeLaunchState struct{ Waiting, Launched bool }
 
 // fakeEventsClient is a no-op implementation of EventsProxyServiceClient for tests.
 type fakeEventsClient struct{}
@@ -1058,6 +1058,60 @@ var _ = Describe("TaskAction Controller", func() {
 			persisted = getTaskAction(nn)
 			Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseRunning.String()))
 			Expect(persisted.Status.AttemptStartedAt).NotTo(BeNil())
+			Expect(persisted.Status.TimeoutAt).To(BeNil())
+			Expect(fake.abortCalls).To(BeZero())
+		})
+
+		It("does not end an attempt on the launch report that follows a saved wait to launch", func() {
+			nn := createTaskAction("qt-saved-wait",
+				buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
+			base := getTaskAction(nn).CreationTimestamp.Time
+			fakeClock := testingclock.NewFakeClock(base)
+			fake := &fakePlugin{id: "timeout-plugin"}
+			fake.handleFunc = func(_ context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+				state := fakeLaunchState{}
+				if _, err := tCtx.PluginStateReader().Get(&state); err != nil {
+					return pluginsCore.UnknownTransition, err
+				}
+				if state.Launched {
+					return runningTransition(base.Add(time.Second)), nil
+				}
+				if state.Waiting {
+					if err := tCtx.PluginStateWriter().Put(1, &fakeLaunchState{Launched: true}); err != nil {
+						return pluginsCore.UnknownTransition, err
+					}
+					// Adopting a resource only says that it exists, whatever it has done since.
+					return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(
+						fakeClock.Now(), pluginsCore.DefaultPhaseVersion, "task submitted")), nil
+				}
+				if err := tCtx.PluginStateWriter().Put(1, &fakeLaunchState{Waiting: true}); err != nil {
+					return pluginsCore.UnknownTransition, err
+				}
+				return pluginsCore.DoTransition(pluginsCore.PhaseInfoWaitingForResourcesInfo(
+					fakeClock.Now(), pluginsCore.DefaultPhaseVersion, "waiting for the previous resource", nil)), nil
+			}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+			req := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseWaitingForResources.String()))
+			Expect(persisted.Status.PluginState).NotTo(BeEmpty())
+
+			fakeClock.Step(10 * time.Second) // the wait outlasted the budget
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			persisted = getTaskAction(nn)
+			Expect(isTerminal(persisted)).To(BeFalse())
+			Expect(persisted.Status.TimeoutAt).To(BeNil())
+			Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseQueued.String()))
+			Expect(fake.abortCalls).To(BeZero())
+
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).NotTo(HaveOccurred())
+			persisted = getTaskAction(nn)
+			Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseRunning.String()))
 			Expect(persisted.Status.TimeoutAt).To(BeNil())
 			Expect(fake.abortCalls).To(BeZero())
 		})

@@ -394,6 +394,17 @@ func isQueuedPhase(phase pluginsCore.Phase) bool {
 	}
 }
 
+func isLaunchedPluginPhase(phase string) bool {
+	switch phase {
+	case pluginsCore.PhaseQueued.String(),
+		pluginsCore.PhaseInitializing.String(),
+		pluginsCore.PhaseRunning.String():
+		return true
+	default:
+		return false
+	}
+}
+
 func initializingMissedQueuedDeadline(info pluginsCore.PhaseInfo, deadline, now time.Time) bool {
 	if info.Phase() != pluginsCore.PhaseInitializing || now.Before(deadline) {
 		return false
@@ -1127,14 +1138,16 @@ func (r *TaskActionReconciler) reconcileTask(
 
 	// Invoke plugin.Handle only when cache handling did not short-circuit execution.
 	var handleErr error
-	hadPluginState := len(taskAction.Status.PluginState) > 0
+	// Saved plugin state alone does not mean the resource exists: a plugin can save state while
+	// it waits to launch. It counts as launched once it has reported Queued or later.
+	launched := len(taskAction.Status.PluginState) > 0 && isLaunchedPluginPhase(taskAction.Status.PluginPhase)
 	if !cacheShortCircuited {
 		transition, handleErr = p.Handle(ctx, tCtx)
 	}
 	// A plugin's first report only says that it launched or adopted its resource. An adopted
 	// resource may have been running since before the deadline, so wait for the next poll.
 	_, _, wroteState := stateMgr.GetNewState()
-	firstReport := !cacheShortCircuited && !hadPluginState && wroteState
+	firstReport := !cacheShortCircuited && !launched && wroteState
 
 	if handleErr == nil {
 		if err := r.recordAttemptQueuedFromPhase(ctx, taskAction, transition.Info()); err != nil {
