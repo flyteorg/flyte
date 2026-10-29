@@ -48,6 +48,9 @@ const (
 	// DataProxyServiceTailLogsProcedure is the fully-qualified name of the DataProxyService's TailLogs
 	// RPC.
 	DataProxyServiceTailLogsProcedure = "/flyteidl2.dataproxy.DataProxyService/TailLogs"
+	// DataProxyServiceGetCloudCredentialsProcedure is the fully-qualified name of the
+	// DataProxyService's GetCloudCredentials RPC.
+	DataProxyServiceGetCloudCredentialsProcedure = "/flyteidl2.dataproxy.DataProxyService/GetCloudCredentials"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -58,6 +61,7 @@ var (
 	dataProxyServiceCreateDownloadLinkMethodDescriptor   = dataProxyServiceServiceDescriptor.Methods().ByName("CreateDownloadLink")
 	dataProxyServiceGetActionDataMethodDescriptor        = dataProxyServiceServiceDescriptor.Methods().ByName("GetActionData")
 	dataProxyServiceTailLogsMethodDescriptor             = dataProxyServiceServiceDescriptor.Methods().ByName("TailLogs")
+	dataProxyServiceGetCloudCredentialsMethodDescriptor  = dataProxyServiceServiceDescriptor.Methods().ByName("GetCloudCredentials")
 )
 
 // DataProxyServiceClient is a client for the flyteidl2.dataproxy.DataProxyService service.
@@ -71,6 +75,21 @@ type DataProxyServiceClient interface {
 	GetActionData(context.Context, *connect.Request[dataproxy.GetActionDataRequest]) (*connect.Response[dataproxy.GetActionDataResponse], error)
 	// Stream logs for an action attempt.
 	TailLogs(context.Context, *connect.Request[dataproxy.TailLogsRequest]) (*connect.ServerStreamForClient[dataproxy.TailLogsResponse], error)
+	// GetCloudCredentials vends short-lived, prefix-scoped object-store credentials
+	// for one resource inside the caller's project/domain.
+	//
+	// This is the capability form of CreateUploadLocation. A signed URL is a
+	// capability for ONE object with conditions attached; these credentials are a
+	// capability over a PREFIX, for as long as they last. Which to use is a
+	// per-call-site choice and both are supported:
+	//
+	//   - Credentials when a client touches many objects it discovers as it goes
+	//     -- a mounted Volume reads and writes thousands of chunk keys, so a
+	//     signed URL per object is not a workable shape.
+	//   - A signed URL when the platform must constrain the write (it binds
+	//     content_md5 and a size, which credentials cannot), or when the consumer
+	//     is a browser with no cloud SDK (see CreateDownloadLink).
+	GetCloudCredentials(context.Context, *connect.Request[dataproxy.GetCloudCredentialsRequest]) (*connect.Response[dataproxy.GetCloudCredentialsResponse], error)
 }
 
 // NewDataProxyServiceClient constructs a client for the flyteidl2.dataproxy.DataProxyService
@@ -114,6 +133,12 @@ func NewDataProxyServiceClient(httpClient connect.HTTPClient, baseURL string, op
 			connect.WithSchema(dataProxyServiceTailLogsMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		getCloudCredentials: connect.NewClient[dataproxy.GetCloudCredentialsRequest, dataproxy.GetCloudCredentialsResponse](
+			httpClient,
+			baseURL+DataProxyServiceGetCloudCredentialsProcedure,
+			connect.WithSchema(dataProxyServiceGetCloudCredentialsMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -124,6 +149,7 @@ type dataProxyServiceClient struct {
 	createDownloadLink   *connect.Client[dataproxy.CreateDownloadLinkRequest, dataproxy.CreateDownloadLinkResponse]
 	getActionData        *connect.Client[dataproxy.GetActionDataRequest, dataproxy.GetActionDataResponse]
 	tailLogs             *connect.Client[dataproxy.TailLogsRequest, dataproxy.TailLogsResponse]
+	getCloudCredentials  *connect.Client[dataproxy.GetCloudCredentialsRequest, dataproxy.GetCloudCredentialsResponse]
 }
 
 // CreateUploadLocation calls flyteidl2.dataproxy.DataProxyService.CreateUploadLocation.
@@ -151,6 +177,11 @@ func (c *dataProxyServiceClient) TailLogs(ctx context.Context, req *connect.Requ
 	return c.tailLogs.CallServerStream(ctx, req)
 }
 
+// GetCloudCredentials calls flyteidl2.dataproxy.DataProxyService.GetCloudCredentials.
+func (c *dataProxyServiceClient) GetCloudCredentials(ctx context.Context, req *connect.Request[dataproxy.GetCloudCredentialsRequest]) (*connect.Response[dataproxy.GetCloudCredentialsResponse], error) {
+	return c.getCloudCredentials.CallUnary(ctx, req)
+}
+
 // DataProxyServiceHandler is an implementation of the flyteidl2.dataproxy.DataProxyService service.
 type DataProxyServiceHandler interface {
 	// CreateUploadLocation generates a signed URL for uploading data to the configured storage backend.
@@ -162,6 +193,21 @@ type DataProxyServiceHandler interface {
 	GetActionData(context.Context, *connect.Request[dataproxy.GetActionDataRequest]) (*connect.Response[dataproxy.GetActionDataResponse], error)
 	// Stream logs for an action attempt.
 	TailLogs(context.Context, *connect.Request[dataproxy.TailLogsRequest], *connect.ServerStream[dataproxy.TailLogsResponse]) error
+	// GetCloudCredentials vends short-lived, prefix-scoped object-store credentials
+	// for one resource inside the caller's project/domain.
+	//
+	// This is the capability form of CreateUploadLocation. A signed URL is a
+	// capability for ONE object with conditions attached; these credentials are a
+	// capability over a PREFIX, for as long as they last. Which to use is a
+	// per-call-site choice and both are supported:
+	//
+	//   - Credentials when a client touches many objects it discovers as it goes
+	//     -- a mounted Volume reads and writes thousands of chunk keys, so a
+	//     signed URL per object is not a workable shape.
+	//   - A signed URL when the platform must constrain the write (it binds
+	//     content_md5 and a size, which credentials cannot), or when the consumer
+	//     is a browser with no cloud SDK (see CreateDownloadLink).
+	GetCloudCredentials(context.Context, *connect.Request[dataproxy.GetCloudCredentialsRequest]) (*connect.Response[dataproxy.GetCloudCredentialsResponse], error)
 }
 
 // NewDataProxyServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -201,6 +247,12 @@ func NewDataProxyServiceHandler(svc DataProxyServiceHandler, opts ...connect.Han
 		connect.WithSchema(dataProxyServiceTailLogsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	dataProxyServiceGetCloudCredentialsHandler := connect.NewUnaryHandler(
+		DataProxyServiceGetCloudCredentialsProcedure,
+		svc.GetCloudCredentials,
+		connect.WithSchema(dataProxyServiceGetCloudCredentialsMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.dataproxy.DataProxyService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case DataProxyServiceCreateUploadLocationProcedure:
@@ -213,6 +265,8 @@ func NewDataProxyServiceHandler(svc DataProxyServiceHandler, opts ...connect.Han
 			dataProxyServiceGetActionDataHandler.ServeHTTP(w, r)
 		case DataProxyServiceTailLogsProcedure:
 			dataProxyServiceTailLogsHandler.ServeHTTP(w, r)
+		case DataProxyServiceGetCloudCredentialsProcedure:
+			dataProxyServiceGetCloudCredentialsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -240,4 +294,8 @@ func (UnimplementedDataProxyServiceHandler) GetActionData(context.Context, *conn
 
 func (UnimplementedDataProxyServiceHandler) TailLogs(context.Context, *connect.Request[dataproxy.TailLogsRequest], *connect.ServerStream[dataproxy.TailLogsResponse]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.dataproxy.DataProxyService.TailLogs is not implemented"))
+}
+
+func (UnimplementedDataProxyServiceHandler) GetCloudCredentials(context.Context, *connect.Request[dataproxy.GetCloudCredentialsRequest]) (*connect.Response[dataproxy.GetCloudCredentialsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.dataproxy.DataProxyService.GetCloudCredentials is not implemented"))
 }

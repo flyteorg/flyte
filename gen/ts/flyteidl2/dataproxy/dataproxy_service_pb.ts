@@ -27,7 +27,303 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/dataproxy/dataproxy_service.proto.
  */
 export const file_flyteidl2_dataproxy_dataproxy_service: GenFile = /*@__PURE__*/
-  fileDesc("CitmbHl0ZWlkbDIvZGF0YXByb3h5L2RhdGFwcm94eV9zZXJ2aWNlLnByb3RvEhNmbHl0ZWlkbDIuZGF0YXByb3h5IpwCChtDcmVhdGVVcGxvYWRMb2NhdGlvblJlcXVlc3QSGAoHcHJvamVjdBgBIAEoCUIHukgEcgIQARIXCgZkb21haW4YAiABKAlCB7pIBHICEAESEAoIZmlsZW5hbWUYAyABKAkSLQoKZXhwaXJlc19pbhgEIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIcCgtjb250ZW50X21kNRgFIAEoDEIHukgEegJoEBIVCg1maWxlbmFtZV9yb290GAYgASgJEiAKGGFkZF9jb250ZW50X21kNV9tZXRhZGF0YRgHIAEoCBILCgNvcmcYCCABKAkSFgoOY29udGVudF9sZW5ndGgYCSABKAMSDQoFcXVldWUYCiABKAki9wEKHENyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2USEgoKc2lnbmVkX3VybBgBIAEoCRISCgpuYXRpdmVfdXJsGAIgASgJEi4KCmV4cGlyZXNfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEk8KB2hlYWRlcnMYBCADKAsyPi5mbHl0ZWlkbDIuZGF0YXByb3h5LkNyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2UuSGVhZGVyc0VudHJ5Gi4KDEhlYWRlcnNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIoEDChNVcGxvYWRJbnB1dHNSZXF1ZXN0EjEKBnJ1bl9pZBgBIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckgAEjkKCnByb2plY3RfaWQYAiABKAsyIy5mbHl0ZWlkbDIuY29tbW9uLlByb2plY3RJZGVudGlmaWVySAASMQoHdGFza19pZBgDIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVySAESLQoJdGFza19zcGVjGAQgASgLMhguZmx5dGVpZGwyLnRhc2suVGFza1NwZWNIARI1Cgx0cmlnZ2VyX25hbWUYBSABKAsyHS5mbHl0ZWlkbDIuY29tbW9uLlRyaWdnZXJOYW1lSAESJgoGaW5wdXRzGAYgASgLMhYuZmx5dGVpZGwyLnRhc2suSW5wdXRzEhAKCGJhc2VfZGlyGAcgASgJEg0KBXF1ZXVlGAggASgJQgsKAmlkEgW6SAIIAUINCgR0YXNrEgW6SAIIASJaChRVcGxvYWRJbnB1dHNSZXNwb25zZRJCChRvZmZsb2FkZWRfaW5wdXRfZGF0YRgBIAEoCzIkLmZseXRlaWRsMi5jb21tb24uT2ZmbG9hZGVkSW5wdXREYXRhIlMKDVByZVNpZ25lZFVSTHMSEgoKc2lnbmVkX3VybBgBIAMoCRIuCgpleHBpcmVzX2F0GAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCLHAgoZQ3JlYXRlRG93bmxvYWRMaW5rUmVxdWVzdBJCCg1hcnRpZmFjdF90eXBlGAEgASgOMiEuZmx5dGVpZGwyLmRhdGFwcm94eS5BcnRpZmFjdFR5cGVCCLpIBYIBAiAAEi0KCmV4cGlyZXNfaW4YAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SRgoRYWN0aW9uX2F0dGVtcHRfaWQYAyABKAsyKS5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbkF0dGVtcHRJZGVudGlmaWVySAASKwoGYXBwX2lkGAQgASgLMhkuZmx5dGVpZGwyLmFwcC5JZGVudGlmaWVySAASMQoHdGFza19pZBgFIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVySABCDwoGc291cmNlEgW6SAIIASJZChpDcmVhdGVEb3dubG9hZExpbmtSZXNwb25zZRI7Cg9wcmVfc2lnbmVkX3VybHMYASABKAsyIi5mbHl0ZWlkbDIuZGF0YXByb3h5LlByZVNpZ25lZFVSTHMiiAEKFEdldEFjdGlvbkRhdGFSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBEjEKCnJ1bl9zb3VyY2UYAiABKA4yHS5mbHl0ZWlkbDIud29ya2Zsb3cuUnVuU291cmNlIpIBChVHZXRBY3Rpb25EYXRhUmVzcG9uc2USJgoGaW5wdXRzGAEgASgLMhYuZmx5dGVpZGwyLnRhc2suSW5wdXRzEigKB291dHB1dHMYAiABKAsyFy5mbHl0ZWlkbDIudGFzay5PdXRwdXRzEhIKCmlucHV0c191cmkYAyABKAkSEwoLb3V0cHV0c191cmkYBCABKAki8QEKD1RhaWxMb2dzUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAEhUKC3ByaW1hcnlfcG9kGAYgASgISAASEgoIYWxsX3BvZHMYBSABKAhIABISCghwb2RfbmFtZRgDIAEoCUgAEh8KEmNvbm5lY3Rvcl9lbmRwb2ludBgEIAEoCUgBiAEBQg4KDHBvZF9zZWxlY3RvckIVChNfY29ubmVjdG9yX2VuZHBvaW50IsgBChBUYWlsTG9nc1Jlc3BvbnNlEjgKBGxvZ3MYASADKAsyKi5mbHl0ZWlkbDIuZGF0YXByb3h5LlRhaWxMb2dzUmVzcG9uc2UuTG9ncxp6CgRMb2dzEjAKBWxpbmVzGAEgAygLMiEuZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lLkxvZ0xpbmUSQAoJY29udGFpbmVyGAIgASgLMi0uZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lLkNvbnRhaW5lcklkZW50aWZpZXIqZgoMQXJ0aWZhY3RUeXBlEh0KGUFSVElGQUNUX1RZUEVfVU5TUEVDSUZJRUQQABIYChRBUlRJRkFDVF9UWVBFX1JFUE9SVBABEh0KGUFSVElGQUNUX1RZUEVfQ09ERV9CVU5ETEUQAjK7BAoQRGF0YVByb3h5U2VydmljZRJ9ChRDcmVhdGVVcGxvYWRMb2NhdGlvbhIwLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlVXBsb2FkTG9jYXRpb25SZXF1ZXN0GjEuZmx5dGVpZGwyLmRhdGFwcm94eS5DcmVhdGVVcGxvYWRMb2NhdGlvblJlc3BvbnNlIgASZQoMVXBsb2FkSW5wdXRzEiguZmx5dGVpZGwyLmRhdGFwcm94eS5VcGxvYWRJbnB1dHNSZXF1ZXN0GikuZmx5dGVpZGwyLmRhdGFwcm94eS5VcGxvYWRJbnB1dHNSZXNwb25zZSIAEncKEkNyZWF0ZURvd25sb2FkTGluaxIuLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlRG93bmxvYWRMaW5rUmVxdWVzdBovLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlRG93bmxvYWRMaW5rUmVzcG9uc2UiABJrCg1HZXRBY3Rpb25EYXRhEikuZmx5dGVpZGwyLmRhdGFwcm94eS5HZXRBY3Rpb25EYXRhUmVxdWVzdBoqLmZseXRlaWRsMi5kYXRhcHJveHkuR2V0QWN0aW9uRGF0YVJlc3BvbnNlIgOQAgESWwoIVGFpbExvZ3MSJC5mbHl0ZWlkbDIuZGF0YXByb3h5LlRhaWxMb2dzUmVxdWVzdBolLmZseXRlaWRsMi5kYXRhcHJveHkuVGFpbExvZ3NSZXNwb25zZSIAMAFC2AEKF2NvbS5mbHl0ZWlkbDIuZGF0YXByb3h5QhVEYXRhcHJveHlTZXJ2aWNlUHJvdG9IAlABWjdnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvZGF0YXByb3h5ogIDRkRYqgITRmx5dGVpZGwyLkRhdGFwcm94ecoCE0ZseXRlaWRsMlxEYXRhcHJveHniAh9GbHl0ZWlkbDJcRGF0YXByb3h5XEdQQk1ldGFkYXRh6gIURmx5dGVpZGwyOjpEYXRhcHJveHliBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_app_app_definition, file_flyteidl2_common_identifier, file_flyteidl2_common_run, file_flyteidl2_logs_dataplane_payload, file_flyteidl2_task_common, file_flyteidl2_task_task_definition, file_flyteidl2_workflow_run_definition, file_google_protobuf_duration, file_google_protobuf_timestamp]);
+  fileDesc("CitmbHl0ZWlkbDIvZGF0YXByb3h5L2RhdGFwcm94eV9zZXJ2aWNlLnByb3RvEhNmbHl0ZWlkbDIuZGF0YXByb3h5IhEKD1Byb2plY3REYXRhQXJlYSKdAQoKVm9sdW1lRGF0YRI6Cg1hY3Rpb25fb3V0cHV0GAEgASgLMiEuZmx5dGVpZGwyLmRhdGFwcm94eS5BY3Rpb25PdXRwdXRIABJAChBhcnRpZmFjdF92ZXJzaW9uGAIgASgLMiQuZmx5dGVpZGwyLmRhdGFwcm94eS5BcnRpZmFjdFZlcnNpb25IAEIRCghpZGVudGl0eRIFukgCCAEiUwoMQWN0aW9uT3V0cHV0EhkKCHJ1bl9uYW1lGAEgASgJQge6SARyAhABEhMKC2FjdGlvbl9uYW1lGAIgASgJEhMKC291dHB1dF9uYW1lGAMgASgJIjkKD0FydGlmYWN0VmVyc2lvbhIVCgRuYW1lGAEgASgJQge6SARyAhABEg8KB3ZlcnNpb24YAiABKAkiygIKGkdldENsb3VkQ3JlZGVudGlhbHNSZXF1ZXN0EjIKBXNjb3BlGAEgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllchI8Cgxwcm9qZWN0X2RhdGEYAiABKAsyJC5mbHl0ZWlkbDIuZGF0YXByb3h5LlByb2plY3REYXRhQXJlYUgAEjEKBnZvbHVtZRgDIAEoCzIfLmZseXRlaWRsMi5kYXRhcHJveHkuVm9sdW1lRGF0YUgAEjUKBmFjY2VzcxgEIAEoDjIlLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlZGVudGlhbEFjY2VzcxIQCghzdWJwYXRocxgFIAMoCRIrCghkdXJhdGlvbhgGIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIRCghyZXNvdXJjZRIFukgCCAEi9wEKG0dldENsb3VkQ3JlZGVudGlhbHNSZXNwb25zZRIxCgRraW5kGAEgASgOMiMuZmx5dGVpZGwyLmRhdGFwcm94eS5DcmVkZW50aWFsS2luZBIVCg1hY2Nlc3Nfa2V5X2lkGAIgASgJEhkKEXNlY3JldF9hY2Nlc3Nfa2V5GAMgASgJEhUKDXNlc3Npb25fdG9rZW4YBCABKAkSLgoKZXhwaXJhdGlvbhgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASEgoKYnVja2V0X3VyaRgGIAEoCRIYChBncmFudGVkX3ByZWZpeGVzGAcgAygJIpwCChtDcmVhdGVVcGxvYWRMb2NhdGlvblJlcXVlc3QSGAoHcHJvamVjdBgBIAEoCUIHukgEcgIQARIXCgZkb21haW4YAiABKAlCB7pIBHICEAESEAoIZmlsZW5hbWUYAyABKAkSLQoKZXhwaXJlc19pbhgEIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhIcCgtjb250ZW50X21kNRgFIAEoDEIHukgEegJoEBIVCg1maWxlbmFtZV9yb290GAYgASgJEiAKGGFkZF9jb250ZW50X21kNV9tZXRhZGF0YRgHIAEoCBILCgNvcmcYCCABKAkSFgoOY29udGVudF9sZW5ndGgYCSABKAMSDQoFcXVldWUYCiABKAki9wEKHENyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2USEgoKc2lnbmVkX3VybBgBIAEoCRISCgpuYXRpdmVfdXJsGAIgASgJEi4KCmV4cGlyZXNfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEk8KB2hlYWRlcnMYBCADKAsyPi5mbHl0ZWlkbDIuZGF0YXByb3h5LkNyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2UuSGVhZGVyc0VudHJ5Gi4KDEhlYWRlcnNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIoEDChNVcGxvYWRJbnB1dHNSZXF1ZXN0EjEKBnJ1bl9pZBgBIAEoCzIfLmZseXRlaWRsMi5jb21tb24uUnVuSWRlbnRpZmllckgAEjkKCnByb2plY3RfaWQYAiABKAsyIy5mbHl0ZWlkbDIuY29tbW9uLlByb2plY3RJZGVudGlmaWVySAASMQoHdGFza19pZBgDIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVySAESLQoJdGFza19zcGVjGAQgASgLMhguZmx5dGVpZGwyLnRhc2suVGFza1NwZWNIARI1Cgx0cmlnZ2VyX25hbWUYBSABKAsyHS5mbHl0ZWlkbDIuY29tbW9uLlRyaWdnZXJOYW1lSAESJgoGaW5wdXRzGAYgASgLMhYuZmx5dGVpZGwyLnRhc2suSW5wdXRzEhAKCGJhc2VfZGlyGAcgASgJEg0KBXF1ZXVlGAggASgJQgsKAmlkEgW6SAIIAUINCgR0YXNrEgW6SAIIASJaChRVcGxvYWRJbnB1dHNSZXNwb25zZRJCChRvZmZsb2FkZWRfaW5wdXRfZGF0YRgBIAEoCzIkLmZseXRlaWRsMi5jb21tb24uT2ZmbG9hZGVkSW5wdXREYXRhIlMKDVByZVNpZ25lZFVSTHMSEgoKc2lnbmVkX3VybBgBIAMoCRIuCgpleHBpcmVzX2F0GAIgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCLHAgoZQ3JlYXRlRG93bmxvYWRMaW5rUmVxdWVzdBJCCg1hcnRpZmFjdF90eXBlGAEgASgOMiEuZmx5dGVpZGwyLmRhdGFwcm94eS5BcnRpZmFjdFR5cGVCCLpIBYIBAiAAEi0KCmV4cGlyZXNfaW4YAiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SRgoRYWN0aW9uX2F0dGVtcHRfaWQYAyABKAsyKS5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbkF0dGVtcHRJZGVudGlmaWVySAASKwoGYXBwX2lkGAQgASgLMhkuZmx5dGVpZGwyLmFwcC5JZGVudGlmaWVySAASMQoHdGFza19pZBgFIAEoCzIeLmZseXRlaWRsMi50YXNrLlRhc2tJZGVudGlmaWVySABCDwoGc291cmNlEgW6SAIIASJZChpDcmVhdGVEb3dubG9hZExpbmtSZXNwb25zZRI7Cg9wcmVfc2lnbmVkX3VybHMYASABKAsyIi5mbHl0ZWlkbDIuZGF0YXByb3h5LlByZVNpZ25lZFVSTHMiiAEKFEdldEFjdGlvbkRhdGFSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBEjEKCnJ1bl9zb3VyY2UYAiABKA4yHS5mbHl0ZWlkbDIud29ya2Zsb3cuUnVuU291cmNlIpIBChVHZXRBY3Rpb25EYXRhUmVzcG9uc2USJgoGaW5wdXRzGAEgASgLMhYuZmx5dGVpZGwyLnRhc2suSW5wdXRzEigKB291dHB1dHMYAiABKAsyFy5mbHl0ZWlkbDIudGFzay5PdXRwdXRzEhIKCmlucHV0c191cmkYAyABKAkSEwoLb3V0cHV0c191cmkYBCABKAki8QEKD1RhaWxMb2dzUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIYCgdhdHRlbXB0GAIgASgNQge6SAQqAiAAEhUKC3ByaW1hcnlfcG9kGAYgASgISAASEgoIYWxsX3BvZHMYBSABKAhIABISCghwb2RfbmFtZRgDIAEoCUgAEh8KEmNvbm5lY3Rvcl9lbmRwb2ludBgEIAEoCUgBiAEBQg4KDHBvZF9zZWxlY3RvckIVChNfY29ubmVjdG9yX2VuZHBvaW50IsgBChBUYWlsTG9nc1Jlc3BvbnNlEjgKBGxvZ3MYASADKAsyKi5mbHl0ZWlkbDIuZGF0YXByb3h5LlRhaWxMb2dzUmVzcG9uc2UuTG9ncxp6CgRMb2dzEjAKBWxpbmVzGAEgAygLMiEuZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lLkxvZ0xpbmUSQAoJY29udGFpbmVyGAIgASgLMi0uZmx5dGVpZGwyLmxvZ3MuZGF0YXBsYW5lLkNvbnRhaW5lcklkZW50aWZpZXIqZgoMQXJ0aWZhY3RUeXBlEh0KGUFSVElGQUNUX1RZUEVfVU5TUEVDSUZJRUQQABIYChRBUlRJRkFDVF9UWVBFX1JFUE9SVBABEh0KGUFSVElGQUNUX1RZUEVfQ09ERV9CVU5ETEUQAipzChBDcmVkZW50aWFsQWNjZXNzEiEKHUNSRURFTlRJQUxfQUNDRVNTX1VOU1BFQ0lGSUVEEAASGgoWQ1JFREVOVElBTF9BQ0NFU1NfUkVBRBABEiAKHENSRURFTlRJQUxfQUNDRVNTX1JFQURfV1JJVEUQAiqVAQoOQ3JlZGVudGlhbEtpbmQSHwobQ1JFREVOVElBTF9LSU5EX1VOU1BFQ0lGSUVEEAASHQoZQ1JFREVOVElBTF9LSU5EX0FXU19TSUdWNBABEiQKIENSRURFTlRJQUxfS0lORF9HQ1BfQUNDRVNTX1RPS0VOEAISHQoZQ1JFREVOVElBTF9LSU5EX0FaVVJFX1NBUxADMrcFChBEYXRhUHJveHlTZXJ2aWNlEn0KFENyZWF0ZVVwbG9hZExvY2F0aW9uEjAuZmx5dGVpZGwyLmRhdGFwcm94eS5DcmVhdGVVcGxvYWRMb2NhdGlvblJlcXVlc3QaMS5mbHl0ZWlkbDIuZGF0YXByb3h5LkNyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2UiABJlCgxVcGxvYWRJbnB1dHMSKC5mbHl0ZWlkbDIuZGF0YXByb3h5LlVwbG9hZElucHV0c1JlcXVlc3QaKS5mbHl0ZWlkbDIuZGF0YXByb3h5LlVwbG9hZElucHV0c1Jlc3BvbnNlIgASdwoSQ3JlYXRlRG93bmxvYWRMaW5rEi4uZmx5dGVpZGwyLmRhdGFwcm94eS5DcmVhdGVEb3dubG9hZExpbmtSZXF1ZXN0Gi8uZmx5dGVpZGwyLmRhdGFwcm94eS5DcmVhdGVEb3dubG9hZExpbmtSZXNwb25zZSIAEmsKDUdldEFjdGlvbkRhdGESKS5mbHl0ZWlkbDIuZGF0YXByb3h5LkdldEFjdGlvbkRhdGFSZXF1ZXN0GiouZmx5dGVpZGwyLmRhdGFwcm94eS5HZXRBY3Rpb25EYXRhUmVzcG9uc2UiA5ACARJbCghUYWlsTG9ncxIkLmZseXRlaWRsMi5kYXRhcHJveHkuVGFpbExvZ3NSZXF1ZXN0GiUuZmx5dGVpZGwyLmRhdGFwcm94eS5UYWlsTG9nc1Jlc3BvbnNlIgAwARJ6ChNHZXRDbG91ZENyZWRlbnRpYWxzEi8uZmx5dGVpZGwyLmRhdGFwcm94eS5HZXRDbG91ZENyZWRlbnRpYWxzUmVxdWVzdBowLmZseXRlaWRsMi5kYXRhcHJveHkuR2V0Q2xvdWRDcmVkZW50aWFsc1Jlc3BvbnNlIgBC2AEKF2NvbS5mbHl0ZWlkbDIuZGF0YXByb3h5QhVEYXRhcHJveHlTZXJ2aWNlUHJvdG9IAlABWjdnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvZGF0YXByb3h5ogIDRkRYqgITRmx5dGVpZGwyLkRhdGFwcm94ecoCE0ZseXRlaWRsMlxEYXRhcHJveHniAh9GbHl0ZWlkbDJcRGF0YXByb3h5XEdQQk1ldGFkYXRh6gIURmx5dGVpZGwyOjpEYXRhcHJveHliBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_app_app_definition, file_flyteidl2_common_identifier, file_flyteidl2_common_run, file_flyteidl2_logs_dataplane_payload, file_flyteidl2_task_common, file_flyteidl2_task_task_definition, file_flyteidl2_workflow_run_definition, file_google_protobuf_duration, file_google_protobuf_timestamp]);
+
+/**
+ * ProjectDataArea names the project/domain's own data area -- the same place
+ * CreateUploadLocation writes to. A marker message rather than a bare bool so
+ * it can grow a field without a breaking change.
+ *
+ * @generated from message flyteidl2.dataproxy.ProjectDataArea
+ */
+export type ProjectDataArea = Message<"flyteidl2.dataproxy.ProjectDataArea"> & {
+};
+
+/**
+ * Describes the message flyteidl2.dataproxy.ProjectDataArea.
+ * Use `create(ProjectDataAreaSchema)` to create a new message.
+ */
+export const ProjectDataAreaSchema: GenMessage<ProjectDataArea> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 0);
+
+/**
+ * VolumeData names one Volume the way the platform names it, never by path.
+ *
+ * A locator would be the tempting field and is the wrong one: it is a path the
+ * caller supplies, so accepting it means deciding whether this identity may
+ * touch that path -- the path->resource->authorization mapping this request
+ * exists to avoid. Worse, it cannot be rescued by validating that the locator
+ * sits inside `scope`, because a Volume's chunks do NOT: they live at
+ * `<bucket root>/<Format.Name>/chunks/...`, since JuiceFS discards any path in
+ * the bucket URI. A locator "inside the scope" still yields a grant outside it.
+ *
+ * So the server resolves the identity below to the version's metadata object,
+ * reads it, and takes BOTH halves from the record:
+ *
+ *   * the authorization subject -- `produced_by`, an ACTION, carrying
+ *     org/project/domain. Authorizing an action is a question the platform
+ *     already answers, and it must agree with `scope`.
+ *   * the prefixes -- `chunk_prefix` (the format name) and `metadata_prefix`,
+ *     as recorded. NOT derived from the volume's name: a fork keeps its
+ *     ancestor's format name, so a name-derived prefix authenticates perfectly
+ *     and then fails every chunk read.
+ *
+ * What this gives up on purpose: a caller holding only a locator cannot get
+ * credentials. That is the confused-deputy case, and such a caller keeps
+ * working the way it does today -- with its own object-store access.
+ *
+ * @generated from message flyteidl2.dataproxy.VolumeData
+ */
+export type VolumeData = Message<"flyteidl2.dataproxy.VolumeData"> & {
+  /**
+   * @generated from oneof flyteidl2.dataproxy.VolumeData.identity
+   */
+  identity: {
+    /**
+     * @generated from field: flyteidl2.dataproxy.ActionOutput action_output = 1;
+     */
+    value: ActionOutput;
+    case: "actionOutput";
+  } | {
+    /**
+     * @generated from field: flyteidl2.dataproxy.ArtifactVersion artifact_version = 2;
+     */
+    value: ArtifactVersion;
+    case: "artifactVersion";
+  } | { case: undefined; value?: undefined };
+};
+
+/**
+ * Describes the message flyteidl2.dataproxy.VolumeData.
+ * Use `create(VolumeDataSchema)` to create a new message.
+ */
+export const VolumeDataSchema: GenMessage<VolumeData> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 1);
+
+/**
+ * ActionOutput names the Volume a task execution returned. project/domain come
+ * from the request's scope; this is the rest of what ActionRef records on every
+ * published version, which is also how `flyte mount volume --run/--action` and
+ * `flyte explore volume` already name one.
+ *
+ * @generated from message flyteidl2.dataproxy.ActionOutput
+ */
+export type ActionOutput = Message<"flyteidl2.dataproxy.ActionOutput"> & {
+  /**
+   * +required
+   *
+   * @generated from field: string run_name = 1;
+   */
+  runName: string;
+
+  /**
+   * +optional. Defaults to the run's root action.
+   *
+   * @generated from field: string action_name = 2;
+   */
+  actionName: string;
+
+  /**
+   * +optional. With none, the action's outputs are searched for a Volume and
+   * then its inputs, as the CLI does.
+   *
+   * @generated from field: string output_name = 3;
+   */
+  outputName: string;
+};
+
+/**
+ * Describes the message flyteidl2.dataproxy.ActionOutput.
+ * Use `create(ActionOutputSchema)` to create a new message.
+ */
+export const ActionOutputSchema: GenMessage<ActionOutput> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 2);
+
+/**
+ * ArtifactVersion names a Volume published to the artifact registry. The
+ * handle a reader would normally type.
+ *
+ * @generated from message flyteidl2.dataproxy.ArtifactVersion
+ */
+export type ArtifactVersion = Message<"flyteidl2.dataproxy.ArtifactVersion"> & {
+  /**
+   * +required
+   *
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * +optional. Defaults to the artifact's latest version.
+   *
+   * @generated from field: string version = 2;
+   */
+  version: string;
+};
+
+/**
+ * Describes the message flyteidl2.dataproxy.ArtifactVersion.
+ * Use `create(ArtifactVersionSchema)` to create a new message.
+ */
+export const ArtifactVersionSchema: GenMessage<ArtifactVersion> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 3);
+
+/**
+ * GetCloudCredentialsRequest asks for credentials for a resource, never for a
+ * path.
+ *
+ * "Credentials for s3://bucket/path" is the tempting shape and the wrong one:
+ * the server would have to decide whether this identity may touch that path,
+ * which means inventing a path->resource->authorization mapping and keeping it
+ * correct forever. Keyed by a resource inside a scope, authorization is the
+ * question the platform already answers, and the path is an OUTPUT.
+ *
+ * @generated from message flyteidl2.dataproxy.GetCloudCredentialsRequest
+ */
+export type GetCloudCredentialsRequest = Message<"flyteidl2.dataproxy.GetCloudCredentialsRequest"> & {
+  /**
+   * The project/domain this is for: where authorization is answered.
+   *
+   * It is NOT, for every resource, a containment boundary. A ProjectDataArea's
+   * prefix is inside it. A Volume's chunk prefix is not and cannot be made so
+   * for an existing volume -- see VolumeData. What bounds a Volume grant
+   * instead is that the server has verified, from the version's own metadata,
+   * that the family was produced inside this scope: the grant reaches one
+   * family's chunk prefix and one metadata prefix, and nothing else in the
+   * store.
+   * +required
+   *
+   * @generated from field: flyteidl2.common.ProjectIdentifier scope = 1;
+   */
+  scope?: ProjectIdentifier;
+
+  /**
+   * Which resource inside the scope.
+   *
+   * @generated from oneof flyteidl2.dataproxy.GetCloudCredentialsRequest.resource
+   */
+  resource: {
+    /**
+     * @generated from field: flyteidl2.dataproxy.ProjectDataArea project_data = 2;
+     */
+    value: ProjectDataArea;
+    case: "projectData";
+  } | {
+    /**
+     * @generated from field: flyteidl2.dataproxy.VolumeData volume = 3;
+     */
+    value: VolumeData;
+    case: "volume";
+  } | { case: undefined; value?: undefined };
+
+  /**
+   * +optional. Unspecified reads as READ, which is the safe direction for a
+   * caller that forgot to say.
+   *
+   * @generated from field: flyteidl2.dataproxy.CredentialAccess access = 4;
+   */
+  access: CredentialAccess;
+
+  /**
+   * Narrowing WITHIN the resolved resource, relative to its prefix. Safe to
+   * accept from a client because narrowing cannot widen: a caller that needs
+   * one key says so and gets a session that can reach one key.
+   * +optional
+   *
+   * @generated from field: repeated string subpaths = 5;
+   */
+  subpaths: string[];
+
+  /**
+   * +optional. Clamped to the server's configured maximum; the default comes
+   * from configuration.
+   *
+   * @generated from field: google.protobuf.Duration duration = 6;
+   */
+  duration?: Duration;
+};
+
+/**
+ * Describes the message flyteidl2.dataproxy.GetCloudCredentialsRequest.
+ * Use `create(GetCloudCredentialsRequestSchema)` to create a new message.
+ */
+export const GetCloudCredentialsRequestSchema: GenMessage<GetCloudCredentialsRequest> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 4);
+
+/**
+ * GetCloudCredentialsResponse carries credentials. Every field but kind,
+ * expiration, bucket_uri and granted_prefixes is a secret: do not log it.
+ *
+ * @generated from message flyteidl2.dataproxy.GetCloudCredentialsResponse
+ */
+export type GetCloudCredentialsResponse = Message<"flyteidl2.dataproxy.GetCloudCredentialsResponse"> & {
+  /**
+   * @generated from field: flyteidl2.dataproxy.CredentialKind kind = 1;
+   */
+  kind: CredentialKind;
+
+  /**
+   * @generated from field: string access_key_id = 2;
+   */
+  accessKeyId: string;
+
+  /**
+   * @generated from field: string secret_access_key = 3;
+   */
+  secretAccessKey: string;
+
+  /**
+   * The AWS session token, or -- for the other kinds -- the OAuth2 access
+   * token or the SAS query string.
+   *
+   * @generated from field: string session_token = 4;
+   */
+  sessionToken: string;
+
+  /**
+   * When these stop working. A client that cannot parse this cannot refresh,
+   * so it is always set.
+   *
+   * @generated from field: google.protobuf.Timestamp expiration = 5;
+   */
+  expiration?: Timestamp;
+
+  /**
+   * Where the data is, resolved, so the client works none of it out. For S3
+   * this is region-qualified on purpose: a client given a bare bucket may ask
+   * the store for its location, and a scoped session is not permitted that
+   * call.
+   *
+   * @generated from field: string bucket_uri = 6;
+   */
+  bucketUri: string;
+
+  /**
+   * The prefixes these credentials can actually reach, relative to the bucket.
+   *
+   * Plural because a Volume's are not one prefix and not derivable: its chunks
+   * sit under the format name at the bucket root while its metadata sits under
+   * the version prefix, and a fork shares its ancestor's format name.
+   *
+   * Read them rather than assuming them. For a Volume, READ reaches the whole
+   * FAMILY's chunk prefix, which is wider than the one version asked for and
+   * is inherent: a branch's reads require its ancestors' chunks, forks share
+   * one format name, and chunk keys are slice-id-derived rather than
+   * per-branch. READ_WRITE need not be that wide -- a writer only creates keys
+   * in its own slice-id range -- so the two accesses may return different
+   * prefixes for the same resource.
+   *
+   * @generated from field: repeated string granted_prefixes = 7;
+   */
+  grantedPrefixes: string[];
+};
+
+/**
+ * Describes the message flyteidl2.dataproxy.GetCloudCredentialsResponse.
+ * Use `create(GetCloudCredentialsResponseSchema)` to create a new message.
+ */
+export const GetCloudCredentialsResponseSchema: GenMessage<GetCloudCredentialsResponse> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 5);
 
 /**
  * CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.
@@ -132,7 +428,7 @@ export type CreateUploadLocationRequest = Message<"flyteidl2.dataproxy.CreateUpl
  * Use `create(CreateUploadLocationRequestSchema)` to create a new message.
  */
 export const CreateUploadLocationRequestSchema: GenMessage<CreateUploadLocationRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 0);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 6);
 
 /**
  * CreateUploadLocationResponse specifies the response for the CreateUploadLocation API.
@@ -174,7 +470,7 @@ export type CreateUploadLocationResponse = Message<"flyteidl2.dataproxy.CreateUp
  * Use `create(CreateUploadLocationResponseSchema)` to create a new message.
  */
 export const CreateUploadLocationResponseSchema: GenMessage<CreateUploadLocationResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 1);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 7);
 
 /**
  * @generated from message flyteidl2.dataproxy.UploadInputsRequest
@@ -267,7 +563,7 @@ export type UploadInputsRequest = Message<"flyteidl2.dataproxy.UploadInputsReque
  * Use `create(UploadInputsRequestSchema)` to create a new message.
  */
 export const UploadInputsRequestSchema: GenMessage<UploadInputsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 2);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 8);
 
 /**
  * @generated from message flyteidl2.dataproxy.UploadInputsResponse
@@ -284,7 +580,7 @@ export type UploadInputsResponse = Message<"flyteidl2.dataproxy.UploadInputsResp
  * Use `create(UploadInputsResponseSchema)` to create a new message.
  */
 export const UploadInputsResponseSchema: GenMessage<UploadInputsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 3);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 9);
 
 /**
  * PreSignedURLs contains a list of signed URLs for downloading artifacts.
@@ -312,7 +608,7 @@ export type PreSignedURLs = Message<"flyteidl2.dataproxy.PreSignedURLs"> & {
  * Use `create(PreSignedURLsSchema)` to create a new message.
  */
 export const PreSignedURLsSchema: GenMessage<PreSignedURLs> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 4);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 10);
 
 /**
  * CreateDownloadLinkRequest specifies the request for the CreateDownloadLink API.
@@ -370,7 +666,7 @@ export type CreateDownloadLinkRequest = Message<"flyteidl2.dataproxy.CreateDownl
  * Use `create(CreateDownloadLinkRequestSchema)` to create a new message.
  */
 export const CreateDownloadLinkRequestSchema: GenMessage<CreateDownloadLinkRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 5);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 11);
 
 /**
  * CreateDownloadLinkResponse specifies the response for the CreateDownloadLink API.
@@ -391,7 +687,7 @@ export type CreateDownloadLinkResponse = Message<"flyteidl2.dataproxy.CreateDown
  * Use `create(CreateDownloadLinkResponseSchema)` to create a new message.
  */
 export const CreateDownloadLinkResponseSchema: GenMessage<CreateDownloadLinkResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 6);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 12);
 
 /**
  * Request message for querying action data.
@@ -423,7 +719,7 @@ export type GetActionDataRequest = Message<"flyteidl2.dataproxy.GetActionDataReq
  * Use `create(GetActionDataRequestSchema)` to create a new message.
  */
 export const GetActionDataRequestSchema: GenMessage<GetActionDataRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 7);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 13);
 
 /**
  * Response message for querying action data.
@@ -467,7 +763,7 @@ export type GetActionDataResponse = Message<"flyteidl2.dataproxy.GetActionDataRe
  * Use `create(GetActionDataResponseSchema)` to create a new message.
  */
 export const GetActionDataResponseSchema: GenMessage<GetActionDataResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 8);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 14);
 
 /**
  * Request message for tailing logs.
@@ -534,7 +830,7 @@ export type TailLogsRequest = Message<"flyteidl2.dataproxy.TailLogsRequest"> & {
  * Use `create(TailLogsRequestSchema)` to create a new message.
  */
 export const TailLogsRequestSchema: GenMessage<TailLogsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 9);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 15);
 
 /**
  * Reponse message for tailing logs.
@@ -555,7 +851,7 @@ export type TailLogsResponse = Message<"flyteidl2.dataproxy.TailLogsResponse"> &
  * Use `create(TailLogsResponseSchema)` to create a new message.
  */
 export const TailLogsResponseSchema: GenMessage<TailLogsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 10);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 16);
 
 /**
  * A batch of logs.
@@ -583,7 +879,7 @@ export type TailLogsResponse_Logs = Message<"flyteidl2.dataproxy.TailLogsRespons
  * Use `create(TailLogsResponse_LogsSchema)` to create a new message.
  */
 export const TailLogsResponse_LogsSchema: GenMessage<TailLogsResponse_Logs> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 10, 0);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 16, 0);
 
 /**
  * ArtifactType defines the type of artifact to be downloaded.
@@ -616,6 +912,80 @@ export enum ArtifactType {
  */
 export const ArtifactTypeSchema: GenEnum<ArtifactType> = /*@__PURE__*/
   enumDesc(file_flyteidl2_dataproxy_dataproxy_service, 0);
+
+/**
+ * CredentialAccess is what the caller intends to do with the data. The verbs
+ * each access implies are decided by the server: a request that could name its
+ * own actions (or carry its own policy) would be a request that could ask for
+ * more than its resource.
+ *
+ * @generated from enum flyteidl2.dataproxy.CredentialAccess
+ */
+export enum CredentialAccess {
+  /**
+   * @generated from enum value: CREDENTIAL_ACCESS_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: CREDENTIAL_ACCESS_READ = 1;
+   */
+  READ = 1,
+
+  /**
+   * @generated from enum value: CREDENTIAL_ACCESS_READ_WRITE = 2;
+   */
+  READ_WRITE = 2,
+}
+
+/**
+ * Describes the enum flyteidl2.dataproxy.CredentialAccess.
+ */
+export const CredentialAccessSchema: GenEnum<CredentialAccess> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_dataproxy_dataproxy_service, 1);
+
+/**
+ * CredentialKind says what shape the returned credentials are, because that is
+ * not the same across clouds. A client that cannot use a given kind must fail
+ * rather than assume: an Azure SAS put into an AWS key field would be used to
+ * sign a request with an empty secret.
+ *
+ * @generated from enum flyteidl2.dataproxy.CredentialKind
+ */
+export enum CredentialKind {
+  /**
+   * @generated from enum value: CREDENTIAL_KIND_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * An AWS SigV4 triple: access key, secret and session token.
+   *
+   * @generated from enum value: CREDENTIAL_KIND_AWS_SIGV4 = 1;
+   */
+  AWS_SIGV4 = 1,
+
+  /**
+   * A GCP OAuth2 access token, downscoped with a Credential Access Boundary,
+   * in session_token.
+   *
+   * @generated from enum value: CREDENTIAL_KIND_GCP_ACCESS_TOKEN = 2;
+   */
+  GCP_ACCESS_TOKEN = 2,
+
+  /**
+   * An Azure user-delegation SAS query string in session_token.
+   *
+   * @generated from enum value: CREDENTIAL_KIND_AZURE_SAS = 3;
+   */
+  AZURE_SAS = 3,
+}
+
+/**
+ * Describes the enum flyteidl2.dataproxy.CredentialKind.
+ */
+export const CredentialKindSchema: GenEnum<CredentialKind> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_dataproxy_dataproxy_service, 2);
 
 /**
  * DataProxyService provides an interface for managing data uploads and downloads.
@@ -670,6 +1040,29 @@ export const DataProxyService: GenService<{
     methodKind: "server_streaming";
     input: typeof TailLogsRequestSchema;
     output: typeof TailLogsResponseSchema;
+  },
+  /**
+   * GetCloudCredentials vends short-lived, prefix-scoped object-store credentials
+   * for one resource inside the caller's project/domain.
+   *
+   * This is the capability form of CreateUploadLocation. A signed URL is a
+   * capability for ONE object with conditions attached; these credentials are a
+   * capability over a PREFIX, for as long as they last. Which to use is a
+   * per-call-site choice and both are supported:
+   *
+   *   * Credentials when a client touches many objects it discovers as it goes
+   *     -- a mounted Volume reads and writes thousands of chunk keys, so a
+   *     signed URL per object is not a workable shape.
+   *   * A signed URL when the platform must constrain the write (it binds
+   *     content_md5 and a size, which credentials cannot), or when the consumer
+   *     is a browser with no cloud SDK (see CreateDownloadLink).
+   *
+   * @generated from rpc flyteidl2.dataproxy.DataProxyService.GetCloudCredentials
+   */
+  getCloudCredentials: {
+    methodKind: "unary";
+    input: typeof GetCloudCredentialsRequestSchema;
+    output: typeof GetCloudCredentialsResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_flyteidl2_dataproxy_dataproxy_service, 0);
