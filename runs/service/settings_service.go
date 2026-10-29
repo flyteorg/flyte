@@ -239,7 +239,8 @@ func validateDataplaneIngressAllowedCIDRs(setting *settings.StringListSetting) e
 		if _, err := netip.ParsePrefix(entry); err == nil {
 			continue
 		}
-		if _, err := netip.ParseAddr(entry); err == nil {
+		// ParseAddr accepts an IPv6 zone ("fe80::1%eth0"), which has no CIDR form.
+		if addr, err := netip.ParseAddr(entry); err == nil && addr.Zone() == "" {
 			continue
 		}
 		bad = append(bad, entry)

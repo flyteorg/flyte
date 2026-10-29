@@ -510,8 +510,18 @@ func TestValidateDataplaneIngressAllowedCIDRs(t *testing.T) {
 			wantBad: []string{"not-a-cidr", "10.0.0.0/33"},
 		},
 		{
+			name:    "IPv6 zone has no CIDR form",
+			setting: strList(stateValue, "fe80::1%eth0", "2001:db8::1%eth0/129"),
+			wantBad: []string{"fe80::1%eth0", "2001:db8::1%eth0/129"},
+		},
+		{
 			name:    "an empty VALUE is rejected",
 			setting: strList(stateValue),
+			wantMsg: "use UNSET for no restriction",
+		},
+		{
+			name:    "a present but empty list is rejected",
+			setting: &settings.StringListSetting{State: stateValue, ListValue: &settings.StringValues{}},
 			wantMsg: "use UNSET for no restriction",
 		},
 	}
