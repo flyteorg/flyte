@@ -11,16 +11,18 @@ import (
 
 // cachedMetadataClient wraps an AuthMetadataServiceClient and caches the
 // GetPublicClientConfig response. The server returns static configuration
-// that does not change at runtime, so a single fetch is sufficient.
+// that does not change at runtime, so a single successful fetch is enough.
+// Errors are not cached: a failed call (for example a transient RPC error or
+// a cancelled context) is retried on the next call.
 type cachedMetadataClient struct {
 	service.AuthMetadataServiceClient
-	once   sync.Once
+	mu     sync.Mutex
 	cached *service.PublicClientAuthConfigResponse
-	err    error
 }
 
 // NewCachedMetadataClient returns an AuthMetadataServiceClient that calls
-// GetPublicClientConfig at most once and returns the cached result thereafter.
+// GetPublicClientConfig until it succeeds once and returns the cached
+// response thereafter.
 func NewCachedMetadataClient(inner service.AuthMetadataServiceClient) service.AuthMetadataServiceClient {
 	return &cachedMetadataClient{AuthMetadataServiceClient: inner}
 }
@@ -30,8 +32,15 @@ func (c *cachedMetadataClient) GetPublicClientConfig(
 	in *service.PublicClientAuthConfigRequest,
 	opts ...grpc.CallOption,
 ) (*service.PublicClientAuthConfigResponse, error) {
-	c.once.Do(func() {
-		c.cached, c.err = c.AuthMetadataServiceClient.GetPublicClientConfig(ctx, in, opts...)
-	})
-	return c.cached, c.err
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if c.cached != nil {
+		return c.cached, nil
+	}
+	resp, err := c.AuthMetadataServiceClient.GetPublicClientConfig(ctx, in, opts...)
+	if err != nil {
+		return nil, err
+	}
+	c.cached = resp
+	return resp, nil
 }
