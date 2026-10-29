@@ -494,6 +494,11 @@ func TestValidateDataplaneIngressAllowedCIDRs(t *testing.T) {
 		{name: "nil leaf", setting: nil},
 		{name: "inherit ignores its value", setting: strList(stateInherit, "not-a-cidr")},
 		{name: "unset ignores its value", setting: strList(stateUnset, "not-a-cidr")},
+		{
+			name:    "a state outside the enum is rejected",
+			setting: strList(settings.SettingState(3)),
+			wantMsg: "unknown state 3",
+		},
 		{name: "IPv4 CIDR", setting: strList(stateValue, "10.0.0.0/8")},
 		{name: "IPv6 CIDR", setting: strList(stateValue, "2001:db8::/32")},
 		{name: "bare IPv4 address", setting: strList(stateValue, "192.0.2.7")},

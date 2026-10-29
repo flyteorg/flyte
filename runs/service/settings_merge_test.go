@@ -363,11 +363,12 @@ func TestMergeNetworkSettings(t *testing.T) {
 
 	t.Run("the most specific list wins whole, without concatenation", func(t *testing.T) {
 		got := mergeNetworkSettings([]*settings.NetworkSettings{
-			{DataplaneIngressAllowedCidrs: strList(stateValue, "10.0.0.0/8", "192.0.2.0/24")},
-			{DataplaneIngressAllowedCidrs: strList(stateValue, "2001:db8::/32")},
+			{DataplaneIngressAllowedCidrs: strList(stateValue, "10.0.0.0/8")},
+			{DataplaneIngressAllowedCidrs: strList(stateValue, "2001:db8::/32", "192.0.2.0/24")},
 		})
-		assert.Equal(t, []string{"2001:db8::/32"}, got.GetDataplaneIngressAllowedCidrs().GetListValue().GetValues())
-		assert.Equal(t, levelDomain, got.GetDataplaneIngressAllowedCidrs().GetScopeLevel())
+		want := strList(stateValue, "2001:db8::/32", "192.0.2.0/24")
+		want.ScopeLevel = levelDomain
+		assert.Truef(t, proto.Equal(want, got.GetDataplaneIngressAllowedCidrs()), "want %v, got %v", want, got.GetDataplaneIngressAllowedCidrs())
 	})
 
 	t.Run("inherited from the org", func(t *testing.T) {

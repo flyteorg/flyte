@@ -224,11 +224,16 @@ func validateQuantity(name string, setting *settings.QuantitySetting) error {
 // validateDataplaneIngressAllowedCIDRs requires a CIDR list in VALUE state to hold
 // at least one entry, each an IPv4 or IPv6 CIDR or a bare address. Entries are
 // stored as written, the way quantities are, so a prefix with host bits set is
-// accepted. UNSET, not an empty list, is how to say "no restriction".
+// accepted. UNSET, not an empty list, is how to say "no restriction". A state
+// outside the enum is rejected rather than left for the enforcer to interpret.
 func validateDataplaneIngressAllowedCIDRs(setting *settings.StringListSetting) error {
 	const name = "network.dataplane_ingress_allowed_cidrs"
-	if setting.GetState() != settings.SettingState_SETTING_STATE_VALUE {
+	switch setting.GetState() {
+	case settings.SettingState_SETTING_STATE_INHERIT, settings.SettingState_SETTING_STATE_UNSET:
 		return nil
+	case settings.SettingState_SETTING_STATE_VALUE:
+	default:
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid %s: unknown state %d", name, setting.GetState()))
 	}
 	entries := setting.GetListValue().GetValues()
 	if len(entries) == 0 {
