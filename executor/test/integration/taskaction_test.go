@@ -388,7 +388,6 @@ func TestQueuedTimeoutSparesAdoptedRunningPod(t *testing.T) {
 	require.NoError(t, k8sClient.Get(ctx, key, ta))
 	ta.Status.Attempts = 2
 	ta.Status.PluginPhase = pluginsCore.PhaseQueued.String()
-	ta.Status.AttemptQueuedAt = &metav1.Time{Time: enqueuedAt}
 	require.NoError(t, k8sClient.Status().Update(ctx, ta))
 	_, err = r.Reconcile(ctx, req) // launches its pod
 	require.NoError(t, err)
