@@ -209,12 +209,13 @@ stop-mlx-bridge:
 
 .PHONY: start
 start: FLYTE_DEVBOX_IMAGE := flyte-devbox:latest
+start: APPLE_SILICON := False
 start: FLYTE_DEV := False
 start:
 	[ -n "$(shell docker volume ls --filter name=^flyte-devbox$$ --format {{.Name}})" ] || \
 		docker volume create flyte-devbox
 	@if [ -z "$(shell docker ps --filter name=^flyte-devbox$$ --format {{.Names}})" ]; then \
-		if [ "$(APPLE_SILICON)" = 1 ]; then \
+		if [ "$(APPLE_SILICON)" = True ]; then \
 			$(MAKE) --no-print-directory start-mlx-bridge || exit 1; \
 		fi; \
 		rm -f $(PWD)/.kube/kubeconfig; \
@@ -222,8 +223,8 @@ start:
 			--add-host "host.docker.internal:host-gateway" \
 			--env FLYTE_DEV=$(FLYTE_DEV) \
 			--env K3S_KUBECONFIG_OUTPUT=/.kube/kubeconfig \
-			$(if $(filter 1,$(APPLE_SILICON)),$(APPLE_SILICON_PORT_ENV)) \
-			$(if $(filter 1,$(APPLE_SILICON)),$(APPLE_SILICON_SECRET_ENV)) \
+			$(if $(filter True,$(APPLE_SILICON)),$(APPLE_SILICON_PORT_ENV)) \
+			$(if $(filter True,$(APPLE_SILICON)),$(APPLE_SILICON_SECRET_ENV)) \
 			--volume $(PWD)/.kube:/.kube \
 				--volume flyte-devbox:/var/lib/flyte/storage \
 			--publish "6443":"6443" \
