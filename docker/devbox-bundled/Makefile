@@ -159,23 +159,53 @@ override DEVBOX_CONTEXT := flyte-devbox
 APPLE_SILICON_PORT ?= 30090
 FLYTE_PYTHON ?= uv run --isolated --no-project --with flyte python
 APPLE_SILICON_DIR := $(HOME)/.flyte/apple-silicon
+APPLE_SILICON_PORT_ENV = --env FLYTE_DEVBOX_APPLE_SILICON_PORT=$(APPLE_SILICON_PORT)
+APPLE_SILICON_SECRET_ENV = --env FLYTE_DEVBOX_APPLE_SILICON_TOKEN_SECRET=$$(cat $(APPLE_SILICON_DIR)/secret)
+
+if_mlx_bridge_healthy = curl -fs -o /dev/null http://127.0.0.1:$(APPLE_SILICON_PORT)/healthz
 
 .PHONY: start-mlx-bridge
 start-mlx-bridge:
-	@mkdir -p $(APPLE_SILICON_DIR)
-	@curl -fs -o /dev/null http://127.0.0.1:$(APPLE_SILICON_PORT)/healthz && exit 0; \
+	@if [ ! -d $(APPLE_SILICON_DIR) ]; then \
+		mkdir -p $(APPLE_SILICON_DIR); \
+		echo "$(APPLE_SILICON_DIR) not found, create dir"; \
+	fi
+	@if $(if_mlx_bridge_healthy); then \
+		echo "Using existing MLX bridge on 127.0.0.1:$(APPLE_SILICON_PORT)"; \
+		exit 0; \
+	fi; \
 	nohup $(FLYTE_PYTHON) -m flyte._internal.apple_silicon._bridge --port $(APPLE_SILICON_PORT) \
 		--state-dir $(APPLE_SILICON_DIR) </dev/null >>$(APPLE_SILICON_DIR)/bridge.log 2>&1 & \
-	echo "{\"pid\": $$!, \"port\": $(APPLE_SILICON_PORT)}" > $(APPLE_SILICON_DIR)/bridge.json; \
-	for i in $$(seq 60); do curl -fs -o /dev/null http://127.0.0.1:$(APPLE_SILICON_PORT)/healthz && exit 0; sleep 0.5; done; \
-	tail -5 $(APPLE_SILICON_DIR)/bridge.log; exit 1
-	@echo "Apple Silicon bridge on 127.0.0.1:$(APPLE_SILICON_PORT)"
+	pid=$$!; \
+	echo "{\"pid\": $$pid, \"port\": $(APPLE_SILICON_PORT)}" > $(APPLE_SILICON_DIR)/bridge.json; \
+	for i in $$(seq 60); do \
+		if $(if_mlx_bridge_healthy); then \
+			break; \
+		fi; \
+		sleep 0.5; \
+	done; \
+	if $(if_mlx_bridge_healthy); then \
+		echo "MLX bridge is serving on 127.0.0.1:$(APPLE_SILICON_PORT)"; \
+	else \
+		echo "MLX bridge failed to start, log is at $(APPLE_SILICON_DIR)/bridge.log"; \
+		tail -5 $(APPLE_SILICON_DIR)/bridge.log; \
+		exit 1; \
+	fi
 
 .PHONY: stop-mlx-bridge
 stop-mlx-bridge:
 	@pid=$$(sed -n 's/.*"pid": *\([0-9]*\).*/\1/p' $(APPLE_SILICON_DIR)/bridge.json 2>/dev/null); \
 	rm -f $(APPLE_SILICON_DIR)/bridge.json; \
-	[ -n "$$pid" ] && ps -o command= -p $$pid | grep -q apple_silicon._bridge && kill $$pid || true
+	if [ -z "$$pid" ]; then \
+		echo "MLX bridge pid is empty, skip it"; \
+	else \
+		if ps -o command= -p $$pid | grep -q apple_silicon._bridge; then \
+			kill $$pid; \
+			echo "MLX bridge stopped (pid $$pid)"; \
+		else \
+			echo "MLX bridge (pid $$pid) not found, skip it"; \
+		fi; \
+	fi
 
 .PHONY: start
 start: FLYTE_DEVBOX_IMAGE := flyte-devbox:latest
@@ -186,15 +216,14 @@ start:
 	@if [ -z "$(shell docker ps --filter name=^flyte-devbox$$ --format {{.Names}})" ]; then \
 		if [ "$(APPLE_SILICON)" = 1 ]; then \
 			$(MAKE) --no-print-directory start-mlx-bridge || exit 1; \
-			APPLE_SILICON_ENV="--env FLYTE_DEVBOX_APPLE_SILICON_PORT=$(APPLE_SILICON_PORT) \
-				--env FLYTE_DEVBOX_APPLE_SILICON_TOKEN_SECRET=$$(cat $(APPLE_SILICON_DIR)/secret)"; \
 		fi; \
 		rm -f $(PWD)/.kube/kubeconfig; \
 		docker run --detach --rm --privileged --name flyte-devbox \
 			--add-host "host.docker.internal:host-gateway" \
 			--env FLYTE_DEV=$(FLYTE_DEV) \
 			--env K3S_KUBECONFIG_OUTPUT=/.kube/kubeconfig \
-			$$APPLE_SILICON_ENV \
+			$(if $(filter 1,$(APPLE_SILICON)),$(APPLE_SILICON_PORT_ENV)) \
+			$(if $(filter 1,$(APPLE_SILICON)),$(APPLE_SILICON_SECRET_ENV)) \
 			--volume $(PWD)/.kube:/.kube \
 				--volume flyte-devbox:/var/lib/flyte/storage \
 			--publish "6443":"6443" \
