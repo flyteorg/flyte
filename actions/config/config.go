@@ -51,6 +51,10 @@ type Config struct {
 	// RunService configures the internal run service client.
 	RunService serviceclient.ServiceConfig `json:"runService" pflag:",Internal run service client configuration"`
 
+	// ParentLabelQueries enables server-side parent-label filtering. Leave disabled
+	// during rolling upgrades and until legacy TaskActions are drained or backfilled.
+	ParentLabelQueries bool `json:"parentLabelQueries" pflag:",Enable parent-label queries after all writers and existing TaskActions have migrated"`
+
 	// RecordFilterSize is the size of the bloom filter used to deduplicate RecordAction calls.
 	RecordFilterSize int `json:"recordFilterSize" pflag:",Size of the oppo bloom filter for deduplicating RecordAction calls"`
 }
