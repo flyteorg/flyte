@@ -156,6 +156,27 @@ override DEVBOX_CONTEXT := flyte-devbox
 # 30080 - Flyte Proxy
 # 30081 - Kourier (Knative apps)
 # 30300 - Grafana (only serves something after `make monitoring`)
+APPLE_SILICON_PORT ?= 30090
+FLYTE_PYTHON ?= uv run --isolated --no-project --with flyte python
+APPLE_SILICON_DIR := $(HOME)/.flyte/apple-silicon
+
+.PHONY: start-mlx-bridge
+start-mlx-bridge:
+	@mkdir -p $(APPLE_SILICON_DIR)
+	@curl -fs -o /dev/null http://127.0.0.1:$(APPLE_SILICON_PORT)/healthz && exit 0; \
+	nohup $(FLYTE_PYTHON) -m flyte._internal.apple_silicon._bridge --port $(APPLE_SILICON_PORT) \
+		--state-dir $(APPLE_SILICON_DIR) </dev/null >>$(APPLE_SILICON_DIR)/bridge.log 2>&1 & \
+	echo "{\"pid\": $$!, \"port\": $(APPLE_SILICON_PORT)}" > $(APPLE_SILICON_DIR)/bridge.json; \
+	for i in $$(seq 60); do curl -fs -o /dev/null http://127.0.0.1:$(APPLE_SILICON_PORT)/healthz && exit 0; sleep 0.5; done; \
+	tail -5 $(APPLE_SILICON_DIR)/bridge.log; exit 1
+	@echo "Apple Silicon bridge on 127.0.0.1:$(APPLE_SILICON_PORT)"
+
+.PHONY: stop-mlx-bridge
+stop-mlx-bridge:
+	@pid=$$(sed -n 's/.*"pid": *\([0-9]*\).*/\1/p' $(APPLE_SILICON_DIR)/bridge.json 2>/dev/null); \
+	rm -f $(APPLE_SILICON_DIR)/bridge.json; \
+	[ -n "$$pid" ] && ps -o command= -p $$pid | grep -q apple_silicon._bridge && kill $$pid || true
+
 .PHONY: start
 start: FLYTE_DEVBOX_IMAGE := flyte-devbox:latest
 start: FLYTE_DEV := False
@@ -163,11 +184,17 @@ start:
 	[ -n "$(shell docker volume ls --filter name=^flyte-devbox$$ --format {{.Name}})" ] || \
 		docker volume create flyte-devbox
 	@if [ -z "$(shell docker ps --filter name=^flyte-devbox$$ --format {{.Names}})" ]; then \
+		if [ "$(APPLE_SILICON)" = 1 ]; then \
+			$(MAKE) --no-print-directory start-mlx-bridge || exit 1; \
+			APPLE_SILICON_ENV="--env FLYTE_DEVBOX_APPLE_SILICON_PORT=$(APPLE_SILICON_PORT) \
+				--env FLYTE_DEVBOX_APPLE_SILICON_TOKEN_SECRET=$$(cat $(APPLE_SILICON_DIR)/secret)"; \
+		fi; \
 		rm -f $(PWD)/.kube/kubeconfig; \
 		docker run --detach --rm --privileged --name flyte-devbox \
 			--add-host "host.docker.internal:host-gateway" \
 			--env FLYTE_DEV=$(FLYTE_DEV) \
 			--env K3S_KUBECONFIG_OUTPUT=/.kube/kubeconfig \
+			$$APPLE_SILICON_ENV \
 			--volume $(PWD)/.kube:/.kube \
 				--volume flyte-devbox:/var/lib/flyte/storage \
 			--publish "6443":"6443" \
@@ -251,4 +278,5 @@ monitoring-clean:
 
 .PHONY: stop
 stop:
+	@$(MAKE) --no-print-directory stop-mlx-bridge
 	docker stop --time 5 flyte-devbox
