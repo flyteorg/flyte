@@ -145,17 +145,6 @@ build-gpu: build
 		--build-arg BASE_IMAGE=base \
 		--tag flyte-devbox:gpu-latest .
 
-override DEVBOX_NAME := flyte-devbox
-override DEVBOX_CONTEXT := flyte-devbox
-
-# Port map
-# 6443 - k8s API server
-# 30000 - Docker Registry
-# 30001 - DB
-# 30002 - RustFS
-# 30080 - Flyte Proxy
-# 30081 - Kourier (Knative apps)
-# 30300 - Grafana (only serves something after `make monitoring`)
 APPLE_SILICON_PORT ?= 30090
 FLYTE_PYTHON ?= uv run --isolated --no-project --with flyte python
 APPLE_SILICON_DIR := $(HOME)/.flyte/apple-silicon
@@ -207,6 +196,17 @@ stop-mlx-bridge:
 		fi; \
 	fi
 
+override DEVBOX_NAME := flyte-devbox
+override DEVBOX_CONTEXT := flyte-devbox
+
+# Port map
+# 6443 - k8s API server
+# 30000 - Docker Registry
+# 30001 - DB
+# 30002 - RustFS
+# 30080 - Flyte Proxy
+# 30081 - Kourier (Knative apps)
+# 30300 - Grafana (only serves something after `make monitoring`)
 .PHONY: start
 start: FLYTE_DEVBOX_IMAGE := flyte-devbox:latest
 start: APPLE_SILICON := False
