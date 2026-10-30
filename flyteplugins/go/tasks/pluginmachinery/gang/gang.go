@@ -57,7 +57,8 @@ func (e Eviction) ExecutionError() *core.ExecutionError {
 	}
 }
 
-func (e Eviction) describe() string {
+// Summary says who took the gang back and why, without what that costs the task.
+func (e Eviction) Summary() string {
 	var b strings.Builder
 	b.WriteString("gang evicted")
 	if e.Source != "" {
@@ -74,6 +75,12 @@ func (e Eviction) describe() string {
 		b.WriteString(": ")
 		b.WriteString(msg)
 	}
+	return b.String()
+}
+
+func (e Eviction) describe() string {
+	var b strings.Builder
+	b.WriteString(e.Summary())
 	switch {
 	case !e.UserCaused:
 		b.WriteString("; this does not count against the task's retries")
