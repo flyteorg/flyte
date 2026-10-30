@@ -56,6 +56,7 @@ type ActionUpdate struct {
 
 const (
 	labelTerminalStatusRecorded = "flyte.org/terminal-status-recorded"
+	labelParentTaskAction       = "flyte.org/parent-task-action"
 )
 
 // ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
@@ -1007,7 +1008,8 @@ func (c *ActionsClient) newTaskActionCR(actionID *common.ActionIdentifier, actio
 }
 
 // setParentOwnership resolves the parent TaskAction and wires an OwnerReference
-// on the child so K8s cascades deletion. Returns the parent CR.
+// and a parent-name label on the child so K8s cascades deletion and children can
+// be selected by their immediate parent. Returns the parent CR.
 func (c *ActionsClient) setParentOwnership(ctx context.Context, child *executorv1.TaskAction, runID *common.RunIdentifier, parentActionName string) (*executorv1.TaskAction, error) {
 	parentID := &common.ActionIdentifier{
 		Run:  runID,
@@ -1021,6 +1023,10 @@ func (c *ActionsClient) setParentOwnership(ctx context.Context, child *executorv
 	}
 
 	blockOwnerDeletion := true
+	if child.Labels == nil {
+		child.Labels = make(map[string]string)
+	}
+	child.Labels[labelParentTaskAction] = parent.Name
 	child.OwnerReferences = []metav1.OwnerReference{
 		{
 			APIVersion:         "flyte.org/v1",
