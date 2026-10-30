@@ -502,6 +502,14 @@ configuration:
     timeout: 30s
     clusterName: flyte
 
+  # Where each run's TaskActions and pods are created. template is rendered from the run's
+  # project and domain, such as "{{ project }}-{{ domain }}" ({{ org }} is also supported), and is
+  # not passed through tpl. Empty runs everything in kubernetes.namespace. Set createNamespaces
+  # to false when namespaces are provisioned separately; runs mapped to a missing one then fail.
+  namespaceMapping:
+    template: ""
+    createNamespaces: true
+
   database:
     maxIdleConnections: 10
     maxOpenConnections: 100

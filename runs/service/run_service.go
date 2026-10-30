@@ -23,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/namespaceutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
@@ -53,6 +54,8 @@ type RunService struct {
 	trustHeaders bool
 	// identityHeaders names the proxy-forwarded headers identity is read from.
 	identityHeaders config.IdentityHeadersConfig
+	// namespaceTemplate is only used to reject runs whose namespace name would be invalid.
+	namespaceTemplate string
 }
 
 const (
@@ -155,18 +158,20 @@ func NewRunService(
 	authServerBaseURL string,
 	trustForwardedIdentityHeaders bool,
 	identityHeaders config.IdentityHeadersConfig,
+	namespaceTemplate string,
 ) *RunService {
 	return &RunService{
-		repo:            repo,
-		settingsRepo:    settingsRepo,
-		actionsClient:   actionsClient,
-		projectClient:   projectClient,
-		storagePrefix:   storagePrefix,
-		dataStore:       dataStore,
-		abortReconciler: reconciler,
-		enricher:        newIdentityEnricher(authServerBaseURL),
-		trustHeaders:    trustForwardedIdentityHeaders,
-		identityHeaders: identityHeaders,
+		repo:              repo,
+		settingsRepo:      settingsRepo,
+		actionsClient:     actionsClient,
+		projectClient:     projectClient,
+		storagePrefix:     storagePrefix,
+		dataStore:         dataStore,
+		abortReconciler:   reconciler,
+		enricher:          newIdentityEnricher(authServerBaseURL),
+		trustHeaders:      trustForwardedIdentityHeaders,
+		identityHeaders:   identityHeaders,
+		namespaceTemplate: namespaceTemplate,
 	}
 }
 
@@ -208,6 +213,12 @@ func (s *RunService) CreateRun(
 		}
 	default:
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid run ID type"))
+	}
+
+	// Reject a project-domain whose namespace Kubernetes would refuse, rather than
+	// persist a run that can never start.
+	if _, err := namespaceutils.MappedNamespace(s.namespaceTemplate, "", runId.GetOrg(), runId.GetProject(), runId.GetDomain()); err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
 	if err := validateProjectExists(ctx, s.projectClient, runId.GetProject()); err != nil {
@@ -400,6 +411,11 @@ func (s *RunService) CreateRun(
 	}))
 	if err != nil {
 		logger.Errorf(ctx, "Failed to enqueue root action: %v", err)
+		// Only a definite rejection means the run can never start. Others, such as
+		// AlreadyExists from a resubmitted run or a timeout, may have launched it.
+		if code := connect.CodeOf(err); code == connect.CodeFailedPrecondition || code == connect.CodeInvalidArgument {
+			s.failUnstartedAction(ctx, actionID, err)
+		}
 	} else {
 		logger.Infof(ctx, "Successfully enqueued root action for run %s", runId.Name)
 	}
@@ -407,6 +423,35 @@ func (s *RunService) CreateRun(
 	return connect.NewResponse(&workflow.CreateRunResponse{
 		Run: s.convertRunToProto(run),
 	}), nil
+}
+
+// failUnstartedAction fails an action whose enqueue was rejected. Nothing retries the
+// enqueue, so otherwise the run would stay queued forever.
+func (s *RunService) failUnstartedAction(ctx context.Context, actionID *common.ActionIdentifier, cause error) {
+	message := cause.Error()
+	var connectErr *connect.Error
+	if errors.As(cause, &connectErr) {
+		message = connectErr.Message()
+	}
+	event := &workflow.ActionEvent{
+		Id:          actionID,
+		Attempt:     1,
+		Phase:       common.ActionPhase_ACTION_PHASE_FAILED,
+		UpdatedTime: timestamppb.Now(),
+		ErrorInfo: &workflow.ErrorInfo{
+			Message: "failed to start: " + message,
+			Kind:    workflow.ErrorInfo_KIND_SYSTEM,
+		},
+	}
+	if err := s.recordEvents(ctx, []*workflow.ActionEvent{event}); err != nil {
+		logger.Errorf(ctx, "Failed to record enqueue failure for %s: %v", actionID.GetName(), err)
+	}
+	if err := s.updateSingleActionStatus(ctx, &workflow.UpdateActionStatusRequest{
+		ActionId: actionID,
+		Status:   &workflow.ActionStatus{Phase: common.ActionPhase_ACTION_PHASE_FAILED, Attempts: 1},
+	}); err != nil {
+		logger.Errorf(ctx, "Failed to mark %s failed after enqueue error: %v", actionID.GetName(), err)
+	}
 }
 
 // persistRunModel stores the task spec, builds the run model, and inserts it to DB via CreateAction.
