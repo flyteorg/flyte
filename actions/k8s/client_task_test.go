@@ -87,6 +87,7 @@ func TestEnqueue_ParentTaskActionLabel(t *testing.T) {
 			rootCR, err := c.GetTaskAction(ctx, root.ActionId)
 			require.NoError(t, err)
 			assert.NotContains(t, rootCR.Labels, "flyte.org/parent-task-action")
+			assert.Equal(t, "true", rootCR.Labels[labelParentLabelEnabled])
 
 			child := newAction()
 			child.ParentActionName = &root.ActionId.Name
@@ -94,6 +95,7 @@ func TestEnqueue_ParentTaskActionLabel(t *testing.T) {
 			childCR, err := c.GetTaskAction(ctx, child.ActionId)
 			require.NoError(t, err)
 			assert.Equal(t, rootCR.Name, childCR.Labels["flyte.org/parent-task-action"])
+			assert.Equal(t, "true", childCR.Labels[labelParentLabelEnabled])
 
 			grandchild := newAction()
 			grandchild.ActionId.Name = "grandchild"

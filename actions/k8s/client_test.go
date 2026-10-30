@@ -16,10 +16,12 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
@@ -31,6 +33,117 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	runmocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect/mocks"
 )
+
+func TestListChildActions_ParentLabelAndLegacySpec(t *testing.T) {
+	ctx := context.Background()
+	stringPtr := func(value string) *string { return &value }
+	scheme := runtime.NewScheme()
+	require.NoError(t, executorv1.AddToScheme(scheme))
+	parentID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Project: "proj", Domain: "dev", Name: "run1"},
+		Name: "run1",
+	}
+	listCalls := 0
+	c := &ActionsClient{namespace: "flyte", k8sClient: fake.NewClientBuilder().WithScheme(scheme).
+		WithInterceptorFuncs(interceptor.Funcs{
+			List: func(ctx context.Context, cl client.WithWatch, list client.ObjectList, opts ...client.ListOption) error {
+				options := (&client.ListOptions{}).ApplyOptions(opts)
+				require.Equal(t, "flyte", options.Namespace)
+				require.NotNil(t, options.LabelSelector)
+				matching := labels.Set{"flyte.org/project": "proj", "flyte.org/domain": "dev", "flyte.org/run": "run1"}
+				if listCalls == 0 {
+					assert.False(t, options.LabelSelector.Matches(matching), "child query must require the parent label")
+					matching[labelParentTaskAction] = "run1-a0"
+					assert.True(t, options.LabelSelector.Matches(matching))
+				} else {
+					assert.True(t, options.LabelSelector.Matches(matching), "legacy query must select unlabeled actions")
+					matching[labelParentTaskAction] = "run1-a0"
+					assert.False(t, options.LabelSelector.Matches(matching))
+				}
+				matching[labelParentTaskAction] = "run1-other"
+				assert.False(t, options.LabelSelector.Matches(matching), "neither query should return unrelated labeled actions")
+				delete(matching, labelParentTaskAction)
+				matching["flyte.org/run"] = "other-run"
+				assert.False(t, options.LabelSelector.Matches(matching))
+				listCalls++
+				return cl.List(ctx, list, opts...)
+			},
+		}).Build()}
+	for _, tc := range []struct {
+		name       string
+		label      *string
+		specParent *string
+	}{
+		{name: "run1"},
+		{name: "labeled-child", label: stringPtr("run1-a0")},
+		{name: "legacy-child", specParent: stringPtr("run1")},
+		{name: "label-wins-match", label: stringPtr("run1-a0"), specParent: stringPtr("other")},
+		{name: "label-wins-mismatch", label: stringPtr("run1-other"), specParent: stringPtr("run1")},
+		{name: "empty-label", label: stringPtr(""), specParent: stringPtr("run1")},
+		{name: "legacy-unrelated", specParent: stringPtr("other")},
+		{name: "no-parent"},
+	} {
+		id := &common.ActionIdentifier{Run: parentID.Run, Name: tc.name}
+		cr := c.newTaskActionCR(id, executorv1.ActionTypeTask, tc.specParent == nil)
+		delete(cr.Labels, labelParentLabelEnabled) // Simulate CRs created before the marker.
+		cr.Spec.ActionName = tc.name
+		cr.Spec.ParentActionName = tc.specParent
+		if tc.label != nil {
+			cr.Labels[labelParentTaskAction] = *tc.label
+		}
+		require.NoError(t, c.k8sClient.Create(ctx, cr))
+	}
+	got, err := c.ListChildActions(ctx, parentID)
+	require.NoError(t, err)
+	assert.Equal(t, 2, listCalls)
+	names := make([]string, 0, len(got))
+	for _, cr := range got {
+		names = append(names, cr.Spec.ActionName)
+	}
+	assert.ElementsMatch(t, []string{"run1", "labeled-child", "legacy-child", "label-wins-match"}, names)
+
+	// Creation metadata, rather than child query results, enables the fast path.
+	parent, err := c.GetTaskAction(ctx, parentID)
+	require.NoError(t, err)
+	for _, marker := range []string{labelParentLabelEnabled, labelParentTaskAction} {
+		parent.Labels[marker] = "true"
+		if marker == labelParentTaskAction {
+			parent.Labels[marker] = "run1-ancestor"
+		}
+		require.NoError(t, c.k8sClient.Update(ctx, parent))
+		listCalls = 0
+		got, err = c.ListChildActions(ctx, parentID)
+		require.NoError(t, err)
+		assert.Equal(t, 1, listCalls)
+		assert.Len(t, got, 3)
+		delete(parent.Labels, marker)
+	}
+	require.NoError(t, c.k8sClient.Update(ctx, parent))
+
+	// With no labeled children, fall back to the legacy spec-based lookup.
+	for _, name := range []string{"labeled-child", "label-wins-match"} {
+		cr, err := c.GetTaskAction(ctx, &common.ActionIdentifier{Run: parentID.Run, Name: name})
+		require.NoError(t, err)
+		require.NoError(t, c.k8sClient.Delete(ctx, cr))
+	}
+	listCalls = 0
+	got, err = c.ListChildActions(ctx, parentID)
+	require.NoError(t, err)
+	assert.Equal(t, 2, listCalls)
+	names = nil
+	for _, cr := range got {
+		names = append(names, cr.Spec.ActionName)
+	}
+	assert.ElementsMatch(t, []string{"run1", "legacy-child"}, names)
+	parent.Labels[labelParentLabelEnabled] = "true"
+	require.NoError(t, c.k8sClient.Update(ctx, parent))
+	listCalls = 0
+	got, err = c.ListChildActions(ctx, parentID)
+	require.NoError(t, err)
+	assert.Equal(t, 1, listCalls, "marked parents do not fall back even for empty results")
+	assert.Len(t, got, 1)
+
+}
 
 func newTestActionUpdate(actionName string) (*executorv1.TaskAction, *ActionUpdate) {
 	runID := &common.RunIdentifier{
