@@ -36,6 +36,8 @@ const (
 	notificationDeletedMetricName                    = "runs.notification.evictions"
 	notificationBufferAction      notificationBuffer = "action"
 	notificationBufferRun         notificationBuffer = "run"
+	activeRunsMetricName                             = "runs.active"
+	activeRunsQueryTimeout                           = 5 * time.Second
 )
 
 // Defaults for the pq.Listener behind LISTEN/NOTIFY.
@@ -77,6 +79,40 @@ func newNotificationMetrics(provider metric.MeterProvider) (*notificationMetrics
 	}
 
 	return &notificationMetrics{notifyDeletedCount: notifyDeletedCount}, nil
+}
+
+func registerActiveRunsGauge(provider metric.MeterProvider, db *sqlx.DB) error {
+	if provider == nil {
+		return nil
+	}
+	if _, ok := provider.(metricnoop.MeterProvider); ok {
+		return nil
+	}
+
+	meter := provider.Meter(notificationMeterName)
+
+	active, err := meter.Int64ObservableGauge(
+		activeRunsMetricName,
+		metric.WithDescription("Number of runs currently in the RUNNING phase"),
+	)
+	if err != nil {
+		return err
+	}
+
+	_, err = meter.RegisterCallback(func(ctx context.Context, o metric.Observer) error {
+		ctx, cancel := context.WithTimeout(ctx, activeRunsQueryTimeout)
+		defer cancel()
+
+		var count int64
+		if err := sqlx.GetContext(ctx, db, &count,
+			"SELECT COUNT(*) FROM actions WHERE parent_action_name IS NULL AND phase = $1",
+			int32(common.ActionPhase_ACTION_PHASE_RUNNING)); err != nil {
+			return fmt.Errorf("count active runs: %w", err)
+		}
+		o.ObserveInt64(active, count)
+		return nil
+	}, active)
+	return err
 }
 
 func (m *notificationMetrics) recordDeleted(ctx context.Context, bufferFrom notificationBuffer, count int64) {
@@ -152,6 +188,10 @@ func NewActionRepo(
 	notificationMetrics, err := newNotificationMetrics(meterProvider)
 	if err != nil {
 		return nil, fmt.Errorf("register notification metrics: %w", err)
+	}
+
+	if err := registerActiveRunsGauge(meterProvider, db); err != nil {
+		return nil, fmt.Errorf("register active runs gauge: %w", err)
 	}
 
 	dsn := database.GetPostgresDsn(context.Background(), dbConfig.Postgres)

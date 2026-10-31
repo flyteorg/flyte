@@ -1092,6 +1092,54 @@ func collectNotificationMetric(t *testing.T, reader *sdkmetric.ManualReader, nam
 	return metricdata.Metrics{}
 }
 
+func TestRegisterActiveRunsGaugeNoop(t *testing.T) {
+	require.NoError(t, registerActiveRunsGauge(nil, nil))
+	require.NoError(t, registerActiveRunsGauge(metricnoop.NewMeterProvider(), nil))
+}
+
+func TestActiveRunsGauge(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+
+	reader := sdkmetric.NewManualReader()
+	provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader))
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig, provider)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	createRun := func(name string, phase common.ActionPhase) {
+		_, err := actionRepo.CreateAction(ctx, &models.Run{
+			Project: "proj1",
+			Domain:  "domain1",
+			RunName: name,
+			Name:    rootActionName,
+			Phase:   int32(phase),
+		}, false)
+		require.NoError(t, err)
+	}
+	createRun("running-1", common.ActionPhase_ACTION_PHASE_RUNNING)
+	createRun("running-2", common.ActionPhase_ACTION_PHASE_RUNNING)
+	createRun("queued", common.ActionPhase_ACTION_PHASE_QUEUED)
+	createRun("succeeded", common.ActionPhase_ACTION_PHASE_SUCCEEDED)
+
+	// A RUNNING child action is not a run and must not be counted. It hangs off an
+	// already-RUNNING run, because creating a child promotes a QUEUED parent to RUNNING.
+	_, err = actionRepo.CreateAction(ctx, &models.Action{
+		Project:          "proj1",
+		Domain:           "domain1",
+		RunName:          "running-1",
+		Name:             "a1",
+		ParentActionName: sql.NullString{String: rootActionName, Valid: true},
+		Phase:            int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+	}, false)
+	require.NoError(t, err)
+
+	gauge, ok := collectNotificationMetric(t, reader, activeRunsMetricName).Data.(metricdata.Gauge[int64])
+	require.True(t, ok)
+	require.Len(t, gauge.DataPoints, 1)
+	assert.Equal(t, int64(2), gauge.DataPoints[0].Value)
+}
+
 func TestNotificationBufferLimitConfig(t *testing.T) {
 	r := newNotifyTestRepo(NewNotificationConfig(
 		defaultNotificationBufferSize,
