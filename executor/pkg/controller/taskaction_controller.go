@@ -212,6 +212,9 @@ func mutateTaskActionState(taskAction *flyteorgv1.TaskAction, stateMgr *plugin.P
 
 // taskTimeouts are the time bounds a task template declares. Zero means unbounded.
 type taskTimeouts struct {
+	// queued bounds how long one attempt may wait to leave the queue, from the moment it
+	// is queued (TaskMetadata.timeouts.queued_timeout).
+	queued time.Duration
 	// maxRuntime bounds one attempt, from the moment it is seen Running (TaskMetadata.timeout).
 	maxRuntime time.Duration
 	// deadline bounds the whole action, from when it was first queued to a terminal
@@ -219,7 +222,7 @@ type taskTimeouts struct {
 	deadline time.Duration
 }
 
-// timeoutsFromTaskTemplate reads the per-attempt max runtime and the action deadline.
+// timeoutsFromTaskTemplate reads the per-attempt queued timeout and max runtime, and the action deadline.
 func timeoutsFromTaskTemplate(data []byte) (taskTimeouts, error) {
 	if len(data) == 0 {
 		return taskTimeouts{}, nil
@@ -230,6 +233,10 @@ func timeoutsFromTaskTemplate(data []byte) (taskTimeouts, error) {
 		return taskTimeouts{}, fmt.Errorf("unmarshal task template: %w", err)
 	}
 
+	queued, err := nonNegativeDuration(taskTemplate.GetMetadata().GetTimeouts().GetQueuedTimeout())
+	if err != nil {
+		return taskTimeouts{}, fmt.Errorf("invalid queued timeout: %w", err)
+	}
 	maxRuntime, err := nonNegativeDuration(taskTemplate.GetMetadata().GetTimeout())
 	if err != nil {
 		return taskTimeouts{}, fmt.Errorf("invalid task timeout: %w", err)
@@ -238,7 +245,7 @@ func timeoutsFromTaskTemplate(data []byte) (taskTimeouts, error) {
 	if err != nil {
 		return taskTimeouts{}, fmt.Errorf("invalid task deadline: %w", err)
 	}
-	return taskTimeouts{maxRuntime: maxRuntime, deadline: deadline}, nil
+	return taskTimeouts{queued: queued, maxRuntime: maxRuntime, deadline: deadline}, nil
 }
 
 // nonNegativeDuration converts an optional proto duration, treating nil as zero.
@@ -322,6 +329,9 @@ func (r *TaskActionReconciler) scheduleNextAttempt(
 	failedAttempts uint32,
 ) {
 	taskAction.Status.NextAttemptAt = nil
+	taskAction.Status.AttemptInitializedAt = nil
+	queuedAt := metav1.NewTime(r.now())
+	taskAction.Status.AttemptQueuedAt = &queuedAt
 	backoff, err := retryBackoffFromTaskTemplate(taskAction.Spec.TaskTemplate)
 	if err == nil {
 		err = validateRetryBackoff(backoff)
@@ -331,8 +341,10 @@ func (r *TaskActionReconciler) scheduleNextAttempt(
 		return
 	}
 	if delay := retryBackoffDelay(backoff, failedAttempts-1); delay > 0 {
-		nextAttemptAt := metav1.NewTime(r.now().Add(delay))
+		nextAttemptAt := metav1.NewTime(queuedAt.Add(delay))
 		taskAction.Status.NextAttemptAt = &nextAttemptAt
+		// The queue budget starts when this retry may launch, after its backoff.
+		taskAction.Status.AttemptQueuedAt = &nextAttemptAt
 	}
 }
 
@@ -350,6 +362,65 @@ func taskAttemptDeadline(taskAction *flyteorgv1.TaskAction, maxRuntime time.Dura
 		return time.Time{}, false
 	}
 	return taskAction.Status.AttemptStartedAt.Add(maxRuntime), true
+}
+
+func taskAttemptQueuedDeadline(taskAction *flyteorgv1.TaskAction, queuedTimeout time.Duration) (time.Time, bool) {
+	if queuedTimeout <= 0 || taskAction.Status.AttemptQueuedAt == nil ||
+		taskAction.Status.AttemptStartedAt != nil || taskAction.Status.AttemptInitializedAt != nil ||
+		!isQueuedPluginPhase(taskAction.Status.PluginPhase) {
+		return time.Time{}, false
+	}
+	return taskAction.Status.AttemptQueuedAt.Add(queuedTimeout), true
+}
+
+func isQueuedPluginPhase(phase string) bool {
+	switch phase {
+	case "",
+		pluginsCore.PhaseNotReady.String(),
+		pluginsCore.PhaseQueued.String(),
+		pluginsCore.PhaseWaitingForResources.String(),
+		pluginsCore.PhaseWaitingForCache.String():
+		return true
+	default:
+		return false
+	}
+}
+
+func isQueuedPhase(phase pluginsCore.Phase) bool {
+	switch phase {
+	case pluginsCore.PhaseNotReady,
+		pluginsCore.PhaseQueued,
+		pluginsCore.PhaseWaitingForResources,
+		pluginsCore.PhaseWaitingForCache:
+		return true
+	default:
+		return false
+	}
+}
+
+func isLaunchedPluginPhase(phase string) bool {
+	switch phase {
+	case pluginsCore.PhaseQueued.String(),
+		pluginsCore.PhaseInitializing.String(),
+		pluginsCore.PhaseRunning.String():
+		return true
+	default:
+		return false
+	}
+}
+
+// initializingMissedQueuedDeadline reports whether the plugin shows that the attempt left the queue after its
+// deadline. Only a time from before the poll can: a plugin that does not know when its resource changed phase
+// (Dask, Ray, Spark and clustered) stamps the poll itself, which says nothing about when the resource initialized.
+func initializingMissedQueuedDeadline(info pluginsCore.PhaseInfo, deadline, now, polledAt time.Time) bool {
+	if info.Phase() != pluginsCore.PhaseInitializing || now.Before(deadline) {
+		return false
+	}
+	taskInfo := info.Info()
+	if taskInfo == nil || taskInfo.OccurredAt == nil || !taskInfo.OccurredAt.Before(polledAt) {
+		return false
+	}
+	return taskInfo.OccurredAt.After(deadline)
 }
 
 // actionDeadline returns the absolute deadline of the whole action. It is anchored
@@ -417,6 +488,11 @@ func (r *TaskActionReconciler) timeoutAwareRequeue(
 		requeueAfter = remaining
 	}
 	deadline, ok := effectiveDeadline(taskAction, timeouts)
+	// A queued attempt is also due when its queue budget ends.
+	queuedDeadline, queued := taskAttemptQueuedDeadline(taskAction, timeouts.queued)
+	if queued && (!ok || queuedDeadline.Before(deadline)) {
+		deadline, ok = queuedDeadline, true
+	}
 	// No timeout set for the action, we can requeue directly
 	if !ok {
 		return ctrl.Result{RequeueAfter: requeueAfter}
@@ -507,6 +583,92 @@ func (r *TaskActionReconciler) recordAttemptStart(
 
 	// Persisted startedAt into CRD
 	return r.persistAttemptStartedAt(ctx, taskAction, startedAt)
+}
+
+func (r *TaskActionReconciler) ensureAttemptQueuedAt(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	retryLaunchableAt *metav1.Time,
+) error {
+	if taskAction.Status.AttemptQueuedAt != nil || !isQueuedPluginPhase(taskAction.Status.PluginPhase) {
+		return nil
+	}
+	queuedAt, ok := getPhaseLastTransitionTime(taskAction, flyteorgv1.ConditionReasonQueued)
+	if retryLaunchableAt != nil {
+		// A retry scheduled before queue budgets were recorded: its backoff is not queue wait.
+		queuedAt, ok = retryLaunchableAt.Time, true
+	}
+	if !ok {
+		queuedAt = r.now()
+		if observedAttempts(taskAction) == 1 && !taskAction.CreationTimestamp.IsZero() {
+			queuedAt = taskAction.CreationTimestamp.Time
+		}
+	}
+	return r.persistAttemptQueuedAt(ctx, taskAction, queuedAt)
+}
+
+func (r *TaskActionReconciler) recordAttemptQueuedFromPhase(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	info pluginsCore.PhaseInfo,
+) error {
+	if taskAction.Status.AttemptQueuedAt != nil || !isQueuedPhase(info.Phase()) {
+		return nil
+	}
+	queuedAt := r.now()
+	if taskInfo := info.Info(); taskInfo != nil && taskInfo.OccurredAt != nil && !taskInfo.OccurredAt.IsZero() {
+		queuedAt = *taskInfo.OccurredAt
+	}
+	return r.persistAttemptQueuedAt(ctx, taskAction, queuedAt)
+}
+
+func (r *TaskActionReconciler) persistAttemptQueuedAt(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	queuedAt time.Time,
+) error {
+	finalQueuedAt := metav1.NewTime(queuedAt)
+	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
+		if latest.Status.AttemptQueuedAt == nil {
+			latest.Status.AttemptQueuedAt = &finalQueuedAt
+		}
+		finalQueuedAt = *latest.Status.AttemptQueuedAt
+	}); err != nil {
+		return err
+	}
+	taskAction.Status.AttemptQueuedAt = &finalQueuedAt
+	return nil
+}
+
+// recordAttemptInitialized anchors the first time the plugin reports the attempt initializing,
+// unless it shows that happened after the queue deadline, before that report's event is published.
+// When publishing fails the stored phase stays Queued, and without this anchor a later poll that
+// lands after the deadline reads the outage as time spent queued.
+func (r *TaskActionReconciler) recordAttemptInitialized(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	info pluginsCore.PhaseInfo,
+	timeouts taskTimeouts,
+	polledAt time.Time,
+) error {
+	if info.Phase() != pluginsCore.PhaseInitializing {
+		return nil
+	}
+	deadline, ok := taskAttemptQueuedDeadline(taskAction, timeouts.queued)
+	if !ok || initializingMissedQueuedDeadline(info, deadline, r.now(), polledAt) {
+		return nil
+	}
+	finalInitializedAt := metav1.NewTime(r.now())
+	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
+		if latest.Status.AttemptInitializedAt == nil {
+			latest.Status.AttemptInitializedAt = &finalInitializedAt
+		}
+		finalInitializedAt = *latest.Status.AttemptInitializedAt
+	}); err != nil {
+		return err
+	}
+	taskAction.Status.AttemptInitializedAt = &finalInitializedAt
+	return nil
 }
 
 // persistAttemptStartedAt writes Status.AttemptStartedAt, keeping any value a
@@ -615,6 +777,15 @@ func (r *TaskActionReconciler) reconcileTimedOutAttempt(
 		currentAttempts,
 		timeouts.maxRuntime,
 	)
+	requeueReason := "restarting task after max-runtime timeout"
+	if taskAction.Status.AttemptStartedAt == nil {
+		timeoutMessage = fmt.Sprintf(
+			"task attempt %d exceeded its queued timeout of %s",
+			currentAttempts,
+			timeouts.queued,
+		)
+		requeueReason = "restarting task after queued-timeout"
+	}
 	if deadlineExceeded {
 		timeoutCode = TaskDeadlineExceededCode
 		timeoutMessage = fmt.Sprintf(
@@ -640,9 +811,10 @@ func (r *TaskActionReconciler) reconcileTimedOutAttempt(
 		phaseInfo := pluginsCore.PhaseInfoQueued(
 			r.now(),
 			pluginsCore.DefaultPhaseVersion,
-			"restarting task after max-runtime timeout",
+			requeueReason,
 		)
 		taskAction.Status.Attempts = currentAttempts + 1
+		taskAction.Status.AttemptQueuedAt = nil
 		taskAction.Status.AttemptStartedAt = nil
 		taskAction.Status.TimeoutAt = nil
 		taskAction.Status.PluginState = nil
@@ -815,10 +987,11 @@ func (r *TaskActionReconciler) recordSystemError(
 	}
 
 	if taskActionStatusChanged(original.Status, taskAction.Status) {
-		start := time.Now()
-		updErr := r.Status().Update(ctx, taskAction)
-		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
-		if updErr != nil {
+		// Not a direct Update: an earlier write in this reconcile advanced the stored
+		// version, and a stale one would lose the failure count.
+		if updErr := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
+			applyReconciledStatus(latest, taskAction)
+		}); updErr != nil {
 			logger.Error(updErr, "failed to persist SystemFailures counter")
 		}
 	}
@@ -973,6 +1146,7 @@ func (r *TaskActionReconciler) reconcileTask(
 	if remaining := r.backoffRemaining(taskAction); remaining > 0 && !actionDeadlinePassed {
 		return r.backoffRequeue(taskAction, timeouts, remaining), nil
 	}
+	retryLaunchableAt := taskAction.Status.NextAttemptAt
 	taskAction.Status.NextAttemptAt = nil
 
 	// Build PluginStateManager from persisted state
@@ -993,6 +1167,10 @@ func (r *TaskActionReconciler) reconcileTask(
 	if err != nil {
 		logger.Error(err, "failed to build task execution context")
 		return r.timeoutAwareRequeue(taskAction, timeouts), nil
+	}
+
+	if err := r.ensureAttemptQueuedAt(ctx, taskAction, retryLaunchableAt); err != nil {
+		return ctrl.Result{}, err
 	}
 
 	// A recorded deadline means an earlier reconcile already committed to ending
@@ -1028,6 +1206,14 @@ func (r *TaskActionReconciler) reconcileTask(
 		if hasDeadline && !r.now().Before(deadline) {
 			return r.setAttemptTimeout(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, timeouts, deadline)
 		}
+		// A cache error cannot establish whether a resource that may already exist has left
+		// the queue, so it cannot expire the deadline. With no saved state and no launched phase
+		// nothing has run for the attempt, and a cache that keeps failing must not hold it in the queue.
+		if len(taskAction.Status.PluginState) > 0 || isLaunchedPluginPhase(taskAction.Status.PluginPhase) {
+			timeouts.queued = 0
+		} else if queuedDeadline, ok := taskAttemptQueuedDeadline(taskAction, timeouts.queued); ok && !r.now().Before(queuedDeadline) {
+			return r.setAttemptTimeout(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, timeouts, queuedDeadline)
+		}
 		return r.timeoutAwareRequeue(taskAction, timeouts), nil
 	}
 	// Even when cache handling short-circuits execution, we still continue through the
@@ -1036,12 +1222,41 @@ func (r *TaskActionReconciler) reconcileTask(
 
 	// Invoke plugin.Handle only when cache handling did not short-circuit execution.
 	var handleErr error
+	// Saved plugin state alone does not mean the resource exists: a plugin can save state while
+	// it waits to launch. It counts as launched once it has reported Queued or later.
+	hasState := len(taskAction.Status.PluginState) > 0
+	launched := hasState && isLaunchedPluginPhase(taskAction.Status.PluginPhase)
+	if cacheShortCircuited && hasState {
+		// A cache wait is not a report from the resource. Once the plugin has saved state a resource
+		// may exist, and the wait cannot show that it is still queued. Leave the queue deadline out
+		// of this reconcile, including its requeue, which would otherwise spin on the expired deadline.
+		timeouts.queued = 0
+	}
+	polledAt := r.now()
 	if !cacheShortCircuited {
+		// With no saved state and no launched phase nothing has run for the attempt, so no resource can
+		// have left the queue in time. A spent budget ends it here, before anything is launched for it.
+		queuedDeadline, ok := taskAttemptQueuedDeadline(taskAction, timeouts.queued)
+		if ok && !hasState && !isLaunchedPluginPhase(taskAction.Status.PluginPhase) && !polledAt.Before(queuedDeadline) {
+			return r.setAttemptTimeout(
+				ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, timeouts, queuedDeadline)
+		}
 		transition, handleErr = p.Handle(ctx, tCtx)
 	}
+	// A plugin's first Queued report only says that it launched or adopted its resource. An adopted
+	// resource may have been running since before the deadline, so wait for the next poll.
+	_, _, wroteState := stateMgr.GetNewState()
+	firstReport := !cacheShortCircuited && !launched && wroteState &&
+		transition.Info().Phase() == pluginsCore.PhaseQueued
 
 	if handleErr == nil {
+		if err := r.recordAttemptQueuedFromPhase(ctx, taskAction, transition.Info()); err != nil {
+			return ctrl.Result{}, err
+		}
 		if err := r.recordAttemptStart(ctx, taskAction, transition.Info(), alreadyRunning); err != nil {
+			return ctrl.Result{}, err
+		}
+		if err := r.recordAttemptInitialized(ctx, taskAction, transition.Info(), timeouts, polledAt); err != nil {
 			return ctrl.Result{}, err
 		}
 	}
@@ -1055,7 +1270,22 @@ func (r *TaskActionReconciler) reconcileTask(
 		}
 	}
 
+	if deadline, ok := taskAttemptQueuedDeadline(taskAction, timeouts.queued); ok && handleErr == nil {
+		// A persisted queued phase can lag behind the resource after downtime
+		// or a failed event publication. Check the plugin before ending the attempt.
+		// The action deadline is enforced above, so it wins when both have passed.
+		if isQueuedPhase(transition.Info().Phase()) && !firstReport && !r.now().Before(deadline) {
+			return r.setAttemptTimeout(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, timeouts, deadline)
+		}
+		if initializingMissedQueuedDeadline(transition.Info(), deadline, r.now(), polledAt) {
+			return r.setAttemptTimeout(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, timeouts, deadline)
+		}
+	}
+
 	if handleErr != nil {
+		// The plugin could not report its current phase. Keep the system-error
+		// retry cadence instead of requeueing on an unconfirmed queued deadline.
+		timeouts.queued = 0
 		return r.recordSystemError(ctx, taskAction, originalTaskActionInstance, p.GetID(), handleErr, timeouts)
 	}
 
@@ -1176,6 +1406,10 @@ func (r *TaskActionReconciler) reconcileTask(
 	taskAction.Status.CacheStatus = observedCacheStatus(phaseInfo.Info())
 
 	if err := r.updateTaskActionStatus(ctx, originalTaskActionInstance, taskAction, phaseInfo); err != nil {
+		// Only a queue budget makes the first report matter, so a task without one behaves as before.
+		if firstReport && timeouts.queued > 0 {
+			r.keepLaunchProgress(ctx, taskAction)
+		}
 		return ctrl.Result{}, err
 	}
 
@@ -1331,6 +1565,20 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	}
 
 	return nil
+}
+
+// keepLaunchProgress saves the plugin state and phase of a launch or adoption whose event could not be
+// published. Forgotten, the next reconcile would launch or adopt the resource again and take its report
+// for the first one again, for as long as publishing keeps failing. The conditions and phase history that
+// mark the event as unpublished are left alone, so it is still retried.
+func (r *TaskActionReconciler) keepLaunchProgress(ctx context.Context, taskAction *flyteorgv1.TaskAction) {
+	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
+		latest.Status.PluginState = taskAction.Status.PluginState
+		latest.Status.PluginStateVersion = taskAction.Status.PluginStateVersion
+		latest.Status.PluginPhase = taskAction.Status.PluginPhase
+	}); err != nil {
+		log.FromContext(ctx).Error(err, "failed to keep the launch progress of the plugin")
+	}
 }
 
 // applyReconciledStatus writes the reconciled status onto the re-fetched
@@ -1620,6 +1868,8 @@ func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) b
 		oldStatus.SystemFailures != newStatus.SystemFailures ||
 		oldStatus.SystemRetries != newStatus.SystemRetries ||
 		oldStatus.CacheStatus != newStatus.CacheStatus ||
+		!oldStatus.AttemptQueuedAt.Equal(newStatus.AttemptQueuedAt) ||
+		!oldStatus.AttemptInitializedAt.Equal(newStatus.AttemptInitializedAt) ||
 		!oldStatus.AttemptStartedAt.Equal(newStatus.AttemptStartedAt) ||
 		!oldStatus.TimeoutAt.Equal(newStatus.TimeoutAt) ||
 		!oldStatus.NextAttemptAt.Equal(newStatus.NextAttemptAt) {

@@ -343,14 +343,28 @@ type TaskActionStatus struct {
 	// +optional
 	Attempts uint32 `json:"attempts,omitempty"`
 
+	// AttemptQueuedAt is when the current user attempt first entered the queued
+	// or waiting-for-resources phase. It is persisted so queued-timeout
+	// enforcement survives controller and event-service outages.
+	// +optional
+	AttemptQueuedAt *metav1.Time `json:"attemptQueuedAt,omitempty"`
+
+	// AttemptInitializedAt is when the current user attempt was first seen initializing,
+	// unless the plugin showed that it left the queue after its deadline. It is persisted
+	// independently from ActionEvent publication so a resource that left the queue in time
+	// is not expired by a later controller or event-service outage.
+	// +optional
+	AttemptInitializedAt *metav1.Time `json:"attemptInitializedAt,omitempty"`
+
 	// AttemptStartedAt is when the current user attempt first entered the Running phase.
 	// It is persisted independently from ActionEvent publication so max-runtime
 	// enforcement survives controller and event-service outages.
 	// +optional
 	AttemptStartedAt *metav1.Time `json:"attemptStartedAt,omitempty"`
 
-	// TimeoutAt is the expired deadline that ended the current attempt: the earlier
-	// of the attempt's max runtime and the action's deadline across all attempts.
+	// TimeoutAt is the expired deadline that ended the current attempt: its queued
+	// timeout or max runtime, or the action's deadline across all attempts once that
+	// has passed.
 	// While set on a non-terminal action, timeout cleanup is pending and the
 	// plugin resource must not be handled or recreated.
 	// +optional
