@@ -8,6 +8,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestParentLabelQueriesConfig(t *testing.T) {
+	assert.False(t, defaultConfig.ParentLabelQueries)
+	flags := (Config{}).GetPFlagSet("actions.")
+	value, err := flags.GetBool("actions.parentLabelQueries")
+	require.NoError(t, err)
+	assert.False(t, value)
+	require.NoError(t, flags.Set("actions.parentLabelQueries", "true"))
+	value, err = flags.GetBool("actions.parentLabelQueries")
+	require.NoError(t, err)
+	assert.True(t, value)
+	actual := Config{}
+	require.NoError(t, decode_Config(map[string]any{"parentLabelQueries": true}, &actual))
+	assert.True(t, actual.ParentLabelQueries)
+}
+
 func TestServiceAuthConfigDecoding(t *testing.T) {
 	actual := Config{}
 	require.NoError(t, decode_Config(map[string]any{

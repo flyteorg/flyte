@@ -68,6 +68,44 @@ func newChildTaskAction() *actions.Action {
 	}
 }
 
+func TestEnqueue_ParentTaskActionLabel(t *testing.T) {
+	for _, actionType := range []string{"task", "condition"} {
+		t.Run(actionType, func(t *testing.T) {
+			ctx := context.Background()
+			c := newTaskClient(t, nil)
+			newAction := func() *actions.Action {
+				if actionType == "condition" {
+					return newConditionAction(core.SimpleType_BOOLEAN)
+				}
+				return newChildTaskAction()
+			}
+
+			root := newAction()
+			root.ActionId.Name = "root"
+			root.ParentActionName = nil
+			require.NoError(t, c.Enqueue(ctx, root, nil))
+			rootCR, err := c.GetTaskAction(ctx, root.ActionId)
+			require.NoError(t, err)
+			assert.NotContains(t, rootCR.Labels, "flyte.org/parent-task-action")
+
+			child := newAction()
+			child.ParentActionName = &root.ActionId.Name
+			require.NoError(t, c.Enqueue(ctx, child, nil))
+			childCR, err := c.GetTaskAction(ctx, child.ActionId)
+			require.NoError(t, err)
+			assert.Equal(t, rootCR.Name, childCR.Labels["flyte.org/parent-task-action"])
+
+			grandchild := newAction()
+			grandchild.ActionId.Name = "grandchild"
+			grandchild.ParentActionName = &child.ActionId.Name
+			require.NoError(t, c.Enqueue(ctx, grandchild, nil))
+			grandchildCR, err := c.GetTaskAction(ctx, grandchild.ActionId)
+			require.NoError(t, err)
+			assert.Equal(t, childCR.Name, grandchildCR.Labels["flyte.org/parent-task-action"])
+		})
+	}
+}
+
 // A restarted parent re-enqueues children with the same deterministic action
 // IDs; the second Enqueue must return AlreadyExists and leave the existing CR
 // untouched.

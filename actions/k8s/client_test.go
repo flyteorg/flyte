@@ -16,10 +16,12 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
@@ -31,6 +33,69 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	runmocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect/mocks"
 )
+
+func TestListChildActions_ParentLabelQueries(t *testing.T) {
+	for _, enabled := range []bool{false, true} {
+		for _, withChildren := range []bool{false, true} {
+			t.Run(fmt.Sprintf("enabled=%t/children=%t", enabled, withChildren), func(t *testing.T) {
+				ctx := context.Background()
+				scheme := runtime.NewScheme()
+				require.NoError(t, executorv1.AddToScheme(scheme))
+				parentID := &common.ActionIdentifier{Run: &common.RunIdentifier{Project: "proj", Domain: "dev", Name: "run1"}, Name: "run1"}
+				listCalls := 0
+				c := &ActionsClient{namespace: "flyte", parentLabelQueries: enabled,
+					k8sClient: fake.NewClientBuilder().WithScheme(scheme).WithInterceptorFuncs(interceptor.Funcs{
+						List: func(ctx context.Context, cl client.WithWatch, list client.ObjectList, opts ...client.ListOption) error {
+							listCalls++
+							options := (&client.ListOptions{}).ApplyOptions(opts)
+							assert.Equal(t, "flyte", options.Namespace)
+							expected := labels.Set{"flyte.org/project": "proj", "flyte.org/domain": "dev", "flyte.org/run": "run1"}
+							if enabled {
+								expected[labelParentTaskAction] = "run1-a0"
+							}
+							assert.Equal(t, labels.SelectorFromSet(expected).String(), options.LabelSelector.String())
+							return cl.List(ctx, list, opts...)
+						},
+					}).Build()}
+				parent := c.newTaskActionCR(parentID, executorv1.ActionTypeTask, true)
+				parent.Spec.ActionName = parentID.Name
+				// Old markers must not control query behavior during a rolling upgrade.
+				parent.Labels["flyte.org/parent-label-enabled"] = "true"
+				require.NoError(t, c.k8sClient.Create(ctx, parent))
+				if withChildren {
+					for _, name := range []string{"labeled", "legacy", "unrelated"} {
+						cr := c.newTaskActionCR(&common.ActionIdentifier{Run: parentID.Run, Name: name}, executorv1.ActionTypeTask, false)
+						cr.Spec.ActionName = name
+						cr.Spec.ParentActionName = &parentID.Name
+						if name == "labeled" {
+							cr.Labels[labelParentTaskAction] = parent.Name
+						} else if name == "unrelated" {
+							other := "other"
+							cr.Spec.ParentActionName = &other
+							cr.Labels[labelParentTaskAction] = "run1-other"
+						}
+						require.NoError(t, c.k8sClient.Create(ctx, cr))
+					}
+				}
+				got, err := c.ListChildActions(ctx, parentID)
+				require.NoError(t, err)
+				assert.Equal(t, 1, listCalls)
+				var names []string
+				for _, cr := range got {
+					names = append(names, cr.Spec.ActionName)
+				}
+				expected := []string{"run1"}
+				if withChildren {
+					expected = append(expected, "labeled")
+					if !enabled {
+						expected = append(expected, "legacy")
+					}
+				}
+				assert.ElementsMatch(t, expected, names)
+			})
+		}
+	}
+}
 
 func newTestActionUpdate(actionName string) (*executorv1.TaskAction, *ActionUpdate) {
 	runID := &common.RunIdentifier{
@@ -1136,14 +1201,14 @@ func testFilter() fastcheck.Filter {
 func TestNewActionsClient_FilterSizeValidation(t *testing.T) {
 	// The dedup filter is mandatory, so recordFilterSize must be positive.
 	// Both negative and zero are rejected.
-	_, err := NewActionsClient(nil, nil, "ns", 10, 1, nil, -1, promutils.NewTestScope())
+	_, err := NewActionsClient(nil, nil, "ns", 10, 1, nil, -1, false, promutils.NewTestScope())
 	require.Error(t, err)
 
-	_, err = NewActionsClient(nil, nil, "ns", 10, 1, nil, 0, promutils.NewTestScope())
+	_, err = NewActionsClient(nil, nil, "ns", 10, 1, nil, 0, false, promutils.NewTestScope())
 	require.Error(t, err)
 
 	// A positive size builds the mandatory filter.
-	c, err := NewActionsClient(nil, nil, "ns", 10, 1, nil, 128, promutils.NewTestScope())
+	c, err := NewActionsClient(nil, nil, "ns", 10, 1, nil, 128, false, promutils.NewTestScope())
 	require.NoError(t, err)
 	require.NotNil(t, c.recordedFilter)
 }

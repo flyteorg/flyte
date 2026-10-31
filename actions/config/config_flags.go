@@ -69,5 +69,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "runService.auth.scopes"), defaultConfig.RunService.Auth.Scopes, "Internal run service OAuth 2.0 scopes")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.audience"), defaultConfig.RunService.Auth.Audience, "Internal run service OAuth 2.0 token audience")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "recordFilterSize"), defaultConfig.RecordFilterSize, "Size of the oppo bloom filter for deduplicating RecordAction calls")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "parentLabelQueries"), defaultConfig.ParentLabelQueries, "Enable parent-label queries after all writers and existing TaskActions have migrated")
 	return cmdFlags
 }

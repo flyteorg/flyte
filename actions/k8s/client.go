@@ -56,12 +56,14 @@ type ActionUpdate struct {
 
 const (
 	labelTerminalStatusRecorded = "flyte.org/terminal-status-recorded"
+	labelParentTaskAction       = "flyte.org/parent-task-action"
 )
 
 // ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
 type ActionsClient struct {
-	k8sClient   client.WithWatch
-	sharedCache ctrlcache.Cache
+	parentLabelQueries bool
+	k8sClient          client.WithWatch
+	sharedCache        ctrlcache.Cache
 	// namespace is the single Kubernetes namespace used for all Flyte resources.
 	namespace  string
 	bufferSize int
@@ -95,7 +97,7 @@ type ActionsClient struct {
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) (*ActionsClient, error) {
+func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, parentLabelQueries bool, scope promutils.Scope) (*ActionsClient, error) {
 	if numWorkers <= 0 {
 		numWorkers = 1
 	}
@@ -107,13 +109,14 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, n
 		return nil, fmt.Errorf("actions: metrics scope is required")
 	}
 	c := &ActionsClient{
-		k8sClient:   k8sClient,
-		sharedCache: sharedCache,
-		namespace:   namespace,
-		bufferSize:  bufferSize,
-		numWorkers:  numWorkers,
-		runClient:   runClient,
-		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+		k8sClient:          k8sClient,
+		parentLabelQueries: parentLabelQueries,
+		sharedCache:        sharedCache,
+		namespace:          namespace,
+		bufferSize:         bufferSize,
+		numWorkers:         numWorkers,
+		runClient:          runClient,
+		subscribers:        make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 
 	// The dedup filter is mandatory: notifyRunService records on every event type
@@ -420,34 +423,36 @@ func (c *ActionsClient) ListRunActions(ctx context.Context, runID *common.RunIde
 	return result, nil
 }
 
-// ListChildActions lists all TaskActions that are children of the given parent action
+// ListChildActions lists the parent TaskAction and its direct children.
 func (c *ActionsClient) ListChildActions(ctx context.Context, parentActionID *common.ActionIdentifier) ([]*executorv1.TaskAction, error) {
-	// List all TaskActions in the same run
-	taskActionList := &executorv1.TaskActionList{}
-	listOpts := []client.ListOption{
-		client.InNamespace(c.namespace),
-		client.MatchingLabels{
-			"flyte.org/project": parentActionID.Run.Project,
-			"flyte.org/domain":  parentActionID.Run.Domain,
-			"flyte.org/run":     parentActionID.Run.Name,
-		},
+	listLabels := client.MatchingLabels{
+		"flyte.org/project": parentActionID.Run.Project,
+		"flyte.org/domain":  parentActionID.Run.Domain,
+		"flyte.org/run":     parentActionID.Run.Name,
 	}
-
-	if err := c.k8sClient.List(ctx, taskActionList, listOpts...); err != nil {
+	if c.parentLabelQueries {
+		listLabels[labelParentTaskAction] = buildTaskActionName(parentActionID)
+	}
+	items := &executorv1.TaskActionList{}
+	if err := c.k8sClient.List(ctx, items, client.InNamespace(c.namespace), listLabels); err != nil {
 		return nil, fmt.Errorf("failed to list TaskActions: %w", err)
 	}
 
-	// Filter for the parent and its children
 	var result []*executorv1.TaskAction
-	for i := range taskActionList.Items {
-		action := &taskActionList.Items[i]
-		// Include the parent action itself
-		if action.Spec.ActionName == parentActionID.Name {
-			result = append(result, action)
-			continue
+	if c.parentLabelQueries {
+		// The filtered list excludes the parent, which is part of this method's result.
+		parent, err := c.GetTaskAction(ctx, parentActionID)
+		if err != nil && !apierrors.IsNotFound(err) {
+			return nil, err
 		}
-		// Include direct children
-		if action.Spec.ParentActionName != nil && *action.Spec.ParentActionName == parentActionID.Name {
+		if parent != nil {
+			result = append(result, parent)
+		}
+	}
+	for i := range items.Items {
+		action := &items.Items[i]
+		if c.parentLabelQueries || action.Spec.ActionName == parentActionID.Name ||
+			(action.Spec.ParentActionName != nil && *action.Spec.ParentActionName == parentActionID.Name) {
 			result = append(result, action)
 		}
 	}
@@ -1007,7 +1012,8 @@ func (c *ActionsClient) newTaskActionCR(actionID *common.ActionIdentifier, actio
 }
 
 // setParentOwnership resolves the parent TaskAction and wires an OwnerReference
-// on the child so K8s cascades deletion. Returns the parent CR.
+// and a parent-name label on the child so K8s cascades deletion and children can
+// be selected by their immediate parent. Returns the parent CR.
 func (c *ActionsClient) setParentOwnership(ctx context.Context, child *executorv1.TaskAction, runID *common.RunIdentifier, parentActionName string) (*executorv1.TaskAction, error) {
 	parentID := &common.ActionIdentifier{
 		Run:  runID,
@@ -1021,6 +1027,10 @@ func (c *ActionsClient) setParentOwnership(ctx context.Context, child *executorv
 	}
 
 	blockOwnerDeletion := true
+	if child.Labels == nil {
+		child.Labels = make(map[string]string)
+	}
+	child.Labels[labelParentTaskAction] = parent.Name
 	child.OwnerReferences = []metav1.OwnerReference{
 		{
 			APIVersion:         "flyte.org/v1",

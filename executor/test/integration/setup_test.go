@@ -161,7 +161,7 @@ func TestMain(m *testing.M) {
 	// Actions half: the client that Enqueues CRs and watches them back.
 	runClient = &recordingRunClient{}
 	var acErr error
-	actionsClient, acErr = actionsk8s.NewActionsClient(k8sClient, mgr.GetCache(), "flyte", 32, 1, runClient, 1024, promutils.NewScope("integration_actions"))
+	actionsClient, acErr = actionsk8s.NewActionsClient(k8sClient, mgr.GetCache(), "flyte", 32, 1, runClient, 1024, false, promutils.NewScope("integration_actions"))
 	if acErr != nil {
 		log.Printf("Failed to create actions client: %v", acErr)
 		return

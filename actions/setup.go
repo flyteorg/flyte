@@ -59,6 +59,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		cfg.WatchWorkers,
 		runClient,
 		cfg.RecordFilterSize,
+		cfg.ParentLabelQueries,
 		sc.Scope,
 	)
 	if err != nil {
