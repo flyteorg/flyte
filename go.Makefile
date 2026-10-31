@@ -144,10 +144,18 @@ apple-silicon-config: ## Generate a config with the MLX bridge settings
 		echo "$(APPLE_SILICON_DIR)/secret not found, run 'make devbox-run FLYTE_DEV=True APPLE_SILICON=True' first"; \
 		exit 1; \
 	fi
-	@# Pods cannot resolve host.docker.internal, so the bridge endpoint uses the IP the devbox maps it to.
 	@ip=$$(docker exec flyte-devbox cat /etc/hosts | awk '$$2 == "host.docker.internal" { print $$1; exit }'); \
 	if [ -z "$$ip" ]; then \
 		echo "host.docker.internal not found in flyte-devbox, is the devbox running?"; \
+		exit 1; \
+	fi; \
+	type=$$(kubectl --context flyte-devbox -n flyte get svc flyte-binary-http -o jsonpath='{.spec.type}' 2>/dev/null); \
+	if [ -z "$$type" ]; then \
+		kubectl --context flyte-devbox -n flyte create service externalname flyte-binary-http \
+			--external-name flyte-devbox-local.flyte.svc.cluster.local --tcp 8090:8090 >/dev/null || exit 1; \
+		echo "Created flyte-binary-http in flyte-devbox, pointing at the manager on the host"; \
+	elif [ "$$type" != ExternalName ]; then \
+		echo "flyte-binary-http is already served inside flyte-devbox, run 'make devbox-run FLYTE_DEV=True APPLE_SILICON=True' first"; \
 		exit 1; \
 	fi; \
 	umask 077; \
@@ -156,7 +164,10 @@ apple-silicon-config: ## Generate a config with the MLX bridge settings
 		echo "      endpoint: \"http://$$ip:$(APPLE_SILICON_PORT)\""; \
 		echo "      token-secret: \"$$(cat $(APPLE_SILICON_DIR)/secret)\""; \
 		echo '      host-platform: "darwin/arm64"'; \
-	} | sed '/^  k8s:$$/r /dev/stdin' config.yaml > $(APPLE_SILICON_CONFIG); \
+	} | sed -e '/^  k8s:$$/r /dev/stdin' \
+		-e 's|rustfs-svc\.flyte\.svc\.cluster\.local:9000|rustfs-svc.flyte:9000|' \
+		-e '/_U_EP_OVERRIDE/s|host\.docker\.internal:8090|flyte-binary-http.flyte:8090|' \
+		config.yaml > $(APPLE_SILICON_CONFIG); \
 	echo "Apple MLX bridge config set successfully, at $(APPLE_SILICON_CONFIG)"
 
 ##@ Cleanup
