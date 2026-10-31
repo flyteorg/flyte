@@ -1136,16 +1136,9 @@ func (r *TaskActionReconciler) reconcileTask(
 			phaseInfo = transition.Info()
 		}
 	}
-	// A task that fails for good keeps its resource until the TaskAction is garbage collected.
-	// A plugin asks for cleanup when that resource would otherwise keep going: a gang an admission
-	// gate took back is re-admitted by the gate and would run again for a task that has already
-	// failed. Delete it now, as a retry above already does.
-	if !cacheShortCircuited && cleanupOnFailure && phaseInfo.Phase() == pluginsCore.PhasePermanentFailure {
-		if abortErr := p.Abort(ctx, tCtx); abortErr != nil {
-			logger.Error(abortErr, "failed to clean up the resource of a failed task")
-		}
-	}
-
+	// A pod still pulling its image or an evicted gang could start again after the task fails.
+	// Delete the resource after the failure is recorded when the plugin requests cleanup.
+	abortAfterFailure := !cacheShortCircuited && cleanupOnFailure && phaseInfo.Phase() == pluginsCore.PhasePermanentFailure
 	mapPhaseToConditions(taskAction, phaseInfo)
 
 	// Update StateJSON for observability
@@ -1177,6 +1170,14 @@ func (r *TaskActionReconciler) reconcileTask(
 
 	if err := r.updateTaskActionStatus(ctx, originalTaskActionInstance, taskAction, phaseInfo); err != nil {
 		return ctrl.Result{}, err
+	}
+
+	// Only after the failure is persisted: a reconcile that found the resource gone before then
+	// would take it for a system failure and relaunch the task.
+	if abortAfterFailure {
+		if abortErr := p.Abort(ctx, tCtx); abortErr != nil {
+			logger.Error(abortErr, "failed to abort plugin resource after terminal failure")
+		}
 	}
 
 	// If the TaskAction just became terminal, stamp GC labels
