@@ -885,7 +885,7 @@ func (c *nodeExecutor) execute(ctx context.Context, h interfaces.NodeHandler, nC
 		currentAttempt, maxAttempts, isEligible := c.isEligibleForRetry(nCtx, nodeStatus, phase.GetErr())
 		if !isEligible {
 			return handler.PhaseInfoFailure(
-				core.ExecutionError_USER,
+				phase.GetErr().GetKind(),
 				fmt.Sprintf("RetriesExhausted|%s", phase.GetErr().GetCode()),
 				fmt.Sprintf("[%d/%d] currentAttempt done. Last Error: %s::%s", currentAttempt, maxAttempts, phase.GetErr().GetKind().String(), phase.GetErr().GetMessage()),
 				phase.GetInfo(),
