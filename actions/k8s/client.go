@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"hash/fnv"
 	"strings"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	rpccode "google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -230,8 +232,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 				Trace: action.GetTrace(),
 			},
 		}
-		_, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq))
-		if err != nil {
+		if err := checkRecordAction(c.runClient.RecordAction(ctx, connect.NewRequest(recordReq))); err != nil {
 			return err
 		}
 
@@ -813,6 +814,22 @@ func (c *ActionsClient) notifySubscribers(ctx context.Context, update *ActionUpd
 	}
 }
 
+// checkRecordAction returns an error unless the run service accepted the action. The run
+// service reports a rejection in the response body with no transport error, so a nil error
+// alone does not mean the action was recorded.
+func checkRecordAction(resp *connect.Response[workflow.RecordActionResponse], err error) error {
+	if err != nil {
+		return err
+	}
+	if resp == nil || resp.Msg.GetStatus() == nil {
+		return connect.NewError(connect.CodeInternal, errors.New("run service returned no RecordAction status"))
+	}
+	if status := resp.Msg.GetStatus(); status.GetCode() != int32(rpccode.Code_OK) {
+		return connect.NewError(connect.Code(status.GetCode()), errors.New(status.GetMessage()))
+	}
+	return nil
+}
+
 // notifyRunService forwards a watch event to the internal run service.
 // On ADDED events it calls RecordAction to create the DB record.
 // On all events it calls UpdateActionStatus (when phase is meaningful) to update the actions table.
@@ -863,7 +880,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 				Task: ta,
 			}
 		}
-		if _, err := c.runClient.RecordAction(ctx, connect.NewRequest(recordReq)); err != nil {
+		if err := checkRecordAction(c.runClient.RecordAction(ctx, connect.NewRequest(recordReq))); err != nil {
 			logger.Warnf(ctx, "Failed to record action in run service for %s: %v", update.ActionID.Name, err)
 		} else {
 			c.recordedFilter.Add(ctx, actionKey)
