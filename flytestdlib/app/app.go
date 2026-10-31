@@ -19,6 +19,8 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // App is the shared entry-point skeleton for Flyte services.
@@ -81,6 +83,11 @@ func (a *App) serve(ctx context.Context) error {
 		Mux:  http.NewServeMux(),
 	}
 
+	if sc.Scope == nil {
+		sc.Scope = promutils.NewScope(a.Name)
+	}
+
+	sc.Mux.Handle("/metrics", promhttp.Handler())
 	// 3. Let the caller populate resources & register handlers
 	if err := a.Setup(ctx, sc); err != nil {
 		return fmt.Errorf("setup failed: %w", err)
