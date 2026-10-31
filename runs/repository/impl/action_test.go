@@ -545,14 +545,14 @@ func TestListRuns_HasPausedActionFilter(t *testing.T) {
 	assert.False(t, runs[0].ParentActionName.Valid, "only the root action should be returned")
 }
 
-func TestCountActionsByPhase(t *testing.T) {
+func TestCountActiveActionsByPhase(t *testing.T) {
 	db := setupActionDB(t)
 	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
 	t.Run("empty table", func(t *testing.T) {
-		counts, err := actionRepo.CountActionsByPhase(ctx)
+		counts, err := actionRepo.CountActiveActionsByPhase(ctx)
 		require.NoError(t, err)
 		assert.Empty(t, counts)
 	})
@@ -591,7 +591,7 @@ func TestCountActionsByPhase(t *testing.T) {
 			require.NoError(t, err)
 		}
 
-		counts, err := actionRepo.CountActionsByPhase(ctx)
+		counts, err := actionRepo.CountActiveActionsByPhase(ctx)
 		require.NoError(t, err)
 		key := func(phase common.ActionPhase, isRoot bool) interfaces.PhaseKey {
 			return interfaces.PhaseKey{Phase: int32(phase), IsRoot: isRoot}

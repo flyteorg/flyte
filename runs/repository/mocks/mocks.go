@@ -237,12 +237,12 @@ func (_c *ActionRepo_ClearAbortRequest_Call) RunAndReturn(run func(ctx context.C
 	return _c
 }
 
-// CountActionsByPhase provides a mock function for the type ActionRepo
-func (_mock *ActionRepo) CountActionsByPhase(ctx context.Context) (map[interfaces.PhaseKey]int64, error) {
+// CountActiveActionsByPhase provides a mock function for the type ActionRepo
+func (_mock *ActionRepo) CountActiveActionsByPhase(ctx context.Context) (map[interfaces.PhaseKey]int64, error) {
 	ret := _mock.Called(ctx)
 
 	if len(ret) == 0 {
-		panic("no return value specified for CountActionsByPhase")
+		panic("no return value specified for CountActiveActionsByPhase")
 	}
 
 	var r0 map[interfaces.PhaseKey]int64
@@ -265,18 +265,18 @@ func (_mock *ActionRepo) CountActionsByPhase(ctx context.Context) (map[interface
 	return r0, r1
 }
 
-// ActionRepo_CountActionsByPhase_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CountActionsByPhase'
-type ActionRepo_CountActionsByPhase_Call struct {
+// ActionRepo_CountActiveActionsByPhase_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CountActiveActionsByPhase'
+type ActionRepo_CountActiveActionsByPhase_Call struct {
 	*mock.Call
 }
 
-// CountActionsByPhase is a helper method to define mock.On call
+// CountActiveActionsByPhase is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *ActionRepo_Expecter) CountActionsByPhase(ctx interface{}) *ActionRepo_CountActionsByPhase_Call {
-	return &ActionRepo_CountActionsByPhase_Call{Call: _e.mock.On("CountActionsByPhase", ctx)}
+func (_e *ActionRepo_Expecter) CountActiveActionsByPhase(ctx interface{}) *ActionRepo_CountActiveActionsByPhase_Call {
+	return &ActionRepo_CountActiveActionsByPhase_Call{Call: _e.mock.On("CountActiveActionsByPhase", ctx)}
 }
 
-func (_c *ActionRepo_CountActionsByPhase_Call) Run(run func(ctx context.Context)) *ActionRepo_CountActionsByPhase_Call {
+func (_c *ActionRepo_CountActiveActionsByPhase_Call) Run(run func(ctx context.Context)) *ActionRepo_CountActiveActionsByPhase_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -289,12 +289,12 @@ func (_c *ActionRepo_CountActionsByPhase_Call) Run(run func(ctx context.Context)
 	return _c
 }
 
-func (_c *ActionRepo_CountActionsByPhase_Call) Return(counts map[interfaces.PhaseKey]int64, err error) *ActionRepo_CountActionsByPhase_Call {
+func (_c *ActionRepo_CountActiveActionsByPhase_Call) Return(counts map[interfaces.PhaseKey]int64, err error) *ActionRepo_CountActiveActionsByPhase_Call {
 	_c.Call.Return(counts, err)
 	return _c
 }
 
-func (_c *ActionRepo_CountActionsByPhase_Call) RunAndReturn(run func(ctx context.Context) (map[interfaces.PhaseKey]int64, error)) *ActionRepo_CountActionsByPhase_Call {
+func (_c *ActionRepo_CountActiveActionsByPhase_Call) RunAndReturn(run func(ctx context.Context) (map[interfaces.PhaseKey]int64, error)) *ActionRepo_CountActiveActionsByPhase_Call {
 	_c.Call.Return(run)
 	return _c
 }

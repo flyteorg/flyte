@@ -1237,9 +1237,9 @@ func (r *actionRepo) ListRootActions(ctx context.Context, project, domain string
 	return actions, nil
 }
 
-// CountActionsByPhase counts the actions in an active phase, split by phase
+// CountActiveActionsByPhase counts the actions in an active phase, split by phase
 // and by whether the action is a root (a run).
-func (r *actionRepo) CountActionsByPhase(ctx context.Context) (map[interfaces.PhaseKey]int64, error) {
+func (r *actionRepo) CountActiveActionsByPhase(ctx context.Context) (map[interfaces.PhaseKey]int64, error) {
 	var rows []struct {
 		Phase  int32 `db:"phase"`
 		IsRoot bool  `db:"is_root"`
