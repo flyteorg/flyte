@@ -81,6 +81,17 @@ func newNotificationMetrics(provider metric.MeterProvider) (*notificationMetrics
 	return &notificationMetrics{notifyDeletedCount: notifyDeletedCount}, nil
 }
 
+// CountRunningRuns returns the number of runs currently in the RUNNING phase.
+func CountRunningRuns(ctx context.Context, db *sqlx.DB) (int64, error) {
+	var count int64
+	if err := sqlx.GetContext(ctx, db, &count,
+		"SELECT COUNT(*) FROM actions WHERE parent_action_name IS NULL AND phase = $1",
+		int32(common.ActionPhase_ACTION_PHASE_RUNNING)); err != nil {
+		return 0, fmt.Errorf("count running runs: %w", err)
+	}
+	return count, nil
+}
+
 func registerActiveRunsGauge(provider metric.MeterProvider, db *sqlx.DB) error {
 	if provider == nil {
 		return nil
@@ -103,11 +114,9 @@ func registerActiveRunsGauge(provider metric.MeterProvider, db *sqlx.DB) error {
 		ctx, cancel := context.WithTimeout(ctx, activeRunsQueryTimeout)
 		defer cancel()
 
-		var count int64
-		if err := sqlx.GetContext(ctx, db, &count,
-			"SELECT COUNT(*) FROM actions WHERE parent_action_name IS NULL AND phase = $1",
-			int32(common.ActionPhase_ACTION_PHASE_RUNNING)); err != nil {
-			return fmt.Errorf("count active runs: %w", err)
+		count, err := CountRunningRuns(ctx, db)
+		if err != nil {
+			return err
 		}
 		o.ObserveInt64(active, count)
 		return nil
