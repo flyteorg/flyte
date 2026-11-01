@@ -1428,6 +1428,9 @@ func (s *RunService) WatchActions(
 			if updated == nil {
 				// Updates may have been lost; re-list the run.
 				if err := s.listAndSendAllActions(ctx, runID, rsm, stream); err != nil {
+					if !errors.Is(err, errListActions) {
+						return err
+					}
 					logger.Errorf(ctx, "Failed to re-list actions: %v", err)
 				}
 				continue
@@ -1442,6 +1445,9 @@ func (s *RunService) WatchActions(
 		}
 	}
 }
+
+// errListActions marks a failed DB read in listAndSendAllActions, which a re-list can tolerate.
+var errListActions = errors.New("list actions")
 
 func (s *RunService) listAndSendAllActions(
 	ctx context.Context,
@@ -1475,7 +1481,7 @@ func (s *RunService) listAndSendAllActions(
 			},
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("%w: %w", errListActions, err)
 		}
 
 		// ListActions returns up to Limit+1 rows (the extra row is a has-more probe).

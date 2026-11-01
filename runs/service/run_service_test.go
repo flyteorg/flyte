@@ -2170,3 +2170,33 @@ func TestWatchActions_RelistsOnResync(t *testing.T) {
 	require.Len(t, resent, 1, "the unchanged child must not be sent again")
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, resent[0].GetAction().GetStatus().GetPhase())
 }
+
+func TestWatchActions_KeepsStreamOnResyncListError(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+	client := newRunServiceTestClient(t, svc)
+
+	runID := &common.RunIdentifier{Project: "p", Domain: "d", Name: "r1"}
+	root := func(phase common.ActionPhase, updatedAt time.Time) *models.Action {
+		return &models.Action{Project: "p", Domain: "d", RunName: "r1", Name: "a0", Phase: int32(phase), UpdatedAt: updatedAt}
+	}
+	actionRepo.On("WatchAllActionUpdates", mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
+		Run(func(args mock.Arguments) {
+			updates := args.Get(2).(chan<- *models.Action)
+			updates <- nil
+			updates <- root(common.ActionPhase_ACTION_PHASE_SUCCEEDED, time.Unix(200, 0))
+			<-args.Get(0).(context.Context).Done()
+		}).Once()
+	actionRepo.On("ListActions", mock.Anything, mock.Anything).
+		Return([]*models.Action{root(common.ActionPhase_ACTION_PHASE_RUNNING, time.Unix(100, 0))}, nil).Once()
+	actionRepo.On("ListActions", mock.Anything, mock.Anything).
+		Return(nil, errors.New("db down")).Once()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	stream, err := client.WatchActions(ctx, connect.NewRequest(&workflow.WatchActionsRequest{RunId: runID}))
+	require.NoError(t, err)
+
+	require.True(t, stream.Receive())
+	require.True(t, stream.Receive(), "a failed re-list must not end the stream: %v", stream.Err())
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, stream.Msg().GetEnrichedActions()[0].GetAction().GetStatus().GetPhase())
+}
