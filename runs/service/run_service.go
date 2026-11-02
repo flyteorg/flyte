@@ -317,9 +317,6 @@ func (s *RunService) CreateRun(
 	}
 	inputPrefix := buildInputPrefix(runBase, runId.GetProject(), runId.GetDomain(), runId.GetName())
 	runOutputBase := buildRunOutputBase(runBase, runId.GetProject(), runId.GetDomain(), runId.GetName())
-	if runSpec.GetRawDataStorage() == nil || runSpec.GetRawDataStorage().GetRawDataPrefix() == "" {
-		runSpec.RawDataStorage = &task.RawDataStorage{RawDataPrefix: s.storagePrefix}
-	}
 
 	cacheKey := ""
 	switch iw := request.GetInputWrapper().(type) {

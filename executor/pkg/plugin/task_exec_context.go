@@ -64,6 +64,17 @@ func (t *taskExecutionContext) Catalog() catalog.AsyncClient  { return t.catalog
 // TaskAction's namespace and name. It is inserted immediately after the bucket
 // (AWS S3 hot-spot avoidance convention) so that storage traffic is spread
 // across key prefixes from the root. The attempt segment isolates each retry.
+// ComputeActionRawOutputPath returns where the action writes raw data: under
+// Spec.RawDataPrefix when set, laid out like the output path, else outputPrefix.
+func ComputeActionRawOutputPath(ctx context.Context, taskAction *flyteorgv1.TaskAction, attempt uint32, outputPrefix storage.DataReference) (storage.DataReference, error) {
+	prefix := strings.TrimRight(taskAction.Spec.RawDataPrefix, "/")
+	if prefix == "" {
+		return outputPrefix, nil
+	}
+	rawBase := fmt.Sprintf("%s/%s/%s/%s/", prefix, taskAction.Spec.Project, taskAction.Spec.Domain, taskAction.Spec.RunName)
+	return ComputeActionOutputPath(ctx, taskAction.Namespace, taskAction.Name, rawBase, taskAction.Spec.ActionName, attempt)
+}
+
 func ComputeActionOutputPath(ctx context.Context, namespace, name, runOutputBase, actionName string, attempt uint32) (storage.DataReference, error) {
 	sharder, err := ioutils.NewBase36PrefixShardSelector(ctx)
 	if err != nil {
@@ -144,7 +155,11 @@ func NewTaskExecutionContext(
 	if err != nil {
 		return nil, err
 	}
-	rawOutputPaths := ioutils.NewRawOutputPaths(ctx, outputPrefix)
+	rawOutputPrefix, err := ComputeActionRawOutputPath(ctx, taskAction, attempt, outputPrefix)
+	if err != nil {
+		return nil, err
+	}
+	rawOutputPaths := ioutils.NewRawOutputPaths(ctx, rawOutputPrefix)
 
 	// Attempts is 1-indexed, so the first attempt has nothing to resume from.
 	// Only set a previous checkpoint path from attempt 2 onward.

@@ -188,6 +188,11 @@ type TaskActionSpec struct {
 	// +optional
 	Interruptible *bool `json:"interruptible,omitempty"`
 
+	// RawDataPrefix is the run-scoped raw data base projected from RunSpec.RawDataStorage.
+	// Empty writes raw data under RunOutputBase.
+	// +optional
+	RawDataPrefix string `json:"rawDataPrefix,omitempty"`
+
 	// Group is the group this action belongs to, if applicable.
 	// +optional
 	// +kubebuilder:validation:MaxLength=256
