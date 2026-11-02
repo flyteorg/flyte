@@ -3031,6 +3031,51 @@ func TestDemystifyFailure(t *testing.T) {
 		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
 	})
 
+	// The pod was torn down before the container finished, so the kubelet could not read the
+	// termination log and fabricated an exit code. Attributing that to the application would
+	// spend a user retry on a platform disruption.
+	t.Run("unreadable termination status", func(t *testing.T) {
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					State: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason:   "Error",
+							ExitCode: 2,
+							Message:  "Error on reading termination message from logs: failed to try resolving symlinks in path \"/var/log/pods/x/0.log\": no such file or directory",
+						},
+					},
+				},
+			},
+		}, pluginsCore.TaskInfo{}, "")
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, Interrupted, phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().Kind)
+	})
+
+	// The same exit code with a readable termination message is the application's own answer and
+	// stays attributed to the user.
+	t.Run("readable termination status with the same exit code", func(t *testing.T) {
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					State: v1.ContainerState{
+						Terminated: &v1.ContainerStateTerminated{
+							Reason:   "Error",
+							ExitCode: 2,
+							Message:  "Traceback (most recent call last): ValueError",
+						},
+					},
+				},
+			},
+		}, pluginsCore.TaskInfo{}, "")
+		assert.Nil(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "Error", phaseInfo.Err().Code)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().Kind)
+	})
+
 	t.Run("OOMKilled", func(t *testing.T) {
 		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
 			ContainerStatuses: []v1.ContainerStatus{
@@ -4620,4 +4665,358 @@ func TestApplyPodSpecMutators(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, map[string]string{"mutated-for": primaryContainerName}, p.NodeSelector)
 	})
+}
+
+// A pod an external controller such as Kueue stopped says so on its TerminationTarget
+// condition, and that verdict outranks whatever the container exit codes would have said.
+func TestDemystifyFailureExternalTermination(t *testing.T) {
+	ctx := context.TODO()
+	const kueueMessage = "Preempted to accommodate a workload (UID: 1234, JobUID: 5678) due to prioritization in the ClusterQueue"
+	preempted := v1.PodCondition{
+		Type:    TerminationTargetCondition,
+		Status:  v1.ConditionTrue,
+		Reason:  "WorkloadEvictedDueToPreempted",
+		Message: kueueMessage,
+	}
+	sigkilled := v1.ContainerStatus{
+		Name: "primary",
+		State: v1.ContainerState{
+			Terminated: &v1.ContainerStateTerminated{Reason: "Error", ExitCode: SIGKILL},
+		},
+	}
+
+	t.Run("the controller's reason is the code and its message the explanation", func(t *testing.T) {
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Conditions:        []v1.PodCondition{preempted},
+			ContainerStatuses: []v1.ContainerStatus{sigkilled},
+		}, pluginsCore.TaskInfo{}, "primary")
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Equal(t, "WorkloadEvictedDueToPreempted", phaseInfo.Err().GetCode())
+		assert.Contains(t, phaseInfo.Err().GetMessage(), "Pod was terminated by an external controller: "+kueueMessage)
+		// The exit code still adds detail below the controller's explanation.
+		assert.Contains(t, phaseInfo.Err().GetMessage(), "[primary] terminated with exit code (137)")
+	})
+
+	t.Run("an OOM kill does not rename the failure either", func(t *testing.T) {
+		oomKilled := sigkilled
+		oomKilled.State.Terminated = &v1.ContainerStateTerminated{Reason: OOMKilled, ExitCode: SIGKILL}
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Conditions:        []v1.PodCondition{preempted},
+			ContainerStatuses: []v1.ContainerStatus{oomKilled},
+		}, pluginsCore.TaskInfo{}, "primary")
+		assert.NoError(t, err)
+		assert.Equal(t, "WorkloadEvictedDueToPreempted", phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Contains(t, phaseInfo.Err().GetMessage(), "Reason [OOMKilled]")
+	})
+
+	t.Run("a condition that is not true is ignored", func(t *testing.T) {
+		notTrue := preempted
+		notTrue.Status = v1.ConditionFalse
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Conditions:        []v1.PodCondition{notTrue},
+			ContainerStatuses: []v1.ContainerStatus{sigkilled},
+		}, pluginsCore.TaskInfo{}, "primary")
+		assert.NoError(t, err)
+		assert.Equal(t, Interrupted, phaseInfo.Err().GetCode())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+	})
+
+	t.Run("a scheduler preemption is reported the same way", func(t *testing.T) {
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Conditions: []v1.PodCondition{{
+				Type:    v1.DisruptionTarget,
+				Status:  v1.ConditionTrue,
+				Reason:  v1.PodReasonPreemptionByScheduler,
+				Message: "Pod flyte/p was preempted by higher priority workload flyte/q",
+			}},
+			ContainerStatuses: []v1.ContainerStatus{{
+				Name: "primary",
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{Reason: "Error", ExitCode: 143},
+				},
+			}},
+		}, pluginsCore.TaskInfo{}, "primary")
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Equal(t, v1.PodReasonPreemptionByScheduler, phaseInfo.Err().GetCode())
+		assert.Contains(t, phaseInfo.Err().GetMessage(), "preempted by higher priority workload flyte/q")
+	})
+
+	t.Run("a reasonless condition still names the condition", func(t *testing.T) {
+		bare := v1.PodCondition{Type: TerminationTargetCondition, Status: v1.ConditionTrue}
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Conditions: []v1.PodCondition{bare},
+		}, pluginsCore.TaskInfo{}, "")
+		assert.NoError(t, err)
+		assert.Equal(t, "TerminationTarget", phaseInfo.Err().GetCode())
+		assert.Equal(t, "Pod was terminated by an external controller", phaseInfo.Err().GetMessage())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+	})
+
+	t.Run("a disruption stamped after the pod had failed keeps the exit-code verdict", func(t *testing.T) {
+		finishedAt := metav1.NewTime(time.Date(2026, 10, 13, 10, 0, 0, 0, time.UTC))
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Conditions: []v1.PodCondition{{
+				Type:               v1.DisruptionTarget,
+				Status:             v1.ConditionTrue,
+				Reason:             "EvictionByEvictionAPI",
+				Message:            "Eviction API: evicting",
+				LastTransitionTime: metav1.NewTime(finishedAt.Add(time.Minute)),
+			}},
+			ContainerStatuses: []v1.ContainerStatus{{
+				Name: "primary",
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{Reason: "Error", ExitCode: 1, FinishedAt: finishedAt},
+				},
+			}},
+		}, pluginsCore.TaskInfo{}, "primary")
+		assert.NoError(t, err)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
+		assert.Equal(t, "Error", phaseInfo.Err().GetCode())
+	})
+}
+
+func TestGetTerminationTarget(t *testing.T) {
+	assert.Nil(t, GetTerminationTarget(v1.PodStatus{}, "primary"))
+	assert.Nil(t, GetTerminationTarget(v1.PodStatus{Conditions: []v1.PodCondition{
+		{Type: v1.PodScheduled, Status: v1.ConditionTrue},
+		{Type: TerminationTargetCondition, Status: v1.ConditionFalse, Reason: "NotAdmitted"},
+	}}, "primary"))
+
+	got := GetTerminationTarget(v1.PodStatus{Conditions: []v1.PodCondition{
+		{Type: v1.PodReady, Status: v1.ConditionFalse},
+		{Type: TerminationTargetCondition, Status: v1.ConditionTrue, Reason: "StoppedByKueue", Message: "Workload is deleted"},
+	}}, "primary")
+	if assert.NotNil(t, got) {
+		assert.Equal(t, "StoppedByKueue", got.Reason)
+		assert.Equal(t, "Workload is deleted", got.Message)
+	}
+	assert.Equal(t, "StoppedByKueue", ExternalTerminationCode(got))
+
+	preempted := GetTerminationTarget(v1.PodStatus{Conditions: []v1.PodCondition{
+		{Type: v1.DisruptionTarget, Status: v1.ConditionTrue, Reason: v1.PodReasonPreemptionByScheduler},
+	}}, "primary")
+	if assert.NotNil(t, preempted) {
+		assert.Equal(t, v1.PodReasonPreemptionByScheduler, ExternalTerminationCode(preempted))
+	}
+	// A node-pressure eviction can be the task's own doing, so it is not treated as one.
+	assert.Nil(t, GetTerminationTarget(v1.PodStatus{Conditions: []v1.PodCondition{
+		{Type: v1.DisruptionTarget, Status: v1.ConditionTrue, Reason: v1.PodReasonTerminationByKubelet},
+	}}, "primary"))
+	assert.Equal(t, "Pod was terminated by an external controller: Workload is deleted", ExternalTerminationMessage(got))
+	assert.Equal(t, "Pod was terminated by an external controller (NotAdmitted)",
+		ExternalTerminationMessage(&v1.PodCondition{Reason: "NotAdmitted"}))
+}
+
+// migMixedConfig configures the NVIDIA device class the way a cluster running the device plugin
+// with migStrategy=mixed would, using partitionResourceName as the per-partition template. The
+// previous config comes back when the test ends, since other tests reload only part of it.
+func migMixedConfig(t *testing.T, partitionResourceName string) {
+	prev := *config.GetK8sPluginConfig()
+	t.Cleanup(func() { assert.NoError(t, config.SetK8sPluginConfig(&prev)) })
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		GpuResourceName: ResourceNvidiaGPU,
+		AcceleratorDeviceClasses: map[string]config.AcceleratorDeviceClassConfig{
+			core.GPUAccelerator_NVIDIA_GPU.String(): {
+				ResourceName:           ResourceNvidiaGPU,
+				DeviceNodeLabel:        "gpu-device",
+				PartitionSizeNodeLabel: "gpu-partition-size",
+				PartitionResourceName:  partitionResourceName,
+			},
+		},
+		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
+			ResourceNvidiaGPU: {{Key: "flyte/gpu", Value: "dedicated", Operator: v1.TolerationOpEqual, Effect: v1.TaintEffectNoSchedule}},
+		},
+		AddTolerationsForExtendedResources: []string{ResourceNvidiaGPU},
+	}))
+}
+
+func TestToK8sPodSpecMIGMixedStrategy(t *testing.T) {
+	const migResource = v1.ResourceName("nvidia.com/mig-1g.5gb")
+	gpuTol := v1.Toleration{Key: "flyte/gpu", Value: "dedicated", Operator: v1.TolerationOpEqual, Effect: v1.TaintEffectNoSchedule}
+	deviceTol := v1.Toleration{Key: "gpu-device", Value: "nvidia-tesla-a100", Operator: v1.TolerationOpEqual, Effect: v1.TaintEffectNoSchedule}
+	extendedTol := v1.Toleration{Key: ResourceNvidiaGPU, Operator: v1.TolerationOpExists, Effect: v1.TaintEffectNoSchedule}
+	partitionTol := v1.Toleration{Key: "gpu-partition-size", Value: "1g.5gb", Operator: v1.TolerationOpEqual, Effect: v1.TaintEffectNoSchedule}
+	deviceNsr := v1.NodeSelectorRequirement{Key: "gpu-device", Operator: v1.NodeSelectorOpIn, Values: []string{"nvidia-tesla-a100"}}
+	partitionNsr := v1.NodeSelectorRequirement{Key: "gpu-partition-size", Operator: v1.NodeSelectorOpIn, Values: []string{"1g.5gb"}}
+
+	partitioned := &core.GPUAccelerator{
+		Device:             "nvidia-tesla-a100",
+		PartitionSizeValue: &core.GPUAccelerator_PartitionSize{PartitionSize: "1g.5gb"},
+	}
+	unpartitioned := &core.GPUAccelerator{Device: "nvidia-tesla-a100"}
+
+	build := func(t *testing.T, accelerator *core.GPUAccelerator, gpuName v1.ResourceName) (*v1.PodSpec, *metav1.ObjectMeta) {
+		taskTemplate := dummyTaskTemplate()
+		taskTemplate.ExtendedResources = &core.ExtendedResources{GpuAccelerator: accelerator}
+		taskContext := dummyExecContext(taskTemplate, &v1.ResourceRequirements{
+			Requests: v1.ResourceList{gpuName: resource.MustParse("2")},
+			Limits:   v1.ResourceList{gpuName: resource.MustParse("2")},
+		}, nil, "", nil)
+		p, m, _, err := ToK8sPodSpec(context.TODO(), taskContext)
+		assert.NoError(t, err)
+		return p, m
+	}
+
+	for _, gpuName := range []v1.ResourceName{resourceGPU, ResourceNvidiaGPU} {
+		t.Run(fmt.Sprintf("template with partition requests the MIG resource (%s)", gpuName), func(t *testing.T) {
+			migMixedConfig(t, "nvidia.com/mig-{partition}")
+			p, m := build(t, partitioned, gpuName)
+
+			res := p.Containers[0].Resources
+			assert.Equal(t, resource.MustParse("2"), res.Requests[migResource])
+			assert.Equal(t, resource.MustParse("2"), res.Limits[migResource])
+			assert.NotContains(t, res.Requests, v1.ResourceName(ResourceNvidiaGPU))
+			assert.NotContains(t, res.Limits, v1.ResourceName(ResourceNvidiaGPU))
+			assert.NotContains(t, res.Limits, v1.ResourceName(resourceGPU))
+
+			assert.Equal(t,
+				[]v1.NodeSelectorTerm{{MatchExpressions: []v1.NodeSelectorRequirement{deviceNsr}}},
+				p.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+			assert.ElementsMatch(t, []v1.Toleration{gpuTol, deviceTol, extendedTol}, p.Tolerations)
+			assert.Equal(t, "1", m.Labels[GpuPartitionSlicesLabel])
+		})
+	}
+
+	t.Run("no template keeps the partition size affinity", func(t *testing.T) {
+		migMixedConfig(t, "")
+		p, _ := build(t, partitioned, resourceGPU)
+
+		res := p.Containers[0].Resources
+		assert.Equal(t, resource.MustParse("2"), res.Limits[ResourceNvidiaGPU])
+		assert.NotContains(t, res.Limits, migResource)
+		assert.Equal(t,
+			[]v1.NodeSelectorTerm{{MatchExpressions: []v1.NodeSelectorRequirement{deviceNsr, partitionNsr}}},
+			p.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+		assert.ElementsMatch(t, []v1.Toleration{gpuTol, deviceTol, partitionTol, extendedTol}, p.Tolerations)
+	})
+
+	t.Run("template without partition requests whole GPUs", func(t *testing.T) {
+		migMixedConfig(t, "nvidia.com/mig-{partition}")
+		p, _ := build(t, unpartitioned, resourceGPU)
+
+		res := p.Containers[0].Resources
+		assert.Equal(t, resource.MustParse("2"), res.Limits[ResourceNvidiaGPU])
+		assert.Len(t, res.Limits, 3)
+		assert.Equal(t,
+			[]v1.NodeSelectorTerm{{MatchExpressions: []v1.NodeSelectorRequirement{deviceNsr}}},
+			p.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+		assert.ElementsMatch(t, []v1.Toleration{gpuTol, deviceTol, extendedTol}, p.Tolerations)
+	})
+
+	t.Run("template with explicit unpartitioned keeps the unpartitioned affinity", func(t *testing.T) {
+		migMixedConfig(t, "nvidia.com/mig-{partition}")
+		p, _ := build(t, &core.GPUAccelerator{
+			Device:             "nvidia-tesla-a100",
+			PartitionSizeValue: &core.GPUAccelerator_Unpartitioned{Unpartitioned: true},
+		}, resourceGPU)
+
+		assert.Equal(t, resource.MustParse("2"), p.Containers[0].Resources.Limits[ResourceNvidiaGPU])
+		assert.Equal(t,
+			[]v1.NodeSelectorTerm{{MatchExpressions: []v1.NodeSelectorRequirement{
+				deviceNsr,
+				{Key: "gpu-partition-size", Operator: v1.NodeSelectorOpDoesNotExist},
+			}}},
+			p.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms)
+	})
+
+	// PodTemplates merge after the task's resources are customized, so a template that gives
+	// the primary container whole GPUs must not leave them next to the MIG resource.
+	eightGPUs := v1.ResourceList{ResourceNvidiaGPU: resource.MustParse("8")}
+	gpuTemplateSpec := v1.PodSpec{Containers: []v1.Container{{
+		Name:      "primary",
+		Resources: v1.ResourceRequirements{Requests: eightGPUs, Limits: eightGPUs},
+	}}}
+	templates := map[string]func(t *testing.T, taskTemplate *core.TaskTemplate){
+		"device class": func(t *testing.T, _ *core.TaskTemplate) {
+			cfg := config.GetK8sPluginConfig()
+			deviceClass := cfg.AcceleratorDeviceClasses[core.GPUAccelerator_NVIDIA_GPU.String()]
+			deviceClass.PodTemplate = &v1.PodTemplate{Template: v1.PodTemplateSpec{Spec: *gpuTemplateSpec.DeepCopy()}}
+			cfg.AcceleratorDeviceClasses[core.GPUAccelerator_NVIDIA_GPU.String()] = deviceClass
+		},
+		"base": func(t *testing.T, taskTemplate *core.TaskTemplate) {
+			podTemplate := &v1.PodTemplate{
+				ObjectMeta: metav1.ObjectMeta{Name: "mig-base", Namespace: "test-namespace"},
+				Template:   v1.PodTemplateSpec{Spec: *gpuTemplateSpec.DeepCopy()},
+			}
+			DefaultPodTemplateStore.Store(podTemplate)
+			t.Cleanup(func() { DefaultPodTemplateStore.Delete(podTemplate) })
+			taskTemplate.Metadata = &core.TaskMetadata{PodTemplateName: "mig-base"}
+		},
+	}
+	for templateKind, applyTemplate := range templates {
+		for _, tc := range []struct {
+			name      string
+			requested v1.ResourceList
+			want      string
+		}{
+			{"task GPUs replace the template GPUs", v1.ResourceList{resourceGPU: resource.MustParse("2")}, "2"},
+			{"template GPUs become partitions", v1.ResourceList{}, "8"},
+		} {
+			t.Run(fmt.Sprintf("%s pod template: %s", templateKind, tc.name), func(t *testing.T) {
+				migMixedConfig(t, "nvidia.com/mig-{partition}")
+				taskTemplate := dummyTaskTemplate()
+				taskTemplate.ExtendedResources = &core.ExtendedResources{GpuAccelerator: partitioned}
+				applyTemplate(t, taskTemplate)
+				taskContext := dummyExecContext(taskTemplate, &v1.ResourceRequirements{
+					Requests: tc.requested.DeepCopy(),
+					Limits:   tc.requested.DeepCopy(),
+				}, nil, "", nil)
+				p, _, _, err := ToK8sPodSpec(context.TODO(), taskContext)
+				assert.NoError(t, err)
+
+				res := p.Containers[0].Resources
+				assert.Equal(t, resource.MustParse(tc.want), res.Requests[migResource])
+				assert.Equal(t, resource.MustParse(tc.want), res.Limits[migResource])
+				assert.NotContains(t, res.Requests, v1.ResourceName(ResourceNvidiaGPU))
+				assert.NotContains(t, res.Limits, v1.ResourceName(ResourceNvidiaGPU))
+			})
+		}
+	}
+}
+
+// A DisruptionTarget only explains a failure the disruption caused: one stamped after the primary
+// container had already finished came too late to be the cause.
+func TestGetTerminationTargetDisruptionTiming(t *testing.T) {
+	finishedAt := time.Date(2026, 10, 13, 10, 0, 0, 0, time.UTC)
+	status := func(stampedAt time.Time, containers ...v1.ContainerStatus) v1.PodStatus {
+		return v1.PodStatus{
+			Conditions: []v1.PodCondition{{
+				Type:               v1.DisruptionTarget,
+				Status:             v1.ConditionTrue,
+				Reason:             "EvictionByEvictionAPI",
+				LastTransitionTime: metav1.NewTime(stampedAt),
+			}},
+			ContainerStatuses: containers,
+		}
+	}
+	finished := func(name string) v1.ContainerStatus {
+		return v1.ContainerStatus{Name: name, State: v1.ContainerState{
+			Terminated: &v1.ContainerStateTerminated{ExitCode: 1, FinishedAt: metav1.NewTime(finishedAt)},
+		}}
+	}
+	running := v1.ContainerStatus{Name: "primary", State: v1.ContainerState{Running: &v1.ContainerStateRunning{}}}
+	later := finishedAt.Add(time.Minute)
+
+	assert.Nil(t, GetTerminationTarget(status(later, finished("primary")), "primary"),
+		"stamped after the primary container finished")
+	assert.NotNil(t, GetTerminationTarget(status(finishedAt.Add(-time.Second), finished("primary")), "primary"),
+		"stamped before the primary container finished")
+	assert.NotNil(t, GetTerminationTarget(status(finishedAt, finished("primary")), "primary"),
+		"stamped within the same second: timestamps cannot tell them apart")
+	assert.NotNil(t, GetTerminationTarget(status(later, running), "primary"),
+		"the primary container is still running")
+	assert.NotNil(t, GetTerminationTarget(status(later, finished("sidecar")), "primary"),
+		"only the primary container's exit counts")
+	assert.NotNil(t, GetTerminationTarget(status(time.Time{}, finished("primary")), "primary"),
+		"no stamp time to compare")
+
+	// Kueue's TerminationTarget is not subject to the timing check.
+	kueue := status(later, finished("primary"))
+	kueue.Conditions[0].Type = TerminationTargetCondition
+	assert.NotNil(t, GetTerminationTarget(kueue, "primary"))
 }

@@ -260,6 +260,143 @@ func TestLaunchResourceErrors(t *testing.T) {
 	}
 }
 
+// A launch that finds a resource already under its name adopts it only when that resource is
+// alive: after a system retry the previous incarnation can still be draining its grace period
+// under the same name, and adopting it would rediscover its deletion next round and retry again,
+// once per reconcile, until it is finally gone.
+func TestLaunchResource_AlreadyExists(t *testing.T) {
+	now := metav1.Now()
+	longAgo := metav1.NewTime(time.Now().Add(-time.Hour))
+	tests := []struct {
+		name      string
+		existing  *v1.Pod
+		wantPhase pluginsCore.Phase
+		wantCode  string
+	}{
+		{
+			name:      "a live resource is adopted",
+			existing:  &v1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "name", Namespace: "ns"}},
+			wantPhase: pluginsCore.PhaseQueued,
+		},
+		{
+			name: "a draining resource is waited out",
+			existing: &v1.Pod{ObjectMeta: metav1.ObjectMeta{
+				Name:              "name",
+				Namespace:         "ns",
+				DeletionTimestamp: &now,
+				Finalizers:        []string{"flyte/flytek8s"},
+			}},
+			wantPhase: pluginsCore.PhaseWaitingForResources,
+		},
+		{
+			// Stuck terminating well past its grace period, the resource may never free the
+			// name: the launch fails into the system-retry budget rather than waiting forever.
+			name: "a resource stuck terminating fails the launch",
+			existing: &v1.Pod{ObjectMeta: metav1.ObjectMeta{
+				Name:              "name",
+				Namespace:         "ns",
+				DeletionTimestamp: &longAgo,
+				Finalizers:        []string{"flyte/flytek8s"},
+			}},
+			wantPhase: pluginsCore.PhaseRetryableFailure,
+			wantCode:  codePreviousResourceStuckTerminating,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fakeClient := fake.NewClientBuilder().
+				WithScheme(k8sscheme.Scheme).
+				WithObjects(tt.existing).
+				Build()
+
+			kubeClient := &pluginsCoreMock.KubeClient{}
+			kubeClient.EXPECT().GetClient().Return(fakeClient)
+
+			plugin := &k8sMocks.Plugin{}
+			plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+			plugin.EXPECT().BuildResource(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+
+			tCtx := &pluginsCoreMock.TaskExecutionContext{}
+			tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("name"))
+
+			pm := NewPluginManager("test", plugin, kubeClient)
+
+			transition, err := pm.launchResource(context.Background(), tCtx)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.wantPhase, transition.Info().Phase())
+			assert.Equal(t, tt.wantCode, transition.Info().Err().GetCode())
+			if tt.wantCode != "" {
+				assert.Equal(t, core.ExecutionError_SYSTEM, transition.Info().Err().GetKind())
+			}
+		})
+	}
+}
+
+func TestStuckTerminating(t *testing.T) {
+	deletedAt := func(ago time.Duration) client.Object {
+		ts := metav1.NewTime(time.Now().Add(-ago))
+		return &v1.Pod{ObjectMeta: metav1.ObjectMeta{DeletionTimestamp: &ts}}
+	}
+
+	_, stuck := stuckTerminating(deletedAt(10*time.Minute), 5*time.Minute)
+	assert.True(t, stuck, "terminating past the grace period")
+
+	_, stuck = stuckTerminating(deletedAt(time.Minute), 5*time.Minute)
+	assert.False(t, stuck, "still within the grace period")
+
+	_, stuck = stuckTerminating(deletedAt(-time.Minute), 5*time.Minute)
+	assert.False(t, stuck, "deletion grace period not yet over")
+
+	_, stuck = stuckTerminating(deletedAt(time.Hour), 0)
+	assert.False(t, stuck, "a zero grace period waits indefinitely")
+
+	_, stuck = stuckTerminating(&v1.Pod{}, 5*time.Minute)
+	assert.False(t, stuck, "an unread resource carries no deletion timestamp")
+}
+
+// While the previous resource drains, Handle leaves the plugin at NotStarted, so the next round
+// launches again rather than checking on a resource that is not this attempt's and finding it
+// deleted once more.
+func TestHandle_WaitsForPreviousResourceToDrain(t *testing.T) {
+	now := metav1.Now()
+	draining := &v1.Pod{ObjectMeta: metav1.ObjectMeta{
+		Name:              "name",
+		Namespace:         "ns",
+		DeletionTimestamp: &now,
+		Finalizers:        []string{"flyte/flytek8s"},
+	}}
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(draining).Build()
+	kubeClient := &pluginsCoreMock.KubeClient{}
+	kubeClient.EXPECT().GetClient().Return(fakeClient)
+
+	// Zero state: the plugin has not started this incarnation, as after a system retry.
+	stateReader := &pluginsCoreMock.PluginStateReader{}
+	stateReader.EXPECT().Get(mock.Anything).Return(uint8(pluginStateVersion), nil)
+	var written PluginState
+	stateWriter := &pluginsCoreMock.PluginStateWriter{}
+	stateWriter.EXPECT().Put(uint8(pluginStateVersion), mock.Anything).Run(func(_ uint8, v interface{}) {
+		written = *(v.(*PluginState))
+	}).Return(nil)
+
+	tCtx := &pluginsCoreMock.TaskExecutionContext{}
+	tCtx.EXPECT().PluginStateReader().Return(stateReader)
+	tCtx.EXPECT().PluginStateWriter().Return(stateWriter)
+	tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("name"))
+
+	plugin := &k8sMocks.Plugin{}
+	plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+	plugin.EXPECT().BuildResource(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+
+	pm := NewPluginManager("test", plugin, kubeClient)
+
+	transition, err := pm.Handle(context.Background(), tCtx)
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseWaitingForResources, transition.Info().Phase())
+	assert.Equal(t, PluginPhaseNotStarted, written.Phase)
+	assert.Equal(t, pluginsCore.PhaseWaitingForResources, written.K8sPluginState.Phase)
+}
+
 func TestHandle_CorruptedPluginStateFailsPermanently(t *testing.T) {
 	stateReader := &pluginsCoreMock.PluginStateReader{}
 	// (0, err) matches PluginStateManager's contract: the version is zeroed on decode failure.
@@ -298,6 +435,16 @@ func (w *fakeEventWatcher) List(objectKey watchedObjectKey, createdAfter time.Ti
 // can hand classification an event that belongs to some other incarnation of the pod.
 const testPodUID k8stypes.UID = "pod-uid"
 
+// testNodeName is the node the pod ran on, and so the only node a fault event about it
+// may be reported from.
+const testNodeName = "ip-10-0-0-1"
+
+// otherNodeName is a node the pod did not run on.
+const otherNodeName = "ip-10-0-0-2"
+
+// ordinaryReason is an event reason the GPU fault emitter never uses.
+const ordinaryReason = "BackOff"
+
 func gpuFaultEvent(code int, severity gpufault.Severity, createdAt time.Time) *eventInfo {
 	return gpuFaultEventFor(code, severity, createdAt, createdAt, testPodUID)
 }
@@ -317,7 +464,7 @@ func gpuFaultEventFor(
 			Severity: severity,
 			PCI:      "0000:3b:00.0",
 		},
-		gpufault.Attribution{NodeName: "ip-10-0-0-1", GPUUUID: "GPU-1234", GPUIndex: 0},
+		gpufault.Attribution{NodeName: testNodeName, GPUUUID: "GPU-1234", GPUIndex: 0},
 	)
 	return &eventInfo{
 		Message:        message,
@@ -326,6 +473,7 @@ func gpuFaultEventFor(
 		RecordedAt:     createdAt,
 		LastObservedAt: lastObservedAt,
 		RegardingUID:   regardingUID,
+		ReportingNode:  testNodeName,
 	}
 }
 
@@ -333,8 +481,16 @@ func failedPod() *v1.Pod {
 	pod := &v1.Pod{
 		TypeMeta:   metav1.TypeMeta{Kind: "Pod", APIVersion: "v1"},
 		ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "pod", UID: testPodUID},
+		Spec:       v1.PodSpec{NodeName: testNodeName},
 	}
 	return pod
+}
+
+// reportedFrom is the event as if it had been reported from the given node.
+func reportedFrom(event *eventInfo, node string) *eventInfo {
+	out := *event
+	out.ReportingNode = node
+	return &out
 }
 
 func TestClassifyGpuFailure(t *testing.T) {
@@ -342,7 +498,7 @@ func TestClassifyGpuFailure(t *testing.T) {
 	// Recency is measured against the clock now, so the fixtures have to sit relative to
 	// it: base is inside the relevance window, stale is well outside it.
 	base := time.Now().Add(-time.Minute)
-	stale := time.Now().Add(-2 * gpuFaultRelevanceWindow)
+	stale := time.Now().Add(-2 * gpufault.RelevanceWindow)
 
 	tests := []struct {
 		name        string
@@ -394,9 +550,11 @@ func TestClassifyGpuFailure(t *testing.T) {
 		},
 		{
 			name: "a gpu-health message under an ordinary reason is not trusted",
-			events: []*eventInfo{
-				{Message: "Back-off restarting failed container", CreatedAt: base, RecordedAt: base},
-			},
+			events: func() []*eventInfo {
+				event := gpuFaultEvent(79, gpufault.SeverityCritical, base)
+				event.Reason = ordinaryReason
+				return []*eventInfo{event}
+			}(),
 			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("OOMKilled", "oom", nil),
 			wantPhase: pluginsCore.PhaseRetryableFailure,
 			wantCode:  "OOMKilled",
@@ -466,7 +624,7 @@ func TestClassifyGpuFailure(t *testing.T) {
 			pm := NewPluginManager("test-plugin", nil, nil)
 			pm.eventWatcher = watcher
 
-			got := pm.classifyGpuFailure(failedPod(), tt.phaseInfo)
+			got := pm.classifyGpuFailure(context.Background(), nil, failedPod(), tt.phaseInfo)
 
 			assert.Equal(t, tt.wantPhase, got.Phase())
 			require.NotNil(t, got.Err())
@@ -497,7 +655,7 @@ func TestClassifyGpuFailureRelevanceIsAnchoredOnTheFailure(t *testing.T) {
 		}}
 		pm := NewPluginManager("test-plugin", nil, nil)
 		pm.eventWatcher = watcher
-		got := pm.classifyGpuFailure(failedPod(), phase)
+		got := pm.classifyGpuFailure(context.Background(), nil, failedPod(), phase)
 		assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
 	})
 
@@ -508,7 +666,7 @@ func TestClassifyGpuFailureRelevanceIsAnchoredOnTheFailure(t *testing.T) {
 		}}
 		pm := NewPluginManager("test-plugin", nil, nil)
 		pm.eventWatcher = watcher
-		got := pm.classifyGpuFailure(failedPod(), phase)
+		got := pm.classifyGpuFailure(context.Background(), nil, failedPod(), phase)
 		assert.Equal(t, "UnknownError", got.Err().GetCode())
 		assert.Nil(t, got.Err().GetGpuFault())
 	})
@@ -531,7 +689,7 @@ func TestClassifyGpuFailureRelevanceIsAnInterval(t *testing.T) {
 		}}
 		pm := NewPluginManager("test-plugin", nil, nil)
 		pm.eventWatcher = watcher
-		return pm.classifyGpuFailure(failedPod(), phase)
+		return pm.classifyGpuFailure(context.Background(), nil, failedPod(), phase)
 	}
 
 	t.Run("a fault that started before the failure and kept firing after it explains it", func(t *testing.T) {
@@ -554,7 +712,7 @@ func TestClassifyGpuFailureRelevanceIsAnInterval(t *testing.T) {
 	})
 
 	t.Run("a fault that only started after the failure does not explain it", func(t *testing.T) {
-		started := failedAt.Add(gpuFaultAfterFailureSlack + time.Minute)
+		started := failedAt.Add(gpufault.AfterFailureSlack + time.Minute)
 		got := classify(t, started, started.Add(5*time.Minute))
 		assert.Equal(t, "UnknownError", got.Err().GetCode())
 		assert.Nil(t, got.Err().GetGpuFault())
@@ -564,48 +722,6 @@ func TestClassifyGpuFailureRelevanceIsAnInterval(t *testing.T) {
 		got := classify(t, failedAt.Add(-90*time.Minute), failedAt.Add(-40*time.Minute))
 		assert.Equal(t, "UnknownError", got.Err().GetCode())
 		assert.Nil(t, got.Err().GetGpuFault())
-	})
-}
-
-func TestPodFailureTime(t *testing.T) {
-	occurredAt := time.Date(2026, 8, 25, 12, 0, 0, 0, time.UTC)
-
-	t.Run("prefers the latest container termination", func(t *testing.T) {
-		first := occurredAt.Add(-10 * time.Minute)
-		last := occurredAt.Add(-2 * time.Minute)
-		pod := &v1.Pod{Status: v1.PodStatus{ContainerStatuses: []v1.ContainerStatus{
-			{State: v1.ContainerState{Terminated: &v1.ContainerStateTerminated{FinishedAt: metav1.NewTime(first)}}},
-			{State: v1.ContainerState{Terminated: &v1.ContainerStateTerminated{FinishedAt: metav1.NewTime(last)}}},
-		}}}
-		assert.Equal(t, last, podFailureTime(pod, occurredAt))
-	})
-
-	t.Run("ignores init containers", func(t *testing.T) {
-		// An init container finished long before the work started, and a native sidecar
-		// declared among the init containers is reaped after everything else. Anchoring on
-		// either would put every real fault outside the window.
-		initFinished := occurredAt.Add(-3 * time.Hour)
-		pod := &v1.Pod{Status: v1.PodStatus{
-			InitContainerStatuses: []v1.ContainerStatus{
-				{State: v1.ContainerState{Terminated: &v1.ContainerStateTerminated{FinishedAt: metav1.NewTime(initFinished)}}},
-			},
-			ContainerStatuses: []v1.ContainerStatus{
-				{State: v1.ContainerState{Running: &v1.ContainerStateRunning{}}},
-			},
-		}}
-		assert.Equal(t, occurredAt, podFailureTime(pod, occurredAt))
-	})
-
-	t.Run("falls back to the deletion timestamp", func(t *testing.T) {
-		deletedAt := occurredAt.Add(-time.Minute)
-		deletion := metav1.NewTime(deletedAt)
-		pod := &v1.Pod{ObjectMeta: metav1.ObjectMeta{DeletionTimestamp: &deletion}}
-		assert.Equal(t, deletedAt, podFailureTime(pod, occurredAt))
-	})
-
-	t.Run("falls back to the reported time, then to now", func(t *testing.T) {
-		assert.Equal(t, occurredAt, podFailureTime(&v1.Pod{}, occurredAt))
-		assert.WithinDuration(t, time.Now(), podFailureTime(&v1.Pod{}, time.Time{}), time.Minute)
 	})
 }
 
@@ -639,7 +755,7 @@ func TestClassifyGpuFailureAnchorsOnThePodNotItsStartTime(t *testing.T) {
 	pm := NewPluginManager("test-plugin", nil, nil)
 	pm.eventWatcher = watcher
 
-	got := pm.classifyGpuFailure(pod, phase)
+	got := pm.classifyGpuFailure(context.Background(), nil, pod, phase)
 
 	assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
 	assert.Equal(t, core.ExecutionError_SYSTEM, got.Err().GetKind())
@@ -657,7 +773,7 @@ func TestClassifyGpuFailureIdentity(t *testing.T) {
 		}}
 		pm := NewPluginManager("test-plugin", nil, nil)
 		pm.eventWatcher = watcher
-		got := pm.classifyGpuFailure(failedPod(), phase)
+		got := pm.classifyGpuFailure(context.Background(), nil, failedPod(), phase)
 		assert.Nil(t, got.Err().GetGpuFault())
 		assert.Equal(t, "UnknownError", got.Err().GetCode())
 	})
@@ -673,9 +789,114 @@ func TestClassifyGpuFailureIdentity(t *testing.T) {
 		pm.eventWatcher = watcher
 		pod := failedPod()
 		pod.UID = ""
-		got := pm.classifyGpuFailure(pod, phase)
+		got := pm.classifyGpuFailure(context.Background(), nil, pod, phase)
 		assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
 		assert.NotNil(t, got.Err().GetGpuFault())
+	})
+}
+
+func TestClassifyGpuFailureReportingNode(t *testing.T) {
+	base := time.Now().Add(-time.Minute)
+	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
+	phase := pluginsCore.PhaseInfoRetryableFailure("UnknownError", "Pod failed", nil)
+
+	classify := func(t *testing.T, pod *v1.Pod, event *eventInfo) pluginsCore.PhaseInfo {
+		t.Helper()
+		pm := NewPluginManager("test-plugin", nil, nil)
+		pm.eventWatcher = &fakeEventWatcher{events: map[watchedObjectKey][]*eventInfo{key: {event}}}
+		return pm.classifyGpuFailure(context.Background(), nil, pod, phase)
+	}
+	fault := gpuFaultEvent(79, gpufault.SeverityCritical, base)
+
+	t.Run("a fault reported from another node is not classified", func(t *testing.T) {
+		// The emitter can only record events for its own node, so this one was not
+		// written by the emitter that watched the pod's GPUs.
+		got := classify(t, failedPod(), reportedFrom(fault, otherNodeName))
+		assert.Equal(t, "UnknownError", got.Err().GetCode())
+		assert.Nil(t, got.Err().GetGpuFault())
+	})
+
+	t.Run("a fault that names no reporting node is not classified when the pod's node is known", func(t *testing.T) {
+		got := classify(t, failedPod(), reportedFrom(fault, ""))
+		assert.Equal(t, "UnknownError", got.Err().GetCode())
+		assert.Nil(t, got.Err().GetGpuFault())
+	})
+
+	t.Run("a pod that was never scheduled has no faults", func(t *testing.T) {
+		pod := failedPod()
+		pod.Spec.NodeName = ""
+		got := classify(t, pod, fault)
+		assert.Equal(t, "UnknownError", got.Err().GetCode())
+		assert.Nil(t, got.Err().GetGpuFault())
+	})
+
+	t.Run("a deleted pod takes the fault from whichever node reported it", func(t *testing.T) {
+		// The identity object of a pod that is already gone carries neither its UID nor
+		// its node, so the name match is all there is, the same trade as for the UID.
+		pod := failedPod()
+		pod.UID = ""
+		pod.Spec.NodeName = ""
+		got := classify(t, pod, reportedFrom(fault, otherNodeName))
+		assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
+		assert.NotNil(t, got.Err().GetGpuFault())
+	})
+}
+
+// TestAttachRecentObjectEventsGpuFault covers the fault carried as data on each attached
+// reason. It is set only when the event passes the same trust rule classification uses;
+// every other reason, a GPU fault message under some other reason included, has none.
+func TestAttachRecentObjectEventsGpuFault(t *testing.T) {
+	base := time.Now().Add(-time.Minute)
+	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
+	trusted := gpuFaultEvent(79, gpufault.SeverityCritical, base)
+	otherReason := gpuFaultEvent(79, gpufault.SeverityCritical, base.Add(time.Second))
+	otherReason.Reason = ordinaryReason
+	otherNode := reportedFrom(gpuFaultEvent(79, gpufault.SeverityCritical, base.Add(2*time.Second)), otherNodeName)
+	otherPodAt := base.Add(3 * time.Second)
+	otherPod := gpuFaultEventFor(79, gpufault.SeverityCritical, otherPodAt, otherPodAt, "some-other-pod-uid")
+	ordinaryAt := base.Add(4 * time.Second)
+	ordinary := &eventInfo{Message: "Pulling image", Reason: "Pulling", CreatedAt: ordinaryAt, RecordedAt: ordinaryAt}
+
+	attach := func(t *testing.T, resource client.Object) []pluginsCore.ReasonInfo {
+		t.Helper()
+		pm := NewPluginManager("test-plugin", nil, nil)
+		pm.eventWatcher = &fakeEventWatcher{events: map[watchedObjectKey][]*eventInfo{
+			key: {trusted, otherReason, otherNode, otherPod, ordinary},
+		}}
+		got, _, _ := pm.attachRecentObjectEvents(resource, pluginsCore.PhaseInfoRunning(1, &pluginsCore.TaskInfo{}),
+			k8s.PluginState{}, time.Time{}, time.Time{})
+		require.NotNil(t, got.Info())
+		reasons := got.Info().AdditionalReasons
+		require.Len(t, reasons, 5)
+		return reasons
+	}
+
+	t.Run("on a pod", func(t *testing.T) {
+		reasons := attach(t, failedPod())
+		require.NotNil(t, reasons[0].GpuFault)
+		assert.Equal(t, uint32(79), reasons[0].GpuFault.GetCode())
+		assert.Equal(t, testNodeName, reasons[0].GpuFault.GetNode())
+		for _, reason := range reasons[1:] {
+			assert.Nil(t, reason.GpuFault, reason.Reason)
+		}
+	})
+
+	t.Run("on a pod that was never scheduled", func(t *testing.T) {
+		pod := failedPod()
+		pod.Spec.NodeName = ""
+		for _, reason := range attach(t, pod) {
+			assert.Nil(t, reason.GpuFault, reason.Reason)
+		}
+	})
+
+	t.Run("on something that is not a pod", func(t *testing.T) {
+		resource := &v1.Service{
+			TypeMeta:   metav1.TypeMeta{Kind: "Pod", APIVersion: "v1"},
+			ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "pod", UID: testPodUID},
+		}
+		for _, reason := range attach(t, resource) {
+			assert.Nil(t, reason.GpuFault, reason.Reason)
+		}
 	})
 }
 
@@ -701,14 +922,6 @@ func TestClassifyGpuFailureSkips(t *testing.T) {
 			phaseInfo: pluginsCore.PhaseInfoSuccess(nil),
 		},
 		{
-			name: "the resource is not a pod",
-			resource: &v1.Service{
-				TypeMeta:   metav1.TypeMeta{Kind: "Pod", APIVersion: "v1"},
-				ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "pod"},
-			},
-			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("UnknownError", "Pod failed", nil),
-		},
-		{
 			name:      "there is no event watcher",
 			resource:  failedPod(),
 			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("UnknownError", "Pod failed", nil),
@@ -728,7 +941,7 @@ func TestClassifyGpuFailureSkips(t *testing.T) {
 				pm.eventWatcher = &fakeEventWatcher{events: events}
 			}
 
-			got := pm.classifyGpuFailure(tt.resource, tt.phaseInfo)
+			got := pm.classifyGpuFailure(context.Background(), nil, tt.resource, tt.phaseInfo)
 
 			assert.Equal(t, tt.phaseInfo.Phase(), got.Phase())
 			if tt.phaseInfo.Err() != nil {
@@ -795,4 +1008,332 @@ func TestAddObjectMetadata_ManagedLabel(t *testing.T) {
 
 		assert.Equal(t, flytek8s.ManagedLabelValue, pod.GetLabels()[flytek8s.ManagedLabelKey])
 	})
+}
+
+func TestClassifyExternalTermination(t *testing.T) {
+	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
+	base := time.Date(2026, 9, 18, 10, 0, 0, 0, time.UTC)
+	const kueueMessage = "Preempted to accommodate a workload (UID: 1234, JobUID: 5678) due to prioritization in the ClusterQueue"
+	const explained = "Pod was terminated by an external controller: " + kueueMessage
+
+	stopped := func(uid k8stypes.UID, at time.Time, message string) *eventInfo {
+		return &eventInfo{
+			Message: message, Reason: "Stopped", CreatedAt: at, RecordedAt: at, LastObservedAt: at, RegardingUID: uid,
+		}
+	}
+	terminatingPod := func() *v1.Pod {
+		pod := failedPod()
+		pod.Status.Conditions = []v1.PodCondition{{
+			Type:    v1.PodConditionType("TerminationTarget"),
+			Status:  v1.ConditionTrue,
+			Reason:  "WorkloadEvictedDueToPreempted",
+			Message: kueueMessage,
+		}}
+		return pod
+	}
+	// The identity pod is what the manager has when the pod is already gone: name and
+	// kind, but no UID and no status.
+	identityPod := func() *v1.Pod {
+		return &v1.Pod{
+			TypeMeta:   metav1.TypeMeta{Kind: "Pod", APIVersion: "v1"},
+			ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "pod"},
+		}
+	}
+	deletedInfo := &pluginsCore.TaskInfo{OccurredAt: &base}
+	const deletedMessage = "object [ns/pod] terminated unexpectedly in the background"
+	const goneMessage = "resource not found, name [ns/pod]"
+	deleted := func() pluginsCore.PhaseInfo {
+		return pluginsCore.PhaseInfoSystemRetryableFailure(codeUnexpectedObjectDeletion, deletedMessage, deletedInfo)
+	}
+	gone := func() pluginsCore.PhaseInfo {
+		return pluginsCore.PhaseInfoSystemRetryableFailure(codeResourceDeletedExternally, goneMessage, nil)
+	}
+
+	tests := []struct {
+		name        string
+		resource    client.Object
+		events      []*eventInfo
+		phaseInfo   pluginsCore.PhaseInfo
+		noWatcher   bool
+		wantCode    string
+		wantMessage string
+		wantInfo    *pluginsCore.TaskInfo
+	}{
+		{
+			name:        "a pod caught mid-deletion reports the controller's reason",
+			resource:    terminatingPod(),
+			phaseInfo:   deleted(),
+			wantCode:    "WorkloadEvictedDueToPreempted",
+			wantMessage: explained,
+			wantInfo:    deletedInfo,
+		},
+		{
+			name: "a pod a scheduler preempted reports the preemption",
+			resource: func() *v1.Pod {
+				pod := failedPod()
+				pod.Status.Conditions = []v1.PodCondition{{
+					Type:    v1.DisruptionTarget,
+					Status:  v1.ConditionTrue,
+					Reason:  v1.PodReasonPreemptionByScheduler,
+					Message: "Pod ns/pod was preempted by higher priority workload ns/other",
+				}}
+				return pod
+			}(),
+			phaseInfo:   deleted(),
+			wantCode:    v1.PodReasonPreemptionByScheduler,
+			wantMessage: "Pod was terminated by an external controller: Pod ns/pod was preempted by higher priority workload ns/other",
+			wantInfo:    deletedInfo,
+		},
+		{
+			name: "a pod that had failed before a drain reached it is left alone",
+			resource: func() *v1.Pod {
+				pod := failedPod()
+				pod.Annotations = map[string]string{flytek8s.PrimaryContainerKey: "primary"}
+				pod.Status.ContainerStatuses = []v1.ContainerStatus{{
+					Name: "primary",
+					State: v1.ContainerState{Terminated: &v1.ContainerStateTerminated{
+						ExitCode: 1, FinishedAt: metav1.NewTime(base),
+					}},
+				}}
+				pod.Status.Conditions = []v1.PodCondition{{
+					Type:               v1.DisruptionTarget,
+					Status:             v1.ConditionTrue,
+					Reason:             "EvictionByEvictionAPI",
+					LastTransitionTime: metav1.NewTime(base.Add(time.Minute)),
+				}}
+				return pod
+			}(),
+			phaseInfo: deleted(),
+		},
+		{
+			name:      "a pod mid-deletion without the condition is left alone",
+			resource:  failedPod(),
+			phaseInfo: deleted(),
+		},
+		{
+			name:        "a pod that is gone gets its Stopped event appended",
+			resource:    failedPod(),
+			events:      []*eventInfo{stopped(testPodUID, base, kueueMessage)},
+			phaseInfo:   gone(),
+			wantCode:    codeResourceDeletedExternally,
+			wantMessage: goneMessage + "; last event [Stopped]: " + kueueMessage,
+		},
+		{
+			name:     "the latest Stopped event wins",
+			resource: failedPod(),
+			events: []*eventInfo{
+				stopped(testPodUID, base.Add(time.Minute), kueueMessage),
+				stopped(testPodUID, base, "Not admitted by cluster queue"),
+			},
+			phaseInfo:   gone(),
+			wantCode:    codeResourceDeletedExternally,
+			wantMessage: goneMessage + "; last event [Stopped]: " + kueueMessage,
+		},
+		{
+			name:      "a Stopped event of another incarnation of the pod is not credited",
+			resource:  failedPod(),
+			events:    []*eventInfo{stopped("other-uid", base, kueueMessage)},
+			phaseInfo: gone(),
+		},
+		{
+			name:      "a Stopped event without a regarding UID is not trusted",
+			resource:  failedPod(),
+			events:    []*eventInfo{stopped("", base, kueueMessage)},
+			phaseInfo: gone(),
+		},
+		{
+			name:        "a pod whose UID is unknown takes the event on the name alone",
+			resource:    identityPod(),
+			events:      []*eventInfo{stopped("other-uid", base, kueueMessage)},
+			phaseInfo:   gone(),
+			wantCode:    codeResourceDeletedExternally,
+			wantMessage: goneMessage + "; last event [Stopped]: " + kueueMessage,
+		},
+		{
+			name:     "events other than Stopped are ignored",
+			resource: failedPod(),
+			events: []*eventInfo{{
+				Message: "Back-off restarting failed container", Reason: "BackOff",
+				CreatedAt: base, RecordedAt: base, LastObservedAt: base, RegardingUID: testPodUID,
+			}},
+			phaseInfo: gone(),
+		},
+		{
+			name:      "a failure the plugin classified itself is left alone",
+			resource:  terminatingPod(),
+			events:    []*eventInfo{stopped(testPodUID, base, kueueMessage)},
+			phaseInfo: pluginsCore.PhaseInfoSystemRetryableFailure("WorkloadEvictedDueToPreempted", explained+"\r\n[primary] terminated with exit code (137).", nil),
+		},
+		{
+			name:      "a user failure is left alone",
+			resource:  terminatingPod(),
+			phaseInfo: pluginsCore.PhaseInfoRetryableFailure("OOMKilled", "oom", nil),
+		},
+		{
+			name:      "a running task is left alone",
+			resource:  terminatingPod(),
+			phaseInfo: pluginsCore.PhaseInfoRunning(1, nil),
+		},
+		{
+			name: "the resource is not a pod",
+			resource: &v1.Service{
+				TypeMeta:   metav1.TypeMeta{Kind: "Pod", APIVersion: "v1"},
+				ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "pod"},
+			},
+			phaseInfo: deleted(),
+		},
+		{
+			name:      "there is no event watcher",
+			resource:  failedPod(),
+			events:    []*eventInfo{stopped(testPodUID, base, kueueMessage)},
+			phaseInfo: gone(),
+			noWatcher: true,
+		},
+		{
+			name:      "there is no resource",
+			resource:  nil,
+			phaseInfo: gone(),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pm := NewPluginManager("test-plugin", nil, nil)
+			if !tt.noWatcher {
+				pm.eventWatcher = &fakeEventWatcher{events: map[watchedObjectKey][]*eventInfo{key: tt.events}}
+			}
+
+			got := pm.classifyExternalTermination(tt.resource, tt.phaseInfo)
+
+			assert.Equal(t, tt.phaseInfo.Phase(), got.Phase())
+			if tt.wantCode == "" {
+				// Left alone: the failure, if any, is reported exactly as it came in.
+				if tt.phaseInfo.Err() == nil {
+					assert.Nil(t, got.Err())
+					return
+				}
+				assert.Equal(t, tt.phaseInfo.Err().GetCode(), got.Err().GetCode())
+				assert.Equal(t, tt.phaseInfo.Err().GetMessage(), got.Err().GetMessage())
+				assert.Equal(t, tt.phaseInfo.Err().GetKind(), got.Err().GetKind())
+				return
+			}
+			assert.Equal(t, tt.wantCode, got.Err().GetCode())
+			assert.Equal(t, tt.wantMessage, got.Err().GetMessage())
+			assert.Equal(t, core.ExecutionError_SYSTEM, got.Err().GetKind())
+			if tt.wantInfo != nil {
+				assert.Same(t, tt.wantInfo, got.Info())
+			}
+		})
+	}
+}
+
+// TestCheckResourcePhase_GracefulDeleteIsNotUnexpectedDeletion covers
+// https://github.com/flyteorg/flyte/issues/8066: a pod under a graceful delete carries a
+// DeletionTimestamp and stays non-terminal for its whole grace period, which is not a one-shot
+// condition. Reporting it as UnexpectedObjectDeletion (a SYSTEM-retryable failure) on every
+// reconcile drives the controller to reset plugin state and recreate a pod under the same name,
+// which collides with the still-terminating original (AlreadyExists) and livelocks. A pod that is
+// merely shutting down should be observed, not failed.
+func TestCheckResourcePhase_GracefulDeleteIsNotUnexpectedDeletion(t *testing.T) {
+	pod := failedPod()
+	pod.Status.Phase = v1.PodRunning
+	deletion := metav1.NewTime(time.Now())
+	pod.DeletionTimestamp = &deletion
+	// A real apiserver only carries a deletionTimestamp while at least one finalizer remains;
+	// the fake client enforces the same invariant.
+	pod.Finalizers = []string{"kubernetes"}
+
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pod).Build()
+
+	kubeClient := &pluginsCoreMock.KubeClient{}
+	kubeClient.EXPECT().GetClient().Return(fakeClient)
+
+	runningInfo := pluginsCore.PhaseInfoRunning(0, nil)
+	plugin := &k8sMocks.Plugin{}
+	plugin.EXPECT().GetTaskPhase(mock.Anything, mock.Anything, mock.Anything).Return(runningInfo, nil)
+
+	pm := NewPluginManager("test-plugin", plugin, kubeClient)
+
+	tCtx := &pluginsCoreMock.TaskExecutionContext{}
+	tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock(pod.Name))
+	queryObj := &v1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: pod.Namespace, Name: pod.Name}}
+	k8sState := &k8s.PluginState{}
+
+	transition, err := pm.checkResourcePhase(context.Background(), tCtx, queryObj, k8sState)
+	require.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRunning, transition.Info().Phase())
+	assert.NotEqual(t, "UnexpectedObjectDeletion", transition.Info().Err().GetCode())
+}
+
+// A plugin's reader lists only its namespace and, for pods, only this attempt's, on top of
+// whatever labels the plugin selects by itself.
+func TestCheckResourcePhase_PluginReaderIsScopedToTheAttempt(t *testing.T) {
+	attemptLabels := func(attempt string) map[string]string {
+		return map[string]string{
+			flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue,
+			flytek8s.RunLabel:        "run",
+			flytek8s.ActionLabel:     "a0",
+			flytek8s.AttemptLabel:    attempt,
+		}
+	}
+	pod := func(namespace, name, attempt, app string) *v1.Pod {
+		labels := attemptLabels(attempt)
+		labels["app"] = app
+		return &v1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: namespace, Name: name, Labels: labels}}
+	}
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(
+		pod("ns", "head", "2", "job"),
+		pod("ns", "worker", "2", "other"),
+		pod("ns", "head-attempt-1", "1", "job"),
+		pod("other-ns", "head", "2", "job"),
+		&v1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "unlabelled"}},
+	).Build()
+
+	tests := []struct {
+		name       string
+		taskLabels map[string]string
+		wantPods   []string
+	}{
+		{name: "attempt labels", taskLabels: attemptLabels("2"), wantPods: []string{"ns/head"}},
+		{name: "missing attempt labels", taskLabels: nil, wantPods: []string{"ns/head", "ns/head-attempt-1"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			kubeClient := &pluginsCoreMock.KubeClient{}
+			kubeClient.EXPECT().GetClient().Return(fakeClient)
+			meta := &pluginsCoreMock.TaskExecutionMetadata{}
+			meta.EXPECT().GetLabels().Return(tt.taskLabels)
+			tCtx := &pluginsCoreMock.TaskExecutionContext{}
+			tCtx.EXPECT().TaskExecutionMetadata().Return(meta)
+
+			var pods, configMaps []string
+			plugin := &k8sMocks.Plugin{}
+			plugin.EXPECT().GetTaskPhase(mock.Anything, mock.Anything, mock.Anything).RunAndReturn(
+				func(ctx context.Context, pCtx k8s.PluginContext, _ client.Object) (pluginsCore.PhaseInfo, error) {
+					podList := &v1.PodList{}
+					if err := pCtx.K8sReader().List(ctx, podList, client.MatchingLabels{"app": "job"}); err != nil {
+						return pluginsCore.PhaseInfoUndefined, err
+					}
+					for _, p := range podList.Items {
+						pods = append(pods, p.Namespace+"/"+p.Name)
+					}
+					cmList := &v1.ConfigMapList{}
+					if err := pCtx.K8sReader().List(ctx, cmList); err != nil {
+						return pluginsCore.PhaseInfoUndefined, err
+					}
+					for _, c := range cmList.Items {
+						configMaps = append(configMaps, c.Namespace+"/"+c.Name)
+					}
+					return pluginsCore.PhaseInfoRunning(0, nil), nil
+				})
+
+			pm := NewPluginManager("test-plugin", plugin, kubeClient)
+
+			queryObj := &v1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: "head"}}
+			_, err := pm.checkResourcePhase(context.Background(), tCtx, queryObj, &k8s.PluginState{})
+			require.NoError(t, err)
+			assert.ElementsMatch(t, tt.wantPods, pods)
+			assert.Equal(t, []string{"ns/unlabelled"}, configMaps)
+		})
+	}
 }

@@ -239,16 +239,16 @@ func (_c *ActionsClientInterface_ListChildActions_Call) RunAndReturn(run func(ct
 }
 
 // PutStatus provides a mock function for the type ActionsClientInterface
-func (_mock *ActionsClientInterface) PutStatus(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus) error {
-	ret := _mock.Called(ctx, actionID, attempt, status)
+func (_mock *ActionsClientInterface) PutStatus(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus, address *common.ActionAddress) error {
+	ret := _mock.Called(ctx, actionID, attempt, status, address)
 
 	if len(ret) == 0 {
 		panic("no return value specified for PutStatus")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, uint32, *workflow.ActionStatus) error); ok {
-		r0 = returnFunc(ctx, actionID, attempt, status)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, uint32, *workflow.ActionStatus, *common.ActionAddress) error); ok {
+		r0 = returnFunc(ctx, actionID, attempt, status, address)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -265,11 +265,12 @@ type ActionsClientInterface_PutStatus_Call struct {
 //   - actionID *common.ActionIdentifier
 //   - attempt uint32
 //   - status *workflow.ActionStatus
-func (_e *ActionsClientInterface_Expecter) PutStatus(ctx interface{}, actionID interface{}, attempt interface{}, status interface{}) *ActionsClientInterface_PutStatus_Call {
-	return &ActionsClientInterface_PutStatus_Call{Call: _e.mock.On("PutStatus", ctx, actionID, attempt, status)}
+//   - address *common.ActionAddress
+func (_e *ActionsClientInterface_Expecter) PutStatus(ctx interface{}, actionID interface{}, attempt interface{}, status interface{}, address interface{}) *ActionsClientInterface_PutStatus_Call {
+	return &ActionsClientInterface_PutStatus_Call{Call: _e.mock.On("PutStatus", ctx, actionID, attempt, status, address)}
 }
 
-func (_c *ActionsClientInterface_PutStatus_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus)) *ActionsClientInterface_PutStatus_Call {
+func (_c *ActionsClientInterface_PutStatus_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus, address *common.ActionAddress)) *ActionsClientInterface_PutStatus_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -287,11 +288,16 @@ func (_c *ActionsClientInterface_PutStatus_Call) Run(run func(ctx context.Contex
 		if args[3] != nil {
 			arg3 = args[3].(*workflow.ActionStatus)
 		}
+		var arg4 *common.ActionAddress
+		if args[4] != nil {
+			arg4 = args[4].(*common.ActionAddress)
+		}
 		run(
 			arg0,
 			arg1,
 			arg2,
 			arg3,
+			arg4,
 		)
 	})
 	return _c
@@ -302,7 +308,7 @@ func (_c *ActionsClientInterface_PutStatus_Call) Return(err error) *ActionsClien
 	return _c
 }
 
-func (_c *ActionsClientInterface_PutStatus_Call) RunAndReturn(run func(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus) error) *ActionsClientInterface_PutStatus_Call {
+func (_c *ActionsClientInterface_PutStatus_Call) RunAndReturn(run func(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus, address *common.ActionAddress) error) *ActionsClientInterface_PutStatus_Call {
 	_c.Call.Return(run)
 	return _c
 }

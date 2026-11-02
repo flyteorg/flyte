@@ -325,6 +325,11 @@ service:
   # extraPorts Additional ports to add to Flyte service
   extraPorts: []
 
+# telemetry Crash reports and usage counts Flyte sends to its maintainers, and the console's analytics tags.
+telemetry:
+  # -- Set to false to opt out. Sets DO_NOT_TRACK=1 (https://donottrack.sh) on the backend and the console; the backend passes it on to the task and app pods it creates.
+  enabled: true
+
 # console Configure the Flyte web console (flyteconsole v2)
 # The console is a static SPA served at `console.basePath` (default /v2). It has
 # no backend configuration of its own and talks to the Flyte API same-origin, so

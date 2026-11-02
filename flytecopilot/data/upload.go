@@ -12,6 +12,8 @@ import (
 
 	"github.com/golang/protobuf/proto" //nolint: staticcheck
 	"github.com/pkg/errors"
+	"golang.org/x/sync/errgroup"
+	"golang.org/x/sync/semaphore"
 
 	"github.com/flyteorg/flyte/v2/flyteidl2/clients/go/coreutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/futures"
@@ -22,6 +24,12 @@ import (
 
 const maxPrimitiveSize = 1024
 
+// maxConcurrentFileUploads caps how many files are uploaded at once across all of a task's outputs. The
+// storage client can hold a whole file in memory while uploading it (the S3 transfer manager reads up to
+// its multipart threshold into memory), so uploading every file of a large directory output at once can
+// exceed the sidecar's memory limit.
+const maxConcurrentFileUploads = 8
+
 type Unmarshal func(r io.Reader, msg proto.Message) error
 type Uploader struct {
 	format core.DataLoadingConfig_LiteralMapFormat
@@ -30,6 +38,8 @@ type Uploader struct {
 	store                   *storage.DataStore
 	aggregateOutputFileName string
 	errorFileName           string
+	// fileUploads bounds the number of files uploaded concurrently; it is shared by every output.
+	fileUploads *semaphore.Weighted
 }
 
 // RawContainerError is the failure raised by the raw container
@@ -113,31 +123,31 @@ func (u Uploader) handleBlobType(ctx context.Context, localPath string, toPath s
 			return nil, err
 		}
 
-		childCtx, cancel := context.WithCancel(ctx)
-		defer cancel()
-		fileUploader := make([]futures.Future, 0, len(files))
+		g, gCtx := errgroup.WithContext(ctx)
 		for _, f := range files {
-			pth := f.path
-			ref := f.ref
-			size := f.info.Size()
-			fileUploader = append(fileUploader, futures.NewAsyncFuture(childCtx, func(i2 context.Context) (i interface{}, e error) {
-				return nil, UploadFileToStorage(i2, pth, ref, size, u.store)
-			}))
+			g.Go(func() error {
+				return u.uploadFile(gCtx, f.path, f.ref, f.info.Size())
+			})
 		}
-
-		for _, f := range fileUploader {
-			// TODO maybe we should have timeouts, or we can have a global timeout at the top level
-			_, err := f.Get(ctx)
-			if err != nil {
-				return nil, err
-			}
+		// TODO maybe we should have timeouts, or we can have a global timeout at the top level
+		if err := g.Wait(); err != nil {
+			return nil, err
 		}
 
 		return coreutils.MakeLiteralForBlob(toPath, true, ""), nil
 	}
 	size := info.Size()
 	// Should we make this a go routine as well, so that we can introduce timeouts
-	return coreutils.MakeLiteralForBlob(toPath, false, ""), UploadFileToStorage(ctx, fpath, toPath, size, u.store)
+	return coreutils.MakeLiteralForBlob(toPath, false, ""), u.uploadFile(ctx, fpath, toPath, size)
+}
+
+// uploadFile uploads one file once a slot is free among the concurrent file uploads.
+func (u Uploader) uploadFile(ctx context.Context, filePath string, toPath storage.DataReference, size int64) error {
+	if err := u.fileUploads.Acquire(ctx, 1); err != nil {
+		return err
+	}
+	defer u.fileUploads.Release(1)
+	return UploadFileToStorage(ctx, filePath, toPath, size, u.store)
 }
 
 func (u Uploader) RecursiveUpload(ctx context.Context, vars *core.VariableMap, fromPath string, metaOutputPath, dataRawPath storage.DataReference) error {
@@ -228,5 +238,6 @@ func NewUploader(_ context.Context, store *storage.DataStore, format core.DataLo
 		store:         store,
 		errorFileName: errorFileName,
 		mode:          mode,
+		fileUploads:   semaphore.NewWeighted(maxConcurrentFileUploads),
 	}
 }

@@ -117,6 +117,16 @@ func TestGetPhaseInfo(t *testing.T) {
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
+
+	jobSuspended := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobSuspended,
+	}
+	taskPhase, err = GetPhaseInfo(jobSuspended, time.Now(), pluginsCore.TaskInfo{})
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
+	assert.Equal(t, "Suspended", taskPhase.Reason())
+	assert.NotNil(t, taskPhase.Info())
+	assert.Nil(t, err)
 }
 
 func TestGetMPIPhaseInfo(t *testing.T) {
@@ -162,6 +172,16 @@ func TestGetMPIPhaseInfo(t *testing.T) {
 	taskPhase, err = GetMPIPhaseInfo(jobRestarting, time.Now(), pluginsCore.TaskInfo{})
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
+	assert.NotNil(t, taskPhase.Info())
+	assert.Nil(t, err)
+
+	jobSuspended := kubeflowv1.JobCondition{
+		Type: kubeflowv1.JobSuspended,
+	}
+	taskPhase, err = GetMPIPhaseInfo(jobSuspended, time.Now(), pluginsCore.TaskInfo{})
+	assert.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
+	assert.Equal(t, "Suspended", taskPhase.Reason())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 }

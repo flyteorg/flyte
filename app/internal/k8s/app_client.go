@@ -24,10 +24,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/v2/app/internal/config"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
 	secretUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/telemetry"
 	"github.com/flyteorg/flyte/v2/flytestdlib/utils"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	flytecore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -559,6 +561,13 @@ func specSHA(specBytes []byte) string {
 	return hex.EncodeToString(sum[:8]) // 8 bytes = 16 hex chars, enough for change detection
 }
 
+// AppleSiliconWorkloadID scopes an Apple Silicon app's host workload to one revision of its spec. During a
+// rollout the new revision's pods then get their own host process instead of the old revision's, and an old
+// pod shutting down can't tear down the new revision's. Replicas of one revision share the host process.
+func AppleSiliconWorkloadID(name, specSHA string) string {
+	return "app-" + name + "-" + specSHA
+}
+
 // buildKService constructs a Knative Service manifest from an App proto.
 func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, error) {
 	appID := app.GetMetadata().GetId()
@@ -575,6 +584,13 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 	podSpec, err := buildPodSpec(spec)
 	if err != nil {
 		return nil, err
+	}
+	// Apple Silicon apps run their ML work on the devbox host's Metal GPU via the Apple Silicon
+	// bridge; on any backend without one this fails the deploy with APPLE_SILICON_NOT_AVAILABLE.
+	if flytek8s.IsAppleSilicon(spec.GetExtendedResources().GetGpuAccelerator()) && len(podSpec.Containers) > 0 {
+		if err := flytek8s.ApplyAppleSiliconBridge(&podSpec, primaryContainerName(spec, podSpec), AppleSiliconWorkloadID(name, sha)); err != nil {
+			return nil, err
+		}
 	}
 	if sa := spec.GetSecurityContext().GetRunAs().GetK8SServiceAccount(); sa != "" {
 		podSpec.ServiceAccountName = sa
@@ -606,6 +622,17 @@ func (c *AppK8sClient) buildKService(app *flyteapp.App) (*servingv1.Service, err
 			corev1.EnvVar{Name: "FLYTE_INTERNAL_EXECUTION_PROJECT", Value: appID.GetProject()},
 			corev1.EnvVar{Name: "FLYTE_INTERNAL_EXECUTION_DOMAIN", Value: appID.GetDomain()},
 		)
+		// A deployment that opted out of telemetry opts out its apps too. Last,
+		// replacing any value the app's own env set, so it cannot undo it.
+		if telemetry.Disabled() {
+			env := podSpec.Containers[0].Env[:0]
+			for _, ev := range podSpec.Containers[0].Env {
+				if ev.Name != telemetry.DisableEnvVar {
+					env = append(env, ev)
+				}
+			}
+			podSpec.Containers[0].Env = append(env, corev1.EnvVar{Name: telemetry.DisableEnvVar, Value: "1"})
+		}
 	}
 
 	templateAnnotations := buildAutoscalingAnnotations(spec, c.cfg)
@@ -720,6 +747,15 @@ func buildPodSpec(spec *flyteapp.Spec) (corev1.PodSpec, error) {
 	default:
 		return corev1.PodSpec{}, fmt.Errorf("app spec has no payload (container or pod required)")
 	}
+}
+
+// primaryContainerName returns the app's serving container: the one a K8sPod payload names, or
+// the first container otherwise.
+func primaryContainerName(spec *flyteapp.Spec, podSpec corev1.PodSpec) string {
+	if name := spec.GetPod().GetPrimaryContainerName(); name != "" {
+		return name
+	}
+	return podSpec.Containers[0].Name
 }
 
 // buildResourceRequirements maps flyteidl2 Resources to corev1.ResourceRequirements.

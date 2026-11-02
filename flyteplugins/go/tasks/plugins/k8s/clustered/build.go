@@ -15,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	stdutils "github.com/flyteorg/flyte/v2/flytestdlib/utils"
 	clusteredpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
 
@@ -28,7 +29,7 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	}
 
 	var spec clusteredpb.ClusteredTaskSpec
-	if err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &spec); err != nil { //nolint:staticcheck
+	if err = stdutils.UnmarshalStructToPb(taskTemplate.GetCustom(), &spec); err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid ClusteredTaskSpec: %v", err)
 	}
 
@@ -62,7 +63,10 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	objectMeta.Labels = utils.UnionMaps(cfg.DefaultLabels, objectMeta.Labels,
 		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 	objectMeta.Annotations = utils.UnionMaps(cfg.DefaultAnnotations, objectMeta.Annotations,
-		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
+		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()),
+		// Applied last, naming the container doing the task's own work on every child pod,
+		// so a reader can tell it from an injected sidecar that may outlive it.
+		map[string]string{flytek8s.PrimaryContainerKey: primaryContainerName})
 
 	// The SDK is responsible for setting container.Command to the entrypoint module
 	// (python -m flyte.distributed._entrypoint) at serde time. The plugin stays

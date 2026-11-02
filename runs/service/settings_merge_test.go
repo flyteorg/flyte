@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 )
 
@@ -259,5 +260,120 @@ func TestMergeSettingsHandlesEveryField(t *testing.T) {
 		name := string(fields.Get(i).Name())
 		assert.Truef(t, handled[name],
 			"Settings field %q is not handled by mergeSettings; add it there, then add it to this list", name)
+	}
+}
+
+func accel(state settings.SettingState, device string) *settings.AcceleratorSetting {
+	s := &settings.AcceleratorSetting{State: state}
+	if device != "" {
+		s.AcceleratorValue = &core.GPUAccelerator{Device: device}
+	}
+	return s
+}
+
+func TestMergeTaskResourceSettings_DefaultAccelerator(t *testing.T) {
+	t.Run("the most specific level that set it wins", func(t *testing.T) {
+		got := mergeTaskResourceSettings([]*settings.TaskResourceSettings{
+			{DefaultAccelerator: accel(stateValue, "nvidia-t4")},
+			nil,
+			{DefaultAccelerator: accel(stateValue, "nvidia-h100")},
+		})
+		require.NotNil(t, got)
+		assert.Equal(t, "nvidia-h100", got.GetDefaultAccelerator().GetAcceleratorValue().GetDevice())
+		assert.Equal(t, levelProject, got.GetDefaultAccelerator().GetScopeLevel())
+	})
+
+	t.Run("inherited from the org when nothing below sets it", func(t *testing.T) {
+		got := mergeTaskResourceSettings([]*settings.TaskResourceSettings{
+			{DefaultAccelerator: accel(stateValue, "nvidia-t4")},
+			{DefaultAccelerator: accel(settings.SettingState_SETTING_STATE_INHERIT, "")},
+			nil,
+		})
+		assert.Equal(t, "nvidia-t4", got.GetDefaultAccelerator().GetAcceleratorValue().GetDevice())
+		assert.Equal(t, levelOrg, got.GetDefaultAccelerator().GetScopeLevel())
+	})
+
+	t.Run("UNSET below blocks a value set above", func(t *testing.T) {
+		got := mergeTaskResourceSettings([]*settings.TaskResourceSettings{
+			{DefaultAccelerator: accel(stateValue, "nvidia-t4")},
+			{DefaultAccelerator: accel(settings.SettingState_SETTING_STATE_UNSET, "")},
+			nil,
+		})
+		assert.Equal(t, settings.SettingState_SETTING_STATE_UNSET, got.GetDefaultAccelerator().GetState())
+		assert.Nil(t, got.GetDefaultAccelerator().GetAcceleratorValue())
+	})
+
+	t.Run("a group holding only the accelerator is not dropped", func(t *testing.T) {
+		got := mergeTaskResourceSettings([]*settings.TaskResourceSettings{
+			{DefaultAccelerator: accel(stateValue, "nvidia-l4")},
+		})
+		require.NotNil(t, got)
+		assert.Equal(t, "nvidia-l4", got.GetDefaultAccelerator().GetAcceleratorValue().GetDevice())
+	})
+}
+
+func TestMergeAppSettings_AppDnsStrategy(t *testing.T) {
+	t.Run("a group holding only the DNS strategy is not dropped", func(t *testing.T) {
+		got := mergeAppSettings([]*settings.AppSettings{
+			{AppDnsStrategy: str(stateValue, "dataplane_specific")},
+		})
+		require.NotNil(t, got)
+		assert.Equal(t, "dataplane_specific", got.GetAppDnsStrategy().GetStringValue())
+		assert.Equal(t, levelOrg, got.GetAppDnsStrategy().GetScopeLevel())
+	})
+
+	t.Run("inherited from the org next to a disallow_anonymous set on the project", func(t *testing.T) {
+		got := mergeAppSettings([]*settings.AppSettings{
+			{AppDnsStrategy: str(stateValue, "dataplane_specific")},
+			nil,
+			{DisallowAnonymous: &settings.BoolSetting{State: stateValue, BoolValue: true}},
+		})
+		assert.Equal(t, "dataplane_specific", got.GetAppDnsStrategy().GetStringValue())
+		assert.Equal(t, levelOrg, got.GetAppDnsStrategy().GetScopeLevel())
+		assert.True(t, got.GetDisallowAnonymous().GetBoolValue())
+		assert.Equal(t, levelProject, got.GetDisallowAnonymous().GetScopeLevel())
+	})
+
+	t.Run("UNSET below blocks a value set above", func(t *testing.T) {
+		got := mergeAppSettings([]*settings.AppSettings{
+			{AppDnsStrategy: str(stateValue, "dataplane_specific")},
+			{AppDnsStrategy: str(settings.SettingState_SETTING_STATE_UNSET, "")},
+		})
+		assert.Equal(t, settings.SettingState_SETTING_STATE_UNSET, got.GetAppDnsStrategy().GetState())
+		assert.Empty(t, got.GetAppDnsStrategy().GetStringValue())
+	})
+}
+
+// TestMergeAppSettingsHandlesEveryField fails when a field is added to AppSettings
+// without being handled in mergeAppSettings.
+func TestMergeAppSettingsHandlesEveryField(t *testing.T) {
+	handled := map[string]bool{
+		"disallow_anonymous": true,
+		"app_dns_strategy":   true,
+	}
+
+	fields := (&settings.AppSettings{}).ProtoReflect().Descriptor().Fields()
+	for i := 0; i < fields.Len(); i++ {
+		name := string(fields.Get(i).Name())
+		assert.Truef(t, handled[name],
+			"AppSettings field %q is not handled by mergeAppSettings; add it there, then add it to this list", name)
+	}
+}
+
+// TestMergeTaskResourceSettingsHandlesEveryField fails when a field is added to
+// TaskResourceSettings without being handled in mergeTaskResourceSettings.
+func TestMergeTaskResourceSettingsHandlesEveryField(t *testing.T) {
+	handled := map[string]bool{
+		"min":                   true,
+		"max":                   true,
+		"mirror_limits_request": true,
+		"default_accelerator":   true,
+	}
+
+	fields := (&settings.TaskResourceSettings{}).ProtoReflect().Descriptor().Fields()
+	for i := 0; i < fields.Len(); i++ {
+		name := string(fields.Get(i).Name())
+		assert.Truef(t, handled[name],
+			"TaskResourceSettings field %q is not handled by mergeTaskResourceSettings; add it there, then add it to this list", name)
 	}
 }

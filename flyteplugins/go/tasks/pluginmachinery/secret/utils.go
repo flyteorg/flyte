@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	corev1 "k8s.io/api/core/v1"
@@ -30,6 +31,39 @@ const (
 	secretNameInvalidNotEnoughPartsMsg  = "secret name has an invalid format: not enough parts"
 	secretNameInvalidUnexpectedPartsMsg = "secret name has an invalid format: unexpected parts"
 )
+
+// EagerSecretKey is the pod-facing secret key of the API key that eager tasks use to call back
+// into the platform. It is provisioned once per cluster, so its storage name is cluster-qualified
+// (see ClusterScopedSecretName) while the key requested by tasks, and therefore the injected env
+// var, stays fixed.
+const EagerSecretKey = "EAGER_API_KEY" // #nosec G101
+
+// ClusterScopedSecretKeys lists the pod-facing secret keys that are provisioned per cluster rather
+// than per org/domain/project. When EmbeddedSecretManagerConfig.ClusterName is set, the embedded
+// secret manager resolves these keys under ClusterScopedSecretName first and falls back to the
+// unqualified name, so secrets written before cluster scoping (or by clusters without a configured
+// name) keep resolving.
+var ClusterScopedSecretKeys = []string{EagerSecretKey}
+
+// IsClusterScopedSecretKey reports whether key is one of ClusterScopedSecretKeys.
+func IsClusterScopedSecretKey(key string) bool {
+	return slices.Contains(ClusterScopedSecretKeys, key)
+}
+
+// ClusterScopedSecretName qualifies a secret's storage name with the cluster it belongs to.
+// Clusters can share one secret backend, so a per-cluster storage name keeps them from
+// overwriting each other's copy of a per-cluster secret. An empty clusterName returns name
+// unchanged.
+//
+// The format (name + "-" + clusterName) is shared by the writer that provisions the secret and
+// by the webhook that reads it, so it must not change. The '-' delimiter is safe because encoded
+// secret names are field-separated by "__".
+func ClusterScopedSecretName(name, clusterName string) string {
+	if clusterName == "" {
+		return name
+	}
+	return name + "-" + clusterName
+}
 
 // If env var exists in the existing list of envVars then return the index for it or else return -1
 func hasEnvVar(envVars []corev1.EnvVar, envVarKey string) int {

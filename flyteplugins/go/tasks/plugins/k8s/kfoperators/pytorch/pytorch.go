@@ -10,6 +10,7 @@ import (
 	"github.com/samber/lo"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -31,6 +32,10 @@ type pytorchOperatorResourceHandler struct {
 
 // Sanity test that the plugin implements method of k8s.Plugin
 var _ k8s.Plugin = pytorchOperatorResourceHandler{}
+
+// The job's replica pods are where a node daemon records what the hardware did, so the
+// framework has to be able to find them from the CR this plugin tracks.
+var _ k8s.ChildPodDiscovery = pytorchOperatorResourceHandler{}
 
 func (pytorchOperatorResourceHandler) GetProperties() k8s.PluginProperties {
 	return k8s.PluginProperties{}
@@ -210,7 +215,8 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginCo
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
-	if app.Status.StartTime == nil && app.CreationTimestamp.Add(common.GetConfig().Timeout.Duration).Before(time.Now()) {
+	isSuspended := app.Spec.RunPolicy.Suspend != nil && *app.Spec.RunPolicy.Suspend
+	if !isSuspended && app.Status.StartTime == nil && app.CreationTimestamp.Add(common.GetConfig().Timeout.Duration).Before(time.Now()) {
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("kubeflow operator hasn't updated the pytorch custom resource since creation time %v", app.CreationTimestamp)
 	}
 	currentCondition, err := common.ExtractCurrentCondition(app.Status.Conditions)
@@ -221,7 +227,7 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginCo
 	occurredAt := time.Now()
 	statusDetails, _ := utils.MarshalObjToStruct(app.Status) //nolint: staticcheck
 	podList := &v1.PodList{}
-	err = pluginContext.K8sReader().List(ctx, podList)
+	err = pluginContext.K8sReader().List(ctx, podList, client.MatchingLabels{kubeflowv1.JobNameLabel: app.Name})
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("failed to list pytorch execution pods. Error: %w", err)
 	}
@@ -285,6 +291,20 @@ func (pytorchOperatorResourceHandler) IsTerminal(_ context.Context, resource cli
 		}
 	}
 	return false, nil
+}
+
+// ChildPods implements k8s.ChildPodDiscovery. The pods that run the task are the replica
+// pods the training operator expands from the templates this plugin built, which the
+// framework tracks nothing of, since it tracks the PyTorchJob.
+func (pytorchOperatorResourceHandler) ChildPods(
+	ctx context.Context,
+	taskCtx pluginsCore.TaskExecutionMetadata,
+	resource client.Object,
+) (labels.Selector, error) {
+	if _, ok := resource.(*kubeflowv1.PyTorchJob); !ok {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "expected a PyTorchJob, got %T", resource)
+	}
+	return common.ChildPods(ctx, taskCtx, resource)
 }
 
 // GetCompletionTime returns the completion time of the PyTorchJob
