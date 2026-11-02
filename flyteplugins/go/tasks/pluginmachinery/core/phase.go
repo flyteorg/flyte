@@ -101,6 +101,11 @@ type ReasonInfo struct {
 	// KubernetesEvent carries structured metadata about the Kubernetes object event this reason
 	// originated from, when applicable.
 	KubernetesEvent *K8sEventMetadata
+	// GpuFault is the GPU fault this reason reports, as data. It is set only for an event
+	// whose fault passed the trust rule in gpufault.FromPodEvent, so a consumer can rely on
+	// it without reading the reason text, and should not look for a fault in the text when
+	// it is unset.
+	GpuFault *core.GpuFault
 }
 
 // K8sEventMetadata describes the Kubernetes object event a reason originated from.

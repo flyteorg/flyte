@@ -27,6 +27,24 @@ message ClusterPoolIdentifier {
   string name = 2;
 }
 
+// Identifies a queue. Queues can be scoped to an org, a domain or a project, and
+// a lookup resolves to the narrowest-scoped queue with this name: the
+// project's, then the domain's, then the org's.
+message QueueIdentifier {
+  option (buf.validate.message).cel = {
+    id: "queue_identifier.domain_project_combination"
+    message: "project requires domain to be specified"
+    expression: "!(this.domain == '' && this.project != '')"
+  };
+
+  string organization = 1;
+  // Optional domain scope. Empty resolves org-wide queues only.
+  string domain = 2;
+  // Optional project scope; requires domain. Empty resolves domain-wide (if domain is set) or org-wide queues only.
+  string project = 3;
+  string name = 4 [(buf.validate.field).string.min_len = 1];
+}
+
 message ClusterConfigIdentifier {
   string organization = 1 [(buf.validate.field).string.min_len = 1];
   string id = 2 [(buf.validate.field).string.min_len = 1];

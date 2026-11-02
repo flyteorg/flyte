@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.workflow;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/common/address.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/phase.proto";
 import "flyteidl2/core/execution.proto";
@@ -108,4 +109,9 @@ message ActionUpdate {
 
   // The value literal for the action (used by condition actions).
   optional flyteidl2.core.Literal value = 5;
+
+  // Where the running action can be reached, as reported by its worker (`UpdateRequest.address`).
+  // Set while the current attempt serves traffic; absent once a newer attempt starts, the action's
+  // pod is relaunched, or the action is terminal.
+  flyteidl2.common.ActionAddress address = 6;
 }

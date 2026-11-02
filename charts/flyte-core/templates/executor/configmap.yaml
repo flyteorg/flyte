@@ -24,7 +24,6 @@ data:
       {{- tpl (toYaml .) $ | nindent 6 }}
       {{- end }}
     webhook:
-      localCert: true
       secretName: {{ include "flyte-core.webhookSecretName" . }}
       serviceName: {{ include "flyte-core.componentName" (dict "root" . "component" "executor") }}
       servicePort: {{ .Values.configuration.webhook.listenPort }}

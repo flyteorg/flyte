@@ -97,3 +97,25 @@ func TestNewTaskExecutionContext_Retry_PreviousAndCurrentDontCollide(t *testing.
 	assert.True(t, strings.HasPrefix(curr, "s3://bucket/"),
 		"current checkpoint must live under RunOutputBase bucket; got %q", curr)
 }
+
+// A retry must read the checkpoint where the previous attempt wrote it, which
+// is under Spec.RawDataPrefix when set.
+func TestNewTaskExecutionContext_Retry_PreviousCheckpointFollowsRawDataPrefix(t *testing.T) {
+	ds := newTestDataStore(t)
+	newAction := func(attempts uint32) *flyteorgv1.TaskAction {
+		ta := minimalTaskAction("flyte", "my-action-abc", "s3://bucket/run", "action-0", attempts)
+		ta.Namespace, ta.Name = "flyte", "my-action-abc"
+		ta.Spec.Project, ta.Spec.Domain, ta.Spec.RunName = "proj", "dev", "run"
+		ta.Spec.RawDataPrefix = "s3://raw-bucket/team"
+		return ta
+	}
+
+	first, err := NewTaskExecutionContext(newAction(1), ds, nil, nil, nil, nil)
+	require.NoError(t, err)
+	retry, err := NewTaskExecutionContext(newAction(2), ds, nil, nil, nil, nil)
+	require.NoError(t, err)
+
+	written := first.OutputWriter().GetCheckpointPrefix()
+	assert.True(t, strings.HasPrefix(string(written), "s3://raw-bucket/"), written)
+	assert.Equal(t, written, retry.OutputWriter().GetPreviousCheckpointsPrefix())
+}

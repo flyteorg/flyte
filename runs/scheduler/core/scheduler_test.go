@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	cron "github.com/robfig/cron/v3"
@@ -142,17 +143,19 @@ func TestUpdateSchedules_NoImmediateFireForPastBaseline(t *testing.T) {
 // counterpart: start the cron loop, register a trigger with a past baseline, and
 // assert the executor is not invoked promptly (the next hourly tick is far away).
 func TestUpdateSchedules_RunningSchedulerDoesNotFireImmediately(t *testing.T) {
-	exec := &recordingExecutor{}
-	s := NewGoCronScheduler(exec)
-	s.Start()
-	defer s.Stop()
+	synctest.Test(t, func(t *testing.T) {
+		exec := &recordingExecutor{}
+		s := NewGoCronScheduler(exec)
+		s.Start()
+		defer s.Stop()
 
-	trig := newCronTrigger(t, "k1", "0 * * * *", "", time.Now().Add(-10*time.Minute))
-	s.UpdateSchedules(context.Background(), []*models.Trigger{trig})
+		trig := newCronTrigger(t, "k1", "0 * * * *", "", time.Now().Add(-10*time.Minute))
+		s.UpdateSchedules(context.Background(), []*models.Trigger{trig})
 
-	// Give the run loop time to process the newly added entry. With the past
-	// baseline used verbatim it fired within milliseconds; the next real tick is
-	// up to an hour away, so no execution should happen here.
-	time.Sleep(300 * time.Millisecond)
-	assert.Equal(t, 0, exec.count(), "trigger must not fire immediately on registration")
+		// Let the run loop process the newly added entry. With the past baseline
+		// used verbatim it fired within milliseconds; the next real tick is up to
+		// an hour away, so no execution should happen here.
+		synctest.Sleep(300 * time.Millisecond)
+		assert.Equal(t, 0, exec.count(), "trigger must not fire immediately on registration")
+	})
 }

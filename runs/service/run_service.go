@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -291,6 +292,9 @@ func (s *RunService) CreateRun(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 	applyRunSettings(runSpec, resolveSettings)
+	if err := validatePodTemplateName(runSpec.GetDefaultSettings().GetPodTemplateName()); err != nil {
+		return nil, err
+	}
 
 	// Stamp the run start time, but only for SDKs that understand it (>= 2.3.6) — older task
 	// templates have no {{.runStartTime}} placeholder, so leaving it unset keeps the executor from
@@ -315,9 +319,6 @@ func (s *RunService) CreateRun(
 	}
 	inputPrefix := buildInputPrefix(runBase, runId.GetProject(), runId.GetDomain(), runId.GetName())
 	runOutputBase := buildRunOutputBase(runBase, runId.GetProject(), runId.GetDomain(), runId.GetName())
-	if runSpec.GetRawDataStorage() == nil || runSpec.GetRawDataStorage().GetRawDataPrefix() == "" {
-		runSpec.RawDataStorage = &task.RawDataStorage{RawDataPrefix: s.storagePrefix}
-	}
 
 	cacheKey := ""
 	switch iw := request.GetInputWrapper().(type) {
@@ -784,8 +785,7 @@ func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.Actio
 	reportURI := ""
 	lastEvent := events[len(events)-1]
 	var logContext *core.LogContext
-	for i := len(events) - 1; i >= 0; i-- {
-		event := events[i]
+	for _, event := range slices.Backward(events) {
 		if event.GetLogContext() != nil && logContext == nil {
 			logContext = event.GetLogContext()
 			streamingLogsAvailable = true
@@ -799,9 +799,9 @@ func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.Actio
 		if reportURI == "" && event.GetOutputs().GetReportUri() != "" {
 			reportURI = event.GetOutputs().GetReportUri()
 		}
-		phase := events[i].GetPhase()
+		phase := event.GetPhase()
 		if IsTerminalPhase(phase) {
-			lastEvent = events[i]
+			lastEvent = event
 		}
 	}
 
@@ -946,8 +946,24 @@ func (s *RunService) ListRuns(
 		scopeFilter = scopeFilter.And(impl.NewHasPausedActionFilter())
 	}
 
+	// The console's run search box arrives as a filter on the synthetic "search" field
+	// (run name OR task name). Resolve it here and AND it onto the scope filter: the
+	// generic parser below validates fields against the action column allow-list and
+	// would reject it.
+	listReq := req.Msg.Request
+	searchFilter, remainingFilters, err := impl.SplitSearchFilters(listReq.GetFilters())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+	if searchFilter != nil {
+		scopeFilter = scopeFilter.And(searchFilter)
+		// Clone so the caller's request is not mutated when the search filter is stripped.
+		listReq = proto.Clone(listReq).(*common.ListRequest)
+		listReq.Filters = remainingFilters
+	}
+
 	// Parse pagination, sort, and user-supplied filters from the common ListRequest.
-	listInput, err := impl.NewListResourceInputFromProto(req.Msg.Request, models.ActionColumnsSet)
+	listInput, err := impl.NewListResourceInputFromProto(listReq, models.ActionColumnsSet)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
@@ -991,6 +1007,12 @@ func (s *RunService) ListActions(
 	ctx context.Context,
 	req *connect.Request[workflow.ListActionsRequest],
 ) (*connect.Response[workflow.ListActionsResponse], error) {
+	if req.Msg.GetRunId() == nil && req.Msg.GetQueueId() == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("a run_id or queue_id scope is required"))
+	}
+	if req.Msg.GetQueueId() != nil {
+		return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("queue-scoped action listing is not supported by this service"))
+	}
 	logger.Infof(ctx, "Received ListActions request")
 
 	if err := req.Msg.Validate(); err != nil {
@@ -1001,7 +1023,7 @@ func (s *RunService) ListActions(
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
-	runFilter := interfaces.Filter(impl.NewRunActionsFilter(req.Msg.RunId))
+	runFilter := interfaces.Filter(impl.NewRunActionsFilter(req.Msg.GetRunId()))
 	if listInput.Filter == nil {
 		listInput.Filter = runFilter
 	} else {
