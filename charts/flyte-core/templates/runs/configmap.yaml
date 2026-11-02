@@ -15,6 +15,11 @@ data:
     {{- include "flyte-core.config.logger" . | nindent 4 }}
     runs:
       {{- tpl (toYaml .Values.configuration.runs) . | nindent 6 }}
+    {{- /* Not passed through tpl: the template's {{ project }} placeholders are Flyte's, not Helm's. */}}
+    {{- with .Values.configuration.namespaceMapping }}
+    namespaceMapping:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
   002-database.yaml: |
     {{- include "flyte-core.config.database" . | nindent 4 }}
     {{- $database := deepCopy .Values.configuration.database }}

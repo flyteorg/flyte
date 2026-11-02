@@ -12,6 +12,7 @@ import (
 	"github.com/flyteorg/flyte/v2/actions/service"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/namespaceutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
@@ -51,6 +52,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 	runClient := workflowconnect.NewInternalRunServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
 
+	nsCfg := namespaceutils.GetConfig()
 	actionsClient, err := actionsk8s.NewActionsClient(
 		sc.K8sClient,
 		sc.K8sCache,
@@ -60,6 +62,8 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		runClient,
 		cfg.RecordFilterSize,
 		sc.Scope,
+		nsCfg.Template,
+		nsCfg.CreateNamespaces,
 	)
 	if err != nil {
 		return fmt.Errorf("actions: failed to create actions client: %w", err)
