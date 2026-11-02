@@ -50,7 +50,7 @@ var (
 			MaxIdleConnsPerHost: 1024,
 			IdleConnTimeout:     config.Duration{Duration: 90 * time.Second},
 		},
-		MultiContainerEnabled: false,
+		MultiContainerEnabled: true,
 	}
 )
 
