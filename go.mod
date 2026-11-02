@@ -37,7 +37,7 @@ require (
 	github.com/golang/protobuf v1.5.4
 	github.com/googleapis/gax-go/v2 v2.27.0
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.1.1
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.32.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.33.0
 	github.com/hashicorp/golang-lru v1.0.2
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/imdario/mergo v0.3.16
@@ -84,7 +84,7 @@ require (
 	golang.org/x/time v0.16.0
 	golang.org/x/tools v0.52.0
 	google.golang.org/api v0.308.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20261012220534-4341edf3f941
+	google.golang.org/genproto/googleapis/api v0.0.0-20261026165753-2ffab32bce7e
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b
 	google.golang.org/grpc v1.85.0
 	google.golang.org/protobuf v1.36.12
@@ -156,8 +156,8 @@ require (
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-logr/zapr v1.3.0 // indirect
-	github.com/go-openapi/jsonpointer v1.0.1 // indirect
-	github.com/go-openapi/jsonreference v1.0.2 // indirect
+	github.com/go-openapi/jsonpointer v1.0.2 // indirect
+	github.com/go-openapi/jsonreference v1.0.3 // indirect
 	github.com/go-openapi/swag v0.29.2 // indirect
 	github.com/go-openapi/swag/cmdutils v0.29.2 // indirect
 	github.com/go-openapi/swag/conv v0.29.2 // indirect
