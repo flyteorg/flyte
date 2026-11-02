@@ -4,6 +4,7 @@ package flyteidl2.dataproxy;
 
 import "buf/validate/validate.proto";
 import "flyteidl2/app/app_definition.proto";
+import "flyteidl2/artifact/artifact.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/run.proto";
 import "flyteidl2/logs/dataplane/payload.proto";
@@ -22,6 +23,11 @@ enum ArtifactType {
   ARTIFACT_TYPE_REPORT = 1;
   // ARTIFACT_TYPE_CODE_BUNDLE refers to the code bundle (tarball) generated for an action.
   ARTIFACT_TYPE_CODE_BUNDLE = 2;
+  // ARTIFACT_TYPE_CARD refers to an artifact's card (model or data card document). Only valid with artifact_id.
+  ARTIFACT_TYPE_CARD = 3;
+  // ARTIFACT_TYPE_VALUE refers to the data of an artifact's value: the object of a file (single blob) or every
+  // object under a directory (multipart blob). Only valid with artifact_id.
+  ARTIFACT_TYPE_VALUE = 4;
 }
 
 // DataProxyService provides an interface for managing data uploads and downloads.
@@ -189,6 +195,10 @@ message CreateDownloadLinkRequest {
     common.ActionAttemptIdentifier action_attempt_id = 3;
     flyteidl2.app.Identifier app_id = 4;
     flyteidl2.task.TaskIdentifier task_id = 5;
+    // ArtifactId identifies the artifact whose card (ARTIFACT_TYPE_CARD) or value (ARTIFACT_TYPE_VALUE) is to be
+    // downloaded. The storage location is resolved by the server from the artifact record. An empty version
+    // resolves to the latest version.
+    flyteidl2.artifact.ArtifactIdentifier artifact_id = 6;
   }
 }
 
@@ -196,6 +206,11 @@ message CreateDownloadLinkRequest {
 message CreateDownloadLinkResponse {
   // PreSignedUrls contains the signed URLs and their expiration time.
   PreSignedURLs pre_signed_urls = 1;
+
+  // RelativePaths is set when the download is a directory (ARTIFACT_TYPE_VALUE on a multipart blob): the path of
+  // each object relative to the directory, in the same order as pre_signed_urls.signed_url. Empty for a single
+  // object.
+  repeated string relative_paths = 2;
 }
 
 // Request message for querying action data.
