@@ -13,7 +13,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/common/run.proto.
  */
 export const file_flyteidl2_common_run: GenFile = /*@__PURE__*/
-  fileDesc("ChpmbHl0ZWlkbDIvY29tbW9uL3J1bi5wcm90bxIQZmx5dGVpZGwyLmNvbW1vbiJIChJPZmZsb2FkZWRJbnB1dERhdGESFAoDdXJpGAEgASgJQge6SARyAhABEhwKC2lucHV0c19oYXNoGAIgASgJQge6SARyAhABIvgBCghSZWxhdGlvbhI7CgpyZWxhdGVkX3RvGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQga6SAPIAQESrgEKDXJlbGF0aW9uX3R5cGUYAiABKA4yHi5mbHl0ZWlkbDIuY29tbW9uLlJlbGF0aW9uVHlwZUJ3ukh0ugFuCh9yZWxhdGlvbl90eXBlLmdyZWF0ZXJfdGhhbl96ZXJvEjxSZWxhdGlvbiB0eXBlIG11c3QgYmUgZ3JlYXRlciB0aGFuIDAgKGNhbm5vdCBiZSBVTlNQRUNJRklFRCkaDWludCh0aGlzKSA+IDDIAQEqtgEKDFJlbGF0aW9uVHlwZRIdChlSRUxBVElPTl9UWVBFX1VOU1BFQ0lGSUVEEAASFwoTUkVMQVRJT05fVFlQRV9SRVJVThABEhkKFVJFTEFUSU9OX1RZUEVfUkVDT1ZFUhACEhcKE1JFTEFUSU9OX1RZUEVfU1BBV04QAxIbChdSRUxBVElPTl9UWVBFX1RSSUdHRVJFRBAEEh0KGVJFTEFUSU9OX1RZUEVfT05fQVJUSUZBQ1QQBUK5AQoUY29tLmZseXRlaWRsMi5jb21tb25CCFJ1blByb3RvSAJQAVo0Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2NvbW1vbqICA0ZDWKoCEEZseXRlaWRsMi5Db21tb27KAhBGbHl0ZWlkbDJcQ29tbW9u4gIcRmx5dGVpZGwyXENvbW1vblxHUEJNZXRhZGF0YeoCEUZseXRlaWRsMjo6Q29tbW9uYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identifier]);
+  fileDesc("ChpmbHl0ZWlkbDIvY29tbW9uL3J1bi5wcm90bxIQZmx5dGVpZGwyLmNvbW1vbiJIChJPZmZsb2FkZWRJbnB1dERhdGESFAoDdXJpGAEgASgJQge6SARyAhABEhwKC2lucHV0c19oYXNoGAIgASgJQge6SARyAhABIvgBCghSZWxhdGlvbhI7CgpyZWxhdGVkX3RvGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVyQga6SAPIAQESrgEKDXJlbGF0aW9uX3R5cGUYAiABKA4yHi5mbHl0ZWlkbDIuY29tbW9uLlJlbGF0aW9uVHlwZUJ3ukh0ugFuCh9yZWxhdGlvbl90eXBlLmdyZWF0ZXJfdGhhbl96ZXJvEjxSZWxhdGlvbiB0eXBlIG11c3QgYmUgZ3JlYXRlciB0aGFuIDAgKGNhbm5vdCBiZSBVTlNQRUNJRklFRCkaDWludCh0aGlzKSA+IDDIAQEqzgEKDFJlbGF0aW9uVHlwZRIdChlSRUxBVElPTl9UWVBFX1VOU1BFQ0lGSUVEEAASFwoTUkVMQVRJT05fVFlQRV9SRVJVThABEhkKFVJFTEFUSU9OX1RZUEVfUkVDT1ZFUhACEhcKE1JFTEFUSU9OX1RZUEVfU1BBV04QAxIbChdSRUxBVElPTl9UWVBFX1RSSUdHRVJFRBAEEh0KGVJFTEFUSU9OX1RZUEVfT05fQVJUSUZBQ1QQBRIWChJSRUxBVElPTl9UWVBFX0ZPUksQBkK5AQoUY29tLmZseXRlaWRsMi5jb21tb25CCFJ1blByb3RvSAJQAVo0Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2NvbW1vbqICA0ZDWKoCEEZseXRlaWRsMi5Db21tb27KAhBGbHl0ZWlkbDJcQ29tbW9u4gIcRmx5dGVpZGwyXENvbW1vblxHUEJNZXRhZGF0YeoCEUZseXRlaWRsMjo6Q29tbW9uYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_common_identifier]);
 
 /**
  * Captures required data to reference offloaded inputs.
@@ -115,6 +115,17 @@ export enum RelationType {
    * @generated from enum value: RELATION_TYPE_ON_ARTIFACT = 5;
    */
   ON_ARTIFACT = 5,
+
+  /**
+   * The run recovers the parent run with different code: its root task differs
+   * from the parent's root task (for example, a new task version built from local
+   * changes). Recovery semantics are the same as RELATION_TYPE_RECOVER; the
+   * distinct value only records the provenance. Readers that do not know this
+   * value treat it as an unknown relation type.
+   *
+   * @generated from enum value: RELATION_TYPE_FORK = 6;
+   */
+  FORK = 6,
 }
 
 /**

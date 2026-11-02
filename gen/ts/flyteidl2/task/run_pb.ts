@@ -341,7 +341,7 @@ export type RunSpec = Message<"flyteidl2.task.RunSpec"> & {
 
   /**
    * Optional recovery configuration. Only meaningful when relation is set with
-   * RELATION_TYPE_RECOVER: the run recovers relation.related_to — its successful
+   * RELATION_TYPE_RECOVER or RELATION_TYPE_FORK: the run recovers relation.related_to — its successful
    * actions are reused and only failed/changed ones re-execute. See Recover.
    *
    * @generated from field: flyteidl2.task.Recover recover = 19;

@@ -15,12 +15,14 @@ class RelationType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     RELATION_TYPE_SPAWN: _ClassVar[RelationType]
     RELATION_TYPE_TRIGGERED: _ClassVar[RelationType]
     RELATION_TYPE_ON_ARTIFACT: _ClassVar[RelationType]
+    RELATION_TYPE_FORK: _ClassVar[RelationType]
 RELATION_TYPE_UNSPECIFIED: RelationType
 RELATION_TYPE_RERUN: RelationType
 RELATION_TYPE_RECOVER: RelationType
 RELATION_TYPE_SPAWN: RelationType
 RELATION_TYPE_TRIGGERED: RelationType
 RELATION_TYPE_ON_ARTIFACT: RelationType
+RELATION_TYPE_FORK: RelationType
 
 class OffloadedInputData(_message.Message):
     __slots__ = ["uri", "inputs_hash"]

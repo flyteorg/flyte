@@ -526,7 +526,7 @@ type RunSpec struct {
 	// same org/project/domain as this run. Replaces related_to.
 	Relation *common.Relation `protobuf:"bytes,18,opt,name=relation,proto3" json:"relation,omitempty"`
 	// Optional recovery configuration. Only meaningful when relation is set with
-	// RELATION_TYPE_RECOVER: the run recovers relation.related_to — its successful
+	// RELATION_TYPE_RECOVER or RELATION_TYPE_FORK: the run recovers relation.related_to — its successful
 	// actions are reused and only failed/changed ones re-execute. See Recover.
 	Recover *Recover `protobuf:"bytes,19,opt,name=recover,proto3" json:"recover,omitempty"`
 	// Run-scoped defaults, projected onto every task in the run that does not

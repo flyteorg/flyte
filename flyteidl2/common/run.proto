@@ -34,6 +34,13 @@ enum RelationType {
   // The run is a trigger-task run created because the parent run produced
   // an artifact matching the trigger.
   RELATION_TYPE_ON_ARTIFACT = 5;
+
+  // The run recovers the parent run with different code: its root task differs
+  // from the parent's root task (for example, a new task version built from local
+  // changes). Recovery semantics are the same as RELATION_TYPE_RECOVER; the
+  // distinct value only records the provenance. Readers that do not know this
+  // value treat it as an unknown relation type.
+  RELATION_TYPE_FORK = 6;
 }
 
 // Relation is a provenance link to the single parent run this run was derived from.

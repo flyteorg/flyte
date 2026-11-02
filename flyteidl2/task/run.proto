@@ -178,7 +178,7 @@ message RunSpec {
   flyteidl2.common.Relation relation = 18;
 
   // Optional recovery configuration. Only meaningful when relation is set with
-  // RELATION_TYPE_RECOVER: the run recovers relation.related_to — its successful
+  // RELATION_TYPE_RECOVER or RELATION_TYPE_FORK: the run recovers relation.related_to — its successful
   // actions are reused and only failed/changed ones re-execute. See Recover.
   Recover recover = 19;
 
