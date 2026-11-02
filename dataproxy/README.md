@@ -36,6 +36,28 @@ The data proxy service uses a YAML configuration file. See [config.example.yaml]
 | `dataproxy.upload.storagePrefix` | Prefix for all uploaded files in storage | `uploads` |
 | `dataproxy.download.maxExpiresIn` | Maximum expiration time for download URLs | `1h` |
 
+### Task Log Settings
+
+`TailLogs` reads task logs from the Kubernetes pod first and, once the pod is deleted, from
+a persisted backend. Currently Grafana Loki is supported.
+
+| Field | Description | Default |
+|-------|-------------|---------|
+| `dataproxy.logs.persisted.type` | Persisted backend: `""` (disabled) or `loki` | `""` |
+| `dataproxy.logs.persisted.loki.url` | Loki base URL | |
+| `dataproxy.logs.persisted.loki.queryTemplate` | Go template for the LogQL selector. Fields: `.Namespace`, `.PodName`, `.ContainerName` | `{namespace="{{ .Namespace }}", pod="{{ .PodName }}", container="{{ .ContainerName }}"}` |
+| `dataproxy.logs.persisted.loki.tenantId` | Sent as `X-Scope-OrgID` for multi-tenant Loki | `""` |
+| `dataproxy.logs.persisted.loki.basicAuth.username` / `.password` | HTTP basic auth credentials | |
+| `dataproxy.logs.persisted.loki.bearerToken` | Bearer token for the `Authorization` header | |
+| `dataproxy.logs.persisted.loki.timeout` | Per-request timeout | `30s` |
+| `dataproxy.logs.persisted.loki.pageSize` | Lines per `query_range` call; keep at or below Loki's `max_entries_limit_per_query` | `1000` |
+| `dataproxy.logs.persisted.loki.maxLines` | Cap on lines returned per attempt; `0` for unlimited | `0` |
+| `dataproxy.logs.persisted.loki.timePadding` | Padding added around the recorded container start/end window | `1m` |
+| `dataproxy.logs.persisted.loki.lookback` | Window queried when the log context has no container start time | `168h` |
+
+Match `queryTemplate` to the labels your collector attaches (the OpenTelemetry collector,
+for example, uses `k8s_namespace_name`, `k8s_pod_name` and `k8s_container_name`).
+
 ### Storage Backend Settings
 
 | Field | Description | Options |

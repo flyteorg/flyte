@@ -67,5 +67,17 @@ func (cfg DataProxyConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "runService.auth.scopes"), defaultConfig.RunService.Auth.Scopes, "Runs service OAuth 2.0 scopes")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.audience"), defaultConfig.RunService.Auth.Audience, "Runs service OAuth 2.0 token audience")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "runService.http.maxIdleConnsPerHost"), defaultConfig.RunService.HTTP.MaxIdleConnsPerHost, "Runs service idle connections kept per host; 0 uses Go's default of 2")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.persisted.type"), string(defaultConfig.Logs.Persisted.Type), "Persisted log backend type: '' (disabled) or 'loki'.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.persisted.loki.url"), defaultConfig.Logs.Persisted.Loki.URL, "Loki base URL.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.persisted.loki.queryTemplate"), defaultConfig.Logs.Persisted.Loki.QueryTemplate, "Go template for the LogQL query; fields .Namespace .PodName .ContainerName.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.persisted.loki.tenantId"), defaultConfig.Logs.Persisted.Loki.TenantID, "Loki tenant (X-Scope-OrgID header); empty for single-tenant.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.persisted.loki.basicAuth.username"), defaultConfig.Logs.Persisted.Loki.BasicAuth.Username, "Basic auth username.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.persisted.loki.basicAuth.password"), defaultConfig.Logs.Persisted.Loki.BasicAuth.Password, "Basic auth password.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.persisted.loki.bearerToken"), defaultConfig.Logs.Persisted.Loki.BearerToken, "Bearer token sent in the Authorization header.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.persisted.loki.timeout"), defaultConfig.Logs.Persisted.Loki.Timeout.String(), "Per-request timeout.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "logs.persisted.loki.pageSize"), defaultConfig.Logs.Persisted.Loki.PageSize, "Lines per Loki query_range request; must not exceed Loki's max_entries_limit_per_query.")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "logs.persisted.loki.maxLines"), defaultConfig.Logs.Persisted.Loki.MaxLines, "Maximum lines returned per attempt; 0 for unlimited.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.persisted.loki.timePadding"), defaultConfig.Logs.Persisted.Loki.TimePadding.String(), "Padding added around the container start/end window.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.persisted.loki.lookback"), defaultConfig.Logs.Persisted.Loki.Lookback.String(), "Window queried when no container start time is recorded.")
 	return cmdFlags
 }
