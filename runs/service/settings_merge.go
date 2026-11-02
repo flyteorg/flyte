@@ -92,6 +92,15 @@ func mergeAcceleratorSettings(levels []*settings.AcceleratorSetting) *settings.A
 	})
 }
 
+// mergeStringListSettings resolves one string-list leaf across the level chain,
+// following the same rule as mergeStringSettings: the whole list comes from one
+// level, and lists from different levels are never concatenated.
+func mergeStringListSettings(levels []*settings.StringListSetting) *settings.StringListSetting {
+	return mergeScalar(levels, func(s *settings.StringListSetting, level settings.ScopeLevel) {
+		s.ScopeLevel = level
+	})
+}
+
 // mergeStringMapSettings resolves one string-map leaf across the level chain.
 // Unlike scalars, every level contributes: entries accumulate parent first with
 // child entries overwriting on key conflict, and a level in state UNSET clears
@@ -279,6 +288,25 @@ func mergeAppSettings(levels []*settings.AppSettings) *settings.AppSettings {
 	return out
 }
 
+// mergeNetworkSettings resolves the network group across the level chain. Like the
+// other group mergers it holds no rules of its own. Returns nil when nothing resolved.
+func mergeNetworkSettings(levels []*settings.NetworkSettings) *settings.NetworkSettings {
+	dataplaneIngressAllowedCidrs := make([]*settings.StringListSetting, len(levels))
+
+	for i, l := range levels {
+		dataplaneIngressAllowedCidrs[i] = l.GetDataplaneIngressAllowedCidrs()
+	}
+
+	out := &settings.NetworkSettings{
+		DataplaneIngressAllowedCidrs: mergeStringListSettings(dataplaneIngressAllowedCidrs),
+	}
+
+	if out.DataplaneIngressAllowedCidrs == nil {
+		return nil
+	}
+	return out
+}
+
 // mergeSettings resolves a full settings document across the level chain. Callers
 // pass one entry per level, broadest first, using nil for levels with no stored
 // record.
@@ -292,6 +320,7 @@ func mergeSettings(levels []*settings.Settings) *settings.Settings {
 	envVars := make([]*settings.StringMapSetting, len(levels))
 	app := make([]*settings.AppSettings, len(levels))
 	podTemplateName := make([]*settings.StringSetting, len(levels))
+	network := make([]*settings.NetworkSettings, len(levels))
 
 	for i, l := range levels {
 		run[i] = l.GetRun()
@@ -303,6 +332,7 @@ func mergeSettings(levels []*settings.Settings) *settings.Settings {
 		envVars[i] = l.GetEnvironmentVariables()
 		app[i] = l.GetApp()
 		podTemplateName[i] = l.GetPodTemplateName()
+		network[i] = l.GetNetwork()
 	}
 
 	return &settings.Settings{
@@ -315,5 +345,6 @@ func mergeSettings(levels []*settings.Settings) *settings.Settings {
 		EnvironmentVariables: mergeStringMapSettings(envVars),
 		App:                  mergeAppSettings(app),
 		PodTemplateName:      mergeStringSettings(podTemplateName),
+		Network:              mergeNetworkSettings(network),
 	}
 }

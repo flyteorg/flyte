@@ -98,6 +98,16 @@ class StringMapSetting(_message.Message):
     scope_level: ScopeLevel
     def __init__(self, state: _Optional[_Union[SettingState, str]] = ..., map_value: _Optional[_Union[StringMap, _Mapping]] = ..., scope_level: _Optional[_Union[ScopeLevel, str]] = ...) -> None: ...
 
+class StringListSetting(_message.Message):
+    __slots__ = ["state", "list_value", "scope_level"]
+    STATE_FIELD_NUMBER: _ClassVar[int]
+    LIST_VALUE_FIELD_NUMBER: _ClassVar[int]
+    SCOPE_LEVEL_FIELD_NUMBER: _ClassVar[int]
+    state: SettingState
+    list_value: StringValues
+    scope_level: ScopeLevel
+    def __init__(self, state: _Optional[_Union[SettingState, str]] = ..., list_value: _Optional[_Union[StringValues, _Mapping]] = ..., scope_level: _Optional[_Union[ScopeLevel, str]] = ...) -> None: ...
+
 class QuantitySetting(_message.Message):
     __slots__ = ["state", "quantity_value", "scope_level"]
     STATE_FIELD_NUMBER: _ClassVar[int]
@@ -172,8 +182,14 @@ class AppSettings(_message.Message):
     app_dns_strategy: StringSetting
     def __init__(self, disallow_anonymous: _Optional[_Union[BoolSetting, _Mapping]] = ..., app_dns_strategy: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
 
+class NetworkSettings(_message.Message):
+    __slots__ = ["dataplane_ingress_allowed_cidrs"]
+    DATAPLANE_INGRESS_ALLOWED_CIDRS_FIELD_NUMBER: _ClassVar[int]
+    dataplane_ingress_allowed_cidrs: StringListSetting
+    def __init__(self, dataplane_ingress_allowed_cidrs: _Optional[_Union[StringListSetting, _Mapping]] = ...) -> None: ...
+
 class Settings(_message.Message):
-    __slots__ = ["run", "security", "storage", "task_resource", "labels", "annotations", "environment_variables", "app", "pod_template_name"]
+    __slots__ = ["run", "security", "storage", "task_resource", "labels", "annotations", "environment_variables", "app", "pod_template_name", "network"]
     RUN_FIELD_NUMBER: _ClassVar[int]
     SECURITY_FIELD_NUMBER: _ClassVar[int]
     STORAGE_FIELD_NUMBER: _ClassVar[int]
@@ -183,6 +199,7 @@ class Settings(_message.Message):
     ENVIRONMENT_VARIABLES_FIELD_NUMBER: _ClassVar[int]
     APP_FIELD_NUMBER: _ClassVar[int]
     POD_TEMPLATE_NAME_FIELD_NUMBER: _ClassVar[int]
+    NETWORK_FIELD_NUMBER: _ClassVar[int]
     run: RunSettings
     security: SecuritySettings
     storage: StorageSettings
@@ -192,4 +209,5 @@ class Settings(_message.Message):
     environment_variables: StringMapSetting
     app: AppSettings
     pod_template_name: StringSetting
-    def __init__(self, run: _Optional[_Union[RunSettings, _Mapping]] = ..., security: _Optional[_Union[SecuritySettings, _Mapping]] = ..., storage: _Optional[_Union[StorageSettings, _Mapping]] = ..., task_resource: _Optional[_Union[TaskResourceSettings, _Mapping]] = ..., labels: _Optional[_Union[StringMapSetting, _Mapping]] = ..., annotations: _Optional[_Union[StringMapSetting, _Mapping]] = ..., environment_variables: _Optional[_Union[StringMapSetting, _Mapping]] = ..., app: _Optional[_Union[AppSettings, _Mapping]] = ..., pod_template_name: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
+    network: NetworkSettings
+    def __init__(self, run: _Optional[_Union[RunSettings, _Mapping]] = ..., security: _Optional[_Union[SecuritySettings, _Mapping]] = ..., storage: _Optional[_Union[StorageSettings, _Mapping]] = ..., task_resource: _Optional[_Union[TaskResourceSettings, _Mapping]] = ..., labels: _Optional[_Union[StringMapSetting, _Mapping]] = ..., annotations: _Optional[_Union[StringMapSetting, _Mapping]] = ..., environment_variables: _Optional[_Union[StringMapSetting, _Mapping]] = ..., app: _Optional[_Union[AppSettings, _Mapping]] = ..., pod_template_name: _Optional[_Union[StringSetting, _Mapping]] = ..., network: _Optional[_Union[NetworkSettings, _Mapping]] = ...) -> None: ...
