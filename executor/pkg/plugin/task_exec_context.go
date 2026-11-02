@@ -169,7 +169,12 @@ func NewTaskExecutionContext(
 		if err != nil {
 			return nil, fmt.Errorf("failed to compute previous checkpoint path: %w", err)
 		}
-		prevCheckpointPath = ioutils.ConstructCheckpointPath(dataStore, prevOutputPrefix)
+		// Checkpoints live under the raw output prefix, so resolve it the same way as the write side.
+		prevRawOutputPrefix, err := ComputeActionRawOutputPath(ctx, taskAction, attempt-1, prevOutputPrefix)
+		if err != nil {
+			return nil, fmt.Errorf("failed to compute previous checkpoint path: %w", err)
+		}
+		prevCheckpointPath = ioutils.ConstructCheckpointPath(dataStore, prevRawOutputPrefix)
 	}
 
 	outputFilePaths := ioutils.NewCheckpointRemoteFilePaths(ctx, dataStore, outputPrefix, rawOutputPaths, prevCheckpointPath)
