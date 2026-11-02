@@ -26,7 +26,7 @@ func applyRunSettings(spec *task.RunSpec, resolved *settings.Settings) {
 		spec.MaxActionConcurrency = uint32(concurrency.GetIntValue())
 	}
 
-	// Base for run metadata (inputs.pb, outputs.pb), not for user blobs.
+	// Base for run metadata, and for action raw outputs until raw_data_prefix is honored downstream.
 	if baseDir := resolved.GetRun().GetRunBaseDir(); spec.GetRunBaseDir() == "" &&
 		baseDir.GetState() == settings.SettingState_SETTING_STATE_VALUE {
 		spec.RunBaseDir = baseDir.GetStringValue()

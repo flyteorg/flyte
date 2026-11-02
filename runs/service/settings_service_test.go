@@ -538,6 +538,22 @@ func TestValidateSettings(t *testing.T) {
 		}))
 	})
 
+	t.Run("valid storage paths pass", func(t *testing.T) {
+		for _, path := range []string{"s3://bucket", "s3://bucket/prefix", "gs://bucket/a/b", "abfs://container@account.dfs.core.windows.net/p", "file:///tmp/flyte/data"} {
+			assert.NoError(t, validateSettings(&settings.Settings{
+				Run:     &settings.RunSettings{RunBaseDir: &settings.StringSetting{State: stateValue, StringValue: path}},
+				Storage: &settings.StorageSettings{RawDataPath: &settings.StringSetting{State: stateValue, StringValue: path}},
+			}), path)
+		}
+	})
+
+	t.Run("storage paths not in VALUE state are not checked", func(t *testing.T) {
+		assert.NoError(t, validateSettings(&settings.Settings{
+			Run:     &settings.RunSettings{RunBaseDir: &settings.StringSetting{State: stateInherit, StringValue: "junk"}},
+			Storage: &settings.StorageSettings{RawDataPath: &settings.StringSetting{State: stateUnset, StringValue: "junk"}},
+		}))
+	})
+
 	tests := []struct {
 		name     string
 		input    *settings.Settings
@@ -556,6 +572,34 @@ func TestValidateSettings(t *testing.T) {
 				Max: &settings.TaskResourceDefaults{Memory: quantity(stateValue, "apple")},
 			}},
 			wantPath: "task_resource.max.memory",
+		},
+		{
+			name: "run base dir without a scheme",
+			input: &settings.Settings{Run: &settings.RunSettings{
+				RunBaseDir: &settings.StringSetting{State: stateValue, StringValue: "bucket/prefix"},
+			}},
+			wantPath: "run.run_base_dir",
+		},
+		{
+			name: "empty run base dir in VALUE state",
+			input: &settings.Settings{Run: &settings.RunSettings{
+				RunBaseDir: &settings.StringSetting{State: stateValue},
+			}},
+			wantPath: "run.run_base_dir",
+		},
+		{
+			name: "raw data path without a bucket",
+			input: &settings.Settings{Storage: &settings.StorageSettings{
+				RawDataPath: &settings.StringSetting{State: stateValue, StringValue: "s3:///prefix"},
+			}},
+			wantPath: "storage.raw_data_path",
+		},
+		{
+			name: "unparseable raw data path",
+			input: &settings.Settings{Storage: &settings.StorageSettings{
+				RawDataPath: &settings.StringSetting{State: stateValue, StringValue: "s3://bad host/%zz"},
+			}},
+			wantPath: "storage.raw_data_path",
 		},
 		{
 			name: "bad concurrency is reported",
