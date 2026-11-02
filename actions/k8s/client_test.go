@@ -338,7 +338,8 @@ func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
 				{Key: "TRACE_ID", Value: "abc123"},
 			},
 		},
-		Interruptible: wrapperspb.Bool(true),
+		Interruptible:  wrapperspb.Bool(true),
+		RawDataStorage: &task.RawDataStorage{RawDataPrefix: "s3://raw-bucket/prefix"},
 		Labels: &task.Labels{
 			Values: map[string]string{
 				"flyte.org/run": "should-not-override",
@@ -359,10 +360,25 @@ func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
 	assert.True(t, *taskAction.Spec.Interruptible)
 	assert.Len(t, taskAction.Spec.EnvVars, 1)
 	assert.Equal(t, "abc123", taskAction.Spec.EnvVars["TRACE_ID"])
+	assert.Equal(t, "s3://raw-bucket/prefix", taskAction.Spec.RawDataPrefix)
 	assert.Equal(t, "run1", taskAction.Labels["flyte.org/run"])
 	assert.Equal(t, "platform", taskAction.Labels["team"])
 	assert.Equal(t, "sdk", taskAction.Annotations["owner"])
 	assert.Equal(t, "gpu-template", taskAction.Spec.PodTemplateName)
+}
+
+func TestApplyRunSpecToTaskAction_RawDataPrefix(t *testing.T) {
+	t.Run("unset prefix stays empty", func(t *testing.T) {
+		ta := &executorv1.TaskAction{}
+		applyRunSpecToTaskAction(ta, &task.RunSpec{})
+		assert.Empty(t, ta.Spec.RawDataPrefix)
+	})
+
+	t.Run("nil run spec clears a stale prefix", func(t *testing.T) {
+		ta := &executorv1.TaskAction{Spec: executorv1.TaskActionSpec{RawDataPrefix: "s3://stale"}}
+		applyRunSpecToTaskAction(ta, nil)
+		assert.Empty(t, ta.Spec.RawDataPrefix)
+	})
 }
 
 func TestInheritRunContextFromParentTaskAction(t *testing.T) {
@@ -383,6 +399,7 @@ func TestInheritRunContextFromParentTaskAction(t *testing.T) {
 			},
 			Interruptible:   &interruptible,
 			PodTemplateName: "gpu-template",
+			RawDataPrefix:   "s3://raw-bucket/prefix",
 		},
 	}
 
@@ -400,6 +417,7 @@ func TestInheritRunContextFromParentTaskAction(t *testing.T) {
 	require.NotNil(t, child.Spec.Interruptible)
 	assert.True(t, *child.Spec.Interruptible)
 	assert.Equal(t, parent.Spec.EnvVars, child.Spec.EnvVars)
+	assert.Equal(t, "s3://raw-bucket/prefix", child.Spec.RawDataPrefix)
 	assert.Equal(t, "platform", child.Labels["team"])
 	assert.Equal(t, "run1", child.Labels["flyte.org/run"])
 	assert.Equal(t, "sdk", child.Annotations["owner"])

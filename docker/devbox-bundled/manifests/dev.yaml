@@ -6876,6 +6876,11 @@ spec:
                 maxLength: 63
                 minLength: 1
                 type: string
+              rawDataPrefix:
+                description: |-
+                  RawDataPrefix is the run-scoped raw data base projected from RunSpec.RawDataStorage.
+                  Empty writes raw data under RunOutputBase.
+                type: string
               runName:
                 description: RunName is the name of the run this action belongs to
                 maxLength: 30

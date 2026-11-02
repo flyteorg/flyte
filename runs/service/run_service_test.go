@@ -1565,6 +1565,51 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 	require.NoError(t, err)
 }
 
+// Without a request or settings prefix, raw data stays under RunOutputBase, so the
+// stored run spec must not be stamped with the cluster default.
+func TestCreateRun_LeavesRawDataPrefixEmpty(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(taskRepo)
+
+	svc := &RunService{
+		repo:          repo,
+		settingsRepo:  noSettings(t),
+		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "rraw-123"},
+		},
+		RunSpec: &task.RunSpec{RunBaseDir: "s3://user-base"},
+		Task:    &workflow.CreateRunRequest_TaskSpec{TaskSpec: &task.TaskSpec{}},
+	}
+
+	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("CreateAction", mock.Anything, mock.MatchedBy(func(m *models.Run) bool {
+		var rs task.RunSpec
+		_ = proto.Unmarshal(m.RunSpec, &rs)
+		return rs.GetRawDataStorage().GetRawDataPrefix() == ""
+	}), mock.Anything).Return(&models.Run{Project: "proj", Domain: "dev", Name: "rraw-123"}, nil).Once()
+	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
+		return req.Msg.GetRunSpec().GetRawDataStorage().GetRawDataPrefix() == ""
+	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	require.NoError(t, err)
+}
+
 // TestCreateRun_AppliesSettingsQueue proves the applier is actually wired into run
 // creation: the request names no queue, and the value stored on the run comes from
 // the org's settings row.
