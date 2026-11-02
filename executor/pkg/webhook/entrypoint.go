@@ -21,19 +21,19 @@ const (
 	PodNamespaceEnvVar = "POD_NAMESPACE"
 )
 
-// Setup initializes the webhook: generates certs, registers MutatingWebhookConfiguration, and registers the HTTP handler.
-// It is called before mgr.Start() so that the webhook server is ready to receive requests.
-// The returned PodMutator owns the secret cache and can be used to invalidate it.
+// Setup initializes the webhook: generates certs, registers the MutatingWebhookConfiguration, and registers the
+// HTTP handlers. It is called before mgr.Start() so that the webhook server is ready to receive requests.
+// The returned Webhook owns the secret cache and can be used to invalidate it.
 func Setup(ctx context.Context, kubeClient kubernetes.Interface, cfg *webhookConfig.Config,
-	defaultNamespace string, scope promutils.Scope, mgr manager.Manager) (*PodMutator, error) {
+	defaultNamespace string, scope promutils.Scope, mgr manager.Manager, opts ...Option) (*Webhook, error) {
 
 	if err := InitCerts(ctx, kubeClient, cfg, defaultNamespace); err != nil {
 		return nil, fmt.Errorf("webhook: failed to initialize certs: %w", err)
 	}
 
-	podMutator, err := NewPodMutator(ctx, cfg, defaultNamespace, mgr.GetScheme(), scope)
+	podMutator, err := NewWebhook(ctx, cfg, defaultNamespace, mgr.GetScheme(), scope, opts...)
 	if err != nil {
-		return nil, fmt.Errorf("webhook: failed to create pod mutator: %w", err)
+		return nil, fmt.Errorf("webhook: failed to create handlers: %w", err)
 	}
 
 	if cfg.DisableCreateMutatingWebhookConfig {
@@ -50,7 +50,9 @@ func Setup(ctx context.Context, kubeClient kubernetes.Interface, cfg *webhookCon
 	return podMutator, nil
 }
 
-func createMutationConfig(ctx context.Context, kubeClient kubernetes.Interface, webhookObj *PodMutator, defaultNamespace string) error {
+func createMutationConfig(
+	ctx context.Context, kubeClient kubernetes.Interface, webhookObj *Webhook, defaultNamespace string,
+) error {
 	shouldAddOwnerRef := true
 	podName, found := os.LookupEnv(PodNameEnvVar)
 	if !found {

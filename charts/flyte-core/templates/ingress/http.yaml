@@ -54,7 +54,7 @@ spec:
                 port:
                   number: {{ .Values.console.service.port }}
           {{- end }}
-          {{- if not .Values.ingress.apiJwtIngress.enabled }}
+          {{- if or (not .Values.ingress.apiJwtIngress.enabled) .Values.ingress.apiJwtIngress.keepHttpRoutes }}
           {{- range $route := $apiRoutes }}
           {{- $component := index $.Values.components $route.component }}
           {{- if $component.enabled }}

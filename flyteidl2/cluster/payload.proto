@@ -23,6 +23,11 @@ message SelectClusterRequest {
     // Names the cluster directly. this is for callers that already know
     // the cluster and have nothing else to resolve from.
     flyteidl2.common.ClusterIdentifier cluster_id = 10;
+    // Names a queue. The queue resolves to its cluster pool and the request routes
+    // to a cluster in that pool, e.g. to upload a run's inputs where the queue's
+    // work runs. With OPERATION_USE_SECRETS it is handled exactly as if that pool
+    // had been passed as cluster_pool_id.
+    flyteidl2.common.QueueIdentifier queue_id = 11;
   }
 
   enum Operation {

@@ -6,11 +6,15 @@ on:
 
 jobs:
   regenerate:
-    if: github.event.issue.pull_request && (contains(github.event.comment.body, '/regen') || contains(github.event.comment.body, ':repeat:'))
+    if: >-
+      github.event.issue.pull_request &&
+      (github.event.comment.author_association == 'OWNER' ||
+       github.event.comment.author_association == 'MEMBER') &&
+      (github.event.comment.body == '/regen' ||
+       github.event.comment.body == ':repeat:')
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
     steps:
       - name: Get PR details
         id: pr
@@ -71,4 +75,3 @@ jobs:
             git commit -m "chore: regenerate files via workflow"
             git push origin HEAD:${{ steps.pr.outputs.head_ref }}
           fi
-

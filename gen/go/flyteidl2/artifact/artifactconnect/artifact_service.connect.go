@@ -51,6 +51,15 @@ const (
 	// ArtifactServiceDeleteArtifactProcedure is the fully-qualified name of the ArtifactService's
 	// DeleteArtifact RPC.
 	ArtifactServiceDeleteArtifactProcedure = "/flyteidl2.artifact.ArtifactService/DeleteArtifact"
+	// ArtifactServiceDeclareArtifactProcedure is the fully-qualified name of the ArtifactService's
+	// DeclareArtifact RPC.
+	ArtifactServiceDeclareArtifactProcedure = "/flyteidl2.artifact.ArtifactService/DeclareArtifact"
+	// ArtifactServiceGetArtifactSchemaProcedure is the fully-qualified name of the ArtifactService's
+	// GetArtifactSchema RPC.
+	ArtifactServiceGetArtifactSchemaProcedure = "/flyteidl2.artifact.ArtifactService/GetArtifactSchema"
+	// ArtifactServiceListPartitionValuesProcedure is the fully-qualified name of the ArtifactService's
+	// ListPartitionValues RPC.
+	ArtifactServiceListPartitionValuesProcedure = "/flyteidl2.artifact.ArtifactService/ListPartitionValues"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -62,6 +71,9 @@ var (
 	artifactServiceListArtifactNamesMethodDescriptor        = artifactServiceServiceDescriptor.Methods().ByName("ListArtifactNames")
 	artifactServiceListArtifactMetadataKeysMethodDescriptor = artifactServiceServiceDescriptor.Methods().ByName("ListArtifactMetadataKeys")
 	artifactServiceDeleteArtifactMethodDescriptor           = artifactServiceServiceDescriptor.Methods().ByName("DeleteArtifact")
+	artifactServiceDeclareArtifactMethodDescriptor          = artifactServiceServiceDescriptor.Methods().ByName("DeclareArtifact")
+	artifactServiceGetArtifactSchemaMethodDescriptor        = artifactServiceServiceDescriptor.Methods().ByName("GetArtifactSchema")
+	artifactServiceListPartitionValuesMethodDescriptor      = artifactServiceServiceDescriptor.Methods().ByName("ListPartitionValues")
 )
 
 // ArtifactServiceClient is a client for the flyteidl2.artifact.ArtifactService service.
@@ -86,6 +98,17 @@ type ArtifactServiceClient interface {
 	// does not exist. Deleting the last version removes the artifact name from
 	// the listings. Offloaded data the value references is not touched.
 	DeleteArtifact(context.Context, *connect.Request[artifact.DeleteArtifactRequest]) (*connect.Response[artifact.DeleteArtifactResponse], error)
+	// Declare an artifact name's partition schema ahead of any version. Succeeds
+	// when the name has no schema yet or an equal one; FAILED_PRECONDITION when a
+	// different schema is already fixed (by an earlier declaration or a first
+	// version). Changing the keys is a new artifact name.
+	DeclareArtifact(context.Context, *connect.Request[artifact.DeclareArtifactRequest]) (*connect.Response[artifact.DeclareArtifactResponse], error)
+	// Get an artifact name's partition schema. NOT_FOUND when the name has
+	// neither a declaration nor a version.
+	GetArtifactSchema(context.Context, *connect.Request[artifact.GetArtifactSchemaRequest]) (*connect.Response[artifact.GetArtifactSchemaResponse], error)
+	// List the distinct values one partition key has among an artifact's
+	// addressable versions, optionally scoped by partition filters, sorted.
+	ListPartitionValues(context.Context, *connect.Request[artifact.ListPartitionValuesRequest]) (*connect.Response[artifact.ListPartitionValuesResponse], error)
 }
 
 // NewArtifactServiceClient constructs a client for the flyteidl2.artifact.ArtifactService service.
@@ -139,6 +162,27 @@ func NewArtifactServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithIdempotency(connect.IdempotencyIdempotent),
 			connect.WithClientOptions(opts...),
 		),
+		declareArtifact: connect.NewClient[artifact.DeclareArtifactRequest, artifact.DeclareArtifactResponse](
+			httpClient,
+			baseURL+ArtifactServiceDeclareArtifactProcedure,
+			connect.WithSchema(artifactServiceDeclareArtifactMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyIdempotent),
+			connect.WithClientOptions(opts...),
+		),
+		getArtifactSchema: connect.NewClient[artifact.GetArtifactSchemaRequest, artifact.GetArtifactSchemaResponse](
+			httpClient,
+			baseURL+ArtifactServiceGetArtifactSchemaProcedure,
+			connect.WithSchema(artifactServiceGetArtifactSchemaMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
+		listPartitionValues: connect.NewClient[artifact.ListPartitionValuesRequest, artifact.ListPartitionValuesResponse](
+			httpClient,
+			baseURL+ArtifactServiceListPartitionValuesProcedure,
+			connect.WithSchema(artifactServiceListPartitionValuesMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -150,6 +194,9 @@ type artifactServiceClient struct {
 	listArtifactNames        *connect.Client[artifact.ListArtifactNamesRequest, artifact.ListArtifactNamesResponse]
 	listArtifactMetadataKeys *connect.Client[artifact.ListArtifactMetadataKeysRequest, artifact.ListArtifactMetadataKeysResponse]
 	deleteArtifact           *connect.Client[artifact.DeleteArtifactRequest, artifact.DeleteArtifactResponse]
+	declareArtifact          *connect.Client[artifact.DeclareArtifactRequest, artifact.DeclareArtifactResponse]
+	getArtifactSchema        *connect.Client[artifact.GetArtifactSchemaRequest, artifact.GetArtifactSchemaResponse]
+	listPartitionValues      *connect.Client[artifact.ListPartitionValuesRequest, artifact.ListPartitionValuesResponse]
 }
 
 // CreateArtifact calls flyteidl2.artifact.ArtifactService.CreateArtifact.
@@ -182,6 +229,21 @@ func (c *artifactServiceClient) DeleteArtifact(ctx context.Context, req *connect
 	return c.deleteArtifact.CallUnary(ctx, req)
 }
 
+// DeclareArtifact calls flyteidl2.artifact.ArtifactService.DeclareArtifact.
+func (c *artifactServiceClient) DeclareArtifact(ctx context.Context, req *connect.Request[artifact.DeclareArtifactRequest]) (*connect.Response[artifact.DeclareArtifactResponse], error) {
+	return c.declareArtifact.CallUnary(ctx, req)
+}
+
+// GetArtifactSchema calls flyteidl2.artifact.ArtifactService.GetArtifactSchema.
+func (c *artifactServiceClient) GetArtifactSchema(ctx context.Context, req *connect.Request[artifact.GetArtifactSchemaRequest]) (*connect.Response[artifact.GetArtifactSchemaResponse], error) {
+	return c.getArtifactSchema.CallUnary(ctx, req)
+}
+
+// ListPartitionValues calls flyteidl2.artifact.ArtifactService.ListPartitionValues.
+func (c *artifactServiceClient) ListPartitionValues(ctx context.Context, req *connect.Request[artifact.ListPartitionValuesRequest]) (*connect.Response[artifact.ListPartitionValuesResponse], error) {
+	return c.listPartitionValues.CallUnary(ctx, req)
+}
+
 // ArtifactServiceHandler is an implementation of the flyteidl2.artifact.ArtifactService service.
 type ArtifactServiceHandler interface {
 	// Create a new artifact version.
@@ -204,6 +266,17 @@ type ArtifactServiceHandler interface {
 	// does not exist. Deleting the last version removes the artifact name from
 	// the listings. Offloaded data the value references is not touched.
 	DeleteArtifact(context.Context, *connect.Request[artifact.DeleteArtifactRequest]) (*connect.Response[artifact.DeleteArtifactResponse], error)
+	// Declare an artifact name's partition schema ahead of any version. Succeeds
+	// when the name has no schema yet or an equal one; FAILED_PRECONDITION when a
+	// different schema is already fixed (by an earlier declaration or a first
+	// version). Changing the keys is a new artifact name.
+	DeclareArtifact(context.Context, *connect.Request[artifact.DeclareArtifactRequest]) (*connect.Response[artifact.DeclareArtifactResponse], error)
+	// Get an artifact name's partition schema. NOT_FOUND when the name has
+	// neither a declaration nor a version.
+	GetArtifactSchema(context.Context, *connect.Request[artifact.GetArtifactSchemaRequest]) (*connect.Response[artifact.GetArtifactSchemaResponse], error)
+	// List the distinct values one partition key has among an artifact's
+	// addressable versions, optionally scoped by partition filters, sorted.
+	ListPartitionValues(context.Context, *connect.Request[artifact.ListPartitionValuesRequest]) (*connect.Response[artifact.ListPartitionValuesResponse], error)
 }
 
 // NewArtifactServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -253,6 +326,27 @@ func NewArtifactServiceHandler(svc ArtifactServiceHandler, opts ...connect.Handl
 		connect.WithIdempotency(connect.IdempotencyIdempotent),
 		connect.WithHandlerOptions(opts...),
 	)
+	artifactServiceDeclareArtifactHandler := connect.NewUnaryHandler(
+		ArtifactServiceDeclareArtifactProcedure,
+		svc.DeclareArtifact,
+		connect.WithSchema(artifactServiceDeclareArtifactMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyIdempotent),
+		connect.WithHandlerOptions(opts...),
+	)
+	artifactServiceGetArtifactSchemaHandler := connect.NewUnaryHandler(
+		ArtifactServiceGetArtifactSchemaProcedure,
+		svc.GetArtifactSchema,
+		connect.WithSchema(artifactServiceGetArtifactSchemaMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
+	artifactServiceListPartitionValuesHandler := connect.NewUnaryHandler(
+		ArtifactServiceListPartitionValuesProcedure,
+		svc.ListPartitionValues,
+		connect.WithSchema(artifactServiceListPartitionValuesMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.artifact.ArtifactService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case ArtifactServiceCreateArtifactProcedure:
@@ -267,6 +361,12 @@ func NewArtifactServiceHandler(svc ArtifactServiceHandler, opts ...connect.Handl
 			artifactServiceListArtifactMetadataKeysHandler.ServeHTTP(w, r)
 		case ArtifactServiceDeleteArtifactProcedure:
 			artifactServiceDeleteArtifactHandler.ServeHTTP(w, r)
+		case ArtifactServiceDeclareArtifactProcedure:
+			artifactServiceDeclareArtifactHandler.ServeHTTP(w, r)
+		case ArtifactServiceGetArtifactSchemaProcedure:
+			artifactServiceGetArtifactSchemaHandler.ServeHTTP(w, r)
+		case ArtifactServiceListPartitionValuesProcedure:
+			artifactServiceListPartitionValuesHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -298,4 +398,16 @@ func (UnimplementedArtifactServiceHandler) ListArtifactMetadataKeys(context.Cont
 
 func (UnimplementedArtifactServiceHandler) DeleteArtifact(context.Context, *connect.Request[artifact.DeleteArtifactRequest]) (*connect.Response[artifact.DeleteArtifactResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.artifact.ArtifactService.DeleteArtifact is not implemented"))
+}
+
+func (UnimplementedArtifactServiceHandler) DeclareArtifact(context.Context, *connect.Request[artifact.DeclareArtifactRequest]) (*connect.Response[artifact.DeclareArtifactResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.artifact.ArtifactService.DeclareArtifact is not implemented"))
+}
+
+func (UnimplementedArtifactServiceHandler) GetArtifactSchema(context.Context, *connect.Request[artifact.GetArtifactSchemaRequest]) (*connect.Response[artifact.GetArtifactSchemaResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.artifact.ArtifactService.GetArtifactSchema is not implemented"))
+}
+
+func (UnimplementedArtifactServiceHandler) ListPartitionValues(context.Context, *connect.Request[artifact.ListPartitionValuesRequest]) (*connect.Response[artifact.ListPartitionValuesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.artifact.ArtifactService.ListPartitionValues is not implemented"))
 }

@@ -14,6 +14,10 @@ func runSettings(queue *settings.StringSetting, concurrency *settings.Int64Setti
 	}
 }
 
+func podTemplateSettings(name *settings.StringSetting) *settings.Settings {
+	return &settings.Settings{PodTemplateName: name}
+}
+
 func runBaseDirSettings(baseDir *settings.StringSetting) *settings.Settings {
 	return &settings.Settings{Run: &settings.RunSettings{RunBaseDir: baseDir}}
 }
@@ -24,11 +28,12 @@ func rawDataSettings(rawDataPath *settings.StringSetting) *settings.Settings {
 
 func TestApplyRunSettings(t *testing.T) {
 	tests := []struct {
-		name              string
-		spec              *task.RunSpec
-		resolved          *settings.Settings
-		wantQueue         string
-		wantConcurrency   uint32
+		name            string
+		spec            *task.RunSpec
+		resolved        *settings.Settings
+		wantQueue       string
+		wantConcurrency uint32
+		wantPodTemplate string
 		wantRunBaseDir    string
 		wantRawDataPrefix string
 	}{
@@ -77,6 +82,24 @@ func TestApplyRunSettings(t *testing.T) {
 			name:     "nil spec does not panic",
 			spec:     nil,
 			resolved: runSettings(&settings.StringSetting{State: stateValue, StringValue: "fast-queue"}, nil),
+		},
+		{
+			name:            "empty pod template takes the settings value",
+			spec:            &task.RunSpec{},
+			resolved:        podTemplateSettings(&settings.StringSetting{State: stateValue, StringValue: "gpu-template"}),
+			wantPodTemplate: "gpu-template",
+		},
+		{
+			name:            "an explicit pod template wins over settings",
+			spec:            &task.RunSpec{DefaultSettings: &task.DefaultSettings{PodTemplateName: "user-template"}},
+			resolved:        podTemplateSettings(&settings.StringSetting{State: stateValue, StringValue: "gpu-template"}),
+			wantPodTemplate: "user-template",
+		},
+		{
+			name:            "a pod template in INHERIT contributes nothing",
+			spec:            &task.RunSpec{},
+			resolved:        podTemplateSettings(&settings.StringSetting{State: stateInherit, StringValue: "gpu-template"}),
+			wantPodTemplate: "",
 		},
 		{
 			name:           "empty run base dir takes the settings value",
@@ -129,6 +152,7 @@ func TestApplyRunSettings(t *testing.T) {
 			applyRunSettings(tt.spec, tt.resolved)
 			assert.Equal(t, tt.wantQueue, tt.spec.GetQueue())
 			assert.Equal(t, tt.wantConcurrency, tt.spec.GetMaxActionConcurrency())
+			assert.Equal(t, tt.wantPodTemplate, tt.spec.GetDefaultSettings().GetPodTemplateName())
 			assert.Equal(t, tt.wantRunBaseDir, tt.spec.GetRunBaseDir())
 			assert.Equal(t, tt.wantRawDataPrefix, tt.spec.GetRawDataStorage().GetRawDataPrefix())
 		})

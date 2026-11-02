@@ -80,6 +80,15 @@ message ArtifactTrigger {
   // when the run is kicked off. Mirrors Schedule.kickoff_time_input_arg. Optional; empty means
   // the artifact is not bound to any input.
   string input_arg = 3;
+
+  // Optional: fire only for versions whose string partitions carry every one of these
+  // key/value pairs, e.g. {"region": "us"}. Empty means every partition fires.
+  map<string, string> partitions = 4;
+
+  // Task input name -> partition key. When the trigger fires, each named input receives the
+  // triggering version's value of that partition: a datetime for the time partition, a string
+  // for a string partition. A version flagged with a partition schema mismatch never fires.
+  map<string, string> partition_input_args = 5;
 }
 
 message TriggerAutomationSpec {
@@ -161,6 +170,14 @@ message ProducedArtifact {
   // cross-artifact derivation. Only the name may differ: non-empty scope
   // fields (org/project/domain) must match the produced artifact's own scope.
   repeated flyteidl2.core.ArtifactVersionId parent_artifacts = 6 [(buf.validate.field).repeated.max_items = 32];
+
+  // String partitions of the produced version, copied verbatim into
+  // ArtifactSpec.partitions.
+  flyteidl2.core.Partitions partitions = 7;
+
+  // Time partition of the produced version, copied verbatim into
+  // ArtifactSpec.time_partition.
+  flyteidl2.core.TimePartition time_partition = 8;
 }
 
 // Output payload for an action.

@@ -1,0 +1,33 @@
+{{- $name := "executor" -}}
+{{- $component := $.Values.components.executor -}}
+{{- $budget := default dict $component.podDisruptionBudget }}
+{{- if and $component.enabled $budget.enabled }}
+{{- $hasMin := ne $budget.minAvailable nil }}
+{{- $hasMax := ne $budget.maxUnavailable nil }}
+{{- if eq $hasMin $hasMax }}
+{{- fail (printf "%s.podDisruptionBudget: set exactly one of minAvailable or maxUnavailable (set the other to null)" $name) }}
+{{- end }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "flyte-core.componentName" (dict "root" $ "component" $name) }}
+  namespace: {{ $.Release.Namespace | quote }}
+  labels:
+    {{- include "flyte-core.componentLabels" (dict "root" $ "component" $name) | nindent 4 }}
+  {{- with $.Values.commonAnnotations }}
+  annotations:
+    {{- tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if $hasMin }}
+  minAvailable: {{ $budget.minAvailable | toJson }}
+  {{- else }}
+  maxUnavailable: {{ $budget.maxUnavailable | toJson }}
+  {{- end }}
+  {{- with $budget.unhealthyPodEvictionPolicy }}
+  unhealthyPodEvictionPolicy: {{ . | quote }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "flyte-core.componentSelectorLabels" (dict "root" $ "component" $name) | nindent 6 }}
+{{- end }}

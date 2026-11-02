@@ -60,7 +60,7 @@ func validTaskAction() *flyteorgv1.TaskAction {
 
 func TestValidateTaskAction_ValidSpec(t *testing.T) {
 	resolver := &mockPluginResolver{plugin: mockPlugin{}}
-	p, maxRuntime, reason, err := validateTaskAction(validTaskAction(), resolver)
+	p, timeouts, reason, err := validateTaskAction(validTaskAction(), resolver)
 	if err != nil {
 		t.Fatalf("expected no error, got: %v", err)
 	}
@@ -70,8 +70,8 @@ func TestValidateTaskAction_ValidSpec(t *testing.T) {
 	if p == nil {
 		t.Fatal("expected non-nil plugin")
 	}
-	if maxRuntime != 0 {
-		t.Fatalf("expected no max runtime for a template without a timeout, got: %v", maxRuntime)
+	if timeouts != (taskTimeouts{}) {
+		t.Fatalf("expected no timeouts for a template without one, got: %+v", timeouts)
 	}
 }
 

@@ -102,3 +102,55 @@ func TestEventWatcherOnUpdateKeepsTheFreshestObservation(t *testing.T) {
 	require.Len(t, events, 1)
 	assert.WithinDuration(t, lastObserved, events[0].LastObservedAt, time.Microsecond)
 }
+
+func TestEventWatcherRecordsTheReportingNode(t *testing.T) {
+	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
+	createdAt := time.Now().Add(-time.Hour)
+
+	tests := []struct {
+		name     string
+		instance string
+		host     string
+		want     string
+	}{
+		{name: "the reporting instance", instance: testNodeName, want: testNodeName},
+		{name: "the deprecated source host from an older recorder", host: testNodeName, want: testNodeName},
+		{name: "the reporting instance over the host", instance: testNodeName, host: otherNodeName, want: testNodeName},
+		{name: "neither", want: ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			watcher := &controllerRuntimeEventWatcher{}
+			event := testEvent("event-1", "pod-uid", createdAt)
+			event.ReportingInstance = tt.instance
+			event.DeprecatedSource.Host = tt.host
+			watcher.OnAdd(event, false)
+
+			events := watcher.List(key, time.Time{}, time.Time{})
+			require.Len(t, events, 1)
+			assert.Equal(t, tt.want, events[0].ReportingNode)
+		})
+	}
+}
+
+func TestEventWatcherOnUpdateTakesTheReportingNodeAsItIsNow(t *testing.T) {
+	watcher := &controllerRuntimeEventWatcher{}
+	createdAt := time.Now().Add(-time.Hour)
+	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
+
+	first := testEvent("event-1", "pod-uid", createdAt)
+	first.ReportingInstance = testNodeName
+	watcher.OnAdd(first, false)
+
+	// An event rewritten to name another node is judged on what it says now, not on
+	// the node an earlier version named.
+	rewritten := testEvent("event-1", "pod-uid", createdAt)
+	rewritten.ReportingInstance = otherNodeName
+	watcher.OnUpdate(first, rewritten)
+
+	events := watcher.List(key, time.Time{}, time.Time{})
+	require.Len(t, events, 1)
+	assert.Equal(t, otherNodeName, events[0].ReportingNode)
+	assert.Equal(t, createdAt.UTC(), events[0].CreatedAt.UTC())
+}

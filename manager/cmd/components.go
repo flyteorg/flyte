@@ -20,8 +20,10 @@ import (
 	stdlibapp "github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/v2/flytestdlib/redis"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/runs"
 	runsconfig "github.com/flyteorg/flyte/v2/runs/config"
@@ -32,6 +34,9 @@ import (
 )
 
 const componentAll = "all"
+
+// sharedServiceName identifies clients shared by all components.
+const sharedServiceName = "flyte"
 
 type componentSetup func(context.Context, *stdlibapp.SetupContext) error
 
@@ -60,7 +65,10 @@ func setupRuns(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	sc.Host = cfg.Server.Host
 	sc.Port = cfg.Server.Port
 
-	db, err := database.GetDB(ctx, database.GetConfig())
+	if err := otelutils.RegisterProvidersWithContext(ctx, runs.ServiceName, otelutils.GetConfig()); err != nil {
+		return fmt.Errorf("failed to initialize database telemetry: %w", err)
+	}
+	db, err := database.GetDB(ctx, database.GetConfig(), runs.ServiceName)
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
 	}
@@ -129,7 +137,10 @@ func setupCache(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	sc.Host = cfg.Server.Host
 	sc.Port = cfg.Server.Port
 
-	db, err := database.GetDB(ctx, database.GetConfig())
+	if err := otelutils.RegisterProvidersWithContext(ctx, cache_service.ServiceName, otelutils.GetConfig()); err != nil {
+		return fmt.Errorf("failed to initialize database telemetry: %w", err)
+	}
+	db, err := database.GetDB(ctx, database.GetConfig(), cache_service.ServiceName)
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
 	}
@@ -214,6 +225,15 @@ func setupExecutor(ctx context.Context, sc *stdlibapp.SetupContext) error {
 }
 
 func setupAll(ctx context.Context, sc *stdlibapp.SetupContext) error {
+	// Native Redis metrics are process-wide, so select the shared provider before
+	// any component or storage setup can create a Redis client.
+	if err := otelutils.RegisterProvidersWithContext(ctx, sharedServiceName, otelutils.GetConfig()); err != nil {
+		return fmt.Errorf("failed to initialize shared telemetry: %w", err)
+	}
+	if err := redis.InitMetrics(otelutils.GetMeterProvider(sharedServiceName)); err != nil {
+		return fmt.Errorf("failed to initialize Redis metrics: %w", err)
+	}
+
 	serverCfg := runsconfig.GetConfig().Server
 	k8sCfg := actionsconfig.GetConfig().Kubernetes
 	sc.Host = serverCfg.Host
@@ -223,7 +243,7 @@ func setupAll(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	sc.BaseURL = fmt.Sprintf("http://localhost:%d", serverCfg.Port)
 
 	dbCfg := &runsconfig.GetConfig().Database
-	db, err := database.GetDB(ctx, dbCfg)
+	db, err := database.GetDB(ctx, dbCfg, sharedServiceName)
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
 	}
