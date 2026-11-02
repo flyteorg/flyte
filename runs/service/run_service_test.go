@@ -890,6 +890,73 @@ func TestListRuns_RejectsBadSearchFilter(t *testing.T) {
 	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 }
 
+// TestListRuns_LabelFilter verifies "labels.<key>" filters reach the repository as label
+// predicates next to plain column filters, and that each listed run carries its labels.
+func TestListRuns_LabelFilter(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+
+	var captured interfaces.ListResourceInput
+	actionRepo.On("ListActions", mock.Anything, mock.MatchedBy(func(input interfaces.ListResourceInput) bool {
+		captured = input
+		return true
+	})).Return([]*models.Run{{
+		Project: "p",
+		Domain:  "d",
+		RunName: "run-1",
+		Name:    "a0",
+		Labels:  []byte(`{"example.com/job-id":"j-1"}`),
+	}}, nil).Once()
+
+	got, err := svc.ListRuns(context.Background(), connect.NewRequest(&workflow.ListRunsRequest{
+		ScopeBy: &workflow.ListRunsRequest_ProjectId{ProjectId: &common.ProjectIdentifier{Name: "p", Domain: "d"}},
+		Request: &common.ListRequest{
+			Limit: 10,
+			Filters: []*common.Filter{
+				{Field: "labels.example.com/job-id", Function: common.Filter_EQUAL, Values: []string{"j-1"}},
+				{Field: "phase", Function: common.Filter_EQUAL, Values: []string{"2"}},
+			},
+		},
+	}))
+	require.NoError(t, err)
+
+	require.NotNil(t, captured.Filter)
+	expr, err := captured.Filter.QueryExpression("")
+	require.NoError(t, err)
+	assert.Contains(t, expr.Query, "labels @> ?::jsonb")
+	assert.Contains(t, expr.Query, "phase = ?")
+	assert.Contains(t, expr.Args, `{"example.com/job-id":"j-1"}`)
+
+	require.Len(t, got.Msg.Runs, 1)
+	assert.Equal(t, map[string]string{"example.com/job-id": "j-1"}, got.Msg.Runs[0].GetLabels())
+}
+
+// TestListRuns_LabelsFromRunSpec verifies a run stored before the labels column existed
+// is still listed with the labels in its run spec.
+func TestListRuns_LabelsFromRunSpec(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+
+	runSpec, err := proto.Marshal(&task.RunSpec{
+		Labels: &task.Labels{Values: map[string]string{"example.com/job-id": "j-1"}},
+	})
+	require.NoError(t, err)
+	actionRepo.On("ListActions", mock.Anything, mock.Anything).Return([]*models.Run{{
+		Project: "p",
+		Domain:  "d",
+		RunName: "run-1",
+		Name:    "a0",
+		RunSpec: runSpec,
+	}}, nil).Once()
+
+	got, err := svc.ListRuns(context.Background(), connect.NewRequest(&workflow.ListRunsRequest{
+		ScopeBy: &workflow.ListRunsRequest_ProjectId{ProjectId: &common.ProjectIdentifier{Name: "p", Domain: "d"}},
+		Request: &common.ListRequest{Limit: 10},
+	}))
+	require.NoError(t, err)
+
+	require.Len(t, got.Msg.Runs, 1)
+	assert.Equal(t, map[string]string{"example.com/job-id": "j-1"}, got.Msg.Runs[0].GetLabels())
+}
+
 // TestListAndSendAllActionsUsesAscendingSort guards against regressing the
 // default repo sort order leaking into the WatchActions seed path. Children
 // have a later created_at than their parents; if ListActions returns rows in
@@ -1622,6 +1689,90 @@ func TestCreateRun_AppliesSettingsQueue(t *testing.T) {
 
 	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
 	require.NoError(t, err)
+}
+
+// TestCreateRun_StoresLabels verifies the run's labels are stored in their queryable form,
+// an empty object when it has none.
+func TestCreateRun_StoresLabels(t *testing.T) {
+	for _, tc := range []struct {
+		name   string
+		labels *task.Labels
+		stored string
+	}{
+		{"labeled", &task.Labels{Values: map[string]string{"example.com/job-id": "j-1"}}, `{"example.com/job-id":"j-1"}`},
+		{"unlabeled", nil, `{}`},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			actionRepo := &repoMocks.ActionRepo{}
+			taskRepo := &repoMocks.TaskRepo{}
+			actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+			repo := &repoMocks.Repository{}
+			store := &storageMocks.ComposedProtobufStore{}
+			dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+			repo.On("ActionRepo").Return(actionRepo)
+			repo.On("TaskRepo").Return(taskRepo)
+
+			svc := &RunService{
+				repo:          repo,
+				settingsRepo:  noSettings(t),
+				actionsClient: actionsClient,
+				projectClient: newMockProjectClientAlwaysOK(t),
+				storagePrefix: "s3://flyte-data",
+				dataStore:     dataStore,
+			}
+
+			req := &workflow.CreateRunRequest{
+				Id: &workflow.CreateRunRequest_RunId{
+					RunId: &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "rl-123"},
+				},
+				InputWrapper: &workflow.CreateRunRequest_Inputs{Inputs: &task.Inputs{}},
+				RunSpec:      &task.RunSpec{Labels: tc.labels},
+				Task:         &workflow.CreateRunRequest_TaskSpec{TaskSpec: &task.TaskSpec{}},
+			}
+
+			store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+			taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+			actionRepo.On("CreateAction", mock.Anything, mock.MatchedBy(func(m *models.Run) bool {
+				return string(m.Labels) == tc.stored
+			}), mock.Anything).Return(&models.Run{Project: "proj", Domain: "dev", Name: "rl-123"}, nil).Once()
+			actionsClient.On("Enqueue", mock.Anything, mock.Anything).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+			_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+			require.NoError(t, err)
+			actionRepo.AssertExpectations(t)
+		})
+	}
+}
+
+// TestCreateRun_RejectsNULLabel verifies a label the labels column cannot store is an
+// InvalidArgument rather than a failed insert.
+func TestCreateRun_RejectsNULLabel(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{} // no expectations: any CreateAction call fails the test
+	repo := &repoMocks.Repository{}
+	repo.On("ActionRepo").Maybe().Return(actionRepo)
+	repo.On("TaskRepo").Maybe().Return(&repoMocks.TaskRepo{})
+	t.Cleanup(func() { actionRepo.AssertExpectations(t) })
+
+	svc := &RunService{
+		repo:          repo,
+		settingsRepo:  noSettings(t),
+		projectClient: newMockProjectClientAlwaysOK(t),
+		storagePrefix: "s3://flyte-data",
+	}
+
+	_, err := svc.CreateRun(context.Background(), connect.NewRequest(&workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "rl-nul"},
+		},
+		InputWrapper: &workflow.CreateRunRequest_Inputs{Inputs: &task.Inputs{}},
+		RunSpec: &task.RunSpec{
+			Labels: &task.Labels{Values: map[string]string{"k": "a\x00b"}},
+		},
+		Task: &workflow.CreateRunRequest_TaskSpec{TaskSpec: &task.TaskSpec{}},
+	}))
+	require.Error(t, err)
+	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 }
 
 func TestCreateRun_WithOffloadedInputData(t *testing.T) {
