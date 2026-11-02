@@ -532,9 +532,10 @@ type RunSpec struct {
 	// Run-scoped defaults, projected onto every task in the run that does not
 	// set the corresponding value itself. Set by the server from settings.
 	DefaultSettings *DefaultSettings `protobuf:"bytes,20,opt,name=default_settings,json=defaultSettings,proto3" json:"default_settings,omitempty"`
-	// Kubernetes namespace selected by the server for this run. The value is
-	// immutable after creation and is propagated to every action and finalizer.
-	// An empty value preserves the legacy namespace resolution behavior.
+	// Kubernetes metadata the server sets for this run: the namespace its pods
+	// run in. It is set when the run is created, does not change afterwards, and
+	// applies to every action and finalizer. Absent: the run's pods use the
+	// namespace they use today.
 	K8SMetadata *common.K8SMetadata `protobuf:"bytes,21,opt,name=k8s_metadata,json=k8sMetadata,proto3" json:"k8s_metadata,omitempty"`
 }
 

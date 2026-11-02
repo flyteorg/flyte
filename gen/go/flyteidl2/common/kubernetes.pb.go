@@ -21,14 +21,15 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// K8sMetadata contains server-owned Kubernetes placement metadata.
+// K8sMetadata is Kubernetes metadata the server sets for a run or app; clients
+// do not set it.
 type K8SMetadata struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Namespace is selected by the server. An empty value preserves legacy
-	// namespace resolution behavior.
+	// The namespace the run or app's pods are created in. Required when the
+	// message is set.
 	Namespace string `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
 }
 

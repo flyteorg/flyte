@@ -738,9 +738,9 @@ export type Spec = Message<"flyteidl2.app.Spec"> & {
   timeouts?: TimeoutConfig;
 
   /**
-   * Kubernetes namespace selected by the server for this app. The value is
-   * immutable after creation and remains stable across app updates. An empty
-   * value preserves the legacy namespace resolution behavior.
+   * Kubernetes metadata the server sets for this app: the namespace it runs
+   * in. It is set when the app is created or turned on, and does not change
+   * while the app is running. Absent: the app uses the namespace it uses today.
    *
    * @generated from field: flyteidl2.common.K8sMetadata k8s_metadata = 17;
    */

@@ -187,9 +187,10 @@ message RunSpec {
   // set the corresponding value itself. Set by the server from settings.
   DefaultSettings default_settings = 20;
 
-  // Kubernetes namespace selected by the server for this run. The value is
-  // immutable after creation and is propagated to every action and finalizer.
-  // An empty value preserves the legacy namespace resolution behavior.
+  // Kubernetes metadata the server sets for this run: the namespace its pods
+  // run in. It is set when the run is created, does not change afterwards, and
+  // applies to every action and finalizer. Absent: the run's pods use the
+  // namespace they use today.
   flyteidl2.common.K8sMetadata k8s_metadata = 21;
 }
 

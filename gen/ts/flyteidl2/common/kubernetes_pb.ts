@@ -14,14 +14,15 @@ export const file_flyteidl2_common_kubernetes: GenFile = /*@__PURE__*/
   fileDesc("CiFmbHl0ZWlkbDIvY29tbW9uL2t1YmVybmV0ZXMucHJvdG8SEGZseXRlaWRsMi5jb21tb24iKQoLSzhzTWV0YWRhdGESGgoJbmFtZXNwYWNlGAEgASgJQge6SARyAhABQsABChRjb20uZmx5dGVpZGwyLmNvbW1vbkIPS3ViZXJuZXRlc1Byb3RvSAJQAVo0Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL2NvbW1vbqICA0ZDWKoCEEZseXRlaWRsMi5Db21tb27KAhBGbHl0ZWlkbDJcQ29tbW9u4gIcRmx5dGVpZGwyXENvbW1vblxHUEJNZXRhZGF0YeoCEUZseXRlaWRsMjo6Q29tbW9uYgZwcm90bzM", [file_buf_validate_validate]);
 
 /**
- * K8sMetadata contains server-owned Kubernetes placement metadata.
+ * K8sMetadata is Kubernetes metadata the server sets for a run or app; clients
+ * do not set it.
  *
  * @generated from message flyteidl2.common.K8sMetadata
  */
 export type K8sMetadata = Message<"flyteidl2.common.K8sMetadata"> & {
   /**
-   * Namespace is selected by the server. An empty value preserves legacy
-   * namespace resolution behavior.
+   * The namespace the run or app's pods are created in. Required when the
+   * message is set.
    *
    * @generated from field: string namespace = 1;
    */

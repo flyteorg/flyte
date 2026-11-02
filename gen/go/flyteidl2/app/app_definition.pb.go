@@ -1005,9 +1005,9 @@ type Spec struct {
 	Links  []*Link    `protobuf:"bytes,14,rep,name=links,proto3" json:"links,omitempty"`
 	// Timeout configuration for the app.
 	Timeouts *TimeoutConfig `protobuf:"bytes,15,opt,name=timeouts,proto3" json:"timeouts,omitempty"`
-	// Kubernetes namespace selected by the server for this app. The value is
-	// immutable after creation and remains stable across app updates. An empty
-	// value preserves the legacy namespace resolution behavior.
+	// Kubernetes metadata the server sets for this app: the namespace it runs
+	// in. It is set when the app is created or turned on, and does not change
+	// while the app is running. Absent: the app uses the namespace it uses today.
 	K8SMetadata *common.K8SMetadata `protobuf:"bytes,17,opt,name=k8s_metadata,json=k8sMetadata,proto3" json:"k8s_metadata,omitempty"`
 }
 
