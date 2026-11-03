@@ -10,10 +10,10 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins";
 // Top-level spec for a clustered task execution. Packed into TaskTemplate.custom.
 message ClusteredTaskSpec {
   // Number of pods (== number of nodes). Required, must be >= 1.
-  int32 replicas = 1 [(buf.validate.field).uint32.gt = 0];
+  int32 replicas = 1 [(buf.validate.field).int32.gt = 0];
 
   // Number of processes per node passed to torchrun as --nproc-per-node (typically one per GPU). Required, must be >= 1.
-  int32 nproc_per_node = 2 [(buf.validate.field).uint32.gt = 0];
+  int32 nproc_per_node = 2 [(buf.validate.field).int32.gt = 0];
 
   // Selects the launcher and its per-launcher configuration.
   Runtime runtime = 3;
@@ -77,7 +77,8 @@ enum Interconnect {
   ROCE = 3;
 }
 
-// Controls how the JobSet responds to rank failures and host-maintenance evictions.
+// Controls how the JobSet responds to rank failures, host-maintenance evictions and
+// Kueue preemptions.
 message ClusterFailurePolicy {
   // Maximum number of whole-cluster restarts before the JobSet is marked failed.
   // Each restart increments JOBSET_RESTART_ATTEMPT and rotates the torchrun RDZV_ID.
@@ -86,4 +87,9 @@ message ClusterFailurePolicy {
   // If true, pods evicted due to host maintenance (DisruptionTarget condition)
   // trigger a free restart that does not count against max_restarts.
   bool restart_on_host_maintenance = 2;
+
+  // If true, a gang that Kueue preempts after it started keeps its attempt and JobSet
+  // and resumes when Kueue re-admits it, so a preemption costs no retry. The task's
+  // max_runtime keeps counting while it waits. If false, the preemption ends the attempt.
+  bool resume_after_preemption = 3;
 }

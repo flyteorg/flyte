@@ -10,15 +10,22 @@ import (
 
 	"time"
 
+	"connectrpc.com/connect"
 	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 	"github.com/jmoiron/sqlx"
+	metricnoop "go.opentelemetry.io/otel/metric/noop"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
+	projectpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings/settingsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/migrations"
 	"github.com/flyteorg/flyte/v2/runs/repository"
+	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/service"
 )
 
@@ -85,13 +92,14 @@ func TestMain(m *testing.M) {
 		MaxOpenConnections: 100,
 	}
 	var err error
-	testDB, err = database.GetDB(ctx, dbConfig)
+	testDB, err = database.GetDB(ctx, dbConfig, "runs-service-test")
 	if err != nil {
 		log.Printf("Failed to initialize database: %v", err)
 		exitCode = 1
 		return
 	}
 	log.Println("Database initialized")
+	runsConfig := config.GetConfig()
 
 	// Run migrations
 	if err := migrations.RunMigrations(ctx, testDB); err != nil {
@@ -102,29 +110,53 @@ func TestMain(m *testing.M) {
 	log.Println("Database migrations completed")
 
 	// Create repository and services
-	repo, err := repository.NewRepository(testDB, *dbConfig)
+	repo, err := repository.NewRepository(
+		testDB,
+		*dbConfig,
+		repository.NewNotificationConfig(
+			runsConfig.NotificationBufferLimit,
+			runsConfig.NotifyRetryMinBackoff.Duration,
+			runsConfig.NotifyRetryMaxBackoff.Duration,
+			runsConfig.WatchBufferSize,
+		),
+		metricnoop.NewMeterProvider(),
+	)
 	if err != nil {
 		log.Printf("Failed to create repository: %v", err)
 		exitCode = 1
 		return
 	}
-	taskSvc := service.NewTaskService(repo, nil)
+
+	settingsRepo := impl.NewSettingsRepo(testDB)
+
+	// Services validate project existence through the ProjectService client, so mount a
+	// real ProjectService on the same mux (mirrors production unified mode in setup.go).
+	endpointURL := fmt.Sprintf("http://localhost:%d", testPort)
+	projectSvc := service.NewProjectService(impl.NewProjectRepo(testDB), nil)
+	projectClient := projectconnect.NewProjectServiceClient(http.DefaultClient, endpointURL)
+	taskSvc := service.NewTaskService(repo, projectClient)
 
 	// Create RunService with a no-op actions client (points at test server; not used by watch tests)
-	endpointURL := fmt.Sprintf("http://localhost:%d", testPort)
 	actionsClient := actionsconnect.NewActionsServiceClient(http.DefaultClient, endpointURL)
-	runSvc := service.NewRunService(repo, actionsClient, nil, nil, "", nil, nil)
+	runSvc := service.NewRunService(repo, settingsRepo, actionsClient, projectClient, "", nil, nil, "", true, runsConfig.IdentityHeaders)
 
 	// Setup HTTP server
 	mux := http.NewServeMux()
 	taskPath, taskHandler := taskconnect.NewTaskServiceHandler(taskSvc)
 	mux.Handle(taskPath, taskHandler)
 
+	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(projectSvc)
+	mux.Handle(projectPath, projectHandler)
+
 	runPath, runHandler := workflowconnect.NewRunServiceHandler(runSvc)
 	mux.Handle(runPath, runHandler)
 
 	internalRunPath, internalRunHandler := workflowconnect.NewInternalRunServiceHandler(runSvc)
 	mux.Handle(internalRunPath, internalRunHandler)
+
+	settingsSvc := service.NewSettingsService(settingsRepo)
+	settingsPath, settingsHandler := settingsconnect.NewSettingsServiceHandler(settingsSvc)
+	mux.Handle(settingsPath, settingsHandler)
 
 	// Add health check
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
@@ -168,6 +200,15 @@ func TestMain(m *testing.M) {
 	}
 	log.Println("Test server is ready")
 
+	// Create the shared fixture project that all tests reference.
+	if _, err := projectSvc.CreateProject(ctx, connect.NewRequest(&projectpb.CreateProjectRequest{
+		Project: &projectpb.Project{Id: testProject, Name: testProject},
+	})); err != nil {
+		log.Printf("Failed to create test project: %v", err)
+		exitCode = 1
+		return
+	}
+
 	// Run tests
 	exitCode = m.Run()
 }
@@ -208,9 +249,10 @@ func cleanupTestDB(t *testing.T) {
 		return
 	}
 
-	// Truncate known tables
+	// Truncate known tables. The projects table is excluded so the shared fixture
+	// project created in TestMain survives across tests.
 	tables := []string{
-		"action_events", "actions", "runs", "tasks", "projects",
+		"action_events", "actions", "runs", "tasks", "settings",
 	}
 	for _, table := range tables {
 		if _, err := testDB.Exec(fmt.Sprintf("DELETE FROM %s", table)); err != nil {

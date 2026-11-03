@@ -155,6 +155,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_cacheInvalidationPort", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("cacheInvalidationPort", testValue)
+			if vInt, err := cmdFlags.GetInt("cacheInvalidationPort"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.CacheInvalidationPort)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_serviceName", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -387,6 +401,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("embeddedSecretManagerConfig.imagePullSecrets.enabled", testValue)
 			if vBool, err := cmdFlags.GetBool("embeddedSecretManagerConfig.imagePullSecrets.enabled"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.EmbeddedSecretManagerConfig.ImagePullSecrets.Enabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_embeddedSecretManagerConfig.clusterName", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("embeddedSecretManagerConfig.clusterName", testValue)
+			if vString, err := cmdFlags.GetString("embeddedSecretManagerConfig.clusterName"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.EmbeddedSecretManagerConfig.ClusterName)
 
 			} else {
 				assert.FailNow(t, err.Error())

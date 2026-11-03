@@ -76,3 +76,6 @@ func NewGlobalSecrets(provider GlobalSecretProvider, cfg *config.Config) GlobalS
 		cfg:              cfg,
 	}
 }
+
+// InvalidateCache is a no-op: this injector resolves secrets on every Inject and caches nothing.
+func (g GlobalSecrets) InvalidateCache(_ context.Context, _, _, _, _ string) {}

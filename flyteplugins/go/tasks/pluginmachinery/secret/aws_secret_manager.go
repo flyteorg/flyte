@@ -148,3 +148,6 @@ func NewAWSSecretManagerInjector(cfg config.AWSSecretManagerConfig) AWSSecretMan
 		cfg: cfg,
 	}
 }
+
+// InvalidateCache is a no-op: this injector resolves secrets on every Inject and caches nothing.
+func (i AWSSecretManagerInjector) InvalidateCache(_ context.Context, _, _, _, _ string) {}

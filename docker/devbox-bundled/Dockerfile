@@ -7,10 +7,12 @@ ENV TARGETARCH "${TARGETARCH}"
 WORKDIR /build
 
 COPY images/manifest.txt images/preload ./
-RUN ./preload manifest.txt
+
+ARG CACHEBUST=0
+RUN echo "cachebust=${CACHEBUST}" && ./preload manifest.txt
 
 
-FROM --platform=${BUILDPLATFORM} golang:1.26.3-bookworm AS bootstrap
+FROM --platform=${BUILDPLATFORM} golang:1.27.3-bookworm AS bootstrap
 
 ARG TARGETARCH
 ENV CGO_ENABLED 0
@@ -21,7 +23,7 @@ WORKDIR /flyteorg/build
 COPY bootstrap/go.mod bootstrap/go.sum ./
 RUN go mod download
 COPY bootstrap/ ./
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
+RUN --mount=type=cache,target=/root/.cache/go-build \
     go build -o dist/flyte-devbox-bootstrap cmd/bootstrap/main.go && \
     go build -o dist/embedded-postgres cmd/embedded-postgres/main.go
 
@@ -98,4 +100,11 @@ VOLUME /var/lib/flyte/storage
 ENV SSL_CERT_DIR /var/lib/flyte/config/ca-certificates
 
 ENTRYPOINT [ "/bin/k3d-entrypoint.sh" ]
-CMD [ "server", "--disable=servicelb", "--disable=metrics-server" ]
+CMD [ "server", "--cluster-init", "--disable=servicelb", "--disable=metrics-server", \
+      #"--kubelet-arg=system-reserved=cpu=1500m,memory=3Gi", \
+      #"--kubelet-arg=kube-reserved=cpu=500m,memory=1Gi", \
+      "--kube-apiserver-arg=max-requests-inflight=3000", \
+      "--kube-apiserver-arg=max-mutating-requests-inflight=3000", \
+      "--kube-controller-manager-arg=kube-api-burst=3000", \
+      "--kube-controller-manager-arg=kube-api-qps=3000" \
+    ]

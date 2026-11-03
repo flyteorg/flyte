@@ -267,14 +267,30 @@ func (s *Service) UploadInputs(
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to hash inputs: %w", err))
 	}
 
-	// Build the storage path: storagePrefix/org/project/domain/offloaded-inputs/<hash>/inputs.pb
-	storagePrefix := strings.TrimRight(s.cfg.Upload.StoragePrefix, "/")
-	pathComponents := []string{storagePrefix, org, project, domain, "offloaded-inputs", inputsHash}
+	// Build the storage path: <base>/org/project/domain/offloaded-inputs/<hash>/inputs.pb
+	// req.base_dir (run_base_dir) overrides the configured storagePrefix when set; it must
+	// match the base CreateRun resolves from RunSpec.run_base_dir so the run reads these
+	// inputs from where they were written.
+	//
+	// When base_dir is set it is a full path used verbatim, bucket and all, so it becomes
+	// the base reference directly (enabling cross-bucket writes); otherwise inputs go
+	// under the configured Upload.StoragePrefix within the operator's base container.
+	// TODO: consult org/project/domain settings (RunSettings.run_base_dir) here as the
+	// middle tier. CreateRun already does, so until this matches, a settings-provided
+	// base applies to run metadata but not to offloaded inputs.
+	var baseRef storage.DataReference
+	var pathComponents []string
+	if base := strings.TrimRight(req.Msg.GetBaseDir(), "/"); base != "" {
+		baseRef = storage.DataReference(base)
+		pathComponents = []string{org, project, domain, "offloaded-inputs", inputsHash}
+	} else {
+		baseRef = s.dataStore.GetBaseContainerFQN(ctx)
+		pathComponents = []string{strings.TrimRight(s.cfg.Upload.StoragePrefix, "/"), org, project, domain, "offloaded-inputs", inputsHash}
+	}
 	pathComponents = lo.Filter(pathComponents, func(key string, _ int) bool {
 		return key != ""
 	})
 
-	baseRef := s.dataStore.GetBaseContainerFQN(ctx)
 	dirRef, err := s.dataStore.ConstructReference(ctx, baseRef, pathComponents...)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to construct storage path: %v", err)
@@ -513,17 +529,15 @@ func (s *Service) GetActionData(
 		group.Go(func() error {
 			outputRef := storage.DataReference(urisResp.Msg.GetOutputsUri())
 			logger.Infof(groupCtx, "GetActionData: reading outputs from %s", outputRef)
-			var inputsOrOutputs task.Inputs
-			if err := s.dataStore.ReadProtobuf(groupCtx, outputRef, &inputsOrOutputs); err != nil {
+			outputs := &task.Outputs{}
+			if err := s.dataStore.ReadProtobuf(groupCtx, outputRef, outputs); err != nil {
 				if !storage.IsNotFound(err) {
 					logger.Errorf(groupCtx, "GetActionData: failed to read outputs from %s: %v", outputRef, err)
 					return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to read outputs from %s: %w", outputRef, err))
 				}
 				logger.Debugf(groupCtx, "Outputs not found at %s (action may not have finished)", urisResp.Msg.GetOutputsUri())
 			} else {
-				resp.Outputs = &task.Outputs{
-					Literals: inputsOrOutputs.GetLiterals(),
-				}
+				resp.Outputs = outputs
 				resp.OutputsUri = urisResp.Msg.GetOutputsUri()
 				logger.Debugf(groupCtx, "Read %d output literals", len(resp.Outputs.Literals))
 			}

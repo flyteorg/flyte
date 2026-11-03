@@ -9,6 +9,7 @@ import "flyteidl2/common/run.proto";
 import "flyteidl2/logs/dataplane/payload.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/task_definition.proto";
+import "flyteidl2/workflow/run_definition.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -90,6 +91,10 @@ message CreateUploadLocationRequest {
   // This is validated against the platform's maximum upload size if provided.
   // +optional
   int64 content_length = 9;
+
+  // Queue whose cluster pool must hold this upload. Empty uses the project's
+  // default queue for compatibility with older clients.
+  string queue = 10;
 }
 
 // CreateUploadLocationResponse specifies the response for the CreateUploadLocation API.
@@ -135,6 +140,19 @@ message UploadInputsRequest {
 
   // The actual inputs.
   task.Inputs inputs = 6;
+
+  // Optional explicit base directory under which to write the offloaded inputs.
+  // Mirrors RunSpec.run_base_dir and must match the value the subsequent
+  // CreateRun resolves, so the run reads inputs from where they were written.
+  // When empty, the server resolves the base from org/project/domain settings,
+  // then the dataplane cluster default.
+  string base_dir = 7;
+
+  // Optional name of the queue the run will be placed on, resolved in the run's
+  // project/domain scope like RunSpec.queue. When set, the inputs are written to
+  // the object store of that queue's cluster pool; when empty, the project/domain
+  // default queue's pool is used. Single-cluster deployments may ignore it.
+  string queue = 8;
 }
 
 message UploadInputsResponse {
@@ -184,6 +202,13 @@ message CreateDownloadLinkResponse {
 message GetActionDataRequest {
   // Action to query.
   common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+
+  // Source of the run the action belongs to. Run names are not unique across platform and
+  // tracked runs, so the server uses this to resolve the action against the matching service
+  // (RUN_SOURCE_TRACKED resolves via TrackedRunService; anything else keeps the platform
+  // behavior).
+  // +optional
+  workflow.RunSource run_source = 2;
 }
 
 // Response message for querying action data.

@@ -27,6 +27,14 @@ flyte-binary:
       tag: sandbox
       pullPolicy: Never
   configuration:
+    # CoPilot ships inside the locally-built flyte-binary sandbox image
+    # (at /bin/flyte-copilot), so point the sidecar at it instead of pulling
+    # an external image. The image is loaded into k3s, so IfNotPresent resolves
+    # it without a registry pull.
+    co-pilot:
+      image:
+        repository: flyte-binary-v2
+        tag: sandbox
     database:
       postgres:
         host: 'postgresql'
@@ -69,6 +77,14 @@ flyte-binary:
             - _U_EP_OVERRIDE: 'flyte-binary-http.{{ .Release.Namespace }}:8090'
             - _U_INSECURE: "true"
             - _U_USE_ACTIONS: "1"
+          # Devbox-local Apple Silicon accelerator: the host-side Apple Silicon bridge that
+          # `flyte start devbox --apple-silicon` runs on an Apple Silicon Mac. The devbox bootstrap fills
+          # these in from the FLYTE_DEVBOX_APPLE_SILICON_* container env; left empty, a workload that
+          # requests gpu="AppleSilicon" fails with APPLE_SILICON_NOT_AVAILABLE.
+          apple-silicon-bridge:
+            endpoint: '%{APPLE_SILICON_BRIDGE_ENDPOINT}%'
+            token-secret: '%{APPLE_SILICON_BRIDGE_TOKEN_SECRET}%'
+            host-platform: '%{DEVBOX_HOST_PLATFORM}%'
       runs:
         database:
           postgres:
@@ -189,3 +205,16 @@ sandbox:
   # dev Routes requests to an instance of Flyte running locally on a developer's
   # development environment. This is only usable if the flyte-binary chart is disabled.
   dev: false
+  # console runs an in-cluster Flyte console even in dev mode (when the flyte-binary
+  # chart is disabled and the manager runs on the host), so http://localhost:30080/v2
+  # keeps working. The image is preloaded into the devbox, hence pullPolicy: Never.
+  console:
+    enabled: true
+    image:
+      repository: docker.io/unionai-oss/flyteconsole-v2
+      tag: sandbox
+      pullPolicy: Never
+    containerPort: 8080
+    basePath: /v2
+    service:
+      port: 80

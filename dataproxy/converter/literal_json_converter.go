@@ -1,9 +1,11 @@
 package converter
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"fmt"
+	"math"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -92,7 +94,12 @@ func TaskSpecToLaunchFormJson(ctx context.Context, taskSpec *task.TaskSpec) (*st
 //     }
 func JSONValuesToLiterals(ctx context.Context, variableMap *core.VariableMap, values *structpb.Struct) ([]*task.NamedLiteral, error) {
 	if variableMap == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("variableMap cannot be nil"))
+		// A task with no declared inputs has no variableMap. There are no
+		// expected inputs, so treat it as empty rather than erroring: an empty
+		// payload yields no literals, and any provided values are unmapped and
+		// get ignored (debug-logged) below, consistent with how we handle
+		// unmapped fields elsewhere.
+		variableMap = &core.VariableMap{}
 	}
 	if values == nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("values cannot be nil"))
@@ -164,10 +171,10 @@ func JSONValuesToLiterals(ctx context.Context, variableMap *core.VariableMap, va
 
 	if len(unmappedFields) > 0 {
 		// Extra fields in values that don't have corresponding variables in variableMap
-		// are allowed and will be ignored (with a warning). This is intentional to avoid
+		// are allowed and will be ignored (logged at debug). This is intentional to avoid
 		// hard failures when translating literals for a task version that has a different
 		// template than the original task these inputs were derived from.
-		logger.Warnf(ctx, "found unmapped fields in JSON payload that do not correspond to any variable (ignoring): %v", unmappedFields)
+		logger.Debugf(ctx, "found unmapped fields in JSON payload that do not correspond to any variable (ignoring): %v", unmappedFields)
 	}
 
 	return literals, nil
@@ -387,8 +394,15 @@ func LiteralsToLaunchFormJson(ctx context.Context, literals []*task.NamedLiteral
 	for _, literal := range literals {
 		variable, ok := varMap[literal.GetName()]
 		if !ok {
-			logger.Errorf(ctx, "variable not found in variable map for literal: %s", literal.GetName())
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("variable not found in variable map for literal: %s", literal.GetName()))
+			// The literal has no corresponding variable in the target interface.
+			// This happens legitimately when re-converting a run's inputs against a
+			// different task version (e.g. the launch-form version selector switching
+			// versions): inputs the new task def dropped have nowhere to map. Skip
+			// them (logged at debug) instead of failing the whole conversion, so the
+			// inputs the two versions *share* are still preserved. Mirrors the
+			// unmapped-field handling in JSONValuesToLiterals.
+			logger.Debugf(ctx, "skipping literal %q with no corresponding variable in the target interface (ignoring)", literal.GetName())
+			continue
 		}
 		fieldName := literal.GetName()
 
@@ -630,7 +644,15 @@ func literalTypeToJsonSchema(ctx context.Context, literalType *core.LiteralType)
 				}
 				return metadataMap, nil
 			}
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("missing metadata for struct type"))
+			// A STRUCT carries no metadata when the SDK had no schema to attach,
+			// e.g. dict[int, int] — which is a STRUCT only because a LiteralMap
+			// can't hold non-string keys. Erroring here fails the whole
+			// conversion (the console then shows "Unable to load outputs"), so
+			// fall back to an open object instead.
+			return map[string]any{
+				"type":                 "object",
+				"additionalProperties": true,
+			}, nil
 		case core.SimpleType_ERROR:
 			return errorTypeToJsonSchema(), nil
 		case core.SimpleType_BINARY:
@@ -1035,6 +1057,63 @@ func findMatchingUnionVariant(ctx context.Context, value any, variants []*core.L
 	return nil, nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("%s", errMsg))
 }
 
+// decodeMsgpackToJSON decodes msgpack bytes (the encoding the SDK uses for
+// STRUCT literals: dataclasses, pydantic models, and dicts that aren't
+// map[string, T]) into JSON-compatible values.
+//
+// The default msgpack.Unmarshal into `any` decodes maps as map[string]any and
+// therefore fails outright on non-string keys, e.g. a task returning
+// dict[int, int] — which is exactly why those outputs used to fall back to an
+// unreadable base64 blob. Decode maps untyped instead and stringify the keys,
+// since JSON objects only have string keys.
+func decodeMsgpackToJSON(data []byte) (any, error) {
+	dec := msgpack.NewDecoder(bytes.NewReader(data))
+	dec.SetMapDecoder(func(d *msgpack.Decoder) (any, error) { return d.DecodeUntypedMap() })
+	// Loose decoding yields int64/float64/string rather than sized types
+	// (int8, uint16, ...), which structpb doesn't accept.
+	dec.UseLooseInterfaceDecoding(true)
+
+	var decoded any
+	if err := dec.Decode(&decoded); err != nil {
+		return nil, err
+	}
+	return jsonSafeValue(decoded), nil
+}
+
+// jsonSafeValue rewrites the output of an untyped msgpack decode into values
+// structpb (and thus JSON) accepts: map keys become strings and raw bytes
+// become base64.
+func jsonSafeValue(v any) any {
+	switch t := v.(type) {
+	case map[any]any:
+		m := make(map[string]any, len(t))
+		for k, val := range t {
+			key, ok := k.(string)
+			if !ok {
+				key = fmt.Sprint(k)
+			}
+			m[key] = jsonSafeValue(val)
+		}
+		return m
+	case map[string]any:
+		m := make(map[string]any, len(t))
+		for k, val := range t {
+			m[k] = jsonSafeValue(val)
+		}
+		return m
+	case []any:
+		s := make([]any, len(t))
+		for i, val := range t {
+			s[i] = jsonSafeValue(val)
+		}
+		return s
+	case []byte:
+		return base64.StdEncoding.EncodeToString(t)
+	default:
+		return v
+	}
+}
+
 // literalToJsonValues converts a core.Literal to a JSON-compatible value.
 func literalToJsonValues(ctx context.Context, literal *core.Literal) (any, error) {
 	if literal == nil {
@@ -1056,7 +1135,7 @@ func literalToJsonValues(ctx context.Context, literal *core.Literal) (any, error
 				return p.Boolean, nil
 			case *core.Primitive_Datetime:
 				if p.Datetime != nil {
-					return p.Datetime.AsTime().Format(time.RFC3339), nil
+					return p.Datetime.AsTime().Format(time.RFC3339Nano), nil
 				}
 				logger.Errorf(ctx, "datetime cannot be nil")
 				return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("datetime cannot be nil"))
@@ -1073,8 +1152,7 @@ func literalToJsonValues(ctx context.Context, literal *core.Literal) (any, error
 		case *core.Scalar_Binary:
 			// Try to decode as msgpack, fallback to base64 encoded string
 			if s.Binary != nil && len(s.Binary.GetValue()) > 0 {
-				var decoded any
-				err := msgpack.Unmarshal(s.Binary.GetValue(), &decoded)
+				decoded, err := decodeMsgpackToJSON(s.Binary.GetValue())
 				if err == nil {
 					return decoded, nil
 				}
@@ -1470,6 +1548,12 @@ func jsonValueToLiteralWithFieldName(ctx context.Context, value any, literalType
 			if num, ok := value.(int64); ok {
 				intNum = num
 			} else if num, ok := value.(float64); ok {
+				// JSON numbers decode as float64. Reject a fractional value instead of
+				// truncating it, so that a union such as int | float picks the float variant.
+				if num != math.Trunc(num) {
+					logger.Errorf(ctx, "invalid integer value: %v is not a whole number", num)
+					return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid integer value: %v is not a whole number", num))
+				}
 				intNum = int64(num)
 			} else if num, ok := value.(int); ok {
 				intNum = int64(num)

@@ -237,6 +237,68 @@ func (_c *ActionRepo_ClearAbortRequest_Call) RunAndReturn(run func(ctx context.C
 	return _c
 }
 
+// CountActiveActionsByPhase provides a mock function for the type ActionRepo
+func (_mock *ActionRepo) CountActiveActionsByPhase(ctx context.Context) (map[interfaces.PhaseKey]int64, error) {
+	ret := _mock.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CountActiveActionsByPhase")
+	}
+
+	var r0 map[interfaces.PhaseKey]int64
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context) (map[interfaces.PhaseKey]int64, error)); ok {
+		return returnFunc(ctx)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context) map[interfaces.PhaseKey]int64); ok {
+		r0 = returnFunc(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[interfaces.PhaseKey]int64)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = returnFunc(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// ActionRepo_CountActiveActionsByPhase_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CountActiveActionsByPhase'
+type ActionRepo_CountActiveActionsByPhase_Call struct {
+	*mock.Call
+}
+
+// CountActiveActionsByPhase is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *ActionRepo_Expecter) CountActiveActionsByPhase(ctx interface{}) *ActionRepo_CountActiveActionsByPhase_Call {
+	return &ActionRepo_CountActiveActionsByPhase_Call{Call: _e.mock.On("CountActiveActionsByPhase", ctx)}
+}
+
+func (_c *ActionRepo_CountActiveActionsByPhase_Call) Run(run func(ctx context.Context)) *ActionRepo_CountActiveActionsByPhase_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *ActionRepo_CountActiveActionsByPhase_Call) Return(counts map[interfaces.PhaseKey]int64, err error) *ActionRepo_CountActiveActionsByPhase_Call {
+	_c.Call.Return(counts, err)
+	return _c
+}
+
+func (_c *ActionRepo_CountActiveActionsByPhase_Call) RunAndReturn(run func(ctx context.Context) (map[interfaces.PhaseKey]int64, error)) *ActionRepo_CountActiveActionsByPhase_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateAction provides a mock function for the type ActionRepo
 func (_mock *ActionRepo) CreateAction(ctx context.Context, action *models.Action, updateTriggeredAt bool) (*models.Action, error) {
 	ret := _mock.Called(ctx, action, updateTriggeredAt)
@@ -1155,17 +1217,80 @@ func (_c *ActionRepo_NotifyStateUpdate_Call) RunAndReturn(run func(ctx context.C
 	return _c
 }
 
+// UpdateActionDetailedInfo provides a mock function for the type ActionRepo
+func (_mock *ActionRepo) UpdateActionDetailedInfo(ctx context.Context, actionID *common.ActionIdentifier, detailedInfo []byte) error {
+	ret := _mock.Called(ctx, actionID, detailedInfo)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateActionDetailedInfo")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, []byte) error); ok {
+		r0 = returnFunc(ctx, actionID, detailedInfo)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// ActionRepo_UpdateActionDetailedInfo_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateActionDetailedInfo'
+type ActionRepo_UpdateActionDetailedInfo_Call struct {
+	*mock.Call
+}
+
+// UpdateActionDetailedInfo is a helper method to define mock.On call
+//   - ctx context.Context
+//   - actionID *common.ActionIdentifier
+//   - detailedInfo []byte
+func (_e *ActionRepo_Expecter) UpdateActionDetailedInfo(ctx interface{}, actionID interface{}, detailedInfo interface{}) *ActionRepo_UpdateActionDetailedInfo_Call {
+	return &ActionRepo_UpdateActionDetailedInfo_Call{Call: _e.mock.On("UpdateActionDetailedInfo", ctx, actionID, detailedInfo)}
+}
+
+func (_c *ActionRepo_UpdateActionDetailedInfo_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, detailedInfo []byte)) *ActionRepo_UpdateActionDetailedInfo_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *common.ActionIdentifier
+		if args[1] != nil {
+			arg1 = args[1].(*common.ActionIdentifier)
+		}
+		var arg2 []byte
+		if args[2] != nil {
+			arg2 = args[2].([]byte)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *ActionRepo_UpdateActionDetailedInfo_Call) Return(err error) *ActionRepo_UpdateActionDetailedInfo_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *ActionRepo_UpdateActionDetailedInfo_Call) RunAndReturn(run func(ctx context.Context, actionID *common.ActionIdentifier, detailedInfo []byte) error) *ActionRepo_UpdateActionDetailedInfo_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateActionPhase provides a mock function for the type ActionRepo
-func (_mock *ActionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time) error {
-	ret := _mock.Called(ctx, actionID, phase, attempts, cacheStatus, endTime)
+func (_mock *ActionRepo) UpdateActionPhase(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time, startTime *time.Time) error {
+	ret := _mock.Called(ctx, actionID, phase, attempts, cacheStatus, endTime, startTime)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateActionPhase")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, common.ActionPhase, uint32, core.CatalogCacheStatus, *time.Time) error); ok {
-		r0 = returnFunc(ctx, actionID, phase, attempts, cacheStatus, endTime)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *common.ActionIdentifier, common.ActionPhase, uint32, core.CatalogCacheStatus, *time.Time, *time.Time) error); ok {
+		r0 = returnFunc(ctx, actionID, phase, attempts, cacheStatus, endTime, startTime)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -1184,11 +1309,12 @@ type ActionRepo_UpdateActionPhase_Call struct {
 //   - attempts uint32
 //   - cacheStatus core.CatalogCacheStatus
 //   - endTime *time.Time
-func (_e *ActionRepo_Expecter) UpdateActionPhase(ctx interface{}, actionID interface{}, phase interface{}, attempts interface{}, cacheStatus interface{}, endTime interface{}) *ActionRepo_UpdateActionPhase_Call {
-	return &ActionRepo_UpdateActionPhase_Call{Call: _e.mock.On("UpdateActionPhase", ctx, actionID, phase, attempts, cacheStatus, endTime)}
+//   - startTime *time.Time
+func (_e *ActionRepo_Expecter) UpdateActionPhase(ctx interface{}, actionID interface{}, phase interface{}, attempts interface{}, cacheStatus interface{}, endTime interface{}, startTime interface{}) *ActionRepo_UpdateActionPhase_Call {
+	return &ActionRepo_UpdateActionPhase_Call{Call: _e.mock.On("UpdateActionPhase", ctx, actionID, phase, attempts, cacheStatus, endTime, startTime)}
 }
 
-func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time)) *ActionRepo_UpdateActionPhase_Call {
+func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time, startTime *time.Time)) *ActionRepo_UpdateActionPhase_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
@@ -1214,6 +1340,10 @@ func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, a
 		if args[5] != nil {
 			arg5 = args[5].(*time.Time)
 		}
+		var arg6 *time.Time
+		if args[6] != nil {
+			arg6 = args[6].(*time.Time)
+		}
 		run(
 			arg0,
 			arg1,
@@ -1221,6 +1351,7 @@ func (_c *ActionRepo_UpdateActionPhase_Call) Run(run func(ctx context.Context, a
 			arg3,
 			arg4,
 			arg5,
+			arg6,
 		)
 	})
 	return _c
@@ -1231,7 +1362,7 @@ func (_c *ActionRepo_UpdateActionPhase_Call) Return(err error) *ActionRepo_Updat
 	return _c
 }
 
-func (_c *ActionRepo_UpdateActionPhase_Call) RunAndReturn(run func(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time) error) *ActionRepo_UpdateActionPhase_Call {
+func (_c *ActionRepo_UpdateActionPhase_Call) RunAndReturn(run func(ctx context.Context, actionID *common.ActionIdentifier, phase common.ActionPhase, attempts uint32, cacheStatus core.CatalogCacheStatus, endTime *time.Time, startTime *time.Time) error) *ActionRepo_UpdateActionPhase_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -2208,6 +2339,283 @@ func (_c *Repository_TriggerRepo_Call) Return(triggerRepo interfaces.TriggerRepo
 }
 
 func (_c *Repository_TriggerRepo_Call) RunAndReturn(run func() interfaces.TriggerRepo) *Repository_TriggerRepo_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// NewSettingsRepo creates a new instance of SettingsRepo. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
+// The first argument is typically a *testing.T value.
+func NewSettingsRepo(t interface {
+	mock.TestingT
+	Cleanup(func())
+}) *SettingsRepo {
+	mock := &SettingsRepo{}
+	mock.Mock.Test(t)
+
+	t.Cleanup(func() { mock.AssertExpectations(t) })
+
+	return mock
+}
+
+// SettingsRepo is an autogenerated mock type for the SettingsRepo type
+type SettingsRepo struct {
+	mock.Mock
+}
+
+type SettingsRepo_Expecter struct {
+	mock *mock.Mock
+}
+
+func (_m *SettingsRepo) EXPECT() *SettingsRepo_Expecter {
+	return &SettingsRepo_Expecter{mock: &_m.Mock}
+}
+
+// CreateSettings provides a mock function for the type SettingsRepo
+func (_mock *SettingsRepo) CreateSettings(ctx context.Context, settings *models.Settings) error {
+	ret := _mock.Called(ctx, settings)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateSettings")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *models.Settings) error); ok {
+		r0 = returnFunc(ctx, settings)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// SettingsRepo_CreateSettings_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateSettings'
+type SettingsRepo_CreateSettings_Call struct {
+	*mock.Call
+}
+
+// CreateSettings is a helper method to define mock.On call
+//   - ctx context.Context
+//   - settings *models.Settings
+func (_e *SettingsRepo_Expecter) CreateSettings(ctx interface{}, settings interface{}) *SettingsRepo_CreateSettings_Call {
+	return &SettingsRepo_CreateSettings_Call{Call: _e.mock.On("CreateSettings", ctx, settings)}
+}
+
+func (_c *SettingsRepo_CreateSettings_Call) Run(run func(ctx context.Context, settings *models.Settings)) *SettingsRepo_CreateSettings_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *models.Settings
+		if args[1] != nil {
+			arg1 = args[1].(*models.Settings)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *SettingsRepo_CreateSettings_Call) Return(err error) *SettingsRepo_CreateSettings_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *SettingsRepo_CreateSettings_Call) RunAndReturn(run func(ctx context.Context, settings *models.Settings) error) *SettingsRepo_CreateSettings_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetSettings provides a mock function for the type SettingsRepo
+func (_mock *SettingsRepo) GetSettings(ctx context.Context, key string) (*models.Settings, error) {
+	ret := _mock.Called(ctx, key)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSettings")
+	}
+
+	var r0 *models.Settings
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string) (*models.Settings, error)); ok {
+		return returnFunc(ctx, key)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, string) *models.Settings); ok {
+		r0 = returnFunc(ctx, key)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*models.Settings)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = returnFunc(ctx, key)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// SettingsRepo_GetSettings_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSettings'
+type SettingsRepo_GetSettings_Call struct {
+	*mock.Call
+}
+
+// GetSettings is a helper method to define mock.On call
+//   - ctx context.Context
+//   - key string
+func (_e *SettingsRepo_Expecter) GetSettings(ctx interface{}, key interface{}) *SettingsRepo_GetSettings_Call {
+	return &SettingsRepo_GetSettings_Call{Call: _e.mock.On("GetSettings", ctx, key)}
+}
+
+func (_c *SettingsRepo_GetSettings_Call) Run(run func(ctx context.Context, key string)) *SettingsRepo_GetSettings_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *SettingsRepo_GetSettings_Call) Return(settings *models.Settings, err error) *SettingsRepo_GetSettings_Call {
+	_c.Call.Return(settings, err)
+	return _c
+}
+
+func (_c *SettingsRepo_GetSettings_Call) RunAndReturn(run func(ctx context.Context, key string) (*models.Settings, error)) *SettingsRepo_GetSettings_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetSettingsByKeys provides a mock function for the type SettingsRepo
+func (_mock *SettingsRepo) GetSettingsByKeys(ctx context.Context, keys []string) ([]*models.Settings, error) {
+	ret := _mock.Called(ctx, keys)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSettingsByKeys")
+	}
+
+	var r0 []*models.Settings
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, []string) ([]*models.Settings, error)); ok {
+		return returnFunc(ctx, keys)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context, []string) []*models.Settings); ok {
+		r0 = returnFunc(ctx, keys)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*models.Settings)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context, []string) error); ok {
+		r1 = returnFunc(ctx, keys)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// SettingsRepo_GetSettingsByKeys_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSettingsByKeys'
+type SettingsRepo_GetSettingsByKeys_Call struct {
+	*mock.Call
+}
+
+// GetSettingsByKeys is a helper method to define mock.On call
+//   - ctx context.Context
+//   - keys []string
+func (_e *SettingsRepo_Expecter) GetSettingsByKeys(ctx interface{}, keys interface{}) *SettingsRepo_GetSettingsByKeys_Call {
+	return &SettingsRepo_GetSettingsByKeys_Call{Call: _e.mock.On("GetSettingsByKeys", ctx, keys)}
+}
+
+func (_c *SettingsRepo_GetSettingsByKeys_Call) Run(run func(ctx context.Context, keys []string)) *SettingsRepo_GetSettingsByKeys_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 []string
+		if args[1] != nil {
+			arg1 = args[1].([]string)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *SettingsRepo_GetSettingsByKeys_Call) Return(settingss []*models.Settings, err error) *SettingsRepo_GetSettingsByKeys_Call {
+	_c.Call.Return(settingss, err)
+	return _c
+}
+
+func (_c *SettingsRepo_GetSettingsByKeys_Call) RunAndReturn(run func(ctx context.Context, keys []string) ([]*models.Settings, error)) *SettingsRepo_GetSettingsByKeys_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateSettings provides a mock function for the type SettingsRepo
+func (_mock *SettingsRepo) UpdateSettings(ctx context.Context, settings *models.Settings) error {
+	ret := _mock.Called(ctx, settings)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateSettings")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *models.Settings) error); ok {
+		r0 = returnFunc(ctx, settings)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// SettingsRepo_UpdateSettings_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateSettings'
+type SettingsRepo_UpdateSettings_Call struct {
+	*mock.Call
+}
+
+// UpdateSettings is a helper method to define mock.On call
+//   - ctx context.Context
+//   - settings *models.Settings
+func (_e *SettingsRepo_Expecter) UpdateSettings(ctx interface{}, settings interface{}) *SettingsRepo_UpdateSettings_Call {
+	return &SettingsRepo_UpdateSettings_Call{Call: _e.mock.On("UpdateSettings", ctx, settings)}
+}
+
+func (_c *SettingsRepo_UpdateSettings_Call) Run(run func(ctx context.Context, settings *models.Settings)) *SettingsRepo_UpdateSettings_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *models.Settings
+		if args[1] != nil {
+			arg1 = args[1].(*models.Settings)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *SettingsRepo_UpdateSettings_Call) Return(err error) *SettingsRepo_UpdateSettings_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *SettingsRepo_UpdateSettings_Call) RunAndReturn(run func(ctx context.Context, settings *models.Settings) error) *SettingsRepo_UpdateSettings_Call {
 	_c.Call.Return(run)
 	return _c
 }

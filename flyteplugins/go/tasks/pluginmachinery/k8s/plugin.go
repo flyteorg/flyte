@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
@@ -22,6 +23,14 @@ type PluginEntry struct {
 	ResourceToWatch client.Object
 	// An instance of the plugin
 	Plugin Plugin
+	// ClusterPlugin, when non-nil, indicates this entry is driven by a ClusterPluginManager instead
+	// of a PluginManager. Exactly one of Plugin or ClusterPlugin must be set. When ClusterPlugin is
+	// set, ResourceToWatch must be the job resource type and ClusterResourceToWatch must be the
+	// cluster resource type.
+	ClusterPlugin ClusterPlugin
+	// ClusterResourceToWatch is the cluster CRD type (e.g. &rayv1.RayCluster{}). Required when
+	// ClusterPlugin is set, ignored otherwise.
+	ClusterResourceToWatch client.Object
 	// Boolean that indicates if this plugin can be used as the default for unknown task types. There can only be
 	// one default in the system
 	IsDefault bool
@@ -102,6 +111,53 @@ type Plugin interface {
 	GarbageCollectable
 }
 
+// ClusterPlugin is a simplified interface to author plugins that run a job on top of a shared,
+// long-lived cluster resource. The cluster is created once (keyed by GetClusterName) and reused by
+// every task whose spec hashes to the same name; the job is created only after the cluster is ready.
+//
+// Unlike Plugin, the cluster resource is intentionally NOT owned by the task execution: it has no
+// owner reference and no finalizer, so completing or aborting one task never deletes a cluster that
+// other tasks may still be using. Cleanup of idle clusters is the plugin's own job via
+// StartCleanup. The job resource, by contrast, is owned normally.
+type ClusterPlugin interface {
+	// GetClusterName returns a deterministic name for the cluster backing this task. Implementations
+	// typically hash the task's plugin-spec proto so that identical specs collapse onto the same
+	// cluster. Callers should sanitize the result into a DNS1123 subdomain before use.
+	GetClusterName(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (string, error)
+
+	// BuildClusterResource builds the full cluster object (e.g. a RayCluster) that will be posted to
+	// k8s. Name and namespace are assigned by the framework from GetClusterName.
+	BuildClusterResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error)
+
+	// BuildClusterIdentityResource builds a query object (type/object meta only) used to GET the
+	// cluster for readiness checks.
+	BuildClusterIdentityResource(ctx context.Context, taskMeta pluginsCore.TaskExecutionMetadata) (client.Object, error)
+
+	// IsClusterReady reports whether the cluster can accept jobs.
+	IsClusterReady(ctx context.Context, pluginContext PluginContext, cluster client.Object) (bool, error)
+
+	// BuildJobResource builds the full job object (e.g. a RayJob) bound to the ready cluster
+	// identified by clusterName. The job is created with the normal owner reference / finalizer.
+	BuildJobResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, clusterName string) (client.Object, error)
+
+	// BuildJobIdentityResource builds a query object (type/object meta only) used to GET the job.
+	BuildJobIdentityResource(ctx context.Context, taskMeta pluginsCore.TaskExecutionMetadata) (client.Object, error)
+
+	// GetJobPhase analyses the job resource and reports the status as a TaskPhase. This is analogous
+	// to Plugin.GetTaskPhase and is expected to be relatively fast.
+	GetJobPhase(ctx context.Context, pluginContext PluginContext, job client.Object) (pluginsCore.PhaseInfo, error)
+
+	// GetProperties returns properties desired by the plugin (mirrors Plugin.GetProperties).
+	GetProperties() PluginProperties
+
+	// StartCleanup is intended to be called once by the component driving ClusterPlugins, with the
+	// kube client the plugin's resources live on. Cluster resources outlive individual tasks, so the
+	// plugin owns their cleanup: implementations typically start a background loop that deletes idle
+	// clusters (and any resources retained with them) once they have been idle past their TTL. The
+	// loop must exit when ctx is done; implementations with nothing to clean up may make this a no-op.
+	StartCleanup(ctx context.Context, kubeClient pluginsCore.KubeClient)
+}
+
 // GarbageCollectable is an interface plugins implement to provide an external garbage collector information.
 type GarbageCollectable interface {
 	// IsTerminal returns true if the resource is in a terminal state
@@ -113,6 +169,31 @@ type GarbageCollectable interface {
 	// Note: The external garbage collector uses PluginEntry.ResourceToWatch to determine
 	// which resource type to delete. If a plugin creates additional resources that require
 	// cleanup, this interface will need to be extended to return those resources.
+}
+
+// ChildPodDiscovery is an optional interface a Plugin whose tracked resource is not a Pod
+// can implement so the framework can find the Pods an operator expanded from that resource.
+//
+// The framework tracks one object per task. For a plugin that tracks a Pod that object is
+// also where the kubelet and the node's daemons record what happened, but for a plugin that
+// tracks a CRD the interesting records land on the worker Pods the operator derived from
+// the templates the plugin built, which the framework otherwise has no way to name. A
+// plugin that does not implement this is treated as having no child Pods, which is what the
+// framework assumed before the interface existed.
+type ChildPodDiscovery interface {
+	// ChildPods returns the label selector that selects the Pods belonging to this attempt
+	// of this resource. They live in the resource's own namespace, which the caller already
+	// holds, so only the selector is the plugin's to decide.
+	//
+	// A nil selector means the plugin cannot name its child Pods and the caller must then
+	// look at no Pods at all rather than widen the search. Implementations should combine
+	// flytek8s.AttemptPodSelector, which is exact to one attempt of one action whichever
+	// operator created the Pod, with a label their own operator applies.
+	ChildPods(
+		ctx context.Context,
+		taskCtx pluginsCore.TaskExecutionMetadata,
+		resource client.Object,
+	) (labels.Selector, error)
 }
 
 // An optional interface a Plugin can implement to override its default OnAbort finalizer (deletion of the underlying resource).

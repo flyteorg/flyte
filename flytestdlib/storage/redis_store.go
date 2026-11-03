@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"slices"
 	"strconv"
@@ -134,19 +135,32 @@ func (s *RedisStore) List(ctx context.Context, reference DataReference, maxItems
 	}
 
 	var keys []string
-	var scanCursor uint64
-	for {
-		batch, next, err := s.client.Scan(ctx, scanCursor, match, listScanBatchSize).Result()
-		if err != nil {
-			return nil, NewCursorAtEnd(), err
+	var keysMu sync.Mutex
+	scan := func(ctx context.Context, client redis.Cmdable) error {
+		var scanCursor uint64
+		for {
+			batch, next, err := client.Scan(ctx, scanCursor, match, listScanBatchSize).Result()
+			if err != nil {
+				return err
+			}
+			keysMu.Lock()
+			keys = append(keys, batch...)
+			keysMu.Unlock()
+			if next == 0 {
+				return nil
+			}
+			scanCursor = next
 		}
-
-		keys = append(keys, batch...)
-		if next == 0 {
-			break
-		}
-
-		scanCursor = next
+	}
+	if cluster, ok := s.client.(*redis.ClusterClient); ok {
+		err = cluster.ForEachMaster(ctx, func(ctx context.Context, client *redis.Client) error {
+			return scan(ctx, client)
+		})
+	} else {
+		err = scan(ctx, s.client)
+	}
+	if err != nil {
+		return nil, NewCursorAtEnd(), err
 	}
 
 	// SCAN may return duplicates across batches; sort + compact yields a stable, unique listing.
@@ -259,23 +273,68 @@ func (s *RedisStore) Delete(ctx context.Context, reference DataReference) error 
 	return nil
 }
 
-// NewRedisRawStore creates a RawStore backed by the Redis server configured in cfg.Redis.
-func NewRedisRawStore(_ context.Context, cfg *Config, metrics *dataStoreMetrics) (RawStore, error) {
-	if len(cfg.Redis.Addr) == 0 {
-		return nil, fmt.Errorf("storage type [%v] requires redis.addr to be set", TypeRedis)
+// NewRedisRawStore creates a RawStore backed by the Redis server configured in cfg.Redis. It is the
+// primary-scheme builder (type: redis) and requires redis.addr or redis.addrs to be set.
+func NewRedisRawStore(ctx context.Context, cfg *Config, metrics *dataStoreMetrics) (RawStore, error) {
+	if len(cfg.Redis.Addresses()) == 0 {
+		return nil, fmt.Errorf("storage type [%v] requires redis.addr or redis.addrs to be set", TypeRedis)
 	}
 
+	return buildRedisStore(ctx, cfg.Redis, metrics)
+}
+
+// buildRedisStore constructs a RedisStore from a resolved RedisConfig.
+func buildRedisStore(ctx context.Context, cfg RedisConfig, metrics *dataStoreMetrics) (*RedisStore, error) {
+	client, err := cfg.NewClient(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get redis options: %w", err)
+	}
 	self := &RedisStore{
-		client: redis.NewClient(&redis.Options{
-			Addr:     cfg.Redis.Addr,
-			Username: cfg.Redis.Username,
-			Password: cfg.Redis.Password,
-			DB:       cfg.Redis.DB,
-		}),
-		baseRef: DataReference(fmt.Sprintf("%s://%s", TypeRedis, cfg.Redis.Addr)),
-		addr:    cfg.Redis.Addr,
+		client:  client,
+		baseRef: DataReference(fmt.Sprintf("%s://%s", TypeRedis, cfg.Addresses()[0])),
+		addr:    cfg.Addresses()[0],
 	}
 
 	self.copyImpl = newCopyImpl(self, metrics.copyMetrics)
 	return self, nil
+}
+
+// redisFactory lazily builds a redis-backed RawStore for a secondary redis:// scheme. The address is
+// resolved by precedence: an explicit Schemes["redis"].Redis override, then the top-level Redis
+// config, and finally the host portion of the triggering reference. The last step is what lets a
+// bare redis:// reference "just work" — the DataStore instantiates a client pointed at the reference
+// host on demand. It satisfies backendFactory.
+func redisFactory(ctx context.Context, _ string, ref DataReference, cfg *Config, _ *http.Client, metrics *dataStoreMetrics) (RawStore, error) {
+	var redisCfg RedisConfig
+	switch {
+	case cfg.Schemes[TypeRedis].Redis != nil:
+		redisCfg = *cfg.Schemes[TypeRedis].Redis
+	case len(cfg.Redis.Addresses()) > 0:
+		redisCfg = cfg.Redis
+	}
+
+	if len(redisCfg.Addresses()) == 0 {
+		_, host, _, err := ref.Split()
+		if err != nil {
+			return nil, err
+		}
+		if host == "" {
+			return nil, fmt.Errorf("cannot resolve a redis address for reference [%v]: set redis.addr or include a host in the reference", ref)
+		}
+		redisCfg.Addr = host
+	}
+
+	return buildRedisStore(ctx, redisCfg, metrics)
+}
+
+// redisAddrConfigured reports whether a redis address is configured, meaning redisFactory will NOT
+// fall back to the reference host. It mirrors the address-resolution precedence in redisFactory. The
+// routing store uses this to decide whether redis backends can be memoized per scheme (configured
+// addr: one authoritative server) or must be memoized per host (no addr: each reference host is its
+// own server).
+func redisAddrConfigured(cfg *Config) bool {
+	if rc := cfg.Schemes[TypeRedis].Redis; rc != nil {
+		return len(rc.Addresses()) > 0
+	}
+	return len(cfg.Redis.Addresses()) > 0
 }

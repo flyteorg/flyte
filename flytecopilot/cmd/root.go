@@ -32,7 +32,7 @@ type RootOptions struct {
 	Store          *storage.DataStore
 	configAccessor config.Accessor
 	cfgFile        string
-	// The actual key name that should be created under the remote prefix where the error document is written of the form errors.pb
+	// The actual key name that should be created under the remote prefix where the error document is written of the form error.pb
 	errorOutputName string
 }
 
@@ -48,19 +48,25 @@ func (r RootOptions) UploadError(ctx context.Context, code string, recvErr error
 	if recvErr == nil {
 		recvErr = fmt.Errorf("unknown error")
 	}
+	return r.UploadErrorDocument(ctx, &core.ErrorDocument{
+		Error: &core.ContainerError{
+			Code:    code,
+			Message: recvErr.Error(),
+			Kind:    core.ContainerError_RECOVERABLE,
+		},
+	}, prefix)
+}
+
+// UploadErrorDocument writes document where the plugin's output reader looks
+// for a task's error, leaving its kind and origin as the caller set them.
+func (r RootOptions) UploadErrorDocument(ctx context.Context, document *core.ErrorDocument, prefix storage.DataReference) error {
 	errorPath, err := r.Store.ConstructReference(ctx, prefix, r.errorOutputName)
 	if err != nil {
 		logger.Errorf(ctx, "failed to create error file path err: %s", err)
 		return err
 	}
 	logger.Infof(ctx, "Uploading Error file to path [%s], errFile: %s", errorPath, r.errorOutputName)
-	return r.Store.WriteProtobuf(ctx, errorPath, storage.Options{}, &core.ErrorDocument{
-		Error: &core.ContainerError{
-			Code:    code,
-			Message: recvErr.Error(),
-			Kind:    core.ContainerError_RECOVERABLE,
-		},
-	})
+	return r.Store.WriteProtobuf(ctx, errorPath, storage.Options{}, document)
 }
 
 // NewDataCommand returns a new instance of the co-pilot root command
@@ -101,7 +107,7 @@ func NewDataCommand() *cobra.Command {
 
 	command.PersistentFlags().StringVar(&rootOpts.cfgFile, "config", "", "config file (default is $HOME/config.yaml)")
 	command.PersistentFlags().BoolVarP(&rootOpts.showSource, "show-source", "s", false, "Show line number for errors")
-	command.PersistentFlags().StringVar(&rootOpts.errorOutputName, "err-output-name", "errors.pb", "Actual key name under the prefix where the error protobuf should be written to")
+	command.PersistentFlags().StringVar(&rootOpts.errorOutputName, "err-output-name", "error.pb", "Actual key name under the prefix where the error protobuf should be written to")
 
 	rootOpts.configAccessor = viper.NewAccessor(config.Options{StrictMode: true})
 	// Here you will define your flags and configuration settings. Cobra supports persistent flags, which, if defined

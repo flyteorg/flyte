@@ -4,8 +4,12 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
+	"fmt"
 	"testing"
 	"time"
+
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -20,6 +24,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/flyteorg/flyte/v2/app/internal/config"
+	pluginserrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	k8sconfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	flytecoreapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -32,6 +40,9 @@ func testScheme(t *testing.T) *runtime.Scheme {
 	require.NoError(t, servingv1.AddToScheme(s))
 	return s
 }
+
+// AppNamespace is the namespace all test clients are configured with.
+const AppNamespace = "flyte"
 
 // testRevision builds a Knative Revision object with a given ActualReplicas count.
 func testRevision(name, namespace string, actualReplicas int32) *servingv1.Revision {
@@ -59,7 +70,7 @@ func testClient(t *testing.T, objs ...client.Object) *AppK8sClient {
 		MaxRequestTimeout:     time.Hour,
 		WatchBufferSize:       100,
 	}
-	return NewAppK8sClient(fc, nil, cfg)
+	return NewAppK8sClient(fc, nil, AppNamespace, cfg)
 }
 
 // testApp builds a minimal flyteapp.App for use in tests.
@@ -119,6 +130,103 @@ func TestDeploy_InjectsInternalAppEndpointPattern(t *testing.T) {
 		}
 	}
 	assert.Equal(t, "http://{app_fqdn}-proj-dev.flyte.svc.cluster.local", pattern)
+}
+
+func TestDeploy_InjectsExecutionEnvVars(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+	envVars := ksvc.Spec.Template.Spec.Containers[0].Env
+	var gotProject, gotDomain string
+	for _, e := range envVars {
+		if e.Name == "FLYTE_INTERNAL_EXECUTION_PROJECT" {
+			gotProject = e.Value
+		}
+		if e.Name == "FLYTE_INTERNAL_EXECUTION_DOMAIN" {
+			gotDomain = e.Value
+		}
+	}
+	assert.Equal(t, "proj", gotProject)
+	assert.Equal(t, "dev", gotDomain)
+}
+
+func TestDeploy_InjectsSecretLabelsAndAnnotations(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	app.Spec.SecurityContext = &flyteapp.SecurityContext{
+		Secrets: []*flytecoreapp.Secret{
+			{Group: "my_group", Key: "my_key", MountRequirement: flytecoreapp.Secret_ENV_VAR},
+		},
+	}
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+	tpl := ksvc.Spec.Template
+	assert.Equal(t, "flyte", tpl.Labels["organization"])
+	assert.Equal(t, "proj", tpl.Labels["project"])
+	assert.Equal(t, "dev", tpl.Labels["domain"])
+	assert.Equal(t, "true", tpl.Labels["inject-flyte-secrets"])
+	assert.Contains(t, tpl.Annotations, "flyte.secrets/s0")
+}
+
+func TestDeploy_NoSecretLabelsOrAnnotationsWhenNoSecrets(t *testing.T) {
+	c := testClient(t)
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+	tpl := ksvc.Spec.Template
+	_, hasLabel := tpl.Labels["inject-flyte-secrets"]
+	assert.False(t, hasLabel, "no inject-flyte-secrets label when no secrets configured")
+	_, hasAnnotation := tpl.Annotations["flyte.secrets/s0"]
+	assert.False(t, hasAnnotation, "no secret annotations when no secrets configured")
+}
+
+func TestDeploy_DefaultServiceAccount(t *testing.T) {
+	c := testClient(t)
+	c.cfg.DefaultServiceAccount = "flyte2"
+	require.NoError(t, c.Deploy(context.Background(), testApp("proj", "dev", "myapp", "nginx:latest")))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+	assert.Equal(t, "flyte2", ksvc.Spec.Template.Spec.ServiceAccountName)
+}
+
+func TestDeploy_AppServiceAccountOverridesDefault(t *testing.T) {
+	c := testClient(t)
+	c.cfg.DefaultServiceAccount = "flyte2"
+	app := testApp("proj", "dev", "myapp", "nginx:latest")
+	app.Spec.SecurityContext = &flyteapp.SecurityContext{
+		RunAs: &flytecoreapp.Identity{K8SServiceAccount: "app-requested-sa"},
+	}
+	require.NoError(t, c.Deploy(context.Background(), app))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+	assert.Equal(t, "app-requested-sa", ksvc.Spec.Template.Spec.ServiceAccountName)
+}
+
+func TestDeploy_NoServiceAccountWhenUnset(t *testing.T) {
+	c := testClient(t) // cfg.DefaultServiceAccount is empty
+	require.NoError(t, c.Deploy(context.Background(), testApp("proj", "dev", "myapp", "nginx:latest")))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+	assert.Empty(t, ksvc.Spec.Template.Spec.ServiceAccountName)
 }
 
 func TestDeploy_UpdateOnSpecChange(t *testing.T) {
@@ -245,6 +353,7 @@ func TestStop_DeletesLatestReadyRevision(t *testing.T) {
 		Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
+		namespace: AppNamespace,
 		cfg:       &config.InternalAppConfig{},
 	}
 
@@ -340,6 +449,7 @@ func TestGetApp_CurrentReplicas(t *testing.T) {
 		Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
+		namespace: AppNamespace,
 		cfg:       &config.InternalAppConfig{},
 	}
 
@@ -412,6 +522,7 @@ func TestList(t *testing.T) {
 		Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
+		namespace: AppNamespace,
 		cfg: &config.InternalAppConfig{
 			DefaultRequestTimeout: 5 * time.Minute,
 			MaxRequestTimeout:     time.Hour,
@@ -446,6 +557,7 @@ func TestGetReplicas(t *testing.T) {
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(pod).Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
+		namespace: AppNamespace,
 		cfg:       &config.InternalAppConfig{},
 	}
 
@@ -490,7 +602,7 @@ func TestGetReplicas_FiltersToLatestRevision(t *testing.T) {
 		Status: corev1.PodStatus{Phase: corev1.PodRunning},
 	}
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(ksvc, newPod, oldPod).Build()
-	c := &AppK8sClient{k8sClient: fc, cfg: &config.InternalAppConfig{}}
+	c := &AppK8sClient{k8sClient: fc, namespace: AppNamespace, cfg: &config.InternalAppConfig{}}
 
 	id := &flyteapp.Identifier{Project: "proj", Domain: "dev", Name: "myapp"}
 	replicas, err := c.GetReplicas(context.Background(), id)
@@ -510,6 +622,7 @@ func TestDeleteReplica(t *testing.T) {
 	fc := fake.NewClientBuilder().WithScheme(s).WithObjects(pod).Build()
 	c := &AppK8sClient{
 		k8sClient: fc,
+		namespace: AppNamespace,
 		cfg:       &config.InternalAppConfig{},
 	}
 
@@ -882,4 +995,238 @@ func TestKserviceToStatus_Messages(t *testing.T) {
 			}
 		})
 	}
+}
+
+// transformStructToStructPB converts an arbitrary Go object into a *structpb.Struct
+// by round-tripping through JSON. It fails the test on any marshaling error.
+func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
+	t.Helper()
+	data, err := json.Marshal(obj)
+	require.NoError(t, err)
+	m := make(map[string]interface{})
+	err = json.Unmarshal(data, &m)
+	require.NoError(t, err)
+	s, err := structpb.NewStruct(m)
+	require.NoError(t, err)
+	return s
+}
+
+func TestBuildPodSpec_Container(t *testing.T) {
+	spec := &flyteapp.Spec{
+		AppPayload: &flyteapp.Spec_Container{
+			Container: &flytecoreapp.Container{
+				Image:   "nginx:latest",
+				Command: []string{"nginx"},
+				Args:    []string{"-g", "daemon off;"},
+				Env: []*flytecoreapp.KeyValuePair{
+					{Key: "FOO", Value: "bar"},
+				},
+				Ports: []*flytecoreapp.ContainerPort{
+					{ContainerPort: 8080, Name: "http"},
+				},
+				Resources: &flytecoreapp.Resources{
+					Requests: []*flytecoreapp.Resources_ResourceEntry{
+						{Name: flytecoreapp.Resources_CPU, Value: "100m"},
+						{Name: flytecoreapp.Resources_MEMORY, Value: "128Mi"},
+					},
+				},
+			},
+		},
+	}
+
+	podSpec, err := buildPodSpec(spec)
+	require.NoError(t, err)
+	require.Len(t, podSpec.Containers, 1)
+	assert.Equal(t, "app", podSpec.Containers[0].Name)
+	assert.Equal(t, "nginx:latest", podSpec.Containers[0].Image)
+	assert.Equal(t, []string{"nginx"}, podSpec.Containers[0].Command)
+	assert.Equal(t, []string{"-g", "daemon off;"}, podSpec.Containers[0].Args)
+	assert.Equal(t, []corev1.EnvVar{{Name: "FOO", Value: "bar"}}, podSpec.Containers[0].Env)
+	assert.Equal(t, []corev1.ContainerPort{{ContainerPort: 8080, Name: "http"}}, podSpec.Containers[0].Ports)
+	assert.Equal(t, "100m", podSpec.Containers[0].Resources.Requests.Cpu().String())
+	assert.Equal(t, "128Mi", podSpec.Containers[0].Resources.Requests.Memory().String())
+	assert.NotNil(t, podSpec.EnableServiceLinks)
+	assert.False(t, *podSpec.EnableServiceLinks)
+}
+
+func TestBuildPodSpec_Pod(t *testing.T) {
+	podSpecMap := map[string]interface{}{
+		"containers": []map[string]interface{}{
+			{
+				"name":  "app",
+				"image": "my-image:v1",
+				"ports": []map[string]interface{}{
+					{"containerPort": float64(80), "name": "http"},
+				},
+				"resources": map[string]interface{}{
+					"requests": map[string]interface{}{
+						"cpu":    "250m",
+						"memory": "256Mi",
+					},
+				},
+			},
+		},
+		"restartPolicy": "Always",
+	}
+
+	spec := &flyteapp.Spec{
+		AppPayload: &flyteapp.Spec_Pod{
+			Pod: &flytecoreapp.K8SPod{
+				PodSpec: transformStructToStructPB(t, podSpecMap),
+			},
+		},
+	}
+
+	podSpec, err := buildPodSpec(spec)
+	require.NoError(t, err)
+	require.Len(t, podSpec.Containers, 1)
+	assert.Equal(t, "app", podSpec.Containers[0].Name)
+	assert.Equal(t, "my-image:v1", podSpec.Containers[0].Image)
+	assert.Len(t, podSpec.Containers[0].Ports, 1)
+	assert.Equal(t, int32(80), podSpec.Containers[0].Ports[0].ContainerPort)
+	assert.Equal(t, "250m", podSpec.Containers[0].Resources.Requests.Cpu().String())
+	assert.Equal(t, "256Mi", podSpec.Containers[0].Resources.Requests.Memory().String())
+	assert.Equal(t, corev1.RestartPolicyAlways, podSpec.RestartPolicy)
+	assert.NotNil(t, podSpec.EnableServiceLinks)
+	assert.False(t, *podSpec.EnableServiceLinks)
+}
+
+func TestBuildPodSpec_Pod_NilPodSpec(t *testing.T) {
+	spec := &flyteapp.Spec{
+		AppPayload: &flyteapp.Spec_Pod{
+			Pod: &flytecoreapp.K8SPod{},
+		},
+	}
+
+	_, err := buildPodSpec(spec)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "has no pod spec")
+}
+
+func TestBuildPodSpec_Pod_InvalidJSON(t *testing.T) {
+	// Create a Struct that cannot be unmarshaled into corev1.PodSpec.
+	// "containers" must be an array, not a string.
+	s := &structpb.Struct{
+		Fields: map[string]*structpb.Value{
+			"containers": {Kind: &structpb.Value_StringValue{StringValue: "not-an-array"}},
+		},
+	}
+
+	spec := &flyteapp.Spec{
+		AppPayload: &flyteapp.Spec_Pod{
+			Pod: &flytecoreapp.K8SPod{
+				PodSpec: s,
+			},
+		},
+	}
+
+	_, err := buildPodSpec(spec)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to unmarshal K8sPod spec")
+}
+
+func TestBuildPodSpec_NoPayload(t *testing.T) {
+	spec := &flyteapp.Spec{}
+	_, err := buildPodSpec(spec)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "app spec has no payload")
+}
+
+func TestDeploy_TelemetryOptOutReachesApps(t *testing.T) {
+	for _, disabled := range []bool{true, false} {
+		t.Run(fmt.Sprintf("disabled=%v", disabled), func(t *testing.T) {
+			for _, name := range []string{"FLYTE_DISABLE_TELEMETRY", "DO_NOT_TRACK", "FLYTE_DISABLE_SENTRY"} {
+				t.Setenv(name, "")
+			}
+			if disabled {
+				t.Setenv("DO_NOT_TRACK", "1")
+			}
+			c := testClient(t)
+			app := testApp("proj", "dev", "myapp", "nginx:latest")
+			require.NoError(t, c.Deploy(context.Background(), app))
+
+			ksvc := &servingv1.Service{}
+			require.NoError(t, c.k8sClient.Get(context.Background(),
+				client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+			var got []string
+			for _, e := range ksvc.Spec.Template.Spec.Containers[0].Env {
+				if e.Name == "DO_NOT_TRACK" {
+					got = append(got, e.Value)
+				}
+			}
+			if disabled {
+				assert.Equal(t, []string{"1"}, got)
+			} else {
+				assert.Empty(t, got)
+			}
+		})
+	}
+}
+
+// setK8sConfig swaps in cfg for the rest of the test and restores the previous plugin config after.
+func setK8sConfig(t *testing.T, cfg *k8sconfig.K8sPluginConfig) {
+	t.Helper()
+	previous := *k8sconfig.GetK8sPluginConfig()
+	t.Cleanup(func() { require.NoError(t, k8sconfig.SetK8sPluginConfig(&previous)) })
+	require.NoError(t, k8sconfig.SetK8sPluginConfig(cfg))
+}
+
+func appleSiliconApp() *flyteapp.App {
+	app := testApp("proj", "dev", "llm", "ghcr.io/example/llm:latest")
+	app.Spec.ExtendedResources = &flytecoreapp.ExtendedResources{
+		GpuAccelerator: &flytecoreapp.GPUAccelerator{
+			Device:      "AppleSilicon",
+			DeviceClass: flytecoreapp.GPUAccelerator_APPLE_SILICON,
+		},
+	}
+	return app
+}
+
+func TestDeploy_AppleSiliconInjectsBridge(t *testing.T) {
+	setK8sConfig(t, &k8sconfig.K8sPluginConfig{
+		AppleSiliconBridge: k8sconfig.AppleSiliconBridgeConfig{
+			Endpoint: "http://192.168.65.254:30090", TokenSecret: "s3cret",
+		},
+	})
+
+	c := testClient(t)
+	require.NoError(t, c.Deploy(context.Background(), appleSiliconApp()))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "llm-proj-dev", Namespace: AppNamespace}, ksvc))
+	env := map[string]string{}
+	for _, e := range ksvc.Spec.Template.Spec.Containers[0].Env {
+		env[e.Name] = e.Value
+	}
+	assert.Equal(t, "http://192.168.65.254:30090/v1", env[flytek8s.OpenAIBaseURLEnvVar])
+	workload := AppleSiliconWorkloadID("llm-proj-dev", ksvc.Annotations[annotationSpecSHA])
+	assert.Equal(t, workload, env[flytek8s.AppleSiliconWorkloadEnvVar])
+	assert.Equal(t, flytek8s.MintAppleSiliconToken("s3cret", workload), env[flytek8s.AppleSiliconTokenEnvVar])
+
+	// A new revision gets its own host workload, so a rollout's old pods can't share or tear down the new one's.
+	updated := appleSiliconApp()
+	updated.Spec.GetContainer().Image = "ghcr.io/example/llm:v2"
+	require.NoError(t, c.Deploy(context.Background(), updated))
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "llm-proj-dev", Namespace: AppNamespace}, ksvc))
+	next := ""
+	for _, e := range ksvc.Spec.Template.Spec.Containers[0].Env {
+		if e.Name == flytek8s.AppleSiliconWorkloadEnvVar {
+			next = e.Value
+		}
+	}
+	assert.NotEqual(t, workload, next)
+	assert.Equal(t, AppleSiliconWorkloadID("llm-proj-dev", ksvc.Annotations[annotationSpecSHA]), next)
+}
+
+func TestDeploy_AppleSiliconWithoutBridgeFails(t *testing.T) {
+	setK8sConfig(t, &k8sconfig.K8sPluginConfig{})
+
+	c := testClient(t)
+	err := c.Deploy(context.Background(), appleSiliconApp())
+	require.Error(t, err)
+	assert.True(t, stdErrors.IsCausedBy(err, pluginserrors.AppleSiliconNotAvailable))
+	assert.Contains(t, err.Error(), "requires an Apple Silicon devbox")
 }

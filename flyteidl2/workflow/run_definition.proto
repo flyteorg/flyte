@@ -3,9 +3,11 @@ syntax = "proto3";
 package flyteidl2.workflow;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/common/cache.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/identity.proto";
 import "flyteidl2/common/phase.proto";
+import "flyteidl2/common/run.proto";
 import "flyteidl2/core/catalog.proto";
 import "flyteidl2/core/execution.proto";
 import "flyteidl2/core/literals.proto";
@@ -51,9 +53,10 @@ message TaskAction {
   // Enables caching when set and specifies the cache version to use.
   google.protobuf.StringValue cache_key = 3;
 
-  // the specific cluster that this action should be executed on. if not set, the cluster from the
-  // `RunSpec` will be used.
-  string cluster = 4;
+  // The specific queue that this action should be executed on.
+  // If not set, the queue from the `RunSpec` will be used.
+  string queue = 4;
+  reserved "cluster";
 }
 
 // TraceAction is used to define a trace action that can be used to track the execution of an action that's managed
@@ -92,10 +95,10 @@ message ConditionAction {
   flyteidl2.core.LiteralType type = 6;
 
   // Prompt shown to the user when the condition is awaited.
-  string prompt = 7;
+  string prompt = 7 [(buf.validate.field).string.max_len = 4096];
 
   // Description of the condition.
-  string description = 8;
+  string description = 8 [(buf.validate.field).string.max_len = 2048];
 
   // How to render the prompt.
   ConditionPromptType prompt_type = 9;
@@ -133,6 +136,10 @@ message TaskActionMetadata {
 
   // The short name for this task.
   string short_name = 3;
+
+  // Effective target queue for this task action, including the run default when
+  // no action-level queue override was specified. Unset when the queue is unknown.
+  optional string queue = 4;
 }
 
 message TraceActionMetadata {
@@ -195,6 +202,14 @@ message ActionMetadata {
 
   // Who initiated this run
   RunSource source = 16;
+
+  // Provenance link to the parent run this action was derived from (re-run or
+  // recover), if any. Only set on root actions created with a relation.
+  common.Relation relation = 17;
+
+  // Set only when this action was recovered from a prior run instead of executed
+  // here: the source action (source run id + action name) whose result was reused.
+  common.ActionIdentifier recovered_from = 18;
 }
 
 enum ActionType {
@@ -223,6 +238,21 @@ message ActionStatus {
 
   // Duration of the action in milliseconds.
   optional uint64 duration_ms = 6;
+
+  // Time the current attempt entered the queue, when recorded by the queue
+  // service. Retained after assignment and while running; cleared or replaced
+  // when a new attempt starts. Primarily available in queue-scoped ListActions
+  // responses. Omitted when the queue-entry time was not recorded, for example
+  // by older servers; never inferred from action creation or other timestamps.
+  google.protobuf.Timestamp queued_at = 7;
+
+  // Time worker assignment committed for the current attempt, when recorded.
+  // Together with queued_at, this fixes queue wait at assignment,
+  // excluding later resource waits or initialization. Primarily available in
+  // queue-scoped ListActions responses. Omitted for older assignments without
+  // a recorded assignment time; never inferred from action creation or other
+  // timestamps.
+  google.protobuf.Timestamp worker_assigned_at = 9;
 }
 
 // Lightweight representation of an action.
@@ -263,6 +293,14 @@ message ErrorInfo {
 
   // Error kind.
   Kind kind = 2;
+
+  // Short failure code from the plugin's ExecutionError, for example "OOMKilled",
+  // "Interrupted" or "GpuFallenOffBus". Empty when the producer did not set one.
+  string code = 3;
+
+  // Mirrors ExecutionError.gpu_fault: set when the failure was classified as caused
+  // by or coincident with a GPU fault.
+  flyteidl2.core.GpuFault gpu_fault = 4;
 }
 
 // AbortInfo captures details of an aborted run.
@@ -356,6 +394,9 @@ message ActionAttempt {
 
   // Contains corresponding k8s pods and containers information for this action attempt.
   flyteidl2.core.LogContext log_context = 13;
+
+  // Cache metadata for this attempt, set only for cache hits.
+  common.CacheMetadata cache_metadata = 14;
 }
 
 message ClusterEvent {
@@ -365,7 +406,35 @@ message ClusterEvent {
   // message is the explanation for the most recent phase transition or status update.
   string message = 2;
 
-  // TODO add event_kind or event_type with a fixed set of classification values like "ScaleUp, OutOfResources... etc."
+  // Severity of the source Kubernetes event.
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_NORMAL = 1;
+    TYPE_WARNING = 2;
+  }
+
+  // type mirrors the Kubernetes event type when this entry originated from a Kubernetes object
+  // event. TYPE_UNSPECIFIED for entries synthesized from phase transitions.
+  Type type = 3;
+
+  // reason is the machine-readable, CamelCase reason of the source Kubernetes event, e.g.
+  // "FailedMount", "Pulling", "BackOff". Empty when unknown.
+  string reason = 4;
+
+  // source_component identifies the component that emitted the source event, e.g. "kubelet" or
+  // "default-scheduler". Empty when unknown.
+  string source_component = 5;
+
+  // count is the number of occurrences the cluster had observed for the source event when it was
+  // recorded, when known (0 otherwise). Repeating events are recorded once, with their count.
+  int32 count = 6;
+
+  // gpu_fault is set when this event reports a GPU fault (an NVIDIA Xid or an
+  // NVSwitch SXid) that was attributed to this attempt. The message still
+  // carries the human-readable form; this field carries the same fault as data
+  // so that consumers can classify, filter, and render it without parsing the
+  // message. Unset for every other kind of cluster event.
+  flyteidl2.core.GpuFault gpu_fault = 7;
 }
 
 message PhaseTransition {
@@ -425,6 +494,9 @@ message ActionEvent {
 
   // Timestamp when the event was observed and reported by the executor
   google.protobuf.Timestamp reported_time = 15;
+
+  // Cache metadata for this event, set only for cache hits.
+  common.CacheMetadata cache_metadata = 16;
 }
 
 message ActionSpec {
@@ -460,6 +532,12 @@ enum RunSource {
   RUN_SOURCE_WEB = 1;
   RUN_SOURCE_CLI = 2;
   RUN_SOURCE_SCHEDULE_TRIGGER = 3;
+
+  // The run is orchestrated outside the platform — on a user's machine, in CI, inside an agent
+  // framework — and its action tree is reported via TrackedRunService.
+  RUN_SOURCE_TRACKED = 4;
+
+  RUN_SOURCE_ARTIFACT_TRIGGER = 5;
 }
 
 // TaskGroup represents a group of runs for a specific task.

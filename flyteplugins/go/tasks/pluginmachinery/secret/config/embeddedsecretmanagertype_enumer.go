@@ -5,11 +5,14 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 const _EmbeddedSecretManagerTypeName = "AWSGCPAzureK8s"
 
 var _EmbeddedSecretManagerTypeIndex = [...]uint8{0, 3, 6, 11, 14}
+
+const _EmbeddedSecretManagerTypeLowerName = "awsgcpazurek8s"
 
 func (i EmbeddedSecretManagerType) String() string {
 	if i >= EmbeddedSecretManagerType(len(_EmbeddedSecretManagerTypeIndex)-1) {
@@ -18,13 +21,34 @@ func (i EmbeddedSecretManagerType) String() string {
 	return _EmbeddedSecretManagerTypeName[_EmbeddedSecretManagerTypeIndex[i]:_EmbeddedSecretManagerTypeIndex[i+1]]
 }
 
-var _EmbeddedSecretManagerTypeValues = []EmbeddedSecretManagerType{0, 1, 2, 3}
+// An "invalid array index" compiler error signifies that the constant values have changed.
+// Re-run the stringer command to generate them again.
+func _EmbeddedSecretManagerTypeNoOp() {
+	var x [1]struct{}
+	_ = x[EmbeddedSecretManagerTypeAWS-(0)]
+	_ = x[EmbeddedSecretManagerTypeGCP-(1)]
+	_ = x[EmbeddedSecretManagerTypeAzure-(2)]
+	_ = x[EmbeddedSecretManagerTypeK8s-(3)]
+}
+
+var _EmbeddedSecretManagerTypeValues = []EmbeddedSecretManagerType{EmbeddedSecretManagerTypeAWS, EmbeddedSecretManagerTypeGCP, EmbeddedSecretManagerTypeAzure, EmbeddedSecretManagerTypeK8s}
 
 var _EmbeddedSecretManagerTypeNameToValueMap = map[string]EmbeddedSecretManagerType{
-	_EmbeddedSecretManagerTypeName[0:3]:   0,
-	_EmbeddedSecretManagerTypeName[3:6]:   1,
-	_EmbeddedSecretManagerTypeName[6:11]:  2,
-	_EmbeddedSecretManagerTypeName[11:14]: 3,
+	_EmbeddedSecretManagerTypeName[0:3]:        EmbeddedSecretManagerTypeAWS,
+	_EmbeddedSecretManagerTypeLowerName[0:3]:   EmbeddedSecretManagerTypeAWS,
+	_EmbeddedSecretManagerTypeName[3:6]:        EmbeddedSecretManagerTypeGCP,
+	_EmbeddedSecretManagerTypeLowerName[3:6]:   EmbeddedSecretManagerTypeGCP,
+	_EmbeddedSecretManagerTypeName[6:11]:       EmbeddedSecretManagerTypeAzure,
+	_EmbeddedSecretManagerTypeLowerName[6:11]:  EmbeddedSecretManagerTypeAzure,
+	_EmbeddedSecretManagerTypeName[11:14]:      EmbeddedSecretManagerTypeK8s,
+	_EmbeddedSecretManagerTypeLowerName[11:14]: EmbeddedSecretManagerTypeK8s,
+}
+
+var _EmbeddedSecretManagerTypeNames = []string{
+	_EmbeddedSecretManagerTypeName[0:3],
+	_EmbeddedSecretManagerTypeName[3:6],
+	_EmbeddedSecretManagerTypeName[6:11],
+	_EmbeddedSecretManagerTypeName[11:14],
 }
 
 // EmbeddedSecretManagerTypeString retrieves an enum value from the enum constants string name.
@@ -33,12 +57,23 @@ func EmbeddedSecretManagerTypeString(s string) (EmbeddedSecretManagerType, error
 	if val, ok := _EmbeddedSecretManagerTypeNameToValueMap[s]; ok {
 		return val, nil
 	}
+
+	if val, ok := _EmbeddedSecretManagerTypeNameToValueMap[strings.ToLower(s)]; ok {
+		return val, nil
+	}
 	return 0, fmt.Errorf("%s does not belong to EmbeddedSecretManagerType values", s)
 }
 
 // EmbeddedSecretManagerTypeValues returns all values of the enum
 func EmbeddedSecretManagerTypeValues() []EmbeddedSecretManagerType {
 	return _EmbeddedSecretManagerTypeValues
+}
+
+// EmbeddedSecretManagerTypeStrings returns a slice of all String values of the enum
+func EmbeddedSecretManagerTypeStrings() []string {
+	strs := make([]string, len(_EmbeddedSecretManagerTypeNames))
+	copy(strs, _EmbeddedSecretManagerTypeNames)
+	return strs
 }
 
 // IsAEmbeddedSecretManagerType returns "true" if the value is listed in the enum definition. "false" otherwise

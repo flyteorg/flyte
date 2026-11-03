@@ -1,6 +1,9 @@
 package config
 
-import "github.com/flyteorg/flyte/v2/flytestdlib/config"
+import (
+	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
+)
 
 const configSectionKey = "events"
 
@@ -11,7 +14,7 @@ var defaultConfig = &Config{
 		Port: 8092,
 		Host: "0.0.0.0",
 	},
-	RunServiceURL: "http://localhost:8090",
+	RunService: serviceclient.ServiceConfig{URL: "http://localhost:8090"},
 }
 
 var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
@@ -21,8 +24,8 @@ type Config struct {
 	// HTTP server configuration.
 	Server ServerConfig `json:"server"`
 
-	// RunServiceURL is the base URL for the internal run service.
-	RunServiceURL string `json:"runServiceUrl" pflag:",Base URL of the internal run service"`
+	// RunService configures the internal run service client.
+	RunService serviceclient.ServiceConfig `json:"runService" pflag:",Internal run service client configuration"`
 }
 
 // ServerConfig holds HTTP server configuration.

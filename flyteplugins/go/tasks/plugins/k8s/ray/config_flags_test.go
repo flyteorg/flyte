@@ -141,6 +141,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_submissionMode", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("submissionMode", testValue)
+			if vString, err := cmdFlags.GetString("submissionMode"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.SubmissionMode)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_includeDashboard", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

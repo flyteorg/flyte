@@ -253,28 +253,28 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_EventsServiceURL", func(t *testing.T) {
+	t.Run("Test_eventsService.url", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("EventsServiceURL", testValue)
-			if vString, err := cmdFlags.GetString("EventsServiceURL"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.EventsServiceURL)
+			cmdFlags.Set("eventsService.url", testValue)
+			if vString, err := cmdFlags.GetString("eventsService.url"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.EventsService.URL)
 
 			} else {
 				assert.FailNow(t, err.Error())
 			}
 		})
 	})
-	t.Run("Test_cacheServiceURL", func(t *testing.T) {
+	t.Run("Test_cacheService.url", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("cacheServiceURL", testValue)
-			if vString, err := cmdFlags.GetString("cacheServiceURL"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.CacheServiceURL)
+			cmdFlags.Set("cacheService.url", testValue)
+			if vString, err := cmdFlags.GetString("cacheService.url"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.CacheService.URL)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -317,6 +317,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("maxSystemFailures", testValue)
 			if vInt32, err := cmdFlags.GetInt32("maxSystemFailures"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt32), &actual.MaxSystemFailures)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_requeueDuration", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.RequeueDuration.String()
+
+			cmdFlags.Set("requeueDuration", testValue)
+			if vString, err := cmdFlags.GetString("requeueDuration"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.RequeueDuration)
 
 			} else {
 				assert.FailNow(t, err.Error())

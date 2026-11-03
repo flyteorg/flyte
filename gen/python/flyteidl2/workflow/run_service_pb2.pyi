@@ -157,20 +157,22 @@ class GetActionLogContextResponse(_message.Message):
     def __init__(self, log_context: _Optional[_Union[_execution_pb2.LogContext, _Mapping]] = ..., cluster: _Optional[str] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class ListRunsRequest(_message.Message):
-    __slots__ = ["request", "org", "project_id", "trigger_name", "task_name", "task_id"]
+    __slots__ = ["request", "org", "project_id", "trigger_name", "task_name", "task_id", "paused_actions_only"]
     REQUEST_FIELD_NUMBER: _ClassVar[int]
     ORG_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
     TRIGGER_NAME_FIELD_NUMBER: _ClassVar[int]
     TASK_NAME_FIELD_NUMBER: _ClassVar[int]
     TASK_ID_FIELD_NUMBER: _ClassVar[int]
+    PAUSED_ACTIONS_ONLY_FIELD_NUMBER: _ClassVar[int]
     request: _list_pb2.ListRequest
     org: str
     project_id: _identifier_pb2.ProjectIdentifier
     trigger_name: _identifier_pb2.TriggerName
     task_name: _task_definition_pb2.TaskName
     task_id: _task_definition_pb2.TaskIdentifier
-    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., task_name: _Optional[_Union[_task_definition_pb2.TaskName, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ...) -> None: ...
+    paused_actions_only: bool
+    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., org: _Optional[str] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., trigger_name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., task_name: _Optional[_Union[_task_definition_pb2.TaskName, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., paused_actions_only: bool = ...) -> None: ...
 
 class ListRunsResponse(_message.Message):
     __slots__ = ["runs", "token"]
@@ -199,20 +201,24 @@ class WatchRunsResponse(_message.Message):
     def __init__(self, runs: _Optional[_Iterable[_Union[_run_definition_pb2.Run, _Mapping]]] = ...) -> None: ...
 
 class ListActionsRequest(_message.Message):
-    __slots__ = ["request", "run_id"]
+    __slots__ = ["request", "run_id", "queue_id"]
     REQUEST_FIELD_NUMBER: _ClassVar[int]
     RUN_ID_FIELD_NUMBER: _ClassVar[int]
+    QUEUE_ID_FIELD_NUMBER: _ClassVar[int]
     request: _list_pb2.ListRequest
     run_id: _identifier_pb2.RunIdentifier
-    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ...) -> None: ...
+    queue_id: _identifier_pb2.QueueIdentifier
+    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., queue_id: _Optional[_Union[_identifier_pb2.QueueIdentifier, _Mapping]] = ...) -> None: ...
 
 class ListActionsResponse(_message.Message):
-    __slots__ = ["actions", "token"]
+    __slots__ = ["actions", "token", "total_count"]
     ACTIONS_FIELD_NUMBER: _ClassVar[int]
     TOKEN_FIELD_NUMBER: _ClassVar[int]
+    TOTAL_COUNT_FIELD_NUMBER: _ClassVar[int]
     actions: _containers.RepeatedCompositeFieldContainer[_run_definition_pb2.Action]
     token: str
-    def __init__(self, actions: _Optional[_Iterable[_Union[_run_definition_pb2.Action, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
+    total_count: int
+    def __init__(self, actions: _Optional[_Iterable[_Union[_run_definition_pb2.Action, _Mapping]]] = ..., token: _Optional[str] = ..., total_count: _Optional[int] = ...) -> None: ...
 
 class WatchActionsRequest(_message.Message):
     __slots__ = ["run_id", "filter", "enable_run_store"]
@@ -257,7 +263,7 @@ class WatchWindowedActionsRequest(_message.Message):
         name_filter: str
         def __init__(self, run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., selected_item_id: _Optional[str] = ..., overscan_before: _Optional[int] = ..., overscan_after: _Optional[int] = ..., expanded_nodes: _Optional[_Mapping[str, NodeExpansionParams]] = ..., phase_filter: _Optional[_Iterable[_Union[_phase_pb2.ActionPhase, str]]] = ..., name_filter: _Optional[str] = ...) -> None: ...
     class UpdateWindow(_message.Message):
-        __slots__ = ["selected_item_id", "overscan_before", "overscan_after", "expanded_nodes", "phase_filter", "name_filter"]
+        __slots__ = ["selected_item_id", "anchor_flat_index", "overscan_before", "overscan_after", "expanded_nodes", "phase_filter", "name_filter"]
         class ExpandedNodesEntry(_message.Message):
             __slots__ = ["key", "value"]
             KEY_FIELD_NUMBER: _ClassVar[int]
@@ -266,18 +272,20 @@ class WatchWindowedActionsRequest(_message.Message):
             value: NodeExpansionParams
             def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[NodeExpansionParams, _Mapping]] = ...) -> None: ...
         SELECTED_ITEM_ID_FIELD_NUMBER: _ClassVar[int]
+        ANCHOR_FLAT_INDEX_FIELD_NUMBER: _ClassVar[int]
         OVERSCAN_BEFORE_FIELD_NUMBER: _ClassVar[int]
         OVERSCAN_AFTER_FIELD_NUMBER: _ClassVar[int]
         EXPANDED_NODES_FIELD_NUMBER: _ClassVar[int]
         PHASE_FILTER_FIELD_NUMBER: _ClassVar[int]
         NAME_FILTER_FIELD_NUMBER: _ClassVar[int]
         selected_item_id: str
+        anchor_flat_index: int
         overscan_before: int
         overscan_after: int
         expanded_nodes: _containers.MessageMap[str, NodeExpansionParams]
         phase_filter: _containers.RepeatedScalarFieldContainer[_phase_pb2.ActionPhase]
         name_filter: str
-        def __init__(self, selected_item_id: _Optional[str] = ..., overscan_before: _Optional[int] = ..., overscan_after: _Optional[int] = ..., expanded_nodes: _Optional[_Mapping[str, NodeExpansionParams]] = ..., phase_filter: _Optional[_Iterable[_Union[_phase_pb2.ActionPhase, str]]] = ..., name_filter: _Optional[str] = ...) -> None: ...
+        def __init__(self, selected_item_id: _Optional[str] = ..., anchor_flat_index: _Optional[int] = ..., overscan_before: _Optional[int] = ..., overscan_after: _Optional[int] = ..., expanded_nodes: _Optional[_Mapping[str, NodeExpansionParams]] = ..., phase_filter: _Optional[_Iterable[_Union[_phase_pb2.ActionPhase, str]]] = ..., name_filter: _Optional[str] = ...) -> None: ...
     SUBSCRIBE_FIELD_NUMBER: _ClassVar[int]
     UPDATE_WINDOW_FIELD_NUMBER: _ClassVar[int]
     subscribe: WatchWindowedActionsRequest.Subscribe
@@ -293,7 +301,7 @@ class NodeExpansionParams(_message.Message):
     def __init__(self, offset: _Optional[int] = ..., limit: _Optional[int] = ...) -> None: ...
 
 class WatchWindowedActionsResponse(_message.Message):
-    __slots__ = ["window_items", "ancestors", "total_flat_count", "selected_flat_index", "initial_snapshot_complete", "truncations", "resync_hint"]
+    __slots__ = ["window_items", "ancestors", "total_flat_count", "selected_flat_index", "initial_snapshot_complete", "truncations", "resync_hint", "hydration_complete"]
     WINDOW_ITEMS_FIELD_NUMBER: _ClassVar[int]
     ANCESTORS_FIELD_NUMBER: _ClassVar[int]
     TOTAL_FLAT_COUNT_FIELD_NUMBER: _ClassVar[int]
@@ -301,6 +309,7 @@ class WatchWindowedActionsResponse(_message.Message):
     INITIAL_SNAPSHOT_COMPLETE_FIELD_NUMBER: _ClassVar[int]
     TRUNCATIONS_FIELD_NUMBER: _ClassVar[int]
     RESYNC_HINT_FIELD_NUMBER: _ClassVar[int]
+    HYDRATION_COMPLETE_FIELD_NUMBER: _ClassVar[int]
     window_items: _containers.RepeatedCompositeFieldContainer[WindowedItem]
     ancestors: _containers.RepeatedCompositeFieldContainer[WindowedItem]
     total_flat_count: int
@@ -308,7 +317,8 @@ class WatchWindowedActionsResponse(_message.Message):
     initial_snapshot_complete: bool
     truncations: _containers.RepeatedCompositeFieldContainer[TruncationNotice]
     resync_hint: bool
-    def __init__(self, window_items: _Optional[_Iterable[_Union[WindowedItem, _Mapping]]] = ..., ancestors: _Optional[_Iterable[_Union[WindowedItem, _Mapping]]] = ..., total_flat_count: _Optional[int] = ..., selected_flat_index: _Optional[int] = ..., initial_snapshot_complete: bool = ..., truncations: _Optional[_Iterable[_Union[TruncationNotice, _Mapping]]] = ..., resync_hint: bool = ...) -> None: ...
+    hydration_complete: bool
+    def __init__(self, window_items: _Optional[_Iterable[_Union[WindowedItem, _Mapping]]] = ..., ancestors: _Optional[_Iterable[_Union[WindowedItem, _Mapping]]] = ..., total_flat_count: _Optional[int] = ..., selected_flat_index: _Optional[int] = ..., initial_snapshot_complete: bool = ..., truncations: _Optional[_Iterable[_Union[TruncationNotice, _Mapping]]] = ..., resync_hint: bool = ..., hydration_complete: bool = ...) -> None: ...
 
 class WindowedItem(_message.Message):
     __slots__ = ["action", "group", "depth", "is_expanded"]
@@ -323,14 +333,18 @@ class WindowedItem(_message.Message):
     def __init__(self, action: _Optional[_Union[_run_definition_pb2.EnrichedAction, _Mapping]] = ..., group: _Optional[_Union[GroupNode, _Mapping]] = ..., depth: _Optional[int] = ..., is_expanded: bool = ...) -> None: ...
 
 class ActionLeaf(_message.Message):
-    __slots__ = ["action_id", "short_name", "duration"]
+    __slots__ = ["action_id", "short_name", "duration", "phase", "start_time"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     SHORT_NAME_FIELD_NUMBER: _ClassVar[int]
     DURATION_FIELD_NUMBER: _ClassVar[int]
+    PHASE_FIELD_NUMBER: _ClassVar[int]
+    START_TIME_FIELD_NUMBER: _ClassVar[int]
     action_id: str
     short_name: str
     duration: _duration_pb2.Duration
-    def __init__(self, action_id: _Optional[str] = ..., short_name: _Optional[str] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+    phase: _phase_pb2.ActionPhase
+    start_time: _timestamp_pb2.Timestamp
+    def __init__(self, action_id: _Optional[str] = ..., short_name: _Optional[str] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., phase: _Optional[_Union[_phase_pb2.ActionPhase, str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class GroupAggregations(_message.Message):
     __slots__ = ["failed", "longest_duration", "longest_running", "longest_setup"]

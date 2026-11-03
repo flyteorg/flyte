@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.actions;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/common/address.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/identity.proto";
 import "flyteidl2/core/literals.proto";
@@ -57,7 +58,7 @@ message Action {
   string run_output_base = 4 [(buf.validate.field).string.min_len = 1];
 
   // group this action belongs to, if applicable.
-  string group = 5;
+  string group = 5 [(buf.validate.field).string.max_len = 255];
 
   // subject that created the run, if known.
   string subject = 6;
@@ -74,6 +75,11 @@ message Action {
     // the spec for a condition action. this will be required if the action is to execute a condition.
     flyteidl2.workflow.ConditionAction condition = 9;
   }
+
+  // set server-side when this action was recovered from a prior run instead of executed:
+  // identifies the source action (source run id + action name) whose result was reused.
+  // never set by clients on enqueue.
+  flyteidl2.common.ActionIdentifier recovered_from = 10;
 }
 
 // ============================================================================
@@ -108,6 +114,14 @@ message UpdateRequest {
 
   reserved 4;
   reserved "state";
+
+  // Where the running action can be reached, once it is ready to serve (e.g. an interactive sandbox
+  // session). It is delivered to watchers on `ActionUpdate.address` without waiting for the action
+  // to finish. It belongs to the attempt in `attempt`: an update without an address keeps it, an
+  // empty address withdraws it, and it is no longer delivered once a newer attempt starts, the
+  // action's pod is relaunched (a system retry), or the action is terminal. An address reported
+  // for an attempt older than the current one is ignored. Watchers are notified when it changes.
+  flyteidl2.common.ActionAddress address = 5;
 }
 
 // UpdateResponse is the response message for updating the status of an action.

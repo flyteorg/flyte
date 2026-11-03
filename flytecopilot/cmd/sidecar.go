@@ -116,6 +116,16 @@ func (u *UploadOptions) Sidecar(ctx context.Context) error {
 
 	if err := u.uploader(ctx); err != nil {
 		logger.Errorf(ctx, "Uploading failed, err %s", err)
+		var rawContainerErr data.RawContainerError
+		if errors.As(err, &rawContainerErr) {
+			// When it is a flyte error with error code and message, we should upload the the error directly
+			// The executor will decide whether this is a retryable error
+			if err := u.UploadErrorDocument(ctx, rawContainerErr.Document, storage.DataReference(u.remoteOutputsPrefix)); err != nil {
+				logger.Errorf(ctx, "Failed to write error document, err :%s", err)
+				return err
+			}
+			return nil
+		}
 		if err := u.UploadError(ctx, "OutputUploadFailed", err, storage.DataReference(u.remoteOutputsPrefix)); err != nil {
 			logger.Errorf(ctx, "Failed to write error document, err :%s", err)
 			return err

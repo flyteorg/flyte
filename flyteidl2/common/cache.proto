@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package flyteidl2.common;
+
+import "flyteidl2/common/identifier.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
+
+// Metadata associated with a cache operation.
+message CacheMetadata {
+  // The action attempt that produced the cached outputs.
+  ActionAttemptIdentifier source_action_attempt = 1;
+}

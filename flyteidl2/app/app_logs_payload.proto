@@ -19,6 +19,11 @@ message TailLogsRequest {
     // Identifier of the replica to get logs for.
     ReplicaIdentifier replica_id = 2;
   }
+
+  // Which backends to stream from. Defaults to PERSISTED_ONLY. Use LIVE_ONLY to get the live
+  // tail without paying for a persisted-history scan, and re-request with LIVE_OR_PERSISTED when
+  // the history is actually wanted.
+  flyteidl2.logs.dataplane.LogsSource source = 3;
 }
 
 message ReplicaIdentifierList {
@@ -31,6 +36,9 @@ message LogLines {
   ReplicaIdentifier replica_id = 2 [(buf.validate.field).required = true];
 
   repeated flyteidl2.logs.dataplane.LogLine structured_lines = 3;
+
+  // Which backend these lines were read from. Every line in a batch has the same source.
+  flyteidl2.logs.dataplane.LogLineSource source = 4;
 }
 
 message LogLinesBatch {

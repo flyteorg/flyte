@@ -5,6 +5,8 @@
 import type { GenEnum, GenExtension, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { enumDesc, extDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
+import type { GPUAccelerator } from "../core/tasks_pb.ts";
+import { file_flyteidl2_core_tasks } from "../core/tasks_pb.ts";
 import type { FieldOptions } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_descriptor } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
@@ -13,7 +15,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/settings/settings_definition.proto.
  */
 export const file_flyteidl2_settings_settings_definition: GenFile = /*@__PURE__*/
-  fileDesc("CixmbHl0ZWlkbDIvc2V0dGluZ3Mvc2V0dGluZ3NfZGVmaW5pdGlvbi5wcm90bxISZmx5dGVpZGwyLnNldHRpbmdzIh4KDFN0cmluZ1ZhbHVlcxIOCgZ2YWx1ZXMYASADKAkieAoJU3RyaW5nTWFwEjsKB2VudHJpZXMYASADKAsyKi5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nTWFwLkVudHJpZXNFbnRyeRouCgxFbnRyaWVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJECgtTZXR0aW5nc0tleRIUCgNvcmcYASABKAlCB7pIBHICEAESDgoGZG9tYWluGAIgASgJEg8KB3Byb2plY3QYAyABKAkiiwEKDVN0cmluZ1NldHRpbmcSLwoFc3RhdGUYASABKA4yIC5mbHl0ZWlkbDIuc2V0dGluZ3MuU2V0dGluZ1N0YXRlEhQKDHN0cmluZ192YWx1ZRgCIAEoCRIzCgtzY29wZV9sZXZlbBgDIAEoDjIeLmZseXRlaWRsMi5zZXR0aW5ncy5TY29wZUxldmVsIocBCgxJbnQ2NFNldHRpbmcSLwoFc3RhdGUYASABKA4yIC5mbHl0ZWlkbDIuc2V0dGluZ3MuU2V0dGluZ1N0YXRlEhEKCWludF92YWx1ZRgCIAEoAxIzCgtzY29wZV9sZXZlbBgDIAEoDjIeLmZseXRlaWRsMi5zZXR0aW5ncy5TY29wZUxldmVsIocBCgtCb29sU2V0dGluZxIvCgVzdGF0ZRgBIAEoDjIgLmZseXRlaWRsMi5zZXR0aW5ncy5TZXR0aW5nU3RhdGUSEgoKYm9vbF92YWx1ZRgCIAEoCBIzCgtzY29wZV9sZXZlbBgDIAEoDjIeLmZseXRlaWRsMi5zZXR0aW5ncy5TY29wZUxldmVsIq8BChFTdHJpbmdMaXN0U2V0dGluZxIvCgVzdGF0ZRgBIAEoDjIgLmZseXRlaWRsMi5zZXR0aW5ncy5TZXR0aW5nU3RhdGUSNAoKbGlzdF92YWx1ZRgCIAEoCzIgLmZseXRlaWRsMi5zZXR0aW5ncy5TdHJpbmdWYWx1ZXMSMwoLc2NvcGVfbGV2ZWwYAyABKA4yHi5mbHl0ZWlkbDIuc2V0dGluZ3MuU2NvcGVMZXZlbCKqAQoQU3RyaW5nTWFwU2V0dGluZxIvCgVzdGF0ZRgBIAEoDjIgLmZseXRlaWRsMi5zZXR0aW5ncy5TZXR0aW5nU3RhdGUSMAoJbWFwX3ZhbHVlGAIgASgLMh0uZmx5dGVpZGwyLnNldHRpbmdzLlN0cmluZ01hcBIzCgtzY29wZV9sZXZlbBgDIAEoDjIeLmZseXRlaWRsMi5zZXR0aW5ncy5TY29wZUxldmVsIo8BCg9RdWFudGl0eVNldHRpbmcSLwoFc3RhdGUYASABKA4yIC5mbHl0ZWlkbDIuc2V0dGluZ3MuU2V0dGluZ1N0YXRlEhYKDnF1YW50aXR5X3ZhbHVlGAIgASgJEjMKC3Njb3BlX2xldmVsGAMgASgOMh4uZmx5dGVpZGwyLnNldHRpbmdzLlNjb3BlTGV2ZWwijgIKC1J1blNldHRpbmdzElkKDWRlZmF1bHRfcXVldWUYASABKAsyIS5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nU2V0dGluZ0IfgrUYG0RlZmF1bHQgcXVldWUgZm9yIHRhc2sgcnVucxKjAQoWbWF4X2FjdGlvbl9jb25jdXJyZW5jeRgCIAEoCzIgLmZseXRlaWRsMi5zZXR0aW5ncy5JbnQ2NFNldHRpbmdCYYK1GF1NYXhpbXVtIG51bWJlciBvZiBhY3Rpb25zIG9mIGEgcnVuIHRoYXQgbWF5IGV4ZWN1dGUgY29uY3VycmVudGx5LiAwIG9yIHVuc2V0IG1lYW5zIHVubGltaXRlZC4ifAoQU2VjdXJpdHlTZXR0aW5ncxJoCg9zZXJ2aWNlX2FjY291bnQYASABKAsyIS5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nU2V0dGluZ0IsgrUYKEt1YmVybmV0ZXMgc2VydmljZSBhY2NvdW50IGZvciB0YXNrIHBvZHMijAEKD1N0b3JhZ2VTZXR0aW5ncxJ5Cg1yYXdfZGF0YV9wYXRoGAEgASgLMiEuZmx5dGVpZGwyLnNldHRpbmdzLlN0cmluZ1NldHRpbmdCP4K1GDtCYXNlIHBhdGggZm9yIHJhdyBkYXRhIHN0b3JhZ2UgKGUuZy4gczM6Ly9teS1idWNrZXQvcHJlZml4KSKbAwoUVGFza1Jlc291cmNlRGVmYXVsdHMSXgoDY3B1GAEgASgLMiMuZmx5dGVpZGwyLnNldHRpbmdzLlF1YW50aXR5U2V0dGluZ0IsgrUYKENQVSByZXNvdXJjZSBxdWFudGl0eSAoZS5nLiAiNTAwbSIsICIyIikSVgoDZ3B1GAIgASgLMiMuZmx5dGVpZGwyLnNldHRpbmdzLlF1YW50aXR5U2V0dGluZ0IkgrUYIEdQVSByZXNvdXJjZSBxdWFudGl0eSAoZS5nLiAiMSIpEmcKBm1lbW9yeRgDIAEoCzIjLmZseXRlaWRsMi5zZXR0aW5ncy5RdWFudGl0eVNldHRpbmdCMoK1GC5NZW1vcnkgcmVzb3VyY2UgcXVhbnRpdHkgKGUuZy4gIjI1Nk1pIiwgIjRHaSIpEmIKB3N0b3JhZ2UYBCABKAsyIy5mbHl0ZWlkbDIuc2V0dGluZ3MuUXVhbnRpdHlTZXR0aW5nQiyCtRgoRXBoZW1lcmFsIHN0b3JhZ2UgcXVhbnRpdHkgKGUuZy4gIjEwR2kiKSLaAgoUVGFza1Jlc291cmNlU2V0dGluZ3MSaQoDbWluGAEgASgLMiguZmx5dGVpZGwyLnNldHRpbmdzLlRhc2tSZXNvdXJjZURlZmF1bHRzQjKCtRguTWluaW11bSByZXNvdXJjZSByZXF1ZXN0cyBhcHBsaWVkIHRvIHRhc2sgcG9kcxJnCgNtYXgYAiABKAsyKC5mbHl0ZWlkbDIuc2V0dGluZ3MuVGFza1Jlc291cmNlRGVmYXVsdHNCMIK1GCxNYXhpbXVtIHJlc291cmNlIGxpbWl0cyBhcHBsaWVkIHRvIHRhc2sgcG9kcxJuChVtaXJyb3JfbGltaXRzX3JlcXVlc3QYAyABKAsyHy5mbHl0ZWlkbDIuc2V0dGluZ3MuQm9vbFNldHRpbmdCLoK1GCpXaGVuIHRydWUsIHJlc291cmNlIGxpbWl0cyBtaXJyb3IgcmVxdWVzdHMiqwUKCFNldHRpbmdzEiwKA3J1bhgBIAEoCzIfLmZseXRlaWRsMi5zZXR0aW5ncy5SdW5TZXR0aW5ncxI2CghzZWN1cml0eRgCIAEoCzIkLmZseXRlaWRsMi5zZXR0aW5ncy5TZWN1cml0eVNldHRpbmdzEjQKB3N0b3JhZ2UYAyABKAsyIy5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RvcmFnZVNldHRpbmdzEj8KDXRhc2tfcmVzb3VyY2UYBCABKAsyKC5mbHl0ZWlkbDIuc2V0dGluZ3MuVGFza1Jlc291cmNlU2V0dGluZ3MSiQEKBmxhYmVscxgFIAEoCzIkLmZseXRlaWRsMi5zZXR0aW5ncy5TdHJpbmdNYXBTZXR0aW5nQlOCtRhPS3ViZXJuZXRlcyBsYWJlbHMgYXBwbGllZCB0byB0YXNrIHBvZHMuIENoaWxkIG92ZXJyaWRlcyBwYXJlbnQgb24ga2V5IGNvbmZsaWN0LhKTAQoLYW5ub3RhdGlvbnMYBiABKAsyJC5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nTWFwU2V0dGluZ0JYgrUYVEt1YmVybmV0ZXMgYW5ub3RhdGlvbnMgYXBwbGllZCB0byB0YXNrIHBvZHMuIENoaWxkIG92ZXJyaWRlcyBwYXJlbnQgb24ga2V5IGNvbmZsaWN0LhKfAQoVZW52aXJvbm1lbnRfdmFyaWFibGVzGAcgASgLMiQuZmx5dGVpZGwyLnNldHRpbmdzLlN0cmluZ01hcFNldHRpbmdCWoK1GFZFbnZpcm9ubWVudCB2YXJpYWJsZXMgaW5qZWN0ZWQgaW50byB0YXNrIHBvZHMuIENoaWxkIG92ZXJyaWRlcyBwYXJlbnQgb24ga2V5IGNvbmZsaWN0LipbCgxTZXR0aW5nU3RhdGUSGQoVU0VUVElOR19TVEFURV9JTkhFUklUEAASFwoTU0VUVElOR19TVEFURV9VTlNFVBABEhcKE1NFVFRJTkdfU1RBVEVfVkFMVUUQAipSCgpTY29wZUxldmVsEhMKD1NDT1BFX0xFVkVMX09SRxAAEhYKElNDT1BFX0xFVkVMX0RPTUFJThABEhcKE1NDT1BFX0xFVkVMX1BST0pFQ1QQAjozCgRkZXNjEh0uZ29vZ2xlLnByb3RvYnVmLkZpZWxkT3B0aW9ucxjQhgMgASgJUgRkZXNjQtQBChZjb20uZmx5dGVpZGwyLnNldHRpbmdzQhdTZXR0aW5nc0RlZmluaXRpb25Qcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9zZXR0aW5nc6ICA0ZTWKoCEkZseXRlaWRsMi5TZXR0aW5nc8oCEkZseXRlaWRsMlxTZXR0aW5nc+ICHkZseXRlaWRsMlxTZXR0aW5nc1xHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6U2V0dGluZ3NiBnByb3RvMw", [file_buf_validate_validate, file_google_protobuf_descriptor]);
+  fileDesc("CixmbHl0ZWlkbDIvc2V0dGluZ3Mvc2V0dGluZ3NfZGVmaW5pdGlvbi5wcm90bxISZmx5dGVpZGwyLnNldHRpbmdzIh4KDFN0cmluZ1ZhbHVlcxIOCgZ2YWx1ZXMYASADKAkieAoJU3RyaW5nTWFwEjsKB2VudHJpZXMYASADKAsyKi5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nTWFwLkVudHJpZXNFbnRyeRouCgxFbnRyaWVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJECgtTZXR0aW5nc0tleRIUCgNvcmcYASABKAlCB7pIBHICEAESDgoGZG9tYWluGAIgASgJEg8KB3Byb2plY3QYAyABKAkiiwEKDVN0cmluZ1NldHRpbmcSLwoFc3RhdGUYASABKA4yIC5mbHl0ZWlkbDIuc2V0dGluZ3MuU2V0dGluZ1N0YXRlEhQKDHN0cmluZ192YWx1ZRgCIAEoCRIzCgtzY29wZV9sZXZlbBgDIAEoDjIeLmZseXRlaWRsMi5zZXR0aW5ncy5TY29wZUxldmVsIocBCgxJbnQ2NFNldHRpbmcSLwoFc3RhdGUYASABKA4yIC5mbHl0ZWlkbDIuc2V0dGluZ3MuU2V0dGluZ1N0YXRlEhEKCWludF92YWx1ZRgCIAEoAxIzCgtzY29wZV9sZXZlbBgDIAEoDjIeLmZseXRlaWRsMi5zZXR0aW5ncy5TY29wZUxldmVsIocBCgtCb29sU2V0dGluZxIvCgVzdGF0ZRgBIAEoDjIgLmZseXRlaWRsMi5zZXR0aW5ncy5TZXR0aW5nU3RhdGUSEgoKYm9vbF92YWx1ZRgCIAEoCBIzCgtzY29wZV9sZXZlbBgDIAEoDjIeLmZseXRlaWRsMi5zZXR0aW5ncy5TY29wZUxldmVsIqoBChBTdHJpbmdNYXBTZXR0aW5nEi8KBXN0YXRlGAEgASgOMiAuZmx5dGVpZGwyLnNldHRpbmdzLlNldHRpbmdTdGF0ZRIwCgltYXBfdmFsdWUYAiABKAsyHS5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nTWFwEjMKC3Njb3BlX2xldmVsGAMgASgOMh4uZmx5dGVpZGwyLnNldHRpbmdzLlNjb3BlTGV2ZWwijwEKD1F1YW50aXR5U2V0dGluZxIvCgVzdGF0ZRgBIAEoDjIgLmZseXRlaWRsMi5zZXR0aW5ncy5TZXR0aW5nU3RhdGUSFgoOcXVhbnRpdHlfdmFsdWUYAiABKAkSMwoLc2NvcGVfbGV2ZWwYAyABKA4yHi5mbHl0ZWlkbDIuc2V0dGluZ3MuU2NvcGVMZXZlbCK1AQoSQWNjZWxlcmF0b3JTZXR0aW5nEi8KBXN0YXRlGAEgASgOMiAuZmx5dGVpZGwyLnNldHRpbmdzLlNldHRpbmdTdGF0ZRI5ChFhY2NlbGVyYXRvcl92YWx1ZRgCIAEoCzIeLmZseXRlaWRsMi5jb3JlLkdQVUFjY2VsZXJhdG9yEjMKC3Njb3BlX2xldmVsGAMgASgOMh4uZmx5dGVpZGwyLnNldHRpbmdzLlNjb3BlTGV2ZWwingMKC1J1blNldHRpbmdzElgKDWRlZmF1bHRfcXVldWUYASABKAsyIS5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nU2V0dGluZ0IeolUbRGVmYXVsdCBxdWV1ZSBmb3IgdGFzayBydW5zEqIBChZtYXhfYWN0aW9uX2NvbmN1cnJlbmN5GAIgASgLMiAuZmx5dGVpZGwyLnNldHRpbmdzLkludDY0U2V0dGluZ0JgolVdTWF4aW11bSBudW1iZXIgb2YgYWN0aW9ucyBvZiBhIHJ1biB0aGF0IG1heSBleGVjdXRlIGNvbmN1cnJlbnRseS4gMCBvciB1bnNldCBtZWFucyB1bmxpbWl0ZWQuEo8BCgxydW5fYmFzZV9kaXIYAyABKAsyIS5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nU2V0dGluZ0JWolVTQmFzZSBkaXJlY3RvcnkgZm9yIHJ1biBtZXRhZGF0YSBzdWNoIGFzIGlucHV0cy9vdXRwdXRzIChlLmcuIHMzOi8vbXktYnVja2V0L3ByZWZpeCkiewoQU2VjdXJpdHlTZXR0aW5ncxJnCg9zZXJ2aWNlX2FjY291bnQYASABKAsyIS5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nU2V0dGluZ0IrolUoS3ViZXJuZXRlcyBzZXJ2aWNlIGFjY291bnQgZm9yIHRhc2sgcG9kcyKfAQoPU3RvcmFnZVNldHRpbmdzEngKDXJhd19kYXRhX3BhdGgYASABKAsyIS5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nU2V0dGluZ0I+olU7QmFzZSBwYXRoIGZvciByYXcgZGF0YSBzdG9yYWdlIChlLmcuIHMzOi8vbXktYnVja2V0L3ByZWZpeClKBAgCEANSDHJ1bl9iYXNlX2RpciKXAwoUVGFza1Jlc291cmNlRGVmYXVsdHMSXQoDY3B1GAEgASgLMiMuZmx5dGVpZGwyLnNldHRpbmdzLlF1YW50aXR5U2V0dGluZ0IrolUoQ1BVIHJlc291cmNlIHF1YW50aXR5IChlLmcuICI1MDBtIiwgIjIiKRJVCgNncHUYAiABKAsyIy5mbHl0ZWlkbDIuc2V0dGluZ3MuUXVhbnRpdHlTZXR0aW5nQiOiVSBHUFUgcmVzb3VyY2UgcXVhbnRpdHkgKGUuZy4gIjEiKRJmCgZtZW1vcnkYAyABKAsyIy5mbHl0ZWlkbDIuc2V0dGluZ3MuUXVhbnRpdHlTZXR0aW5nQjGiVS5NZW1vcnkgcmVzb3VyY2UgcXVhbnRpdHkgKGUuZy4gIjI1Nk1pIiwgIjRHaSIpEmEKB3N0b3JhZ2UYBCABKAsyIy5mbHl0ZWlkbDIuc2V0dGluZ3MuUXVhbnRpdHlTZXR0aW5nQiuiVShFcGhlbWVyYWwgc3RvcmFnZSBxdWFudGl0eSAoZS5nLiAiMTBHaSIpIuEDChRUYXNrUmVzb3VyY2VTZXR0aW5ncxJoCgNtaW4YASABKAsyKC5mbHl0ZWlkbDIuc2V0dGluZ3MuVGFza1Jlc291cmNlRGVmYXVsdHNCMaJVLk1pbmltdW0gcmVzb3VyY2UgcmVxdWVzdHMgYXBwbGllZCB0byB0YXNrIHBvZHMSZgoDbWF4GAIgASgLMiguZmx5dGVpZGwyLnNldHRpbmdzLlRhc2tSZXNvdXJjZURlZmF1bHRzQi+iVSxNYXhpbXVtIHJlc291cmNlIGxpbWl0cyBhcHBsaWVkIHRvIHRhc2sgcG9kcxJtChVtaXJyb3JfbGltaXRzX3JlcXVlc3QYAyABKAsyHy5mbHl0ZWlkbDIuc2V0dGluZ3MuQm9vbFNldHRpbmdCLaJVKldoZW4gdHJ1ZSwgcmVzb3VyY2UgbGltaXRzIG1pcnJvciByZXF1ZXN0cxKHAQoTZGVmYXVsdF9hY2NlbGVyYXRvchgEIAEoCzImLmZseXRlaWRsMi5zZXR0aW5ncy5BY2NlbGVyYXRvclNldHRpbmdCQqJVP0FjY2VsZXJhdG9yIGFwcGxpZWQgdG8gYSB0YXNrIHRoYXQgcmVxdWVzdHMgR1BVcyBidXQgbmFtZXMgbm9uZSKVAgoLQXBwU2V0dGluZ3MSfAoSZGlzYWxsb3dfYW5vbnltb3VzGAEgASgLMh8uZmx5dGVpZGwyLnNldHRpbmdzLkJvb2xTZXR0aW5nQj+iVTxEaXNhbGxvdyBhbm9ueW1vdXMgKHVuYXV0aGVudGljYXRlZCkgYWNjZXNzIHRvIGFwcHMgb3JnLXdpZGUShwEKEGFwcF9kbnNfc3RyYXRlZ3kYAiABKAsyIS5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nU2V0dGluZ0JKolVHQXBwIHB1YmxpYy1VUkwgRE5TIHN0cmF0ZWd5OiAnc2hhcmVkJyAoZGVmYXVsdCkgb3IgJ2RhdGFwbGFuZV9zcGVjaWZpYyci9gYKCFNldHRpbmdzEiwKA3J1bhgBIAEoCzIfLmZseXRlaWRsMi5zZXR0aW5ncy5SdW5TZXR0aW5ncxI2CghzZWN1cml0eRgCIAEoCzIkLmZseXRlaWRsMi5zZXR0aW5ncy5TZWN1cml0eVNldHRpbmdzEjQKB3N0b3JhZ2UYAyABKAsyIy5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RvcmFnZVNldHRpbmdzEj8KDXRhc2tfcmVzb3VyY2UYBCABKAsyKC5mbHl0ZWlkbDIuc2V0dGluZ3MuVGFza1Jlc291cmNlU2V0dGluZ3MSiAEKBmxhYmVscxgFIAEoCzIkLmZseXRlaWRsMi5zZXR0aW5ncy5TdHJpbmdNYXBTZXR0aW5nQlKiVU9LdWJlcm5ldGVzIGxhYmVscyBhcHBsaWVkIHRvIHRhc2sgcG9kcy4gQ2hpbGQgb3ZlcnJpZGVzIHBhcmVudCBvbiBrZXkgY29uZmxpY3QuEpIBCgthbm5vdGF0aW9ucxgGIAEoCzIkLmZseXRlaWRsMi5zZXR0aW5ncy5TdHJpbmdNYXBTZXR0aW5nQleiVVRLdWJlcm5ldGVzIGFubm90YXRpb25zIGFwcGxpZWQgdG8gdGFzayBwb2RzLiBDaGlsZCBvdmVycmlkZXMgcGFyZW50IG9uIGtleSBjb25mbGljdC4SngEKFWVudmlyb25tZW50X3ZhcmlhYmxlcxgHIAEoCzIkLmZseXRlaWRsMi5zZXR0aW5ncy5TdHJpbmdNYXBTZXR0aW5nQlmiVVZFbnZpcm9ubWVudCB2YXJpYWJsZXMgaW5qZWN0ZWQgaW50byB0YXNrIHBvZHMuIENoaWxkIG92ZXJyaWRlcyBwYXJlbnQgb24ga2V5IGNvbmZsaWN0LhJHCgNhcHAYCCABKAsyHy5mbHl0ZWlkbDIuc2V0dGluZ3MuQXBwU2V0dGluZ3NCGaJVFlVuaW9uIEFwcHMgYXV0aCBwb2xpY3kSggEKEXBvZF90ZW1wbGF0ZV9uYW1lGAkgASgLMiEuZmx5dGVpZGwyLnNldHRpbmdzLlN0cmluZ1NldHRpbmdCRKJVQU5hbWUgb2YgdGhlIEt1YmVybmV0ZXMgUG9kVGVtcGxhdGUgdXNlZCBhcyB0aGUgYmFzZSBmb3IgdGFzayBwb2RzKlsKDFNldHRpbmdTdGF0ZRIZChVTRVRUSU5HX1NUQVRFX0lOSEVSSVQQABIXChNTRVRUSU5HX1NUQVRFX1VOU0VUEAESFwoTU0VUVElOR19TVEFURV9WQUxVRRACKlIKClNjb3BlTGV2ZWwSEwoPU0NPUEVfTEVWRUxfT1JHEAASFgoSU0NPUEVfTEVWRUxfRE9NQUlOEAESFwoTU0NPUEVfTEVWRUxfUFJPSkVDVBACOjIKBGRlc2MSHS5nb29nbGUucHJvdG9idWYuRmllbGRPcHRpb25zGNQKIAEoCVIEZGVzY0LUAQoWY29tLmZseXRlaWRsMi5zZXR0aW5nc0IXU2V0dGluZ3NEZWZpbml0aW9uUHJvdG9IAlABWjZnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvc2V0dGluZ3OiAgNGU1iqAhJGbHl0ZWlkbDIuU2V0dGluZ3PKAhJGbHl0ZWlkbDJcU2V0dGluZ3PiAh5GbHl0ZWlkbDJcU2V0dGluZ3NcR1BCTWV0YWRhdGHqAhNGbHl0ZWlkbDI6OlNldHRpbmdzYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_core_tasks, file_google_protobuf_descriptor]);
 
 /**
  * StringValues is a wrapper for a list of strings.
@@ -185,39 +187,6 @@ export const BoolSettingSchema: GenMessage<BoolSetting> = /*@__PURE__*/
   messageDesc(file_flyteidl2_settings_settings_definition, 5);
 
 /**
- * A setting that holds a list of strings.
- * Merge behavior: additive (parent-first concatenation). UNSET clears
- * accumulated values from parent scopes.
- *
- * @generated from message flyteidl2.settings.StringListSetting
- */
-export type StringListSetting = Message<"flyteidl2.settings.StringListSetting"> & {
-  /**
-   * @generated from field: flyteidl2.settings.SettingState state = 1;
-   */
-  state: SettingState;
-
-  /**
-   * Meaningful only when state = VALUE.
-   *
-   * @generated from field: flyteidl2.settings.StringValues list_value = 2;
-   */
-  listValue?: StringValues;
-
-  /**
-   * @generated from field: flyteidl2.settings.ScopeLevel scope_level = 3;
-   */
-  scopeLevel: ScopeLevel;
-};
-
-/**
- * Describes the message flyteidl2.settings.StringListSetting.
- * Use `create(StringListSettingSchema)` to create a new message.
- */
-export const StringListSettingSchema: GenMessage<StringListSetting> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_settings_settings_definition, 6);
-
-/**
  * A setting that holds a string-to-string map.
  * Merge behavior: child entries override parent on key conflict. UNSET clears
  * accumulated entries from parent scopes.
@@ -248,7 +217,7 @@ export type StringMapSetting = Message<"flyteidl2.settings.StringMapSetting"> & 
  * Use `create(StringMapSettingSchema)` to create a new message.
  */
 export const StringMapSettingSchema: GenMessage<StringMapSetting> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_settings_settings_definition, 7);
+  messageDesc(file_flyteidl2_settings_settings_definition, 6);
 
 /**
  * A setting that holds a Kubernetes resource quantity string
@@ -281,6 +250,39 @@ export type QuantitySetting = Message<"flyteidl2.settings.QuantitySetting"> & {
  * Use `create(QuantitySettingSchema)` to create a new message.
  */
 export const QuantitySettingSchema: GenMessage<QuantitySetting> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_settings_settings_definition, 7);
+
+/**
+ * A setting that holds an accelerator: a device from the AcceleratorModel
+ * list (GPUAccelerator.device is that value's accelerator_name string), an
+ * optional partition size, and a device class.
+ *
+ * @generated from message flyteidl2.settings.AcceleratorSetting
+ */
+export type AcceleratorSetting = Message<"flyteidl2.settings.AcceleratorSetting"> & {
+  /**
+   * @generated from field: flyteidl2.settings.SettingState state = 1;
+   */
+  state: SettingState;
+
+  /**
+   * Meaningful only when state = VALUE.
+   *
+   * @generated from field: flyteidl2.core.GPUAccelerator accelerator_value = 2;
+   */
+  acceleratorValue?: GPUAccelerator;
+
+  /**
+   * @generated from field: flyteidl2.settings.ScopeLevel scope_level = 3;
+   */
+  scopeLevel: ScopeLevel;
+};
+
+/**
+ * Describes the message flyteidl2.settings.AcceleratorSetting.
+ * Use `create(AcceleratorSettingSchema)` to create a new message.
+ */
+export const AcceleratorSettingSchema: GenMessage<AcceleratorSetting> = /*@__PURE__*/
   messageDesc(file_flyteidl2_settings_settings_definition, 8);
 
 /**
@@ -298,6 +300,11 @@ export type RunSettings = Message<"flyteidl2.settings.RunSettings"> & {
    * @generated from field: flyteidl2.settings.Int64Setting max_action_concurrency = 2;
    */
   maxActionConcurrency?: Int64Setting;
+
+  /**
+   * @generated from field: flyteidl2.settings.StringSetting run_base_dir = 3;
+   */
+  runBaseDir?: StringSetting;
 };
 
 /**
@@ -400,6 +407,11 @@ export type TaskResourceSettings = Message<"flyteidl2.settings.TaskResourceSetti
    * @generated from field: flyteidl2.settings.BoolSetting mirror_limits_request = 3;
    */
   mirrorLimitsRequest?: BoolSetting;
+
+  /**
+   * @generated from field: flyteidl2.settings.AcceleratorSetting default_accelerator = 4;
+   */
+  defaultAccelerator?: AcceleratorSetting;
 };
 
 /**
@@ -408,6 +420,43 @@ export type TaskResourceSettings = Message<"flyteidl2.settings.TaskResourceSetti
  */
 export const TaskResourceSettingsSchema: GenMessage<TaskResourceSettings> = /*@__PURE__*/
   messageDesc(file_flyteidl2_settings_settings_definition, 13);
+
+/**
+ * AppSettings controls policy for Union Apps.
+ *
+ * @generated from message flyteidl2.settings.AppSettings
+ */
+export type AppSettings = Message<"flyteidl2.settings.AppSettings"> & {
+  /**
+   * When VALUE=true, apps may not be deployed with anonymous (unauthenticated)
+   * access: the control plane rejects a deploy that sets allow_anonymous=true,
+   * and the operator forces authentication on at reconcile time. This is the
+   * org-level override of the per-app SecurityContext.allow_anonymous field.
+   *
+   * @generated from field: flyteidl2.settings.BoolSetting disallow_anonymous = 1;
+   */
+  disallowAnonymous?: BoolSetting;
+
+  /**
+   * Selects how an app's public URL is composed. Tokens:
+   *   "shared" (default, or any unrecognized/empty value) — one tenant-wide DNS
+   *     name for the app regardless of which data plane serves it (today's behavior).
+   *   "dataplane_specific" — a per-data-plane DNS name, so the same app can run on
+   *     more than one data plane at distinct URLs.
+   * "edge_proxy" is reserved for a future single-balanced-DNS strategy and is not
+   * yet a valid value. Unset delegates to the parent scope, then defaults to shared.
+   *
+   * @generated from field: flyteidl2.settings.StringSetting app_dns_strategy = 2;
+   */
+  appDnsStrategy?: StringSetting;
+};
+
+/**
+ * Describes the message flyteidl2.settings.AppSettings.
+ * Use `create(AppSettingsSchema)` to create a new message.
+ */
+export const AppSettingsSchema: GenMessage<AppSettings> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_settings_settings_definition, 14);
 
 /**
  * Settings holds all configurable settings for a scope.
@@ -449,6 +498,16 @@ export type Settings = Message<"flyteidl2.settings.Settings"> & {
    * @generated from field: flyteidl2.settings.StringMapSetting environment_variables = 7;
    */
   environmentVariables?: StringMapSetting;
+
+  /**
+   * @generated from field: flyteidl2.settings.AppSettings app = 8;
+   */
+  app?: AppSettings;
+
+  /**
+   * @generated from field: flyteidl2.settings.StringSetting pod_template_name = 9;
+   */
+  podTemplateName?: StringSetting;
 };
 
 /**
@@ -456,7 +515,7 @@ export type Settings = Message<"flyteidl2.settings.Settings"> & {
  * Use `create(SettingsSchema)` to create a new message.
  */
 export const SettingsSchema: GenMessage<Settings> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_settings_settings_definition, 14);
+  messageDesc(file_flyteidl2_settings_settings_definition, 15);
 
 /**
  * SettingState controls how a setting at a given scope behaves.
@@ -523,7 +582,7 @@ export const ScopeLevelSchema: GenEnum<ScopeLevel> = /*@__PURE__*/
   enumDesc(file_flyteidl2_settings_settings_definition, 1);
 
 /**
- * @generated from extension: string desc = 50000;
+ * @generated from extension: string desc = 1364;
  */
 export const desc: GenExtension<FieldOptions, string> = /*@__PURE__*/
   extDesc(file_flyteidl2_settings_settings_definition, 0);

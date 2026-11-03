@@ -6815,11 +6815,26 @@ spec:
                 maxLength: 30
                 minLength: 1
                 type: string
+              actionType:
+                description: |-
+                  ActionType discriminates what kind of action this CR represents.
+                  Mirrors cloud's explicit ActionType enum. Empty means "task" for
+                  backward compatibility with existing CRs.
+                enum:
+                - task
+                - condition
+                type: string
               cacheKey:
                 description: |-
                   CacheKey enables cache lookup/writeback for this task action when set.
                   This is propagated from workflow.TaskAction.cache_key.
                 maxLength: 256
+                type: string
+              conditionSpec:
+                description: |-
+                  ConditionSpec is the proto-serialized workflow.ConditionAction, present iff
+                  actionType == "condition". Carries type/prompt/description/timeout/webhook.
+                format: byte
                 type: string
               domain:
                 description: Domain this action belongs to
@@ -6837,8 +6852,9 @@ spec:
                 maxLength: 256
                 type: string
               inputUri:
-                description: InputURI is the path to the input data for this action
-                minLength: 1
+                description: |-
+                  InputURI is the path to the input data for this action.
+                  Empty for conditions; the reconciler validates presence for tasks.
                 type: string
               interruptible:
                 description: Interruptible is the run-scoped interruptibility override
@@ -6849,10 +6865,21 @@ spec:
                 maxLength: 30
                 minLength: 1
                 type: string
+              podTemplateName:
+                description: |-
+                  PodTemplateName is the run-scoped pod template name projected from RunSpec.DefaultSettings.
+                  Stamped onto tasks that do not name one themselves.
+                maxLength: 253
+                type: string
               project:
                 description: Project this action belongs to
                 maxLength: 63
                 minLength: 1
+                type: string
+              rawDataPrefix:
+                description: |-
+                  RawDataPrefix is the run-scoped raw data base projected from RunSpec.RawDataStorage.
+                  Empty writes raw data under RunOutputBase.
                 type: string
               runName:
                 description: RunName is the name of the run this action belongs to
@@ -6860,9 +6887,9 @@ spec:
                 minLength: 1
                 type: string
               runOutputBase:
-                description: RunOutputBase is the base path where this action should
-                  write its output
-                minLength: 1
+                description: |-
+                  RunOutputBase is the base path where this action should write its output.
+                  Empty for conditions; the reconciler validates presence for tasks.
                 type: string
               shortName:
                 description: ShortName is the human-readable display name for this
@@ -6870,29 +6897,83 @@ spec:
                 maxLength: 63
                 type: string
               taskTemplate:
-                description: TaskTemplate is the proto-serialized core.TaskTemplate
-                  stored inline in etcd
+                description: |-
+                  TaskTemplate is the proto-serialized core.TaskTemplate stored inline in etcd.
+                  Empty for conditions; the reconciler validates presence for tasks.
                 format: byte
                 type: string
               taskType:
-                description: TaskType identifies which plugin handles this task (e.g.
-                  "container", "spark", "ray")
+                description: |-
+                  TaskType identifies which plugin handles this task (e.g. "container", "spark", "ray").
+                  Empty for conditions; the reconciler validates presence for tasks.
                 maxLength: 63
-                minLength: 1
                 type: string
             required:
             - actionName
             - domain
-            - inputUri
             - project
             - runName
-            - runOutputBase
-            - taskTemplate
-            - taskType
             type: object
           status:
             description: status defines the observed state of TaskAction
             properties:
+              address:
+                description: |-
+                  Address is where the running task can be reached, as reported by its worker with
+                  actions.UpdateRequest.address (e.g. an interactive sandbox session). Watchers of the parent
+                  receive it on ActionUpdate.address while the task runs. The actions service owns it: the
+                  reconciler keeps it when persisting status. A later address replaces it and an empty one
+                  withdraws it; it is not delivered once Attempts or SystemRetries move past the ones it was
+                  reported for, or once the task is terminal.
+                properties:
+                  attempt:
+                    description: |-
+                      Attempt is the attempt that reported the address, and SystemRetries the TaskAction's
+                      system-retry count when it did. The address is delivered only while both are still the
+                      TaskAction's own, so a new attempt or an in-place relaunch never exposes a dead pod.
+                    format: int32
+                    type: integer
+                  cluster:
+                    description: Cluster is the cluster the action runs in.
+                    type: string
+                  path:
+                    description: |-
+                      Path is the path on Pod that reaches this action (e.g. /s/<session>); empty when the whole
+                      pod serves it.
+                    type: string
+                  pod:
+                    description: 'Pod is the pod serving the action: its own, or that
+                      of a worker serving many actions.'
+                    properties:
+                      ip:
+                        description: IP is the pod's IP, reachable from inside the
+                          cluster.
+                        type: string
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                      port:
+                        description: Port is the port the action serves on.
+                        format: int32
+                        type: integer
+                    type: object
+                  systemRetries:
+                    format: int32
+                    type: integer
+                  url:
+                    description: |-
+                      URL is an endpoint that cannot be derived from Pod (a gateway or tunnel); it takes
+                      precedence when set.
+                    type: string
+                type: object
+              attemptStartedAt:
+                description: |-
+                  AttemptStartedAt is when the current user attempt first entered the Running phase.
+                  It is persisted independently from ActionEvent publication so max-runtime
+                  enforcement survives controller and event-service outages.
+                format: date-time
+                type: string
               attempts:
                 description: Attempts is the latest observed action attempt number,
                   starting from 1.
@@ -6991,6 +7072,13 @@ spec:
                     description: Message is the human-readable error message.
                     type: string
                 type: object
+              nextAttemptAt:
+                description: |-
+                  NextAttemptAt is the earliest time the next user attempt may launch, set when a
+                  failed attempt is retried under a RetryStrategy with a backoff. While it lies in
+                  the future the plugin is not handled; it is cleared when the attempt launches.
+                format: date-time
+                type: string
               phaseHistory:
                 description: |-
                   PhaseHistory is an append-only log of phase transitions. Unlike conditions
@@ -7034,6 +7122,21 @@ spec:
                 description: PluginStateVersion tracks the version of the plugin state
                   schema for compatibility.
                 type: integer
+              signalValue:
+                description: |-
+                  SignalValue is the proto-serialized core.Literal supplied by Signal.
+                  Set exactly once; the reconciler transitions the CR to Succeeded when present.
+                  Only meaningful for condition actions.
+                format: byte
+                type: string
+              signalledAt:
+                description: SignalledAt is when the signal was received.
+                format: date-time
+                type: string
+              signalledBy:
+                description: SignalledBy identifies the principal that signalled the
+                  condition.
+                type: string
               stateJson:
                 description: StateJSON is the JSON serialized NodeStatus that was
                   last sent to the State Service
@@ -7047,6 +7150,21 @@ spec:
                   maximum, the TaskAction is converted to a permanent failure.
                 format: int32
                 type: integer
+              systemRetries:
+                description: |-
+                  SystemRetries counts the times this TaskAction was relaunched in place after a
+                  system-retryable failure. Unlike SystemFailures it is never reset, so it gives
+                  each system-retry event a version no earlier one used.
+                format: int32
+                type: integer
+              timeoutAt:
+                description: |-
+                  TimeoutAt is the expired deadline that ended the current attempt: the earlier
+                  of the attempt's max runtime and the action's deadline across all attempts.
+                  While set on a non-terminal action, timeout cleanup is pending and the
+                  plugin resource must not be handled or recreated.
+                format: date-time
+                type: string
             type: object
         required:
         - spec
@@ -7065,6 +7183,17 @@ metadata:
     app.kubernetes.io/name: flyte-binary
     helm.sh/chart: flyte-binary-v0.2.0
   name: flyte-binary
+  namespace: flyte
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyteconnector
+    helm.sh/chart: flyteconnector-v2.0.0
+  name: flyteconnector
   namespace: flyte
 ---
 apiVersion: v1
@@ -7165,6 +7294,20 @@ rules:
   - watch
 - apiGroups:
   - ""
+  resources:
+  - pods/log
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - podtemplates
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
   - events.k8s.io
   resources:
   - events
@@ -7205,6 +7348,21 @@ rules:
   - ""
   resources:
   - secrets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - serving.knative.dev
+  resources:
+  - services
+  - revisions
+  - configurations
+  - routes
   verbs:
   - create
   - delete
@@ -7690,6 +7848,12 @@ data:
       secretName: flyte-binary-webhook-secret
       serviceName: flyte-binary-webhook
       servicePort: 443
+      secretManagerTypes:
+        - Embedded
+      embeddedSecretManagerConfig:
+        type: K8s
+        k8sConfig:
+          namespace: flyte
 
     actions:
       kubernetes:
@@ -7705,6 +7869,7 @@ data:
         maxSize: 100Mi
         storagePrefix: uploads
     runs:
+      notificationBufferLimit: 65000
       server:
         host: 0.0.0.0
         port: 8090
@@ -7715,9 +7880,11 @@ data:
         burst: 200
         clusterName: flyte-devbox
         kubeconfig: ""
-        namespace: flyte
+        namespace: 'flyte'
         qps: 100
         timeout: 30s
+      webhook:
+        url: http://flyte-binary-webhook-headless.flyte.svc:9444
   001-plugins.yaml: |
     tasks:
       task-plugins:
@@ -7725,11 +7892,6 @@ data:
           container: container
           container_array: k8s-array
           sidecar: sidecar
-        enabled-plugins:
-        - container
-        - sidecar
-        - connector-service
-        - echo
     plugins:
       logs:
         kubernetes-enabled: false
@@ -7737,7 +7899,25 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.16.4"
+          image: "flyte-binary-v2:sandbox"
+          # Co-pilot reads its storage configuration from this Secret instead of its command
+          # line, keeping the credentials out of every task's pod spec. Omitted for the
+          # deployments that cannot use it; see copilotStorageFromSecret.
+          storage-config-secret-name: "flyte-binary-copilot-storage-config-secret"
+        # Env vars injected into every task pod, so it can reach the control plane
+        # to enqueue child actions and watch their state.
+        #
+        #   - _U_EP_OVERRIDE: where the task reaches the control plane. Defaults to
+        #     this release's in-cluster HTTP service, <fullname>-http.<namespace>:8090.
+        #   - _U_INSECURE: talk plain HTTP — the in-cluster service has no TLS
+        #     (TLS terminates at the ingress).
+        #   - _U_USE_ACTIONS: use the actions/queue execution path.
+        #
+        # Override or extend via configuration.inline.plugins.k8s.default-env-vars.
+        default-env-vars:
+          - _U_EP_OVERRIDE: "flyte-binary-http.flyte:8090"
+          - _U_INSECURE: "true"
+          - _U_USE_ACTIONS: "1"
       k8s-array:
         logs:
           config:
@@ -7755,6 +7935,7 @@ data:
           debug: false
           host: postgresql
           options: sslmode=disable
+          passwordPath: ""
           port: 5432
           username: postgres
   003-storage.yaml: |
@@ -7784,6 +7965,10 @@ data:
       scheme: http
     plugins:
       k8s:
+        apple-silicon-bridge:
+          endpoint: '%{APPLE_SILICON_BRIDGE_ENDPOINT}%'
+          host-platform: '%{DEVBOX_HOST_PLATFORM}%'
+          token-secret: '%{APPLE_SILICON_BRIDGE_TOKEN_SECRET}%'
         default-env-vars:
         - FLYTE_AWS_ENDPOINT: http://rustfs-svc.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: rustfs
@@ -7934,6 +8119,7 @@ apiVersion: v1
 data:
   kubernetes.podspec-affinity: enabled
   kubernetes.podspec-nodeselector: enabled
+  kubernetes.podspec-persistent-volume-claim: enabled
   kubernetes.podspec-tolerations: enabled
 kind: ConfigMap
 metadata:
@@ -7961,7 +8147,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  local-gateway.knative-serving.knative-local-gateway: knative-local-gateway.istio-system.svc.cluster.local
+  local-gateway.knative-serving.knative-local-gateway: kourier-internal.kourier-system.svc.cluster.local
 kind: ConfigMap
 metadata:
   labels:
@@ -8077,6 +8263,36 @@ stringData:
         config:
           access_key_id: "rustfs"
           secret_key: "rustfsstorage"
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-binary
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-binary-copilot-storage-config-secret
+  namespace: flyte
+stringData:
+  copilot-storage-config.yaml: |
+    storage:
+      container: flyte-data
+      signedURL:
+        stowConfigOverride:
+          endpoint: http://localhost:30002
+      stow:
+        config:
+          access_key_id: rustfs
+          auth_type: accesskey
+          disable_ssl: true
+          endpoint: http://rustfs-svc.flyte:9000
+          region: us-east-1
+          secret_key: rustfsstorage
+          v2_signing: true
+        kind: s3
+      type: stow
 type: Opaque
 ---
 apiVersion: v1
@@ -8217,6 +8433,52 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-binary
+    helm.sh/chart: flyte-binary-v0.2.0
+  name: flyte-binary-webhook-headless
+  namespace: flyte
+spec:
+  clusterIP: None
+  ports:
+  - name: cache-internal
+    port: 9444
+    protocol: TCP
+    targetPort: 9444
+  selector:
+    app.kubernetes.io/component: flyte-binary
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/name: flyte-binary
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    projectcontour.io/upstream-protocol.h2c: grpc
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyteconnector
+    helm.sh/chart: flyteconnector-v2.0.0
+  name: flyteconnector
+  namespace: flyte
+spec:
+  ports:
+  - appProtocol: TCP
+    name: connector-grpc
+    port: 8000
+    protocol: TCP
+    targetPort: connector-grpc
+  selector:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/name: flyteconnector
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
     app.kubernetes.io/name: embedded-postgresql
   name: postgresql
   namespace: flyte
@@ -8257,29 +8519,6 @@ spec:
     clientIP:
       timeoutSeconds: 10800
   type: NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app.kubernetes.io/component: net-istio
-    app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.18.1
-    experimental.istio.io/disable-gateway-port-translation: "true"
-    networking.knative.dev/ingress-provider: istio
-  name: knative-local-gateway
-  namespace: istio-system
-spec:
-  ports:
-  - name: http2
-    port: 80
-    targetPort: 8081
-  - name: https
-    port: 443
-    targetPort: 8444
-  selector:
-    istio: ingressgateway
-  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -8592,8 +8831,8 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/configuration: a6c83189407d564600f4ce77d6cedad99dce5b0fa169e07ab6e5ebf6255dff3f
-        checksum/configuration-secret: 800f306f43701bd39e3b42e0d756f4627643cf3cee6dbd050a5a57a08052c280
+        checksum/configuration: a0401c9392460d1e527456d213b4ab1bda9b9bf2731750f219ef262f147efdbb
+        checksum/configuration-secret: ff95a9986cc42dff0a114449c9b8e9a95c781b7bdd9832b31ca461423ae0b678
       labels:
         app.kubernetes.io/component: flyte-binary
         app.kubernetes.io/instance: flyte-devbox
@@ -8624,6 +8863,9 @@ spec:
           name: http
         - containerPort: 9443
           name: webhook
+        - containerPort: 9444
+          name: cache-internal
+          protocol: TCP
         readinessProbe:
           httpGet:
             path: /readyz
@@ -8713,6 +8955,59 @@ spec:
             port: http
           initialDelaySeconds: 5
           periodSeconds: 10
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyteconnector
+    helm.sh/chart: flyteconnector-v2.0.0
+  name: flyteconnector
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: flyte-devbox
+      app.kubernetes.io/name: flyteconnector
+  template:
+    metadata:
+      annotations: null
+      labels:
+        app.kubernetes.io/instance: flyte-devbox
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: flyteconnector
+        helm.sh/chart: flyteconnector-v2.0.0
+    spec:
+      containers:
+      - command:
+        - c0
+        image: ghcr.io/flyteorg/flyte-connectors:py3.12-v2.3.6
+        imagePullPolicy: IfNotPresent
+        name: flyteconnector
+        ports:
+        - containerPort: 8000
+          name: connector-grpc
+        readinessProbe:
+          grpc:
+            port: 8000
+          initialDelaySeconds: 1
+          periodSeconds: 3
+        resources:
+          limits:
+            cpu: 500m
+            ephemeral-storage: 200Mi
+            memory: 300Mi
+          requests:
+            cpu: 500m
+            ephemeral-storage: 200Mi
+            memory: 200Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+      securityContext: {}
+      serviceAccountName: flyteconnector
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -9368,6 +9663,10 @@ spec:
     ports:
       web:
         nodePort: 30080
+        # ALB terminates TLS and forwards plaintext to this entrypoint. Trust its
+        # X-Forwarded-Proto: https instead of letting Traefik rewrite it to http.
+        forwardedHeaders:
+          insecure: true
         transport:
           respondingTimeouts:
             readTimeout: 0
@@ -9394,48 +9693,6 @@ spec:
   - data-plane.knative.dev
   secretName: routing-serving-certs
 ---
-apiVersion: networking.istio.io/v1beta1
-kind: Gateway
-metadata:
-  labels:
-    app.kubernetes.io/component: net-istio
-    app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.18.1
-    networking.knative.dev/ingress-provider: istio
-  name: knative-ingress-gateway
-  namespace: knative-serving
-spec:
-  selector:
-    istio: ingressgateway
-  servers:
-  - hosts:
-    - '*'
-    port:
-      name: http
-      number: 80
-      protocol: HTTP
----
-apiVersion: networking.istio.io/v1beta1
-kind: Gateway
-metadata:
-  labels:
-    app.kubernetes.io/component: net-istio
-    app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.18.1
-    networking.knative.dev/ingress-provider: istio
-  name: knative-local-gateway
-  namespace: knative-serving
-spec:
-  selector:
-    istio: ingressgateway
-  servers:
-  - hosts:
-    - '*'
-    port:
-      name: http
-      number: 8081
-      protocol: HTTP
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -9458,6 +9715,32 @@ spec:
               number: 80
         path: /v2
         pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: flyte-flyte-devbox-root-to-console@kubernetescrd
+    traefik.ingress.kubernetes.io/router.priority: "1000"
+  labels:
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-devbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-devbox-0.1.0
+  name: flyte-console-root-redirect
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-binary-console
+            port:
+              number: 80
+        path: /
+        pathType: Exact
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -9542,41 +9825,22 @@ spec:
         path: /
         pathType: Prefix
 ---
-apiVersion: security.istio.io/v1beta1
-kind: PeerAuthentication
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
 metadata:
   labels:
-    app.kubernetes.io/component: net-istio
-    app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.18.1
-    networking.knative.dev/ingress-provider: istio
-  name: net-istio-webhook
-  namespace: knative-serving
+    app.kubernetes.io/instance: flyte-devbox
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: flyte-devbox
+    app.kubernetes.io/version: 1.16.1
+    helm.sh/chart: flyte-devbox-0.1.0
+  name: flyte-devbox-root-to-console
+  namespace: flyte
 spec:
-  portLevelMtls:
-    "8443":
-      mode: PERMISSIVE
-  selector:
-    matchLabels:
-      app: net-istio-webhook
----
-apiVersion: security.istio.io/v1beta1
-kind: PeerAuthentication
-metadata:
-  labels:
-    app.kubernetes.io/component: net-istio
-    app.kubernetes.io/name: knative-serving
-    app.kubernetes.io/version: 1.18.1
-    networking.knative.dev/ingress-provider: istio
-  name: webhook
-  namespace: knative-serving
-spec:
-  portLevelMtls:
-    "8443":
-      mode: PERMISSIVE
-  selector:
-    matchLabels:
-      app: webhook
+  redirectRegex:
+    permanent: false
+    regex: ^https?://[^/]+/?$
+    replacement: /v2
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration

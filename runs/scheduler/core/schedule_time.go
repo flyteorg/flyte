@@ -9,6 +9,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
+	"github.com/flyteorg/flyte/v2/runs/schedule"
 )
 
 // ParseSchedule returns a cron.Schedule for the trigger's automation spec.
@@ -30,21 +31,8 @@ func ParseSchedule(t *models.Trigger) (cron.Schedule, error) {
 		return nil, nil
 	}
 
-	// Prefer the structured Cron object; fall back to legacy CronExpression string.
-	if c := sched.GetCron(); c != nil && c.GetExpression() != "" {
-		expr := c.GetExpression()
-		parsed, err := cron.ParseStandard(expr)
-		if err != nil {
-			return nil, fmt.Errorf("invalid cron expression %q: %w", expr, err)
-		}
-		return parsed, nil
-	}
-	if expr := sched.GetCronExpression(); expr != "" { //nolint:staticcheck // legacy field
-		parsed, err := cron.ParseStandard(expr)
-		if err != nil {
-			return nil, fmt.Errorf("invalid cron expression %q: %w", expr, err)
-		}
-		return parsed, nil
+	if parsed, err := schedule.ParseCron(sched); err != nil || parsed != nil {
+		return parsed, err
 	}
 
 	// Fixed-rate schedule.

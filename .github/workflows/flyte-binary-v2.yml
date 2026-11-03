@@ -3,13 +3,15 @@ name: Build & Push Flyte Single Binary Images v2
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   # Only cancel superseded runs on PRs; runs on main queue up instead.
-  cancel-in-progress: ${{ github.event_name == 'pull_request_target' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 on:
   push:
     branches:
       - main
-  pull_request_target:
+      - v2
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
     branches:
       - main
   workflow_dispatch:
@@ -18,7 +20,10 @@ env:
   DEPOT_PROJECT_ID: ${{ vars.DEPOT_PROJECT_ID }}
   # Push images on push to main, manual dispatch, OR on a PR labeled
   # `test-push-image` from a branch in the base repo (never from forks).
-  PUSH_IMAGES: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.pull_request.labels.*.name, 'test-push-image')) }}
+  PUSH_IMAGES: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.pull_request.labels.*.name, 'test-push-image')) }}
+  # Fork PRs never get `id-token: write`, so Depot's OIDC auth is unavailable
+  # there and the build falls back to plain buildx (amd64, never pushed).
+  IS_FORK: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
 
 jobs:
   test-bootstrap:
@@ -28,7 +33,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/setup-go@v5
         with:
@@ -37,7 +41,7 @@ jobs:
         uses: golangci/golangci-lint-action@v9
         with:
           working-directory: docker/devbox-bundled/bootstrap
-          version: v2.12.2
+          version: v2.14.0
       - name: Check formatting
         working-directory: docker/devbox-bundled/bootstrap
         run: |
@@ -57,9 +61,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - name: Validate Depot project id
+        if: ${{ env.IS_FORK != 'true' }}
         run: |
           if [ -z "${DEPOT_PROJECT_ID}" ]; then
             echo "::error::DEPOT_PROJECT_ID repo variable is not set. Add it under Settings → Secrets and variables → Actions → Variables." >&2
@@ -88,15 +92,36 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/flyte-binary-v2
           tags: |
             type=raw,value=nightly,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+            type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' }}
             type=sha,format=long
       - name: Set up Depot
+        if: ${{ env.IS_FORK != 'true' }}
         uses: depot/setup-action@v1
       - name: Setup destination directories for image tarballs
         run: |
           mkdir -p docker/devbox-bundled/images/tar/{arm64,amd64}
+      # Fork PRs: no Depot, no push. amd64 only — arm64 would need QEMU
+      # emulation on a GitHub runner. The tarball feeds the devbox job below.
+      - name: Set up Docker Buildx (forks)
+        if: ${{ env.IS_FORK == 'true' }}
+        uses: docker/setup-buildx-action@v3
+      - name: Export AMD64 Image (forks)
+        if: ${{ env.IS_FORK == 'true' }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          platforms: linux/amd64
+          tags: flyte-binary-v2:sandbox
+          build-args: |
+            FLYTE_VERSION=${{ env.FLYTE_VERSION }}
+          outputs: type=docker,dest=docker/devbox-bundled/images/tar/amd64/flyte-binary.tar
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       # Depot builds natively on each architecture (no QEMU emulation), so the
       # per-arch builds run on actual arm64 / amd64 hardware in parallel.
       - name: Export ARM64 Image
+        if: ${{ env.IS_FORK != 'true' }}
         uses: depot/build-push-action@v1
         with:
           project: ${{ env.DEPOT_PROJECT_ID }}
@@ -109,6 +134,7 @@ jobs:
           file: Dockerfile
           outputs: type=docker,dest=docker/devbox-bundled/images/tar/arm64/flyte-binary.tar
       - name: Export AMD64 Image
+        if: ${{ env.IS_FORK != 'true' }}
         uses: depot/build-push-action@v1
         with:
           project: ${{ env.DEPOT_PROJECT_ID }}
@@ -158,13 +184,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
           name: single-binary-image
           path: docker/devbox-bundled/images/tar
       - name: Set up Depot
+        if: ${{ env.IS_FORK != 'true' }}
         uses: depot/setup-action@v1
       - name: Set version
         id: set_version
@@ -183,7 +209,7 @@ jobs:
           tags: |
             type=raw,value=nightly,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/v2' }}
             type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' }}
-            type=sha,format=long,
+            type=sha,format=long
       - name: Login to GitHub Container Registry
         if: ${{ env.PUSH_IMAGES == 'true' }}
         uses: docker/login-action@v3
@@ -191,7 +217,26 @@ jobs:
           registry: ghcr.io
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
+      # Fork PRs: no Depot, no push, amd64 only. The GPU image is skipped —
+      # it resolves its base from Depot's ephemeral registry, which forks
+      # can't reach.
+      - name: Set up Docker Buildx (forks)
+        if: ${{ env.IS_FORK == 'true' }}
+        uses: docker/setup-buildx-action@v3
+      - name: Build CPU image (forks)
+        if: ${{ env.IS_FORK == 'true' }}
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/devbox-bundled
+          platforms: linux/amd64
+          push: false
+          build-args: |
+            FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}
+            CACHEBUST=${{ github.run_id }}-${{ github.run_attempt }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       - name: Build CPU multi-arch image (save to Depot ephemeral registry)
+        if: ${{ env.IS_FORK != 'true' }}
         # buildx refuses local OCI export for multi-node multi-arch builds,
         # and Depot uses native amd64+arm64 nodes — so we save to Depot's
         # ephemeral registry instead. The saved image is referenceable as
@@ -203,10 +248,15 @@ jobs:
           project: ${{ env.DEPOT_PROJECT_ID }}
           context: docker/devbox-bundled
           platforms: linux/arm64,linux/amd64
-          build-args: "FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}"
+          # CACHEBUST forces the Dockerfile preload layer to re-pull moving tags
+          # (flyteconsole-v2:latest) instead of reusing a stale cached layer.
+          build-args: |
+            FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}
+            CACHEBUST=${{ github.run_id }}-${{ github.run_attempt }}
           save: true
           save-tags: cpu-build-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Authenticate Docker to Depot Registry
+        if: ${{ env.IS_FORK != 'true' }}
         # depot/build-push-action forwards the runner's docker auth to the
         # remote BuildKit, so the GPU build below can resolve its FROM from
         # registry.depot.dev. Cross-build auth in the Depot registry is NOT
@@ -222,7 +272,9 @@ jobs:
           context: docker/devbox-bundled
           platforms: linux/arm64,linux/amd64
           tags: ${{ steps.image-names.outputs.tags }}
-          build-args: "FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}"
+          build-args: |
+            FLYTE_DEVBOX_VERSION=${{ env.FLYTE_DEVBOX_VERSION }}
+            CACHEBUST=${{ github.run_id }}-${{ github.run_attempt }}
           push: true
       - name: Prepare GPU Image Names
         id: gpu-image-names
@@ -237,6 +289,7 @@ jobs:
             type=raw,value=gpu-latest,enable=${{ github.event_name == 'workflow_dispatch' }}
             type=sha,format=long,prefix=gpu-
       - name: Build and push GPU multi-arch image
+        if: ${{ env.IS_FORK != 'true' }}
         uses: depot/build-push-action@v1
         with:
           project: ${{ env.DEPOT_PROJECT_ID }}

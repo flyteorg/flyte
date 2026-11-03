@@ -4,7 +4,8 @@
 # Service configuration
 SERVICE_NAME := flyte-manager
 BIN_NAME := flyte-manager
-CMD_PATH := cmd/main.go
+# Package path, not a single file: cmd/ has components.go alongside main.go.
+CMD_PATH := ./cmd
 RUN_ARGS ?= --config config.yaml
 
 # Include common Go targets

@@ -1,0 +1,11 @@
+dotted-keys:
+  annotations:
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+    sidecar.istio.io/inject: "true"
+  plugins:
+    - name: KeepMyCase
+      annotations:
+        config.path: /etc/plugin
+  env-vars:
+    - MY_ENV_VAR: somevalue
+    - FLYTE_AWS_ENDPOINT: http://localhost:30084

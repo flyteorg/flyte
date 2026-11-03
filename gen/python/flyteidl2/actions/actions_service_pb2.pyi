@@ -1,4 +1,5 @@
 from buf.validate import validate_pb2 as _validate_pb2
+from flyteidl2.common import address_pb2 as _address_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import identity_pb2 as _identity_pb2
 from flyteidl2.core import literals_pb2 as _literals_pb2
@@ -12,7 +13,7 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Action(_message.Message):
-    __slots__ = ["action_id", "parent_action_name", "input_uri", "run_output_base", "group", "subject", "task", "trace", "condition"]
+    __slots__ = ["action_id", "parent_action_name", "input_uri", "run_output_base", "group", "subject", "task", "trace", "condition", "recovered_from"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     PARENT_ACTION_NAME_FIELD_NUMBER: _ClassVar[int]
     INPUT_URI_FIELD_NUMBER: _ClassVar[int]
@@ -22,6 +23,7 @@ class Action(_message.Message):
     TASK_FIELD_NUMBER: _ClassVar[int]
     TRACE_FIELD_NUMBER: _ClassVar[int]
     CONDITION_FIELD_NUMBER: _ClassVar[int]
+    RECOVERED_FROM_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     parent_action_name: str
     input_uri: str
@@ -31,7 +33,8 @@ class Action(_message.Message):
     task: _run_definition_pb2.TaskAction
     trace: _run_definition_pb2.TraceAction
     condition: _run_definition_pb2.ConditionAction
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., input_uri: _Optional[str] = ..., run_output_base: _Optional[str] = ..., group: _Optional[str] = ..., subject: _Optional[str] = ..., task: _Optional[_Union[_run_definition_pb2.TaskAction, _Mapping]] = ..., trace: _Optional[_Union[_run_definition_pb2.TraceAction, _Mapping]] = ..., condition: _Optional[_Union[_run_definition_pb2.ConditionAction, _Mapping]] = ...) -> None: ...
+    recovered_from: _identifier_pb2.ActionIdentifier
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., input_uri: _Optional[str] = ..., run_output_base: _Optional[str] = ..., group: _Optional[str] = ..., subject: _Optional[str] = ..., task: _Optional[_Union[_run_definition_pb2.TaskAction, _Mapping]] = ..., trace: _Optional[_Union[_run_definition_pb2.TraceAction, _Mapping]] = ..., condition: _Optional[_Union[_run_definition_pb2.ConditionAction, _Mapping]] = ..., recovered_from: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ...) -> None: ...
 
 class EnqueueRequest(_message.Message):
     __slots__ = ["action", "run_spec"]
@@ -46,14 +49,16 @@ class EnqueueResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class UpdateRequest(_message.Message):
-    __slots__ = ["action_id", "attempt", "status"]
+    __slots__ = ["action_id", "attempt", "status", "address"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     ATTEMPT_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
+    ADDRESS_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     attempt: int
     status: _run_definition_pb2.ActionStatus
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., status: _Optional[_Union[_run_definition_pb2.ActionStatus, _Mapping]] = ...) -> None: ...
+    address: _address_pb2.ActionAddress
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., attempt: _Optional[int] = ..., status: _Optional[_Union[_run_definition_pb2.ActionStatus, _Mapping]] = ..., address: _Optional[_Union[_address_pb2.ActionAddress, _Mapping]] = ...) -> None: ...
 
 class UpdateResponse(_message.Message):
     __slots__ = []

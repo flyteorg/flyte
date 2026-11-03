@@ -77,9 +77,9 @@ func (p *panickingSyncer) sync(_ context.Context, _ Batch) ([]ItemSyncResponse, 
 func TestCacheFour(t *testing.T) {
 	testResyncPeriod := 5 * time.Second
 	rateLimiter := workqueue.DefaultTypedControllerRateLimiter[*Batch]()
-	fakeClock := testingclock.NewFakeClock(time.Now())
 
 	t.Run("normal operation", func(t *testing.T) {
+		fakeClock := testingclock.NewFakeClock(time.Now())
 		// the size of the cache is at least as large as the number of items we're storing
 		cache, err := NewInMemoryAutoRefresh("fake1", syncFakeItem, rateLimiter, testResyncPeriod, 10, 10, promutils.NewTestScope(), WithClock(fakeClock))
 		assert.NoError(t, err)
@@ -112,6 +112,7 @@ func TestCacheFour(t *testing.T) {
 	})
 
 	t.Run("disable sync on create", func(t *testing.T) {
+		fakeClock := testingclock.NewFakeClock(time.Now())
 		cache, err := NewInMemoryAutoRefresh("fake1", syncFakeItem, rateLimiter, testResyncPeriod, 10, 10, promutils.NewTestScope(), WithClock(fakeClock), WithSyncOnCreate(false))
 		assert.NoError(t, err)
 
@@ -143,6 +144,7 @@ func TestCacheFour(t *testing.T) {
 	})
 
 	t.Run("Not Found", func(t *testing.T) {
+		fakeClock := testingclock.NewFakeClock(time.Now())
 		// the size of the cache is at least as large as the number of items we're storing
 		cache, err := NewInMemoryAutoRefresh("fake2", syncFakeItem, rateLimiter, testResyncPeriod, 10, 2, promutils.NewTestScope(), WithClock(fakeClock))
 		assert.NoError(t, err)
@@ -172,14 +174,16 @@ func TestCacheFour(t *testing.T) {
 	})
 
 	t.Run("Enqueue nothing", func(t *testing.T) {
+		fakeClock := testingclock.NewFakeClock(time.Now())
 		cache, err := NewInMemoryAutoRefresh("fake3", syncTerminalItem, rateLimiter, testResyncPeriod, 10, 2, promutils.NewTestScope(), WithClock(fakeClock))
 		assert.NoError(t, err)
 
 		ctx, cancel := context.WithCancel(context.Background())
 		assert.NoError(t, cache.Start(ctx))
 
-		// Wait for goroutines to run
+		// Wait for goroutines to run and timer to be armed in enqueueLoop
 		assert.Eventually(t, func() bool { return cache.enqueueLoopRunning.Load() }, time.Second, time.Millisecond)
+		assert.Eventually(t, fakeClock.HasWaiters, time.Second, time.Millisecond)
 
 		// Create ten items in the cache
 		for i := 1; i <= 10; i++ {
@@ -198,6 +202,9 @@ func TestCacheFour(t *testing.T) {
 		// Should not enqueue
 		assert.Equal(t, syncCount, cache.syncCount.Load())
 
+		// Ensure timer in enqueueLoop is re-armed before second step
+		assert.Eventually(t, fakeClock.HasWaiters, time.Second, time.Millisecond)
+
 		syncCount = cache.syncCount.Load()
 		enqueueCount = cache.enqueueCount.Load()
 		// Move time forwards and trigger the first batch
@@ -211,14 +218,16 @@ func TestCacheFour(t *testing.T) {
 	})
 
 	t.Run("Test update and delete cache", func(t *testing.T) {
+		fakeClock := testingclock.NewFakeClock(time.Now())
 		cache, err := NewInMemoryAutoRefresh("fake3", syncTerminalItem, rateLimiter, testResyncPeriod, 10, 2, promutils.NewTestScope(), WithClock(fakeClock))
 		assert.NoError(t, err)
 
 		ctx, cancel := context.WithCancel(context.Background())
 		assert.NoError(t, cache.Start(ctx))
 
-		// Wait for goroutines to run
+		// Wait for goroutines to run and timer to be armed
 		assert.Eventually(t, func() bool { return cache.enqueueLoopRunning.Load() }, time.Second, time.Millisecond)
+		assert.Eventually(t, fakeClock.HasWaiters, time.Second, time.Millisecond)
 
 		itemID := "dummy_id"
 		_, err = cache.GetOrCreate(itemID, terminalCacheItem{
@@ -251,6 +260,7 @@ func TestCacheFour(t *testing.T) {
 	})
 
 	t.Run("Test panic on sync and shutdown", func(t *testing.T) {
+		fakeClock := testingclock.NewFakeClock(time.Now())
 		syncer := &panickingSyncer{}
 		cache, err := NewInMemoryAutoRefresh("fake3", syncer.sync, rateLimiter, testResyncPeriod, 10, 2, promutils.NewTestScope(), WithClock(fakeClock))
 		assert.NoError(t, err)

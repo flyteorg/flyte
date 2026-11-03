@@ -101,7 +101,7 @@ func TestHandleCacheBeforeExecutionHit(t *testing.T) {
 		},
 	}
 
-	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
+	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, false)
 	require.NoError(t, err)
 	require.True(t, handled)
 	assert.Equal(t, pluginsCore.PhaseSuccess, transition.Info().Phase())
@@ -125,18 +125,72 @@ func TestHandleCacheBeforeExecutionWaitingForReservation(t *testing.T) {
 				return catalog.Entry{}, grpcstatus.Error(codes.NotFound, "miss")
 			},
 			getOrExtendReservationFunc: func(_ context.Context, _ catalog.Key, ownerID string, heartbeat time.Duration) (*cacheservice.Reservation, error) {
-				assert.Equal(t, cacheReservationHeartbeatInterval, heartbeat)
+				// This reconciler leaves RequeueDuration unset, so the heartbeat
+				// falls back to the default requeue duration.
+				assert.Equal(t, TaskActionDefaultRequeueDuration, heartbeat)
 				assert.Equal(t, "default/cacheable-action", ownerID)
 				return &cacheservice.Reservation{OwnerId: "default/other-action"}, nil
 			},
 		},
 	}
 
-	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
+	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, false)
 	require.NoError(t, err)
 	require.True(t, handled)
 	assert.Equal(t, pluginsCore.PhaseWaitingForCache, transition.Info().Phase())
 	assert.Equal(t, corepb.CatalogCacheStatus_CACHE_MISS, transition.Info().Info().ExternalResources[0].CacheStatus)
+}
+
+// The reservation lease has to track the requeue duration. If it did not, an
+// operator who raised the requeue duration would have reservations expire before
+// the next reconcile and another owner could take them.
+func TestHandleCacheBeforeExecutionReservationHeartbeatTracksRequeueDuration(t *testing.T) {
+	ensureTestMetricKeys()
+	ctx := context.Background()
+	taskAction, dataStore := newCacheableTaskAction(t, true, true)
+	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
+
+	const configuredRequeue = 45 * time.Second
+	var gotHeartbeat time.Duration
+
+	r := &TaskActionReconciler{
+		DataStore:       dataStore,
+		RequeueDuration: configuredRequeue,
+		Catalog: &stubCatalogClient{
+			getFunc: func(context.Context, catalog.Key) (catalog.Entry, error) {
+				return catalog.Entry{}, grpcstatus.Error(codes.NotFound, "miss")
+			},
+			getOrExtendReservationFunc: func(_ context.Context, _ catalog.Key, _ string, heartbeat time.Duration) (*cacheservice.Reservation, error) {
+				gotHeartbeat = heartbeat
+				return &cacheservice.Reservation{OwnerId: "default/other-action"}, nil
+			},
+		},
+	}
+
+	_, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, false)
+	require.NoError(t, err)
+	require.True(t, handled)
+	assert.Equal(t, configuredRequeue, gotHeartbeat)
+}
+
+func TestRequeueDurationFallsBackToDefault(t *testing.T) {
+	tests := []struct {
+		name string
+		set  time.Duration
+		want time.Duration
+	}{
+		{name: "unset", set: 0, want: TaskActionDefaultRequeueDuration},
+		{name: "negative", set: -1 * time.Second, want: TaskActionDefaultRequeueDuration},
+		{name: "configured", set: 45 * time.Second, want: 45 * time.Second},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := &TaskActionReconciler{RequeueDuration: tt.set}
+			assert.Equal(t, tt.want, r.requeueDuration())
+			assert.Equal(t, tt.want, r.cacheReservationHeartbeat())
+		})
+	}
 }
 
 func TestHandleCacheBeforeExecutionMissWithoutSerializableSkipsReservation(t *testing.T) {
@@ -158,9 +212,32 @@ func TestHandleCacheBeforeExecutionMissWithoutSerializableSkipsReservation(t *te
 		},
 	}
 
-	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
+	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, false)
 	require.NoError(t, err)
 	require.False(t, handled)
+	assert.Equal(t, pluginsCore.UnknownTransition, transition)
+}
+
+func TestHandleCacheBeforeExecutionRunningSkipsGet(t *testing.T) {
+	ensureTestMetricKeys()
+	ctx := context.Background()
+	// non-serializable cacheable action already RUNNING: the cache-hit lookup must be skipped.
+	taskAction, dataStore := newCacheableTaskAction(t, true, false)
+	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
+
+	r := &TaskActionReconciler{
+		DataStore: dataStore,
+		Catalog: &stubCatalogClient{
+			getFunc: func(context.Context, catalog.Key) (catalog.Entry, error) {
+				t.Fatal("Catalog.Get must not be called for an already-running action")
+				return catalog.Entry{}, nil
+			},
+		},
+	}
+
+	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, true)
+	require.NoError(t, err)
+	require.False(t, handled) // falls through to plugin.Handle
 	assert.Equal(t, pluginsCore.UnknownTransition, transition)
 }
 
@@ -227,6 +304,40 @@ func TestHandleCacheAfterExecutionReleasesReservationOnFailure(t *testing.T) {
 	assert.True(t, released)
 }
 
+func TestTimeoutMaintainsSerializedCacheReservationUntilTerminal(t *testing.T) {
+	ensureTestMetricKeys()
+	ctx := context.Background()
+	taskAction, dataStore := newCacheableTaskAction(t, true, true)
+	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
+
+	extended := 0
+	released := 0
+	r := &TaskActionReconciler{
+		DataStore: dataStore,
+		Catalog: &stubCatalogClient{
+			getOrExtendReservationFunc: func(_ context.Context, _ catalog.Key, ownerID string, heartbeat time.Duration) (*cacheservice.Reservation, error) {
+				extended++
+				assert.Equal(t, "default/cacheable-action", ownerID)
+				assert.Equal(t, TaskActionDefaultRequeueDuration, heartbeat)
+				return &cacheservice.Reservation{OwnerId: ownerID}, nil
+			},
+			releaseReservationFunc: func(_ context.Context, _ catalog.Key, ownerID string) error {
+				released++
+				assert.Equal(t, "default/cacheable-action", ownerID)
+				return nil
+			},
+		},
+	}
+
+	require.NoError(t, r.maintainCacheReservation(ctx, taskAction, tCtx))
+	require.NoError(t, r.maintainCacheReservation(ctx, taskAction, tCtx))
+	assert.Equal(t, 2, extended)
+	assert.Zero(t, released)
+
+	require.NoError(t, r.releaseTaskCacheReservation(ctx, taskAction, tCtx))
+	assert.Equal(t, 1, released)
+}
+
 func newCacheableTaskAction(t *testing.T, discoverable bool, serializable bool) (*flyteorgv1.TaskAction, *storage.DataStore) {
 	t.Helper()
 
@@ -241,7 +352,7 @@ func newCacheableTaskAction(t *testing.T, discoverable bool, serializable bool) 
 			Name:         "task-name",
 			Version:      "task-version",
 		},
-		Type: "python-task",
+		Type: "python",
 		Metadata: &corepb.TaskMetadata{
 			Discoverable:         discoverable,
 			DiscoveryVersion:     "discovery-v1",
@@ -272,10 +383,10 @@ func newCacheableTaskAction(t *testing.T, discoverable bool, serializable bool) 
 			Project:       "project",
 			Domain:        "domain",
 			ActionName:    "action-name",
-			InputURI:      "s3://bucket/inputs.pb",
-			RunOutputBase: "s3://bucket/run-output",
+			InputURI:      "mem://bucket/inputs.pb",
+			RunOutputBase: "mem://bucket/run-output",
 			CacheKey:      "precomputed-cache-key",
-			TaskType:      "python-task",
+			TaskType:      "python",
 			TaskTemplate:  taskTemplateBytes,
 		},
 	}

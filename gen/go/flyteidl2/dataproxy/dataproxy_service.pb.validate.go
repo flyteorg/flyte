@@ -17,6 +17,8 @@ import (
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/types/known/anypb"
+
+	workflow "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
 
 // ensure the imports are used
@@ -33,6 +35,8 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = workflow.RunSource(0)
 )
 
 // Validate checks the field values on CreateUploadLocationRequest with the
@@ -101,6 +105,8 @@ func (m *CreateUploadLocationRequest) validate(all bool) error {
 	// no validation rules for Org
 
 	// no validation rules for ContentLength
+
+	// no validation rules for Queue
 
 	if len(errors) > 0 {
 		return CreateUploadLocationRequestMultiError(errors)
@@ -371,6 +377,10 @@ func (m *UploadInputsRequest) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for BaseDir
+
+	// no validation rules for Queue
 
 	switch v := m.Id.(type) {
 	case *UploadInputsRequest_RunId:
@@ -1368,6 +1378,8 @@ func (m *GetActionDataRequest) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for RunSource
 
 	if len(errors) > 0 {
 		return GetActionDataRequestMultiError(errors)

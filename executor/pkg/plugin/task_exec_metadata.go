@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"fmt"
+	"strconv"
 
 	"google.golang.org/protobuf/proto"
 	v1 "k8s.io/api/core/v1"
@@ -12,6 +13,7 @@ import (
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	executorconfig "github.com/flyteorg/flyte/v2/executor/pkg/config"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	flytesecret "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
 	pluginsUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
@@ -21,6 +23,18 @@ import (
 
 var _ pluginsCore.TaskExecutionMetadata = &taskExecutionMetadata{}
 var _ pluginsCore.TaskExecutionID = &taskExecutionID{}
+
+// Labels stamped on task pods so external per-pod metrics (DCGM, cAdvisor,
+// kube-state-metrics) can be joined back to Flyte semantics, and so the framework can
+// find the pods belonging to one attempt of one action. They are defined in flytek8s
+// alongside the managed label, because the plugins that build pod templates have to keep
+// them intact for the pods an operator derives from those templates to carry them.
+const (
+	RunLabel      = flytek8s.RunLabel
+	ActionLabel   = flytek8s.ActionLabel
+	AttemptLabel  = flytek8s.AttemptLabel
+	TaskNameLabel = flytek8s.TaskNameLabel
+)
 
 type taskExecutionID struct {
 	generatedName string
@@ -32,11 +46,7 @@ func (t *taskExecutionID) GetGeneratedName() string {
 }
 
 func (t *taskExecutionID) GetGeneratedNameWith(minLength, maxLength int) (string, error) {
-	name := t.generatedName
-	if len(name) > maxLength {
-		name = name[:maxLength]
-	}
-	return name, nil
+	return encoding.FixedLengthUniqueID(t.generatedName, maxLength)
 }
 
 func (t *taskExecutionID) GetID() *core.TaskExecutionIdentifier {
@@ -82,9 +92,15 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		// Flyte OSS v2 has no organization concept, but the secret fetcher
 		// still requires an organization label on the pod. Inject a stable
 		// dummy value so scoped secret lookups succeed.
-		flytesecret.OrganizationLabel: "flyte",
+		flytesecret.OrganizationLabel: flytesecret.DefaultOrganization,
 		flytesecret.ProjectLabel:      ta.Spec.Project,
 		flytesecret.DomainLabel:       ta.Spec.Domain,
+		// Marks every Pod this executor is responsible for, including the ones
+		// operators expand from the Pod templates embedded in a plugin's CRD.
+		// The manager cache selects on this label, so a Pod that does not carry
+		// it is invisible to the executor. Plugins merge these labels into the
+		// Pod templates they build, so setting it here covers all of them.
+		flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue,
 	}
 	if securityContext != nil && len(securityContext.Secrets) > 0 {
 		secretsMap, err = secrets.MarshalSecretsToMapStrings(securityContext.Secrets)
@@ -110,6 +126,18 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 	retryAttempt := attemptToRetry(ta.Status.Attempts)
 	maxAttempts := maxAttemptsFromTaskTemplate(ta.Spec.TaskTemplate)
 	taskID := taskIDFromTaskTemplate(ta.Spec.TaskTemplate)
+
+	// Identify the pod in Flyte terms so per-pod metric series can be joined back to
+	// the run, action and attempt that produced them.
+	setSanitizedLabel(injectLabels, RunLabel, ta.Spec.RunName)
+	setSanitizedLabel(injectLabels, ActionLabel, ta.Spec.ActionName)
+	injectLabels[AttemptLabel] = strconv.FormatUint(uint64(retryAttempt)+1, 10)
+	setSanitizedLabel(injectLabels, TaskNameLabel, taskID.GetName())
+
+	interruptible := ta.Spec.Interruptible
+	if interruptible == nil {
+		interruptible = interruptibleFromTaskTemplate(ta.Spec.TaskTemplate)
+	}
 
 	return &taskExecutionMetadata{
 		ownerID: types.NamespacedName{
@@ -144,10 +172,18 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		maxAttempts:     maxAttempts,
 		overrides:       overrides,
 		envVars:         envVars,
-		interruptible:   ta.Spec.Interruptible != nil && *ta.Spec.Interruptible,
+		interruptible:   interruptible != nil && *interruptible,
 		securityContext: securityContext,
 		serviceAccount:  resolveServiceAccount(securityContext, executorconfig.GetConfig().DefaultK8sServiceAccount),
 	}, nil
+}
+
+// setSanitizedLabel stamps a label only when the value survives sanitization, so pods
+// never carry an empty label that would look like a real, blank value to a metrics query.
+func setSanitizedLabel(labels map[string]string, key, value string) {
+	if sanitized := pluginsUtils.SanitizeLabelValue(value); sanitized != "" {
+		labels[key] = sanitized
+	}
 }
 
 func buildGeneratedName(ta *flyteorgv1.TaskAction) string {
@@ -160,6 +196,26 @@ func attemptToRetry(attempt uint32) uint32 {
 		return 0
 	}
 	return attempt - 1
+}
+
+// interruptibleFromTaskTemplate gives the task template's interruptible flag, or nil when the
+// template does not declare one.
+func interruptibleFromTaskTemplate(data []byte) *bool {
+	if len(data) == 0 {
+		return nil
+	}
+
+	tmpl := &core.TaskTemplate{}
+	if err := proto.Unmarshal(data, tmpl); err != nil {
+		return nil
+	}
+
+	md := tmpl.GetMetadata()
+	if md == nil || md.GetInterruptibleValue() == nil {
+		return nil
+	}
+
+	return ptr.To(md.GetInterruptible())
 }
 
 // maxAttemptsFromTaskTemplate give the max attempts (retries + 1) from the task template.

@@ -9,7 +9,7 @@ import { enumDesc, fileDesc } from "@bufbuild/protobuf/codegenv1";
  * Describes the file flyteidl2/common/phase.proto.
  */
 export const file_flyteidl2_common_phase: GenFile = /*@__PURE__*/
-  fileDesc("ChxmbHl0ZWlkbDIvY29tbW9uL3BoYXNlLnByb3RvEhBmbHl0ZWlkbDIuY29tbW9uKqkCCgtBY3Rpb25QaGFzZRIcChhBQ1RJT05fUEhBU0VfVU5TUEVDSUZJRUQQABIXChNBQ1RJT05fUEhBU0VfUVVFVUVEEAESJgoiQUNUSU9OX1BIQVNFX1dBSVRJTkdfRk9SX1JFU09VUkNFUxACEh0KGUFDVElPTl9QSEFTRV9JTklUSUFMSVpJTkcQAxIYChRBQ1RJT05fUEhBU0VfUlVOTklORxAEEhoKFkFDVElPTl9QSEFTRV9TVUNDRUVERUQQBRIXChNBQ1RJT05fUEhBU0VfRkFJTEVEEAYSGAoUQUNUSU9OX1BIQVNFX0FCT1JURUQQBxIaChZBQ1RJT05fUEhBU0VfVElNRURfT1VUEAgSFwoTQUNUSU9OX1BIQVNFX1BBVVNFRBAJQrsBChRjb20uZmx5dGVpZGwyLmNvbW1vbkIKUGhhc2VQcm90b0gCUAFaNGdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9jb21tb26iAgNGQ1iqAhBGbHl0ZWlkbDIuQ29tbW9uygIQRmx5dGVpZGwyXENvbW1vbuICHEZseXRlaWRsMlxDb21tb25cR1BCTWV0YWRhdGHqAhFGbHl0ZWlkbDI6OkNvbW1vbmIGcHJvdG8z");
+  fileDesc("ChxmbHl0ZWlkbDIvY29tbW9uL3BoYXNlLnByb3RvEhBmbHl0ZWlkbDIuY29tbW9uKsUCCgtBY3Rpb25QaGFzZRIcChhBQ1RJT05fUEhBU0VfVU5TUEVDSUZJRUQQABIXChNBQ1RJT05fUEhBU0VfUVVFVUVEEAESJgoiQUNUSU9OX1BIQVNFX1dBSVRJTkdfRk9SX1JFU09VUkNFUxACEh0KGUFDVElPTl9QSEFTRV9JTklUSUFMSVpJTkcQAxIYChRBQ1RJT05fUEhBU0VfUlVOTklORxAEEhoKFkFDVElPTl9QSEFTRV9TVUNDRUVERUQQBRIXChNBQ1RJT05fUEhBU0VfRkFJTEVEEAYSGAoUQUNUSU9OX1BIQVNFX0FCT1JURUQQBxIaChZBQ1RJT05fUEhBU0VfVElNRURfT1VUEAgSFwoTQUNUSU9OX1BIQVNFX1BBVVNFRBAJEhoKFkFDVElPTl9QSEFTRV9SRUNPVkVSRUQQCkK7AQoUY29tLmZseXRlaWRsMi5jb21tb25CClBoYXNlUHJvdG9IAlABWjRnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvY29tbW9uogIDRkNYqgIQRmx5dGVpZGwyLkNvbW1vbsoCEEZseXRlaWRsMlxDb21tb27iAhxGbHl0ZWlkbDJcQ29tbW9uXEdQQk1ldGFkYXRh6gIRRmx5dGVpZGwyOjpDb21tb25iBnByb3RvMw");
 
 /**
  * ActionPhase represents the execution state of an action.
@@ -17,6 +17,8 @@ export const file_flyteidl2_common_phase: GenFile = /*@__PURE__*/
  * Phase transitions follow this typical flow:
  * QUEUED -> WAITING_FOR_RESOURCES -> INITIALIZING -> RUNNING -> {SUCCEEDED|FAILED|ABORTED|TIMED_OUT}
  * Condition actions: PAUSED -> {SUCCEEDED(signal)|TIMED_OUT(timeout)|ABORTED(abort)}
+ * Recovery runs: an action whose counterpart succeeded in the reference run is recorded
+ * directly as RECOVERED (terminal) without executing.
  *
  * @generated from enum flyteidl2.common.ActionPhase
  */
@@ -90,6 +92,14 @@ export enum ActionPhase {
    * @generated from enum value: ACTION_PHASE_PAUSED = 9;
    */
   PAUSED = 9,
+
+  /**
+   * Action was recovered as-is from a prior run; it did not execute in this run.
+   * Terminal and success-equivalent for control flow.
+   *
+   * @generated from enum value: ACTION_PHASE_RECOVERED = 10;
+   */
+  RECOVERED = 10,
 }
 
 /**

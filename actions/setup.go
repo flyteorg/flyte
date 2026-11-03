@@ -13,6 +13,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 )
@@ -31,7 +32,6 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	otelInterceptor, err := otelconnect.NewInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
 		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
-		otelconnect.WithoutServerPeerAttributes(),
 	)
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
@@ -41,21 +41,29 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("actions: failed to initialize scheme: %w", err)
 	}
 
-	runServiceURL := cfg.RunServiceURL
+	runServiceCfg := cfg.RunService
 	if sc.BaseURL != "" {
-		runServiceURL = sc.BaseURL
+		runServiceCfg.URL = sc.BaseURL
 	}
-	runClient := workflowconnect.NewInternalRunServiceClient(http.DefaultClient, runServiceURL, connect.WithInterceptors(otelInterceptor))
+	runHTTPClient, err := serviceclient.NewHTTPClient(ctx, http.DefaultClient, runServiceCfg)
+	if err != nil {
+		return fmt.Errorf("actions: configure run service client: %w", err)
+	}
+	runClient := workflowconnect.NewInternalRunServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
 
-	actionsClient := actionsk8s.NewActionsClient(
+	actionsClient, err := actionsk8s.NewActionsClient(
 		sc.K8sClient,
 		sc.K8sCache,
+		sc.Namespace,
 		cfg.WatchBufferSize,
 		cfg.WatchWorkers,
 		runClient,
 		cfg.RecordFilterSize,
 		sc.Scope,
 	)
+	if err != nil {
+		return fmt.Errorf("actions: failed to create actions client: %w", err)
+	}
 	logger.Infof(ctx, "Actions K8s client initialized")
 
 	if err := actionsClient.StartWatching(ctx); err != nil {

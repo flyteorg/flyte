@@ -69,23 +69,25 @@ class App(_message.Message):
     def __init__(self, metadata: _Optional[_Union[Meta, _Mapping]] = ..., spec: _Optional[_Union[Spec, _Mapping]] = ..., status: _Optional[_Union[Status, _Mapping]] = ...) -> None: ...
 
 class Condition(_message.Message):
-    __slots__ = ["last_transition_time", "deployment_status", "message", "revision", "actor", "substate"]
+    __slots__ = ["last_transition_time", "deployment_status", "message", "revision", "actor", "substate", "deployment_id"]
     LAST_TRANSITION_TIME_FIELD_NUMBER: _ClassVar[int]
     DEPLOYMENT_STATUS_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
     REVISION_FIELD_NUMBER: _ClassVar[int]
     ACTOR_FIELD_NUMBER: _ClassVar[int]
     SUBSTATE_FIELD_NUMBER: _ClassVar[int]
+    DEPLOYMENT_ID_FIELD_NUMBER: _ClassVar[int]
     last_transition_time: _timestamp_pb2.Timestamp
     deployment_status: Status.DeploymentStatus
     message: str
     revision: int
     actor: _identity_pb2.EnrichedIdentity
     substate: Status.Substate
-    def __init__(self, last_transition_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., deployment_status: _Optional[_Union[Status.DeploymentStatus, str]] = ..., message: _Optional[str] = ..., revision: _Optional[int] = ..., actor: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., substate: _Optional[_Union[Status.Substate, str]] = ...) -> None: ...
+    deployment_id: str
+    def __init__(self, last_transition_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., deployment_status: _Optional[_Union[Status.DeploymentStatus, str]] = ..., message: _Optional[str] = ..., revision: _Optional[int] = ..., actor: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., substate: _Optional[_Union[Status.Substate, str]] = ..., deployment_id: _Optional[str] = ...) -> None: ...
 
 class Status(_message.Message):
-    __slots__ = ["assigned_cluster", "current_replicas", "ingress", "created_at", "last_updated_at", "conditions", "lease_expiration", "k8s_metadata", "materialized_inputs"]
+    __slots__ = ["assigned_cluster", "current_replicas", "ingress", "created_at", "last_updated_at", "conditions", "lease_expiration", "k8s_metadata", "materialized_inputs", "last_started_at", "last_assigned_cluster"]
     class DeploymentStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         DEPLOYMENT_STATUS_UNSPECIFIED: _ClassVar[Status.DeploymentStatus]
@@ -120,6 +122,11 @@ class Status(_message.Message):
         SECRET_MOUNT_ERROR: _ClassVar[Status.Substate]
         CRASH_LOOP: _ClassVar[Status.Substate]
         OOM_KILLED: _ClassVar[Status.Substate]
+        RUNNING: _ClassVar[Status.Substate]
+        SCALED_TO_ZERO: _ClassVar[Status.Substate]
+        SCALING_FROM_ZERO: _ClassVar[Status.Substate]
+        SCALING_UP: _ClassVar[Status.Substate]
+        SCALING_DOWN: _ClassVar[Status.Substate]
     SUBSTATE_UNSPECIFIED: Status.Substate
     PULLING_IMAGE: Status.Substate
     INITIALIZING: Status.Substate
@@ -128,6 +135,11 @@ class Status(_message.Message):
     SECRET_MOUNT_ERROR: Status.Substate
     CRASH_LOOP: Status.Substate
     OOM_KILLED: Status.Substate
+    RUNNING: Status.Substate
+    SCALED_TO_ZERO: Status.Substate
+    SCALING_FROM_ZERO: Status.Substate
+    SCALING_UP: Status.Substate
+    SCALING_DOWN: Status.Substate
     ASSIGNED_CLUSTER_FIELD_NUMBER: _ClassVar[int]
     CURRENT_REPLICAS_FIELD_NUMBER: _ClassVar[int]
     INGRESS_FIELD_NUMBER: _ClassVar[int]
@@ -137,6 +149,8 @@ class Status(_message.Message):
     LEASE_EXPIRATION_FIELD_NUMBER: _ClassVar[int]
     K8S_METADATA_FIELD_NUMBER: _ClassVar[int]
     MATERIALIZED_INPUTS_FIELD_NUMBER: _ClassVar[int]
+    LAST_STARTED_AT_FIELD_NUMBER: _ClassVar[int]
+    LAST_ASSIGNED_CLUSTER_FIELD_NUMBER: _ClassVar[int]
     assigned_cluster: str
     current_replicas: int
     ingress: Ingress
@@ -146,7 +160,9 @@ class Status(_message.Message):
     lease_expiration: _timestamp_pb2.Timestamp
     k8s_metadata: K8sMetadata
     materialized_inputs: MaterializedInputs
-    def __init__(self, assigned_cluster: _Optional[str] = ..., current_replicas: _Optional[int] = ..., ingress: _Optional[_Union[Ingress, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., last_updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., conditions: _Optional[_Iterable[_Union[Condition, _Mapping]]] = ..., lease_expiration: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., k8s_metadata: _Optional[_Union[K8sMetadata, _Mapping]] = ..., materialized_inputs: _Optional[_Union[MaterializedInputs, _Mapping]] = ...) -> None: ...
+    last_started_at: _timestamp_pb2.Timestamp
+    last_assigned_cluster: str
+    def __init__(self, assigned_cluster: _Optional[str] = ..., current_replicas: _Optional[int] = ..., ingress: _Optional[_Union[Ingress, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., last_updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., conditions: _Optional[_Iterable[_Union[Condition, _Mapping]]] = ..., lease_expiration: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., k8s_metadata: _Optional[_Union[K8sMetadata, _Mapping]] = ..., materialized_inputs: _Optional[_Union[MaterializedInputs, _Mapping]] = ..., last_started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., last_assigned_cluster: _Optional[str] = ...) -> None: ...
 
 class K8sMetadata(_message.Message):
     __slots__ = ["namespace"]
@@ -165,7 +181,7 @@ class Ingress(_message.Message):
     def __init__(self, public_url: _Optional[str] = ..., cname_url: _Optional[str] = ..., vpc_url: _Optional[str] = ...) -> None: ...
 
 class Spec(_message.Message):
-    __slots__ = ["container", "pod", "autoscaling", "ingress", "desired_state", "cluster_pool", "images", "security_context", "extended_resources", "runtime_metadata", "profile", "creator", "inputs", "links", "timeouts"]
+    __slots__ = ["container", "pod", "autoscaling", "ingress", "desired_state", "cluster_pool", "cluster", "images", "security_context", "extended_resources", "runtime_metadata", "profile", "creator", "inputs", "links", "timeouts"]
     class DesiredState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         DESIRED_STATE_UNSPECIFIED: _ClassVar[Spec.DesiredState]
@@ -182,6 +198,7 @@ class Spec(_message.Message):
     INGRESS_FIELD_NUMBER: _ClassVar[int]
     DESIRED_STATE_FIELD_NUMBER: _ClassVar[int]
     CLUSTER_POOL_FIELD_NUMBER: _ClassVar[int]
+    CLUSTER_FIELD_NUMBER: _ClassVar[int]
     IMAGES_FIELD_NUMBER: _ClassVar[int]
     SECURITY_CONTEXT_FIELD_NUMBER: _ClassVar[int]
     EXTENDED_RESOURCES_FIELD_NUMBER: _ClassVar[int]
@@ -197,6 +214,7 @@ class Spec(_message.Message):
     ingress: IngressConfig
     desired_state: Spec.DesiredState
     cluster_pool: str
+    cluster: str
     images: ImageSpecSet
     security_context: SecurityContext
     extended_resources: _tasks_pb2.ExtendedResources
@@ -206,7 +224,7 @@ class Spec(_message.Message):
     inputs: InputList
     links: _containers.RepeatedCompositeFieldContainer[Link]
     timeouts: TimeoutConfig
-    def __init__(self, container: _Optional[_Union[_tasks_pb2.Container, _Mapping]] = ..., pod: _Optional[_Union[_tasks_pb2.K8sPod, _Mapping]] = ..., autoscaling: _Optional[_Union[AutoscalingConfig, _Mapping]] = ..., ingress: _Optional[_Union[IngressConfig, _Mapping]] = ..., desired_state: _Optional[_Union[Spec.DesiredState, str]] = ..., cluster_pool: _Optional[str] = ..., images: _Optional[_Union[ImageSpecSet, _Mapping]] = ..., security_context: _Optional[_Union[SecurityContext, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ..., runtime_metadata: _Optional[_Union[_runtime_version_pb2.RuntimeMetadata, _Mapping]] = ..., profile: _Optional[_Union[Profile, _Mapping]] = ..., creator: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., inputs: _Optional[_Union[InputList, _Mapping]] = ..., links: _Optional[_Iterable[_Union[Link, _Mapping]]] = ..., timeouts: _Optional[_Union[TimeoutConfig, _Mapping]] = ...) -> None: ...
+    def __init__(self, container: _Optional[_Union[_tasks_pb2.Container, _Mapping]] = ..., pod: _Optional[_Union[_tasks_pb2.K8sPod, _Mapping]] = ..., autoscaling: _Optional[_Union[AutoscalingConfig, _Mapping]] = ..., ingress: _Optional[_Union[IngressConfig, _Mapping]] = ..., desired_state: _Optional[_Union[Spec.DesiredState, str]] = ..., cluster_pool: _Optional[str] = ..., cluster: _Optional[str] = ..., images: _Optional[_Union[ImageSpecSet, _Mapping]] = ..., security_context: _Optional[_Union[SecurityContext, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ..., runtime_metadata: _Optional[_Union[_runtime_version_pb2.RuntimeMetadata, _Mapping]] = ..., profile: _Optional[_Union[Profile, _Mapping]] = ..., creator: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., inputs: _Optional[_Union[InputList, _Mapping]] = ..., links: _Optional[_Iterable[_Union[Link, _Mapping]]] = ..., timeouts: _Optional[_Union[TimeoutConfig, _Mapping]] = ...) -> None: ...
 
 class Link(_message.Message):
     __slots__ = ["path", "title", "is_relative"]
@@ -219,18 +237,16 @@ class Link(_message.Message):
     def __init__(self, path: _Optional[str] = ..., title: _Optional[str] = ..., is_relative: bool = ...) -> None: ...
 
 class Input(_message.Message):
-    __slots__ = ["name", "string_value", "artifact_query", "artifact_id", "app_id"]
+    __slots__ = ["name", "string_value", "app_id", "artifact_id"]
     NAME_FIELD_NUMBER: _ClassVar[int]
     STRING_VALUE_FIELD_NUMBER: _ClassVar[int]
-    ARTIFACT_QUERY_FIELD_NUMBER: _ClassVar[int]
-    ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
     APP_ID_FIELD_NUMBER: _ClassVar[int]
+    ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
     name: str
     string_value: str
-    artifact_query: _artifact_id_pb2.ArtifactQuery
-    artifact_id: _artifact_id_pb2.ArtifactID
     app_id: Identifier
-    def __init__(self, name: _Optional[str] = ..., string_value: _Optional[str] = ..., artifact_query: _Optional[_Union[_artifact_id_pb2.ArtifactQuery, _Mapping]] = ..., artifact_id: _Optional[_Union[_artifact_id_pb2.ArtifactID, _Mapping]] = ..., app_id: _Optional[_Union[Identifier, _Mapping]] = ...) -> None: ...
+    artifact_id: _artifact_id_pb2.ArtifactVersionId
+    def __init__(self, name: _Optional[str] = ..., string_value: _Optional[str] = ..., app_id: _Optional[_Union[Identifier, _Mapping]] = ..., artifact_id: _Optional[_Union[_artifact_id_pb2.ArtifactVersionId, _Mapping]] = ...) -> None: ...
 
 class MaterializedInputs(_message.Message):
     __slots__ = ["items", "revision"]

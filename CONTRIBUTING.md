@@ -17,7 +17,7 @@ Thank you for your interest in contributing to Flyte 2! This guide will help you
 
 Before contributing, ensure you have:
 - [Buf CLI](https://buf.build/docs/installation) installed
-- Go 1.26.3 or later
+- Go 1.27.3 or later
 - Node.js and npm (for TypeScript)
 - Python 3.10+ with `uv` package manager
 - Rust toolchain (if working with Rust bindings)
@@ -58,13 +58,13 @@ From the repo root:
 make devbox-build
 
 # Start the devbox cluster in dev mode (required for running the manager locally)
-make devbox-run FLYTE_DEV=true
+make devbox-run FLYTE_DEV=True
 
 # Stop the devbox when you're done
 make devbox-stop
 ```
 
-`FLYTE_DEV=true` is required when you intend to run the manager locally — it disables the in-cluster manager so your local process can take over. `make devbox-run` writes a kubeconfig pointing at the devbox cluster in global kubeconfig, so `kubectl` will target it automatically.
+`FLYTE_DEV=True` is required when you intend to run the manager locally — it disables the in-cluster manager so your local process can take over. The value is case-insensitive. `make devbox-run` writes a kubeconfig pointing at the devbox cluster in global kubeconfig, so `kubectl` will target it automatically.
 
 ### Build and Run the Manager
 
@@ -148,8 +148,36 @@ Regularly sync with upstream:
 
 ```bash
 git fetch upstream
-git rebase upstream/v2
+git rebase upstream/main
 ```
+
+### CI Checks on Pull Requests from Forks
+
+For security reasons, pull requests opened from a **forked repository do not run the
+full CI suite** that runs on branches in `flyteorg/flyte`. Fork PRs execute in an
+isolated context without access to repository secrets, so any job that builds or pushes
+an image — or comments on the PR — is skipped rather than run.
+
+Checks that behave differently on fork PRs:
+
+- **CI image build & push** (`build-ci-image.yml`): skipped entirely — no image is built
+  or pushed, and no build-status comment is posted to the PR.
+- **Generated-code check** (`check-generate.yml`): runs against the fallback base image
+  instead of a PR-specific image, so it does **not** validate generated code against the
+  changes in the PR.
+- **Single-binary & devbox images** (`flyte-binary-v2.yml`): both build-and-push jobs are
+  skipped.
+
+**For contributors:** this is expected — you don't need to do anything, and a skipped
+image job is not a failure. Run `make gen` and the checks under
+[Testing and Verification](#testing-and-verification) locally to catch issues before
+requesting review.
+
+**For maintainers:** treat a skipped or green image/generate check on a fork PR as
+*"not run,"* not *"passed."* Before merging, validate the change under full CI by either
+checking out the contributor's branch locally and running the affected checks (e.g.
+`make gen` and confirming there is no diff), or pushing the branch to `flyteorg/flyte`
+(with the contributor's permission) to trigger the complete pipeline.
 
 ## Making Changes
 
@@ -309,7 +337,7 @@ git push origin feature/your-feature-name
 1. Go to the [Flyte repository](https://github.com/flyteorg/flyte)
 2. Click "New Pull Request"
 3. Select your fork and branch
-4. Target the `v2` branch (not `main`)
+4. Target the `main` branch
 5. Fill out the PR template with:
    - Description of changes
    - Motivation and context

@@ -9,6 +9,8 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
 // Phase transitions follow this typical flow:
 // QUEUED -> WAITING_FOR_RESOURCES -> INITIALIZING -> RUNNING -> {SUCCEEDED|FAILED|ABORTED|TIMED_OUT}
 // Condition actions: PAUSED -> {SUCCEEDED(signal)|TIMED_OUT(timeout)|ABORTED(abort)}
+// Recovery runs: an action whose counterpart succeeded in the reference run is recorded
+// directly as RECOVERED (terminal) without executing.
 enum ActionPhase {
   // Default/unknown phase
   ACTION_PHASE_UNSPECIFIED = 0;
@@ -39,4 +41,8 @@ enum ActionPhase {
 
   // Action is paused and waiting for an external signal (condition actions)
   ACTION_PHASE_PAUSED = 9;
+
+  // Action was recovered as-is from a prior run; it did not execute in this run.
+  // Terminal and success-equivalent for control flow.
+  ACTION_PHASE_RECOVERED = 10;
 }

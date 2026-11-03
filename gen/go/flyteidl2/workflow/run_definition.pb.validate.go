@@ -438,7 +438,7 @@ func (m *TaskAction) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for Cluster
+	// no validation rules for Queue
 
 	if len(errors) > 0 {
 		return TaskActionMultiError(errors)
@@ -1121,6 +1121,10 @@ func (m *TaskActionMetadata) validate(all bool) error {
 
 	// no validation rules for ShortName
 
+	if m.Queue != nil {
+		// no validation rules for Queue
+	}
+
 	if len(errors) > 0 {
 		return TaskActionMetadataMultiError(errors)
 	}
@@ -1561,6 +1565,64 @@ func (m *ActionMetadata) validate(all bool) error {
 
 	// no validation rules for Source
 
+	if all {
+		switch v := interface{}(m.GetRelation()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionMetadataValidationError{
+					field:  "Relation",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionMetadataValidationError{
+					field:  "Relation",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRelation()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionMetadataValidationError{
+				field:  "Relation",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetRecoveredFrom()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionMetadataValidationError{
+					field:  "RecoveredFrom",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionMetadataValidationError{
+					field:  "RecoveredFrom",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRecoveredFrom()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionMetadataValidationError{
+				field:  "RecoveredFrom",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch v := m.Spec.(type) {
 	case *ActionMetadata_Task:
 		if v == nil {
@@ -1823,6 +1885,64 @@ func (m *ActionStatus) validate(all bool) error {
 	// no validation rules for Attempts
 
 	// no validation rules for CacheStatus
+
+	if all {
+		switch v := interface{}(m.GetQueuedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionStatusValidationError{
+					field:  "QueuedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionStatusValidationError{
+					field:  "QueuedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetQueuedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionStatusValidationError{
+				field:  "QueuedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetWorkerAssignedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionStatusValidationError{
+					field:  "WorkerAssignedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionStatusValidationError{
+					field:  "WorkerAssignedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetWorkerAssignedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionStatusValidationError{
+				field:  "WorkerAssignedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if m.EndTime != nil {
 
@@ -2281,6 +2401,37 @@ func (m *ErrorInfo) validate(all bool) error {
 	// no validation rules for Message
 
 	// no validation rules for Kind
+
+	// no validation rules for Code
+
+	if all {
+		switch v := interface{}(m.GetGpuFault()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ErrorInfoValidationError{
+					field:  "GpuFault",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ErrorInfoValidationError{
+					field:  "GpuFault",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetGpuFault()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ErrorInfoValidationError{
+				field:  "GpuFault",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return ErrorInfoMultiError(errors)
@@ -3343,6 +3494,35 @@ func (m *ActionAttempt) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetCacheMetadata()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionAttemptValidationError{
+					field:  "CacheMetadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionAttemptValidationError{
+					field:  "CacheMetadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCacheMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionAttemptValidationError{
+				field:  "CacheMetadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if m.EndTime != nil {
 
 		if all {
@@ -3539,6 +3719,43 @@ func (m *ClusterEvent) validate(all bool) error {
 	}
 
 	// no validation rules for Message
+
+	// no validation rules for Type
+
+	// no validation rules for Reason
+
+	// no validation rules for SourceComponent
+
+	// no validation rules for Count
+
+	if all {
+		switch v := interface{}(m.GetGpuFault()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ClusterEventValidationError{
+					field:  "GpuFault",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ClusterEventValidationError{
+					field:  "GpuFault",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetGpuFault()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ClusterEventValidationError{
+				field:  "GpuFault",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if len(errors) > 0 {
 		return ClusterEventMultiError(errors)
@@ -4049,6 +4266,35 @@ func (m *ActionEvent) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return ActionEventValidationError{
 				field:  "ReportedTime",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetCacheMetadata()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionEventValidationError{
+					field:  "CacheMetadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionEventValidationError{
+					field:  "CacheMetadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCacheMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionEventValidationError{
+				field:  "CacheMetadata",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

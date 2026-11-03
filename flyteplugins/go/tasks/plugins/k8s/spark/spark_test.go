@@ -8,13 +8,16 @@ import (
 	"testing"
 	"time"
 
-	sj "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
-	sparkOp "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
 	structpb "github.com/golang/protobuf/ptypes/struct"
+	sj "github.com/kubeflow/spark-operator/v2/api/v1beta2"
+	sparkOp "github.com/kubeflow/spark-operator/v2/api/v1beta2"
+	sparkOpCommon "github.com/kubeflow/spark-operator/v2/pkg/common"
+	sparkOpUtil "github.com/kubeflow/spark-operator/v2/pkg/util"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -73,10 +76,10 @@ var (
 )
 
 func TestGetApplicationType(t *testing.T) {
-	assert.Equal(t, getApplicationType(plugins.SparkApplication_PYTHON), sj.PythonApplicationType)
-	assert.Equal(t, getApplicationType(plugins.SparkApplication_R), sj.RApplicationType)
-	assert.Equal(t, getApplicationType(plugins.SparkApplication_JAVA), sj.JavaApplicationType)
-	assert.Equal(t, getApplicationType(plugins.SparkApplication_SCALA), sj.ScalaApplicationType)
+	assert.Equal(t, getApplicationType(plugins.SparkApplication_PYTHON), sj.SparkApplicationTypePython)
+	assert.Equal(t, getApplicationType(plugins.SparkApplication_R), sj.SparkApplicationTypeR)
+	assert.Equal(t, getApplicationType(plugins.SparkApplication_JAVA), sj.SparkApplicationTypeJava)
+	assert.Equal(t, getApplicationType(plugins.SparkApplication_SCALA), sj.SparkApplicationTypeScala)
 }
 
 func TestGetEventInfo(t *testing.T) {
@@ -103,7 +106,7 @@ func TestGetEventInfo(t *testing.T) {
 		},
 	}))
 	pluginContext := dummySparkPluginContext(dummySparkTaskTemplateContainer("blah-1", dummySparkConf), k8s.PluginState{})
-	info, err := getEventInfoForSpark(context.TODO(), pluginContext, dummySparkApplication(sj.RunningState))
+	info, err := getEventInfoForSpark(context.TODO(), pluginContext, dummySparkApplication(sj.ApplicationStateRunning))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 6)
 	assert.Equal(t, "https://spark-ui.flyte", info.CustomInfo.Fields[sparkDriverUI].GetStringValue())
@@ -123,7 +126,7 @@ func TestGetEventInfo(t *testing.T) {
 
 	assert.Equal(t, expectedLinks, generatedLinks)
 
-	info, err = getEventInfoForSpark(context.TODO(), pluginContext, dummySparkApplication(sj.SubmittedState))
+	info, err = getEventInfoForSpark(context.TODO(), pluginContext, dummySparkApplication(sj.ApplicationStateSubmitted))
 	generatedLinks = make([]string, 0, len(info.Logs))
 	for _, l := range info.Logs {
 		generatedLinks = append(generatedLinks, l.Uri)
@@ -161,7 +164,7 @@ func TestGetEventInfo(t *testing.T) {
 		},
 	}))
 
-	info, err = getEventInfoForSpark(context.TODO(), pluginContext, dummySparkApplication(sj.FailedState))
+	info, err = getEventInfoForSpark(context.TODO(), pluginContext, dummySparkApplication(sj.ApplicationStateFailed))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 5)
 	assert.Equal(t, "spark-history.flyte/history/app-id", info.CustomInfo.Fields[sparkHistoryUI].GetStringValue())
@@ -211,70 +214,70 @@ func TestGetTaskPhase(t *testing.T) {
 
 	ctx := context.TODO()
 	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), k8s.PluginState{})
-	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.NewState))
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.ApplicationStateNew))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseQueued)
 	assert.NotNil(t, taskPhase.Info())
 	assert.NotNil(t, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.SubmittedState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.ApplicationStateSubmitted))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseInitializing)
 	assert.NotNil(t, taskPhase.Info())
 	assert.NotNil(t, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.RunningState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.ApplicationStateRunning))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
 	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.CompletedState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.ApplicationStateCompleted))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseSuccess)
 	assert.NotNil(t, taskPhase.Info())
 	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.InvalidatingState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.ApplicationStateInvalidating))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
 	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.FailingState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.ApplicationStateFailing))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
 	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.PendingRerunState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.ApplicationStatePendingRerun))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
 	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.SucceedingState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.ApplicationStateSucceeding))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRunning)
 	assert.NotNil(t, taskPhase.Info())
 	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.FailedSubmissionState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.ApplicationStateFailedSubmission))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRetryableFailure)
 	assert.NotNil(t, taskPhase.Info())
 	assert.Equal(t, expectedLogCtx, taskPhase.Info().LogContext)
 	assert.Nil(t, err)
 
-	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.FailedState))
+	taskPhase, err = sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.ApplicationStateFailed))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseRetryableFailure)
 	assert.NotNil(t, taskPhase.Info())
@@ -293,7 +296,7 @@ func TestGetTaskPhaseIncreasePhaseVersion(t *testing.T) {
 	}
 
 	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), pluginState)
-	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.SubmittedState))
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.ApplicationStateSubmitted))
 
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Version(), pluginsCore.DefaultPhaseVersion+1)
@@ -317,8 +320,8 @@ func dummySparkApplication(state sj.ApplicationStateType) *sj.SparkApplication {
 			},
 			ExecutionAttempts: 1,
 			ExecutorState: map[string]sparkOp.ExecutorState{
-				"exec-pod-1": sparkOp.ExecutorPendingState,
-				"exec-pod-2": sparkOp.ExecutorRunningState,
+				"exec-pod-1": sparkOp.ExecutorStatePending,
+				"exec-pod-2": sparkOp.ExecutorStateRunning,
 			},
 		},
 	}
@@ -710,6 +713,7 @@ func TestBuildResourceContainer(t *testing.T) {
 
 	// Set spark custom feature config.
 	assert.NoError(t, setSparkConfig(&Config{
+		EnablePodTemplate: true,
 		Features: []Feature{
 			{
 				Name:        "feature1",
@@ -732,17 +736,17 @@ func TestBuildResourceContainer(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, sparkMainClass, *sparkApp.Spec.MainClass)
 	assert.Equal(t, sparkApplicationFile, *sparkApp.Spec.MainApplicationFile)
-	assert.Equal(t, sj.PythonApplicationType, sparkApp.Spec.Type)
+	assert.Equal(t, sj.SparkApplicationTypePython, sparkApp.Spec.Type)
 	assert.Equal(t, testArgs, sparkApp.Spec.Arguments)
 	assert.Equal(t, testImage, *sparkApp.Spec.Image)
-	assert.NotNil(t, sparkApp.Spec.Driver.SecurityContenxt)
-	assert.Equal(t, *sparkApp.Spec.Driver.SecurityContenxt.RunAsUser, *defaultConfig.DefaultPodSecurityContext.RunAsUser)
+	assert.NotNil(t, sparkApp.Spec.Driver.PodSecurityContext)
+	assert.Equal(t, *sparkApp.Spec.Driver.PodSecurityContext.RunAsUser, *defaultConfig.DefaultPodSecurityContext.RunAsUser)
 	assert.NotNil(t, sparkApp.Spec.Driver.DNSConfig)
 	assert.Equal(t, []string{"8.8.8.8", "8.8.4.4"}, sparkApp.Spec.Driver.DNSConfig.Nameservers)
 	assert.ElementsMatch(t, defaultConfig.DefaultPodDNSConfig.Options, sparkApp.Spec.Driver.DNSConfig.Options)
 	assert.Equal(t, []string{"ns1.svc.cluster-domain.example", "my.dns.search.suffix"}, sparkApp.Spec.Driver.DNSConfig.Searches)
-	assert.NotNil(t, sparkApp.Spec.Executor.SecurityContenxt)
-	assert.Equal(t, *sparkApp.Spec.Executor.SecurityContenxt.RunAsUser, *defaultConfig.DefaultPodSecurityContext.RunAsUser)
+	assert.NotNil(t, sparkApp.Spec.Executor.PodSecurityContext)
+	assert.Equal(t, *sparkApp.Spec.Executor.PodSecurityContext.RunAsUser, *defaultConfig.DefaultPodSecurityContext.RunAsUser)
 	assert.NotNil(t, sparkApp.Spec.Executor.DNSConfig)
 	assert.NotNil(t, sparkApp.Spec.Executor.DNSConfig)
 	assert.ElementsMatch(t, defaultConfig.DefaultPodDNSConfig.Options, sparkApp.Spec.Executor.DNSConfig.Options)
@@ -753,7 +757,7 @@ func TestBuildResourceContainer(t *testing.T) {
 	execCores, _ := strconv.ParseInt(dummySparkConf["spark.executor.cores"], 10, 32)
 	execInstances, _ := strconv.ParseInt(dummySparkConf["spark.executor.instances"], 10, 32)
 
-	assert.Equal(t, "new-val", *sparkApp.Spec.ServiceAccount)
+	assert.Equal(t, "new-val", *sparkApp.Spec.Executor.ServiceAccount)
 	assert.Equal(t, int32(driverCores), *sparkApp.Spec.Driver.Cores)
 	assert.Equal(t, int32(execCores), *sparkApp.Spec.Executor.Cores)
 	assert.Equal(t, int32(execInstances), *sparkApp.Spec.Executor.Instances)
@@ -965,12 +969,12 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	}, sparkApp.TypeMeta)
 
 	// Application spec
-	assert.Equal(t, flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata()), *sparkApp.Spec.ServiceAccount)
-	assert.Equal(t, sparkOp.PythonApplicationType, sparkApp.Spec.Type)
+	assert.Equal(t, flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata()), *sparkApp.Spec.Executor.ServiceAccount)
+	assert.Equal(t, sparkOp.SparkApplicationTypePython, sparkApp.Spec.Type)
 	assert.Equal(t, testImage, *sparkApp.Spec.Image)
 	assert.Equal(t, testArgs, sparkApp.Spec.Arguments)
 	assert.Equal(t, sparkOp.RestartPolicy{
-		Type:                       sparkOp.OnFailure,
+		Type:                       sparkOp.RestartPolicyOnFailure,
 		OnSubmissionFailureRetries: intPtr(int32(14)),
 	}, sparkApp.Spec.RestartPolicy)
 	assert.Equal(t, sparkMainClass, *sparkApp.Spec.MainClass)
@@ -986,7 +990,7 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, 10, len(sparkApp.Spec.Driver.Env))
 	assert.Equal(t, testImage, *sparkApp.Spec.Driver.Image)
 	assert.Equal(t, flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata()), *sparkApp.Spec.Driver.ServiceAccount)
-	assert.Equal(t, defaultConfig.DefaultPodSecurityContext, sparkApp.Spec.Driver.SecurityContenxt)
+	assert.Equal(t, defaultConfig.DefaultPodSecurityContext, sparkApp.Spec.Driver.PodSecurityContext)
 	assert.Equal(t, defaultConfig.DefaultPodDNSConfig, sparkApp.Spec.Driver.DNSConfig)
 	assert.Equal(t, defaultConfig.EnableHostNetworkingPod, sparkApp.Spec.Driver.HostNetwork)
 	assert.Equal(t, defaultConfig.SchedulerName, *sparkApp.Spec.Driver.SchedulerName)
@@ -1022,7 +1026,7 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, findEnvVarByName(dummyEnvVarsWithSecretRef, "SECRET"), findEnvVarByName(sparkApp.Spec.Executor.Env, "SECRET"))
 	assert.Equal(t, 10, len(sparkApp.Spec.Executor.Env))
 	assert.Equal(t, testImage, *sparkApp.Spec.Executor.Image)
-	assert.Equal(t, defaultConfig.DefaultPodSecurityContext, sparkApp.Spec.Executor.SecurityContenxt)
+	assert.Equal(t, defaultConfig.DefaultPodSecurityContext, sparkApp.Spec.Executor.PodSecurityContext)
 	assert.Equal(t, defaultConfig.DefaultPodDNSConfig, sparkApp.Spec.Executor.DNSConfig)
 	assert.Equal(t, defaultConfig.EnableHostNetworkingPod, sparkApp.Spec.Executor.HostNetwork)
 	assert.Equal(t, defaultConfig.SchedulerName, *sparkApp.Spec.Executor.SchedulerName)
@@ -1066,7 +1070,7 @@ func TestGetTaskPhaseWithNamespaceInLogContext(t *testing.T) {
 	ctx := context.TODO()
 
 	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), k8s.PluginState{})
-	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.RunningState))
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.ApplicationStateRunning))
 	assert.NoError(t, err)
 	assert.NotNil(t, taskPhase.Info())
 	assert.NotNil(t, taskPhase.Info().LogContext)
@@ -1109,7 +1113,7 @@ func TestGetTaskPhaseWithFailedPod(t *testing.T) {
 	pluginCtx := dummySparkPluginContextWithPods(dummySparkTaskTemplateContainer("", dummySparkConf), k8s.PluginState{}, pod)
 
 	// Even though SparkApplication status is running, should return failure due to pod status
-	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.RunningState))
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.ApplicationStateRunning))
 	assert.NoError(t, err)
 	assert.True(t, taskPhase.Phase().IsFailure())
 }
@@ -1152,7 +1156,7 @@ func TestGetTaskPhaseWithPendingPodInvalidImage(t *testing.T) {
 
 	pluginCtx := dummySparkPluginContextWithPods(dummySparkTaskTemplateContainer("", dummySparkConf), k8s.PluginState{}, pod)
 
-	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.SubmittedState))
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.ApplicationStateSubmitted))
 	assert.NoError(t, err)
 	// Should detect the InvalidImageName and return a failure phase
 	assert.True(t, taskPhase.Phase().IsFailure())
@@ -1164,7 +1168,7 @@ func TestGetTaskPhaseContainerNameConstant(t *testing.T) {
 
 	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), k8s.PluginState{})
 
-	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.CompletedState))
+	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.ApplicationStateCompleted))
 	assert.NoError(t, err)
 	assert.NotNil(t, taskPhase.Info())
 	assert.NotNil(t, taskPhase.Info().LogContext)
@@ -1185,16 +1189,16 @@ func TestIsTerminal(t *testing.T) {
 		state          sj.ApplicationStateType
 		expectedResult bool
 	}{
-		{"Completed", sj.CompletedState, true},
-		{"Failed", sj.FailedState, true},
-		{"FailedSubmission", sj.FailedSubmissionState, true},
-		{"New", sj.NewState, false},
-		{"Submitted", sj.SubmittedState, false},
-		{"Running", sj.RunningState, false},
-		{"PendingRerun", sj.PendingRerunState, false},
-		{"Invalidating", sj.InvalidatingState, false},
-		{"Succeeding", sj.SucceedingState, false},
-		{"Failing", sj.FailingState, false},
+		{"Completed", sj.ApplicationStateCompleted, true},
+		{"Failed", sj.ApplicationStateFailed, true},
+		{"FailedSubmission", sj.ApplicationStateFailedSubmission, true},
+		{"New", sj.ApplicationStateNew, false},
+		{"Submitted", sj.ApplicationStateSubmitted, false},
+		{"Running", sj.ApplicationStateRunning, false},
+		{"PendingRerun", sj.ApplicationStatePendingRerun, false},
+		{"Invalidating", sj.ApplicationStateInvalidating, false},
+		{"Succeeding", sj.ApplicationStateSucceeding, false},
+		{"Failing", sj.ApplicationStateFailing, false},
 	}
 
 	for _, tt := range tests {
@@ -1237,20 +1241,20 @@ func TestGetCompletionTime(t *testing.T) {
 					CreationTimestamp: v1.NewTime(evenEarlier),
 				},
 				Status: sj.SparkApplicationStatus{
-					TerminationTime: v1.NewTime(now),
-					SubmissionTime:  v1.NewTime(earlier),
+					TerminationTime:           v1.NewTime(now),
+					LastSubmissionAttemptTime: v1.NewTime(earlier),
 				},
 			},
 			expectedTime: now,
 		},
 		{
-			name: "falls back to SubmissionTime",
+			name: "falls back to LastSubmissionAttemptTime",
 			app: &sj.SparkApplication{
 				ObjectMeta: v1.ObjectMeta{
 					CreationTimestamp: v1.NewTime(evenEarlier),
 				},
 				Status: sj.SparkApplicationStatus{
-					SubmissionTime: v1.NewTime(now),
+					LastSubmissionAttemptTime: v1.NewTime(now),
 				},
 			},
 			expectedTime: now,
@@ -1288,10 +1292,10 @@ func TestGetCompletionTime_WrongResourceType(t *testing.T) {
 
 // TestBuildResourceSparkExecutorAffinityDilution probes whether the non-interruptible
 // node-selector requirement (interruptible=false) survives on a Spark executor whose
-// custom executorPod carries its own node-affinity term. Spark merges the executor
-// overlay (spark.go createExecutorSpec) but re-applies no scheduling afterwards, so
-// this is the Spark analogue of the Ray OR-append dilution. If it fails, the appended
-// custom term lacks the non-interruptible requirement (bug); if it passes, no bug.
+// custom executorPod carries its own node-affinity term. The custom pod spec is handed
+// to the operator as the pod template rather than merged into the pod spec Flyte builds,
+// so it can no longer dilute the platform requirements on the explicit SparkPodSpec
+// fields — the operator treats those as overrides of the template.
 func TestBuildResourceSparkExecutorAffinityDilution(t *testing.T) {
 	sparkResourceHandler := sparkResourceHandler{}
 	defaultConfig := defaultPluginConfig()
@@ -1335,7 +1339,7 @@ func TestBuildResourceSparkExecutorAffinityDilution(t *testing.T) {
 	require.NotNil(t, sparkApp.Spec.Executor.Affinity)
 	require.NotNil(t, sparkApp.Spec.Executor.Affinity.NodeAffinity)
 	terms := sparkApp.Spec.Executor.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
-	require.GreaterOrEqual(t, len(terms), 2, "expected the custom executor affinity term to be appended as a separate term")
+	require.NotEmpty(t, terms)
 	for i, term := range terms {
 		found := false
 		for _, e := range term.MatchExpressions {
@@ -1346,4 +1350,323 @@ func TestBuildResourceSparkExecutorAffinityDilution(t *testing.T) {
 		}
 		assert.Truef(t, found, "executor node selector term %d is missing the non-interruptible requirement", i)
 	}
+
+	// The custom term rides on the template instead, where the explicit fields above win.
+	require.NotNil(t, sparkApp.Spec.Executor.Template)
+	assert.Equal(t, executorPodSpec.Affinity, sparkApp.Spec.Executor.Template.Spec.Affinity)
+}
+
+// TestBuildResourceCustomPodSpecPassthrough covers the driver/executor pod specs reaching
+// the operator verbatim as the pod template. They used to be merged onto the pod spec Flyte
+// builds, which matches containers by name — and the container Flyte generates is named
+// after the task execution ID, so a container the user named anything else (the operator's
+// own `spark-kubernetes-{driver,executor}`, or `primary`) was silently dropped. Worse, a
+// `primary_container_name` that named such a container failed the task outright with
+// "invalid TaskSpecification, container [...] not defined".
+func TestBuildResourceCustomPodSpecPassthrough(t *testing.T) {
+	require.NoError(t, setSparkConfig(&Config{EnablePodTemplate: true}))
+	require.NoError(t, config.SetK8sPluginConfig(defaultPluginConfig()))
+	setPodTemplateSupportedForTest(true)
+
+	customPodSpec := func(containerName string) *corev1.PodSpec {
+		return &corev1.PodSpec{
+			Containers: []corev1.Container{{
+				Name: containerName,
+				Resources: corev1.ResourceRequirements{
+					Requests: corev1.ResourceList{corev1.ResourceEphemeralStorage: resource.MustParse("9Gi")},
+				},
+			}},
+		}
+	}
+	driverPodSpec := customPodSpec("spark-kubernetes-driver")
+	executorPodSpec := customPodSpec("primary")
+
+	driverPodSpecPb, err := utils.MarshalObjToStruct(driverPodSpec)
+	require.NoError(t, err)
+	executorPodSpecPb, err := utils.MarshalObjToStruct(executorPodSpec)
+	require.NoError(t, err)
+
+	sparkJob := dummySparkCustomObj(dummySparkConf)
+	sparkJob.DriverPod = &core.K8SPod{PodSpec: driverPodSpecPb, PrimaryContainerName: "spark-kubernetes-driver"}
+	sparkJob.ExecutorPod = &core.K8SPod{PodSpec: executorPodSpecPb, PrimaryContainerName: "primary"}
+
+	sparkJobJSON, err := utils.MarshalToString(sparkJob)
+	require.NoError(t, err)
+	structObj := structpb.Struct{}
+	require.NoError(t, stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj))
+	taskTemplate := &core.TaskTemplate{
+		Id:     &core.Identifier{Name: "spark-custom-pod"},
+		Type:   "container",
+		Target: &core.TaskTemplate_Container{Container: &core.Container{Image: testImage, Args: testArgs, Env: dummyEnvVars}},
+		Custom: &structObj,
+	}
+
+	res, err := sparkResourceHandler{}.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
+	require.NoError(t, err, "a primary_container_name that does not name a Flyte-generated container must not fail the task")
+	sparkApp, ok := res.(*sj.SparkApplication)
+	require.True(t, ok)
+
+	require.NotNil(t, sparkApp.Spec.Driver.Template)
+	assert.Equal(t, driverPodSpec.Containers, sparkApp.Spec.Driver.Template.Spec.Containers)
+	require.NotNil(t, sparkApp.Spec.Executor.Template)
+	assert.Equal(t, executorPodSpec.Containers, sparkApp.Spec.Executor.Template.Spec.Containers)
+
+	// The explicit fields still come from the pod spec Flyte builds, not from the template.
+	assert.Equal(t, testImage, *sparkApp.Spec.Driver.Image)
+	assert.Equal(t, testImage, *sparkApp.Spec.Executor.Image)
+}
+
+// TestBuildResourceCustomPodSpecDroppedWithoutTemplateSupport pins the accepted tradeoff:
+// the template is the only path a custom driver/executor pod spec travels, so on a cluster
+// whose SparkApplication CRD predates `spec.driver.template` it does not apply at all.
+func TestBuildResourceCustomPodSpecDroppedWithoutTemplateSupport(t *testing.T) {
+	require.NoError(t, setSparkConfig(&Config{EnablePodTemplate: true}))
+	require.NoError(t, config.SetK8sPluginConfig(defaultPluginConfig()))
+	setPodTemplateSupportedForTest(false)
+	defer setPodTemplateSupportedForTest(true)
+
+	executorPodSpec := &corev1.PodSpec{
+		NodeSelector: map[string]string{"custom": "true"},
+		Containers: []corev1.Container{{
+			Name: "primary",
+			Resources: corev1.ResourceRequirements{
+				Requests: corev1.ResourceList{corev1.ResourceEphemeralStorage: resource.MustParse("9Gi")},
+			},
+		}},
+	}
+	podSpecPb, err := utils.MarshalObjToStruct(executorPodSpec)
+	require.NoError(t, err)
+
+	sparkJob := dummySparkCustomObj(dummySparkConf)
+	sparkJob.ExecutorPod = &core.K8SPod{PodSpec: podSpecPb, PrimaryContainerName: "primary"}
+
+	sparkJobJSON, err := utils.MarshalToString(sparkJob)
+	require.NoError(t, err)
+	structObj := structpb.Struct{}
+	require.NoError(t, stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj))
+	taskTemplate := &core.TaskTemplate{
+		Id:     &core.Identifier{Name: "spark-custom-pod-legacy-crd"},
+		Type:   "container",
+		Target: &core.TaskTemplate_Container{Container: &core.Container{Image: testImage, Args: testArgs, Env: dummyEnvVars}},
+		Custom: &structObj,
+	}
+
+	res, err := sparkResourceHandler{}.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
+	require.NoError(t, err)
+	sparkApp, ok := res.(*sj.SparkApplication)
+	require.True(t, ok)
+
+	assert.Nil(t, sparkApp.Spec.Executor.Template)
+	assert.NotContains(t, sparkApp.Spec.Executor.NodeSelector, "custom")
+}
+
+// setPodTemplateSupportedForTest overrides the once-per-process CRD capability probe.
+func setPodTemplateSupportedForTest(supported bool) {
+	podTemplateCapability.once.Do(func() {})
+	podTemplateCapability.supported = supported
+}
+
+func init() {
+	// Unit tests run without a cluster; default to the capability-on path so the
+	// pod-template assertions in the tests above exercise it. Tests toggle as needed.
+	setPodTemplateSupportedForTest(true)
+}
+
+func TestBuildResourcePodTemplateGating(t *testing.T) {
+	assert.NoError(t, setSparkConfig(&Config{EnablePodTemplate: true}))
+	assert.NoError(t, config.SetK8sPluginConfig(defaultPluginConfig()))
+	taskTemplate := dummySparkTaskTemplateContainer("gating", dummySparkConf)
+	taskCtx := dummySparkTaskContext(taskTemplate, true)
+	handler := sparkResourceHandler{}
+
+	setPodTemplateSupportedForTest(true)
+	resource, err := handler.BuildResource(context.TODO(), taskCtx)
+	assert.NoError(t, err)
+	withTemplate := resource.(*sj.SparkApplication)
+
+	setPodTemplateSupportedForTest(false)
+	resource, err = handler.BuildResource(context.TODO(), taskCtx)
+	assert.NoError(t, err)
+	withoutTemplate := resource.(*sj.SparkApplication)
+	setPodTemplateSupportedForTest(true)
+
+	// Capability on: the full pod spec rides along as the template and the service
+	// account is set on both driver and executor.
+	assert.NotNil(t, withTemplate.Spec.Driver.Template)
+	assert.NotNil(t, withTemplate.Spec.Executor.Template)
+	assert.NotEmpty(t, withTemplate.Spec.Driver.Template.Spec.Containers)
+	assert.Equal(t, *withTemplate.Spec.Driver.ServiceAccount, withTemplate.Spec.Driver.Template.Spec.ServiceAccountName)
+	assert.NotNil(t, withTemplate.Spec.Executor.ServiceAccount)
+
+	// Capability off: today's wire shape exactly — no template, no executor service account.
+	assert.Nil(t, withoutTemplate.Spec.Driver.Template)
+	assert.Nil(t, withoutTemplate.Spec.Executor.Template)
+	assert.Nil(t, withoutTemplate.Spec.Executor.ServiceAccount)
+	assert.NotNil(t, withoutTemplate.Spec.Driver.ServiceAccount)
+
+	// sparkVersion is declared only alongside a template, since that is the only thing the
+	// operator gates on it. Without a template the field stays empty, as it has always been.
+	assert.Equal(t, minPodTemplateSparkVersion, withTemplate.Spec.SparkVersion)
+	assert.Empty(t, withoutTemplate.Spec.SparkVersion)
+
+	// The template is strictly additive: with it stripped, the objects are identical.
+	normalized := withTemplate.DeepCopy()
+	normalized.Spec.Driver.Template = nil
+	normalized.Spec.Executor.Template = nil
+	normalized.Spec.Executor.ServiceAccount = nil
+	normalized.Spec.SparkVersion = ""
+	expected := withoutTemplate.DeepCopy()
+	delete(normalized.Spec.SparkConf, "spark.kubernetes.driverEnv.FLYTE_START_TIME")
+	delete(expected.Spec.SparkConf, "spark.kubernetes.driverEnv.FLYTE_START_TIME")
+	// Template-only: they name the container Spark should adopt from the template.
+	assert.Equal(t, defaultDriverPrimaryContainerName,
+		normalized.Spec.SparkConf[sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName])
+	assert.Equal(t, defaultExecutorPrimaryContainerName,
+		normalized.Spec.SparkConf[sparkOpCommon.SparkKubernetesExecutorPodTemplateContainerName])
+	assert.NotContains(t, expected.Spec.SparkConf, sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName)
+	delete(normalized.Spec.SparkConf, sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName)
+	delete(normalized.Spec.SparkConf, sparkOpCommon.SparkKubernetesExecutorPodTemplateContainerName)
+	assert.Equal(t, expected, normalized)
+}
+
+// TestDefaultSparkVersionSatisfiesOperator pins the declared version to the operator's own rule
+// rather than to the string "3.0.0": the validating webhook rejects a SparkApplication carrying
+// a pod template whose spec.sparkVersion compares below 3.0.0, using exactly this comparison
+// (internal/webhook/sparkapplication_validator.go). Leaving it unset is the bug this guards --
+// it parses as invalid semver and loses the comparison.
+func TestDefaultSparkVersionSatisfiesOperator(t *testing.T) {
+	assert.GreaterOrEqual(t, sparkOpUtil.CompareSemanticVersion(minPodTemplateSparkVersion, "3.0.0"), 0,
+		"declared spark version %q is rejected by the operator's pod template validation", minPodTemplateSparkVersion)
+	assert.Less(t, sparkOpUtil.CompareSemanticVersion("", "3.0.0"), 0,
+		"an unset spark-version is expected to lose the comparison; the default exists to avoid it")
+}
+
+// TestBuildResourcePodTemplateRenamesTaskContainer covers two things the operator and Spark
+// require of the template's task container.
+//
+// The name: the operator's mutating webhook patches the container it finds by name and leaves
+// the pod alone when none matches (findContainer in internal/webhook/sparkpod_defaulter.go), and
+// the plugin's own log links and pod demystification look for the same driver name. Under the
+// task's container name all of that misses.
+//
+// The entrypoint: Spark writes its own arguments onto this container but leaves command alone,
+// expecting the image entrypoint to consume them. With the task entrypoint still there the
+// kubelet runs `a0 <task args> driver --properties-file ...` and the task CLI fails with
+// "No such option '--properties-file'". The task arguments must survive on spec.arguments,
+// which is how spark-submit passes them to the application.
+func TestBuildResourcePodTemplateRenamesTaskContainer(t *testing.T) {
+	assert.NoError(t, setSparkConfig(&Config{EnablePodTemplate: true}))
+	assert.NoError(t, config.SetK8sPluginConfig(defaultPluginConfig()))
+	setPodTemplateSupportedForTest(true)
+
+	podSpec := dummyPodSpec()
+	primary := &podSpec.Containers[0] // "primary"; dummyPodSpec's "init" is an init container
+	primary.Command = []string{"a0"}
+	require.NotEmpty(t, primary.Args, "fixture must carry args for this test to mean anything")
+
+	taskTemplate := dummySparkTaskTemplatePod("entrypoint", dummySparkConf, podSpec)
+	taskCtx := dummySparkTaskContext(taskTemplate, false)
+	resource, err := sparkResourceHandler{}.BuildResource(context.TODO(), taskCtx)
+	require.NoError(t, err)
+	sparkApp := resource.(*sj.SparkApplication)
+
+	for _, tc := range []struct {
+		role     string
+		expected string
+		template *corev1.PodTemplateSpec
+	}{
+		{"driver", defaultDriverPrimaryContainerName, sparkApp.Spec.Driver.Template},
+		{"executor", defaultExecutorPrimaryContainerName, sparkApp.Spec.Executor.Template},
+	} {
+		require.NotNil(t, tc.template, "%s template missing", tc.role)
+
+		taskContainer, err := flytek8s.GetContainer(&tc.template.Spec, tc.expected)
+		require.NoErrorf(t, err, "%s template has no %q container", tc.role, tc.expected)
+		assert.Nil(t, taskContainer.Command, "%s template must not carry the task entrypoint", tc.role)
+		assert.Nil(t, taskContainer.Args, "%s template must not carry the task args", tc.role)
+
+		_, err = flytek8s.GetContainer(&tc.template.Spec, primary.Name)
+		assert.Errorf(t, err, "%s template still carries the task container name", tc.role)
+
+		// Sidecars are left alone: only the container Spark adopts is rewritten.
+		sidecar, err := flytek8s.GetContainer(&tc.template.Spec, "secondary")
+		require.NoError(t, err)
+		assert.NotEmpty(t, sidecar.Args, "%s template dropped a sidecar's args", tc.role)
+	}
+
+	assert.Equal(t, testArgs, sparkApp.Spec.Arguments, "task args must still reach spark-submit")
+
+	// Spark picks the first container in the template unless told which one to adopt, so a pod
+	// template that orders a sidecar first would otherwise have it run as the driver.
+	assert.Equal(t, defaultDriverPrimaryContainerName,
+		sparkApp.Spec.SparkConf[sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName])
+	assert.Equal(t, defaultExecutorPrimaryContainerName,
+		sparkApp.Spec.SparkConf[sparkOpCommon.SparkKubernetesExecutorPodTemplateContainerName])
+}
+
+// TestBuildResourcePodTemplateCustomPodSpec pins the other half of the contract: a
+// user-supplied driver/executor pod spec is expected to name its container the way the operator
+// and Spark do, so it is passed through verbatim -- the rename and entrypoint strip apply only
+// to Flyte's own pod spec.
+func TestBuildResourcePodTemplateCustomPodSpec(t *testing.T) {
+	assert.NoError(t, setSparkConfig(&Config{EnablePodTemplate: true}))
+	assert.NoError(t, config.SetK8sPluginConfig(defaultPluginConfig()))
+	setPodTemplateSupportedForTest(true)
+
+	customPodSpec := func(name string) *corev1.PodSpec {
+		return &corev1.PodSpec{Containers: []corev1.Container{{
+			Name:    name,
+			Image:   testImage,
+			Command: []string{"user-entrypoint"},
+			Args:    []string{"--user-flag"},
+		}}}
+	}
+	driverPodSpec := customPodSpec(defaultDriverPrimaryContainerName)
+	executorPodSpec := customPodSpec(defaultExecutorPrimaryContainerName)
+
+	driverPodSpecPb, err := utils.MarshalObjToStruct(driverPodSpec)
+	require.NoError(t, err)
+	executorPodSpecPb, err := utils.MarshalObjToStruct(executorPodSpec)
+	require.NoError(t, err)
+
+	sparkJob := dummySparkCustomObj(dummySparkConf)
+	sparkJob.DriverPod = &core.K8SPod{PodSpec: driverPodSpecPb, PrimaryContainerName: defaultDriverPrimaryContainerName}
+	sparkJob.ExecutorPod = &core.K8SPod{PodSpec: executorPodSpecPb, PrimaryContainerName: defaultExecutorPrimaryContainerName}
+
+	sparkJobJSON, err := utils.MarshalToString(sparkJob)
+	require.NoError(t, err)
+	structObj := structpb.Struct{}
+	require.NoError(t, stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj))
+	taskTemplate := &core.TaskTemplate{
+		Id:     &core.Identifier{Name: "spark-custom-pod-template"},
+		Type:   "container",
+		Target: &core.TaskTemplate_Container{Container: &core.Container{Image: testImage, Args: testArgs, Env: dummyEnvVars}},
+		Custom: &structObj,
+	}
+
+	resource, err := sparkResourceHandler{}.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
+	require.NoError(t, err)
+	sparkApp := resource.(*sj.SparkApplication)
+
+	for _, tc := range []struct {
+		role     string
+		expected *corev1.PodSpec
+		template *corev1.PodTemplateSpec
+	}{
+		{"driver", driverPodSpec, sparkApp.Spec.Driver.Template},
+		{"executor", executorPodSpec, sparkApp.Spec.Executor.Template},
+	} {
+		require.NotNil(t, tc.template, "%s template missing", tc.role)
+		require.Len(t, tc.template.Spec.Containers, 1, "%s template was rewritten", tc.role)
+		assert.Equal(t, tc.expected.Containers[0].Name, tc.template.Spec.Containers[0].Name)
+		assert.Equal(t, tc.expected.Containers[0].Command, tc.template.Spec.Containers[0].Command,
+			"%s custom pod spec must be passed through verbatim", tc.role)
+		assert.Equal(t, tc.expected.Containers[0].Args, tc.template.Spec.Containers[0].Args)
+	}
+
+	// The container Spark adopts is named the same way whoever wrote the template.
+	assert.Equal(t, defaultDriverPrimaryContainerName,
+		sparkApp.Spec.SparkConf[sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName])
+	assert.Equal(t, defaultExecutorPrimaryContainerName,
+		sparkApp.Spec.SparkConf[sparkOpCommon.SparkKubernetesExecutorPodTemplateContainerName])
 }

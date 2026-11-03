@@ -15,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	stdutils "github.com/flyteorg/flyte/v2/flytestdlib/utils"
 	clusteredpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
 
@@ -28,12 +29,18 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	}
 
 	var spec clusteredpb.ClusteredTaskSpec
-	if err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &spec); err != nil { //nolint:staticcheck
+	if err = stdutils.UnmarshalStructToPb(taskTemplate.GetCustom(), &spec); err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid ClusteredTaskSpec: %v", err)
 	}
 
 	if spec.GetReplicas() < 1 {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "replicas must be >= 1, got %d", spec.GetReplicas())
+	}
+	// generatedNameMaxLength reserves pod-index digits up to maxReplicasForNaming so the
+	// derived pod names stay within the 63-char limit. Beyond that the reservation is exceeded
+	// and the JobSet webhook would reject the pods, so fail fast with a clear spec error instead.
+	if spec.GetReplicas() > maxReplicasForNaming {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "replicas must be <= %d, got %d", maxReplicasForNaming, spec.GetReplicas())
 	}
 	if spec.GetNprocPerNode() < 1 {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nproc_per_node must be >= 1, got %d", spec.GetNprocPerNode())
@@ -56,7 +63,10 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	objectMeta.Labels = utils.UnionMaps(cfg.DefaultLabels, objectMeta.Labels,
 		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 	objectMeta.Annotations = utils.UnionMaps(cfg.DefaultAnnotations, objectMeta.Annotations,
-		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
+		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()),
+		// Applied last, naming the container doing the task's own work on every child pod,
+		// so a reader can tell it from an injected sidecar that may outlive it.
+		map[string]string{flytek8s.PrimaryContainerKey: primaryContainerName})
 
 	// The SDK is responsible for setting container.Command to the entrypoint module
 	// (python -m flyte.distributed._entrypoint) at serde time. The plugin stays
@@ -77,15 +87,20 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 	injectTorchRunEnv(container, &spec)
 
 	podSpec.RestartPolicy = corev1.RestartPolicyNever
-	// JobSet name doubles as the headless service / pod subdomain; both must be
-	// RFC 1123 subdomain-compatible. GeneratedName isn't guaranteed to be, so
-	// sanitize once and use the same value for both.
-	jobSetName := utils.ConvertToDNS1123SubdomainCompatibleString(taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
+	replicas := spec.GetReplicas()
+	// The plugin manager stamps the object name via GetGeneratedNameWith(0,
+	// GeneratedNameMaxLength) — sanitized to a DNS-1035 label and bounded so JobSet's
+	// derived child pod names stay within the 63-char limit (see generatedNameMaxLength
+	// in util.go). Derive the same name here for the headless service / pod subdomain,
+	// which must equal the JobSet name for pod DNS to resolve.
+	jobSetName, err := taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedNameWith(0, generatedNameMaxLength)
+	if err != nil {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "failed to derive JobSet name: %v", err)
+	}
 	if podSpec.Subdomain == "" {
 		podSpec.Subdomain = jobSetName
 	}
 
-	replicas := spec.GetReplicas()
 	completionMode := batchv1.IndexedCompletion
 	backoffLimit := int32(0)
 	jobSpec := batchv1.JobSpec{
@@ -97,6 +112,23 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 			ObjectMeta: *objectMeta,
 			Spec:       *podSpec,
 		},
+	}
+
+	if spec.GetFailurePolicy().GetRestartOnHostMaintenance() {
+		// Fail the Job with reason PodFailurePolicy when a pod is terminated by an
+		// involuntary disruption (DisruptionTarget: drain, eviction API, preemption,
+		// taint eviction). The net effect matches backoffLimit=0, but the distinct
+		// failure reason lets the JobSet failurePolicy rule (failure.go) restart the
+		// set without charging maxRestarts. Requires RestartPolicyNever (set above).
+		jobSpec.PodFailurePolicy = &batchv1.PodFailurePolicy{
+			Rules: []batchv1.PodFailurePolicyRule{{
+				Action: batchv1.PodFailurePolicyActionFailJob,
+				OnPodConditions: []batchv1.PodFailurePolicyOnPodConditionsPattern{{
+					Type:   corev1.DisruptionTarget,
+					Status: corev1.ConditionTrue,
+				}},
+			}},
+		}
 	}
 
 	failurePolicy, err := buildFailurePolicy(&spec)
@@ -115,13 +147,13 @@ func (clusteredResourceHandler) BuildResource(ctx context.Context, taskCtx plugi
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      jobSetName,
 			Namespace: taskCtx.TaskExecutionMetadata().GetNamespace(),
-			Labels: map[string]string{
+			Labels: utils.UnionMaps(objectMeta.Labels, map[string]string{
 				"flyte.org/execution": sanitizeLabelValue(taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().GetNodeExecutionId().GetExecutionId().GetName()),
-			},
-			Annotations: map[string]string{
+			}),
+			Annotations: utils.UnionMaps(objectMeta.Annotations, map[string]string{
 				"flyte.org/task-type":      taskType,
 				primaryContainerAnnotation: primaryContainerName,
-			},
+			}),
 		},
 		Spec: jobsetv1alpha2.JobSetSpec{
 			Network: &jobsetv1alpha2.Network{

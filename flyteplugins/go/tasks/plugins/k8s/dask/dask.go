@@ -33,6 +33,9 @@ const (
 	daskTaskType                             = "dask"
 	KindDaskJob                              = "DaskJob"
 	defaultDaskJobRunnerPrimaryContainerName = "job-runner"
+
+	// Set by the Dask operator on a DaskCluster's pods; a DaskJob names its cluster after itself.
+	daskClusterNameLabelKey = "dask.org/cluster-name"
 )
 
 func mergeMapInto(src map[string]string, dst map[string]string) {
@@ -55,7 +58,7 @@ type daskResourceHandler struct {
 }
 
 // dashboardPrefixFromLogConfig returns the path that should be passed to
-// `dask-scheduler --dashboard-prefix` so Bokeh emits tab/WebSocket links that
+// `dask scheduler --dashboard-prefix` so Bokeh emits tab/WebSocket links that
 // resolve through the reverse-proxy chain. It reuses the existing dashboard
 // log-template (the same `linkType: dashboard` entry under
 // `plugins.dask.logs.templates` that powers the user-facing dashboard link)
@@ -206,7 +209,8 @@ func createWorkerSpec(cluster *plugins.DaskWorkerGroup, podSpec *v1.PodSpec, pri
 
 	// Set custom args
 	workerArgs := []string{
-		"dask-worker",
+		"dask",
+		"worker",
 		"--name",
 		"$(DASK_WORKER_NAME)",
 	}
@@ -272,7 +276,7 @@ func createSchedulerSpec(scheduler *plugins.DaskScheduler, clusterName string, p
 	// resolve through the reverse-proxy chain. Without this, Bokeh emits
 	// root-relative links like "/individual-task-stream" that 404 outside the
 	// dashboard mount point.
-	primaryContainer.Args = []string{"dask-scheduler"}
+	primaryContainer.Args = []string{"dask", "scheduler"}
 	if dashboardPrefix != "" {
 		primaryContainer.Args = append(primaryContainer.Args, "--dashboard-prefix", dashboardPrefix)
 	}
@@ -482,7 +486,7 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 
 func getDaskSchedulerPodName(ctx context.Context, daskJobName string, pluginContext k8s.PluginContext) (string, error) {
 	podList := &v1.PodList{}
-	err := pluginContext.K8sReader().List(ctx, podList)
+	err := pluginContext.K8sReader().List(ctx, podList, client.MatchingLabels{daskClusterNameLabelKey: daskJobName})
 	if err != nil {
 		return "", fmt.Errorf("failed to list dask execution pods. Error: %w", err)
 	}
@@ -497,7 +501,7 @@ func getDaskSchedulerPodName(ctx context.Context, daskJobName string, pluginCont
 
 func isDaskSchedulerReady(ctx context.Context, daskJobName string, pluginContext k8s.PluginContext) (bool, error) {
 	podList := &v1.PodList{}
-	err := pluginContext.K8sReader().List(ctx, podList)
+	err := pluginContext.K8sReader().List(ctx, podList, client.MatchingLabels{daskClusterNameLabelKey: daskJobName})
 	if err != nil {
 		return false, fmt.Errorf("failed to list dask execution pods. Error: %w", err)
 	}

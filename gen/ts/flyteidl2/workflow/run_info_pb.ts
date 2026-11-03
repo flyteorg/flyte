@@ -4,15 +4,21 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
+import type { EnrichedIdentity } from "../common/identity_pb.ts";
+import { file_flyteidl2_common_identity } from "../common/identity_pb.ts";
+import type { Literal } from "../core/literals_pb.ts";
+import { file_flyteidl2_core_literals } from "../core/literals_pb.ts";
 import type { RunSpec } from "../task/run_pb.ts";
 import { file_flyteidl2_task_run } from "../task/run_pb.ts";
+import type { ConditionAction } from "./run_definition_pb.ts";
+import { file_flyteidl2_workflow_run_definition } from "./run_definition_pb.ts";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file flyteidl2/workflow/run_info.proto.
  */
 export const file_flyteidl2_workflow_run_info: GenFile = /*@__PURE__*/
-  fileDesc("CiFmbHl0ZWlkbDIvd29ya2Zsb3cvcnVuX2luZm8ucHJvdG8SEmZseXRlaWRsMi53b3JrZmxvdyJ3CgdSdW5JbmZvEhgKEHRhc2tfc3BlY19kaWdlc3QYASABKAkSEgoKaW5wdXRzX3VyaRgCIAEoCRITCgtvdXRwdXRzX3VyaRgDIAEoCRIpCghydW5fc3BlYxgEIAEoCzIXLmZseXRlaWRsMi50YXNrLlJ1blNwZWNCyQEKFmNvbS5mbHl0ZWlkbDIud29ya2Zsb3dCDFJ1bkluZm9Qcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi93b3JrZmxvd6ICA0ZXWKoCEkZseXRlaWRsMi5Xb3JrZmxvd8oCEkZseXRlaWRsMlxXb3JrZmxvd+ICHkZseXRlaWRsMlxXb3JrZmxvd1xHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6V29ya2Zsb3diBnByb3RvMw", [file_flyteidl2_task_run]);
+  fileDesc("CiFmbHl0ZWlkbDIvd29ya2Zsb3cvcnVuX2luZm8ucHJvdG8SEmZseXRlaWRsMi53b3JrZmxvdyKPAgoHUnVuSW5mbxIYChB0YXNrX3NwZWNfZGlnZXN0GAEgASgJEhIKCmlucHV0c191cmkYAiABKAkSEwoLb3V0cHV0c191cmkYAyABKAkSKQoIcnVuX3NwZWMYBCABKAsyFy5mbHl0ZWlkbDIudGFzay5SdW5TcGVjEjYKCWNvbmRpdGlvbhgFIAEoCzIjLmZseXRlaWRsMi53b3JrZmxvdy5Db25kaXRpb25BY3Rpb24SJwoGb3V0cHV0GAYgASgLMhcuZmx5dGVpZGwyLmNvcmUuTGl0ZXJhbBI1CglwcmluY2lwYWwYByABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkVucmljaGVkSWRlbnRpdHlCyQEKFmNvbS5mbHl0ZWlkbDIud29ya2Zsb3dCDFJ1bkluZm9Qcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi93b3JrZmxvd6ICA0ZXWKoCEkZseXRlaWRsMi5Xb3JrZmxvd8oCEkZseXRlaWRsMlxXb3JrZmxvd+ICHkZseXRlaWRsMlxXb3JrZmxvd1xHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6V29ya2Zsb3diBnByb3RvMw", [file_flyteidl2_common_identity, file_flyteidl2_core_literals, file_flyteidl2_task_run, file_flyteidl2_workflow_run_definition]);
 
 /**
  * RunInfo contains detailed metadata about an action/run, stored as serialized
@@ -48,6 +54,29 @@ export type RunInfo = Message<"flyteidl2.workflow.RunInfo"> & {
    * @generated from field: flyteidl2.task.RunSpec run_spec = 4;
    */
   runSpec?: RunSpec;
+
+  /**
+   * For ACTION_TYPE_CONDITION actions: the condition spec, so details can be
+   * rendered (prompt/description/type) after the CR is GC'd.
+   *
+   * @generated from field: flyteidl2.workflow.ConditionAction condition = 5;
+   */
+  condition?: ConditionAction;
+
+  /**
+   * For ACTION_TYPE_CONDITION actions: the resolved signal value, stored
+   * inline (never an outputs.pb). The long-term record once the CR is GC'd.
+   *
+   * @generated from field: flyteidl2.core.Literal output = 6;
+   */
+  output?: Literal;
+
+  /**
+   * Identity of the actor that signalled (or aborted) the action.
+   *
+   * @generated from field: flyteidl2.common.EnrichedIdentity principal = 7;
+   */
+  principal?: EnrichedIdentity;
 };
 
 /**

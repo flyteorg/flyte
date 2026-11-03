@@ -15,7 +15,7 @@ internalApps:
   defaultRequestTimeout: 300s
   maxRequestTimeout: 3600s
   defaultEnvVars:
-    - FLYTE_AWS_ENDPOINT: "http://rustfs.flyte.svc.cluster.local:9000"
+    - FLYTE_AWS_ENDPOINT: "http://rustfs-svc.flyte.svc.cluster.local:9000"
     - FLYTE_AWS_ACCESS_KEY_ID: "rustfs"
     - FLYTE_AWS_SECRET_ACCESS_KEY: "rustfsstorage"
     - _U_EP_OVERRIDE: "host.docker.internal:8090"
@@ -86,7 +86,7 @@ dataproxy:
 plugins:
   k8s:
     default-env-vars:
-      - FLYTE_AWS_ENDPOINT: "http://rustfs.flyte.svc.cluster.local:9000"
+      - FLYTE_AWS_ENDPOINT: "http://rustfs-svc.flyte.svc.cluster.local:9000"
       - FLYTE_AWS_ACCESS_KEY_ID: "rustfs"
       - FLYTE_AWS_SECRET_ACCESS_KEY: "rustfsstorage"
       - _U_EP_OVERRIDE: "host.docker.internal:8090"

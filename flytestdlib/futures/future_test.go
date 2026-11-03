@@ -3,8 +3,8 @@ package futures
 import (
 	"context"
 	"fmt"
-	"runtime"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/stretchr/testify/assert"
@@ -66,32 +66,39 @@ func TestAsyncFuture(t *testing.T) {
 	})
 
 	t.Run("wait-return-val", func(t *testing.T) {
-		v := val
-		err := fmt.Errorf("err")
-		af := NewAsyncFuture(context.TODO(), func(ctx context.Context) (interface{}, error) {
-			time.Sleep(time.Second * 1)
-			return v, err
+		synctest.Test(t, func(t *testing.T) {
+			v := val
+			err := fmt.Errorf("err")
+			af := NewAsyncFuture(t.Context(), func(ctx context.Context) (interface{}, error) {
+				time.Sleep(time.Second)
+				return v, err
+			})
+			assert.NotNil(t, af)
+			rv, rerr := af.Get(t.Context())
+			assert.Equal(t, v, rv)
+			assert.Equal(t, err, rerr)
+			assert.True(t, af.Ready())
 		})
-		runtime.Gosched()
-		assert.NotNil(t, af)
-		rv, rerr := af.Get(context.TODO())
-		assert.Equal(t, v, rv)
-		assert.Equal(t, err, rerr)
-		assert.True(t, af.Ready())
 	})
 
 	t.Run("timeout", func(t *testing.T) {
-		v := val
-		ctx := context.TODO()
-		af := NewAsyncFuture(ctx, func(ctx context.Context) (interface{}, error) {
-			time.Sleep(time.Second * 5)
-			return v, nil
+		synctest.Test(t, func(t *testing.T) {
+			v := val
+			af := NewAsyncFuture(t.Context(), func(ctx context.Context) (interface{}, error) {
+				select {
+				case <-time.After(5 * time.Second):
+					return v, nil
+				case <-ctx.Done():
+					return nil, ctx.Err()
+				}
+			})
+			synctest.Wait()
+			cctx, cancel := context.WithCancel(t.Context())
+			cancel()
+			_, rerr := af.Get(cctx)
+			assert.Error(t, rerr)
+			assert.Equal(t, ErrAsyncFutureCanceled, rerr)
+			synctest.Wait()
 		})
-		runtime.Gosched()
-		cctx, cancel := context.WithCancel(ctx)
-		cancel()
-		_, rerr := af.Get(cctx)
-		assert.Error(t, rerr)
-		assert.Equal(t, ErrAsyncFutureCanceled, rerr)
 	})
 }

@@ -10,12 +10,14 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class TailLogsRequest(_message.Message):
-    __slots__ = ["app_id", "replica_id"]
+    __slots__ = ["app_id", "replica_id", "source"]
     APP_ID_FIELD_NUMBER: _ClassVar[int]
     REPLICA_ID_FIELD_NUMBER: _ClassVar[int]
+    SOURCE_FIELD_NUMBER: _ClassVar[int]
     app_id: _app_definition_pb2.Identifier
     replica_id: _replica_definition_pb2.ReplicaIdentifier
-    def __init__(self, app_id: _Optional[_Union[_app_definition_pb2.Identifier, _Mapping]] = ..., replica_id: _Optional[_Union[_replica_definition_pb2.ReplicaIdentifier, _Mapping]] = ...) -> None: ...
+    source: _payload_pb2.LogsSource
+    def __init__(self, app_id: _Optional[_Union[_app_definition_pb2.Identifier, _Mapping]] = ..., replica_id: _Optional[_Union[_replica_definition_pb2.ReplicaIdentifier, _Mapping]] = ..., source: _Optional[_Union[_payload_pb2.LogsSource, str]] = ...) -> None: ...
 
 class ReplicaIdentifierList(_message.Message):
     __slots__ = ["replicas"]
@@ -24,14 +26,16 @@ class ReplicaIdentifierList(_message.Message):
     def __init__(self, replicas: _Optional[_Iterable[_Union[_replica_definition_pb2.ReplicaIdentifier, _Mapping]]] = ...) -> None: ...
 
 class LogLines(_message.Message):
-    __slots__ = ["lines", "replica_id", "structured_lines"]
+    __slots__ = ["lines", "replica_id", "structured_lines", "source"]
     LINES_FIELD_NUMBER: _ClassVar[int]
     REPLICA_ID_FIELD_NUMBER: _ClassVar[int]
     STRUCTURED_LINES_FIELD_NUMBER: _ClassVar[int]
+    SOURCE_FIELD_NUMBER: _ClassVar[int]
     lines: _containers.RepeatedScalarFieldContainer[str]
     replica_id: _replica_definition_pb2.ReplicaIdentifier
     structured_lines: _containers.RepeatedCompositeFieldContainer[_payload_pb2.LogLine]
-    def __init__(self, lines: _Optional[_Iterable[str]] = ..., replica_id: _Optional[_Union[_replica_definition_pb2.ReplicaIdentifier, _Mapping]] = ..., structured_lines: _Optional[_Iterable[_Union[_payload_pb2.LogLine, _Mapping]]] = ...) -> None: ...
+    source: _payload_pb2.LogLineSource
+    def __init__(self, lines: _Optional[_Iterable[str]] = ..., replica_id: _Optional[_Union[_replica_definition_pb2.ReplicaIdentifier, _Mapping]] = ..., structured_lines: _Optional[_Iterable[_Union[_payload_pb2.LogLine, _Mapping]]] = ..., source: _Optional[_Union[_payload_pb2.LogLineSource, str]] = ...) -> None: ...
 
 class LogLinesBatch(_message.Message):
     __slots__ = ["logs"]

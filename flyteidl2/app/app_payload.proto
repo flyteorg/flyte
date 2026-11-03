@@ -64,6 +64,19 @@ message DeleteRequest {
 // Response message for deleting an app.
 message DeleteResponse {}
 
+// Filter for apps whose spec inputs reference the given artifact.
+// The artifact org is taken from the caller's organization.
+message ConsumedArtifactFilter {
+  // Project of the artifact.
+  string project = 1 [(buf.validate.field).string.min_len = 1];
+  // Domain of the artifact.
+  string domain = 2 [(buf.validate.field).string.min_len = 1];
+  // Name of the artifact.
+  string name = 3 [(buf.validate.field).string.min_len = 1];
+  // Exact artifact version. Empty matches any version.
+  string version = 4;
+}
+
 // Request message for listing apps.
 message ListRequest {
   // Common list request parameters.
@@ -78,10 +91,20 @@ message ListRequest {
     common.ClusterIdentifier cluster_id = 3;
     // Project identifier for filtering apps.
     common.ProjectIdentifier project = 4;
+    // Apps consuming the given artifact as an input.
+    ConsumedArtifactFilter artifact = 7;
   }
 
   // Disable caller identity enrichment in the response.
   bool disable_identity_enrichment = 5;
+
+  // Include the total number of apps matching the request's filters in the response.
+  // May be set on any request, including any page of a paginated listing. The count
+  // reflects state at the time the request is served and may change between pages, so
+  // a client that needs an up-to-date total can request it again on a later page.
+  // This performs an additional count query, so leave it unset when the total is not
+  // needed.
+  bool include_total_count = 6;
 }
 
 // Response message for listing apps.
@@ -90,6 +113,9 @@ message ListResponse {
   repeated App apps = 1;
   // Token for fetching the next page of results, if any.
   string token = 2;
+  // Total number of apps matching the request's filters, ignoring pagination.
+  // Only populated when include_total_count is set on the request.
+  int64 total_count = 3;
 }
 
 // Request message for watching app events.

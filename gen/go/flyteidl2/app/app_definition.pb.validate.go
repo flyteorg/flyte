@@ -765,6 +765,8 @@ func (m *Condition) validate(all bool) error {
 
 	// no validation rules for Substate
 
+	// no validation rules for DeploymentId
+
 	if len(errors) > 0 {
 		return ConditionMultiError(errors)
 	}
@@ -1074,6 +1076,37 @@ func (m *Status) validate(all bool) error {
 			}
 		}
 	}
+
+	if all {
+		switch v := interface{}(m.GetLastStartedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, StatusValidationError{
+					field:  "LastStartedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, StatusValidationError{
+					field:  "LastStartedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLastStartedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return StatusValidationError{
+				field:  "LastStartedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for LastAssignedCluster
 
 	if len(errors) > 0 {
 		return StatusMultiError(errors)
@@ -1439,6 +1472,8 @@ func (m *Spec) validate(all bool) error {
 	// no validation rules for DesiredState
 
 	// no validation rules for ClusterPool
+
+	// no validation rules for Cluster
 
 	if all {
 		switch v := interface{}(m.GetImages()).(type) {
@@ -2010,7 +2045,7 @@ func (m *Input) validate(all bool) error {
 			errors = append(errors, err)
 		}
 		// no validation rules for StringValue
-	case *Input_ArtifactQuery:
+	case *Input_AppId:
 		if v == nil {
 			err := InputValidationError{
 				field:  "Value",
@@ -2023,11 +2058,11 @@ func (m *Input) validate(all bool) error {
 		}
 
 		if all {
-			switch v := interface{}(m.GetArtifactQuery()).(type) {
+			switch v := interface{}(m.GetAppId()).(type) {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, InputValidationError{
-						field:  "ArtifactQuery",
+						field:  "AppId",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -2035,16 +2070,16 @@ func (m *Input) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, InputValidationError{
-						field:  "ArtifactQuery",
+						field:  "AppId",
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
 				}
 			}
-		} else if v, ok := interface{}(m.GetArtifactQuery()).(interface{ Validate() error }); ok {
+		} else if v, ok := interface{}(m.GetAppId()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return InputValidationError{
-					field:  "ArtifactQuery",
+					field:  "AppId",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -2086,47 +2121,6 @@ func (m *Input) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return InputValidationError{
 					field:  "ArtifactId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	case *Input_AppId:
-		if v == nil {
-			err := InputValidationError{
-				field:  "Value",
-				reason: "oneof value cannot be a typed-nil",
-			}
-			if !all {
-				return err
-			}
-			errors = append(errors, err)
-		}
-
-		if all {
-			switch v := interface{}(m.GetAppId()).(type) {
-			case interface{ ValidateAll() error }:
-				if err := v.ValidateAll(); err != nil {
-					errors = append(errors, InputValidationError{
-						field:  "AppId",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			case interface{ Validate() error }:
-				if err := v.Validate(); err != nil {
-					errors = append(errors, InputValidationError{
-						field:  "AppId",
-						reason: "embedded message failed validation",
-						cause:  err,
-					})
-				}
-			}
-		} else if v, ok := interface{}(m.GetAppId()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return InputValidationError{
-					field:  "AppId",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

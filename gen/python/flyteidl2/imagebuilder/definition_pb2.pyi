@@ -1,4 +1,5 @@
 from buf.validate import validate_pb2 as _validate_pb2
+from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.core import security_pb2 as _security_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
@@ -14,12 +15,14 @@ class ImageIdentifier(_message.Message):
     def __init__(self, name: _Optional[str] = ...) -> None: ...
 
 class Image(_message.Message):
-    __slots__ = ["id", "fqin"]
+    __slots__ = ["id", "fqin", "build_run"]
     ID_FIELD_NUMBER: _ClassVar[int]
     FQIN_FIELD_NUMBER: _ClassVar[int]
+    BUILD_RUN_FIELD_NUMBER: _ClassVar[int]
     id: ImageIdentifier
     fqin: str
-    def __init__(self, id: _Optional[_Union[ImageIdentifier, _Mapping]] = ..., fqin: _Optional[str] = ...) -> None: ...
+    build_run: _identifier_pb2.RunIdentifier
+    def __init__(self, id: _Optional[_Union[ImageIdentifier, _Mapping]] = ..., fqin: _Optional[str] = ..., build_run: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ...) -> None: ...
 
 class AptPackages(_message.Message):
     __slots__ = ["packages", "secret_mounts"]

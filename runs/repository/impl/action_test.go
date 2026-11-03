@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"sort"
+	"sync"
 	"testing"
 	"time"
 
@@ -20,6 +22,11 @@ import (
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/attribute"
+	metricnoop "go.opentelemetry.io/otel/metric/noop"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/metric/metricdata"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -34,6 +41,16 @@ var testDbConfig = database.DbConfig{
 	},
 }
 
+// Recommended value based on 50K-scale performance testing.
+const testNotificationBufferLimit = 65_000
+
+var testNotificationConfig = NewNotificationConfig(
+	testNotificationBufferLimit,
+	notifyRetryMinBackoff,
+	notifyRetryMaxBackoff,
+	defaultWatchBufferSize,
+)
+
 func setupActionDB(t *testing.T) *sqlx.DB {
 	db := setupDB(t)
 	t.Cleanup(func() {
@@ -43,10 +60,52 @@ func setupActionDB(t *testing.T) *sqlx.DB {
 	return db
 }
 
+func newNotifyTestRepo(notificationConfig NotificationConfig) *actionRepo {
+	return &actionRepo{
+		pendingActions:     make(map[string]struct{}, defaultNotificationBufferSize),
+		pendingActionQueue: make([]string, 0, defaultNotificationBufferSize),
+		pendingRuns:        make(map[string]struct{}, defaultNotificationBufferSize),
+		pendingRunQueue:    make([]string, 0, defaultNotificationBufferSize),
+		pendingCh:          make(chan struct{}, 1),
+		notificationConfig: notificationConfig,
+	}
+}
+
+func (r *actionRepo) pendingCounts() (actions, runs int) {
+	r.notifyMu.Lock()
+	defer r.notifyMu.Unlock()
+	return len(r.pendingActionQueue), len(r.pendingRunQueue)
+}
+
+func newNotifyRepoWithDB(t *testing.T) (*actionRepo, *sql.DB, *sql.Conn) {
+	t.Helper()
+	db := setupActionDB(t)
+
+	r := &actionRepo{
+		db:                 db,
+		dsn:                database.GetPostgresDsn(context.Background(), testDbConfig.Postgres),
+		runSubscribers:     make(map[*subscription]struct{}),
+		actionSubscribers:  make(map[*subscription]struct{}),
+		pendingActions:     make(map[string]struct{}, defaultNotificationBufferSize),
+		pendingActionQueue: make([]string, 0, defaultNotificationBufferSize),
+		pendingRuns:        make(map[string]struct{}, defaultNotificationBufferSize),
+		pendingRunQueue:    make([]string, 0, defaultNotificationBufferSize),
+		pendingCh:          make(chan struct{}, 1),
+		notificationConfig: testNotificationConfig,
+	}
+	require.NoError(t, r.startPostgresListener())
+
+	conn, err := db.DB.Conn(context.Background())
+	require.NoError(t, err)
+	t.Cleanup(func() { conn.Close() }) //nolint:errcheck
+
+	return r, db.DB, conn
+}
+
 func TestCreateRun(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -57,11 +116,12 @@ func TestCreateRun(t *testing.T) {
 		Name:    "run1",
 	}
 	runModel := &models.Run{
-		Project: runID.Project,
-		Domain:  runID.Domain,
-		RunName: runID.Name,
-		Name:    rootActionName,
-		Phase:   int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		Project:          runID.Project,
+		Domain:           runID.Domain,
+		RunName:          runID.Name,
+		Name:             rootActionName,
+		Phase:            int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+		CreatedBySubject: sql.NullString{String: "00uABC", Valid: true},
 	}
 
 	run, err := actionRepo.CreateAction(ctx, runModel, false)
@@ -72,6 +132,8 @@ func TestCreateRun(t *testing.T) {
 	assert.Equal(t, runID.Name, run.RunName)
 	assert.Equal(t, "a0", run.Name)
 	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_QUEUED), run.Phase)
+	// created_by_subject (indexed owner subject) round-trips for filtering/listing by owner.
+	assert.Equal(t, "00uABC", run.CreatedBySubject.String)
 
 	// Attempt duplicate run create with same run name should return existing (idempotent)
 	run2, err := actionRepo.CreateAction(ctx, runModel, false)
@@ -82,7 +144,7 @@ func TestCreateRun(t *testing.T) {
 func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -107,6 +169,7 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 		3,
 		core.CatalogCacheStatus_CACHE_HIT,
 		&endTime,
+		nil,
 	)
 	require.NoError(t, err)
 
@@ -118,10 +181,70 @@ func TestUpdateActionPhasePersistsAttemptsAndCacheStatus(t *testing.T) {
 	assert.True(t, action.EndedAt.Valid)
 }
 
+// A supplied start time (the action's CRD creationTimestamp) must drive duration, so a
+// long-held action recorded late — e.g. when coalesced/backlogged events collapse
+// created_at toward the terminal time — still reports its real wall-clock duration.
+func TestUpdateActionPhase_StartTimeCorrectsDuration(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	actionID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Org: "org1", Project: "proj1", Domain: "domain1", Name: "run1"},
+		Name: "held-action",
+	}
+	// Row created "late" (created_at defaults to now), as when a coalesced event records
+	// a long-running action only at terminal time.
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	// The action actually started 120s ago (its CRD creationTimestamp) and just ended.
+	endTime := time.Now()
+	startTime := endTime.Add(-120 * time.Second)
+	err = actionRepo.UpdateActionPhase(ctx, actionID, common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime, &startTime)
+	require.NoError(t, err)
+
+	action, err := actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	require.True(t, action.DurationMs.Valid)
+	// Duration ~= ended - start (120s), not ended - created_at (~0).
+	assert.InDelta(t, 120000, action.DurationMs.Int64, 5000,
+		"duration must come from the supplied start time, not the late created_at")
+}
+
+// Without a start time, duration falls back to ended - created_at (unchanged behaviour).
+func TestUpdateActionPhase_NilStartTimeUsesCreatedAt(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	actionID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Org: "org1", Project: "proj1", Domain: "domain1", Name: "run1"},
+		Name: "quick-action",
+	}
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	endTime := time.Now()
+	err = actionRepo.UpdateActionPhase(ctx, actionID, common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil)
+	require.NoError(t, err)
+
+	action, err := actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	require.True(t, action.DurationMs.Valid)
+	assert.Less(t, action.DurationMs.Int64, int64(5000), "without a start time, duration is created_at-based")
+}
+
 func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	repo, err := NewActionRepo(db, testDbConfig)
+	repo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
 	require.NoError(t, err)
 	repoImpl := repo.(*actionRepo)
 
@@ -165,7 +288,7 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	}
 
 	// Update "other" — should NOT produce an update for "target".
-	err = repo.UpdateActionPhase(ctx, otherActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil)
+	err = repo.UpdateActionPhase(ctx, otherActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	select {
@@ -177,7 +300,7 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 	}
 
 	// Update "target" — should produce an update.
-	err = repo.UpdateActionPhase(ctx, targetActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil)
+	err = repo.UpdateActionPhase(ctx, targetActionID, common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	select {
@@ -193,7 +316,7 @@ func TestWatchActionUpdates_OnlyStreamsTargetAction(t *testing.T) {
 func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -214,7 +337,7 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 	endTime := time.Now()
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_FAILED, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, &endTime)
+		core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil)
 	require.NoError(t, err)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
@@ -224,7 +347,7 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 	// Retry: transition from FAILED back to QUEUED — should succeed
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_QUEUED, 2,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	action, err = actionRepo.GetAction(ctx, actionID)
@@ -237,7 +360,7 @@ func TestUpdateActionPhase_AllowsRetryTransition(t *testing.T) {
 func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -257,13 +380,13 @@ func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 	// Move to RUNNING
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_RUNNING, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	// Try to downgrade from RUNNING to QUEUED — should be a no-op (phase guard)
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_QUEUED, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
@@ -275,7 +398,7 @@ func TestUpdateActionPhase_BlocksBackwardFromNonRetryable(t *testing.T) {
 func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -296,13 +419,13 @@ func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 	endTime := time.Now()
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_SUCCEEDED, 1,
-		core.CatalogCacheStatus_CACHE_DISABLED, &endTime)
+		core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil)
 	require.NoError(t, err)
 
 	// Try to downgrade from SUCCEEDED to QUEUED — should be a no-op
 	err = actionRepo.UpdateActionPhase(ctx, actionID,
 		common.ActionPhase_ACTION_PHASE_QUEUED, 2,
-		core.CatalogCacheStatus_CACHE_DISABLED, nil)
+		core.CatalogCacheStatus_CACHE_DISABLED, nil, nil)
 	require.NoError(t, err)
 
 	action, err := actionRepo.GetAction(ctx, actionID)
@@ -314,7 +437,7 @@ func TestUpdateActionPhase_BlocksBackwardFromSucceeded(t *testing.T) {
 func TestListRuns(t *testing.T) {
 	db := setupActionDB(t)
 	defer func() { db.Exec("DELETE FROM actions") }()
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -345,10 +468,9 @@ func TestListRuns(t *testing.T) {
 	assert.True(t, runNames["run-2"])
 	assert.True(t, runNames["run-3"])
 
-	// ListActions uses a keyset cursor: it returns up to Limit+1 rows so the
-	// caller can detect whether another page exists. Page 1 asks for Limit=2
-	// and gets all 3 rows back (limit+1 probe). The caller trims to Limit and
-	// uses the last kept row's created_at as the CursorToken for page 2.
+	// ListActions offset-paginates: it returns up to Limit+1 rows so the caller can detect
+	// whether another page exists. Page 1 asks for Limit=2 and gets all 3 rows back
+	// (limit+1 probe); page 2 continues at Offset=2 and returns the last row.
 	runsPage1, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
 		Filter: NewIsRootActionFilter(),
 		Limit:  2,
@@ -356,11 +478,10 @@ func TestListRuns(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, runsPage1, 3)
 
-	page1 := runsPage1[:2]
 	runsPage2, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
-		Filter:      NewIsRootActionFilter(),
-		Limit:       2,
-		CursorToken: page1[len(page1)-1].CreatedAt.UTC().Format(time.RFC3339Nano),
+		Filter: NewIsRootActionFilter(),
+		Limit:  2,
+		Offset: 2,
 	})
 	require.NoError(t, err)
 	assert.Len(t, runsPage2, 1)
@@ -389,9 +510,361 @@ func TestListRuns(t *testing.T) {
 	}
 }
 
+func TestListRuns_HasPausedActionFilter(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	// run-paused: RUNNING root with a PAUSED child (HITL gate awaiting input).
+	// run-plain: RUNNING root whose child is also RUNNING.
+	for _, a := range []*models.Action{
+		{Project: "proj1", Domain: "domain1", RunName: "run-paused", Name: rootActionName,
+			Phase: int32(common.ActionPhase_ACTION_PHASE_RUNNING)},
+		{Project: "proj1", Domain: "domain1", RunName: "run-paused", Name: "gate-node",
+			ParentActionName: sql.NullString{String: rootActionName, Valid: true},
+			Phase:            int32(common.ActionPhase_ACTION_PHASE_PAUSED)},
+		{Project: "proj1", Domain: "domain1", RunName: "run-plain", Name: rootActionName,
+			Phase: int32(common.ActionPhase_ACTION_PHASE_RUNNING)},
+		{Project: "proj1", Domain: "domain1", RunName: "run-plain", Name: "worker-node",
+			ParentActionName: sql.NullString{String: rootActionName, Valid: true},
+			Phase:            int32(common.ActionPhase_ACTION_PHASE_RUNNING)},
+	} {
+		_, err := actionRepo.CreateAction(ctx, a, false)
+		require.NoError(t, err)
+	}
+
+	runs, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter: NewIsRootActionFilter().And(NewHasPausedActionFilter()),
+		Limit:  50,
+	})
+	require.NoError(t, err)
+	require.Len(t, runs, 1)
+	assert.Equal(t, "run-paused", runs[0].RunName)
+	assert.False(t, runs[0].ParentActionName.Valid, "only the root action should be returned")
+}
+
+func TestCountActiveActionsByPhase(t *testing.T) {
+	db := setupActionDB(t)
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	t.Run("empty table", func(t *testing.T) {
+		counts, err := actionRepo.CountActiveActionsByPhase(ctx)
+		require.NoError(t, err)
+		assert.Empty(t, counts)
+	})
+
+	t.Run("counts only active actions", func(t *testing.T) {
+		root := func(run string, phase common.ActionPhase) *models.Action {
+			return &models.Action{Project: "proj1", Domain: "domain1", RunName: run, Name: rootActionName,
+				Phase: int32(phase)}
+		}
+		child := func(run, name string, phase common.ActionPhase) *models.Action {
+			return &models.Action{Project: "proj1", Domain: "domain1", RunName: run, Name: name,
+				ParentActionName: sql.NullString{String: rootActionName, Valid: true},
+				Phase:            int32(phase)}
+		}
+		for _, a := range []*models.Action{
+			// r1: a live run with children in live and terminal phases.
+			root("r1", common.ActionPhase_ACTION_PHASE_RUNNING),
+			child("r1", "c1", common.ActionPhase_ACTION_PHASE_QUEUED),
+			child("r1", "c2", common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES),
+			child("r1", "c3", common.ActionPhase_ACTION_PHASE_INITIALIZING),
+			child("r1", "c4", common.ActionPhase_ACTION_PHASE_RUNNING),
+			child("r1", "c5", common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			child("r1", "c6", common.ActionPhase_ACTION_PHASE_FAILED),
+			// r2: a paused run is still live.
+			root("r2", common.ActionPhase_ACTION_PHASE_PAUSED),
+			// r3-r7: one run in each terminal phase; none are counted.
+			root("r3", common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			child("r3", "c1", common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+			root("r4", common.ActionPhase_ACTION_PHASE_FAILED),
+			root("r5", common.ActionPhase_ACTION_PHASE_ABORTED),
+			child("r5", "c1", common.ActionPhase_ACTION_PHASE_ABORTED),
+			root("r6", common.ActionPhase_ACTION_PHASE_TIMED_OUT),
+			root("r7", common.ActionPhase_ACTION_PHASE_RECOVERED),
+		} {
+			_, err := actionRepo.CreateAction(ctx, a, false)
+			require.NoError(t, err)
+		}
+
+		counts, err := actionRepo.CountActiveActionsByPhase(ctx)
+		require.NoError(t, err)
+		key := func(phase common.ActionPhase, isRoot bool) interfaces.PhaseKey {
+			return interfaces.PhaseKey{Phase: int32(phase), IsRoot: isRoot}
+		}
+		assert.Equal(t, map[interfaces.PhaseKey]int64{
+			// Runs (root actions).
+			key(common.ActionPhase_ACTION_PHASE_RUNNING, true): 1, // r1
+			key(common.ActionPhase_ACTION_PHASE_PAUSED, true):  1, // r2
+
+			// Child actions.
+			key(common.ActionPhase_ACTION_PHASE_QUEUED, false):                1, // r1/c1
+			key(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES, false): 1, // r1/c2
+			key(common.ActionPhase_ACTION_PHASE_INITIALIZING, false):          1, // r1/c3
+			key(common.ActionPhase_ACTION_PHASE_RUNNING, false):               1, // r1/c4
+		}, counts)
+
+		// The gauge totals: runs are the root rows, actions are all rows.
+		var runs, actions int64
+		for k, n := range counts {
+			if k.IsRoot {
+				runs += n
+			}
+			actions += n
+		}
+		assert.Equal(t, int64(2), runs, "active runs: r1, r2")
+		assert.Equal(t, int64(6), actions, "active actions: r1, r2, r1/c1-c4")
+	})
+}
+
+// TestListRuns_SearchFilter runs the console's run search predicate against a real
+// database: one term must match either the run name or the task name, case-insensitively,
+// and EQUAL on a full run name must select exactly that run.
+func TestListRuns_SearchFilter(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	// Run names are unrelated to task names so a match is attributable to one column.
+	for _, a := range []*models.Action{
+		{Project: "proj1", Domain: "domain1", RunName: "runone-abc", Name: rootActionName,
+			TaskName: sql.NullString{String: "env1.searchfn", Valid: true},
+			Phase:    int32(common.ActionPhase_ACTION_PHASE_RUNNING)},
+		{Project: "proj1", Domain: "domain1", RunName: "runtwo-abc", Name: rootActionName,
+			TaskName: sql.NullString{String: "env2.otherfn", Valid: true},
+			Phase:    int32(common.ActionPhase_ACTION_PHASE_RUNNING)},
+	} {
+		_, err := actionRepo.CreateAction(ctx, a, false)
+		require.NoError(t, err)
+	}
+
+	search := func(t *testing.T, fn common.Filter_Function, term string) []string {
+		t.Helper()
+		filter, err := NewSearchFilter(fn, []string{term})
+		require.NoError(t, err)
+		runs, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+			Filter: NewIsRootActionFilter().And(filter),
+			Limit:  50,
+		})
+		require.NoError(t, err)
+		names := make([]string, 0, len(runs))
+		for _, r := range runs {
+			names = append(names, r.RunName)
+		}
+		return names
+	}
+
+	assert.ElementsMatch(t, []string{"runone-abc"}, search(t, common.Filter_CONTAINS_CASE_INSENSITIVE, "RUNONE"),
+		"matches the run name case-insensitively")
+	assert.ElementsMatch(t, []string{"runone-abc"}, search(t, common.Filter_CONTAINS_CASE_INSENSITIVE, "searchfn"),
+		"matches the task name")
+	assert.ElementsMatch(t, []string{"runone-abc", "runtwo-abc"}, search(t, common.Filter_CONTAINS_CASE_INSENSITIVE, "abc"),
+		"matches either column across runs")
+	assert.ElementsMatch(t, []string{"runtwo-abc"}, search(t, common.Filter_EQUAL, "runtwo-abc"),
+		"EQUAL selects exactly the named run")
+	assert.Empty(t, search(t, common.Filter_CONTAINS_CASE_INSENSITIVE, "nomatch"),
+		"a term matching neither column returns nothing")
+}
+
+// TestListActions_KeysetPagination covers the O(n) keyset paging used by the
+// WatchActions snapshot: pages continue after the previous page's (created_at, name)
+// instead of by OFFSET. It forces tied created_at (the bulk-created map-task case) so
+// paging must rely on the unique "name" tiebreaker to stay a total order and cover
+// every action exactly once.
+func TestListActions_KeysetPagination(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	runID := &common.RunIdentifier{Project: "proj1", Domain: "domain1", Name: "run1"}
+	const total = 250
+	for i := 0; i < total; i++ {
+		aid := &common.ActionIdentifier{Run: runID, Name: fmt.Sprintf("n%04d", i)}
+		_, err := actionRepo.CreateAction(ctx, models.NewActionModel(aid), false)
+		require.NoError(t, err)
+	}
+	// Force one shared created_at (map-task tie case) so keyset leans on the name tiebreaker.
+	_, err = db.Exec("UPDATE actions SET created_at = '2024-01-01T00:00:00Z'")
+	require.NoError(t, err)
+
+	const pageSize = 50
+	sortAsc := []interfaces.SortParameter{
+		NewSortParameter("created_at", interfaces.SortOrderAscending),
+		NewSortParameter("name", interfaces.SortOrderAscending),
+	}
+	seen := map[string]struct{}{}
+	var ordered []string
+	var afterCreatedAt *time.Time
+	var afterName string
+	for {
+		batch, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+			Filter:               NewRunActionsFilter(runID),
+			Limit:                pageSize,
+			KeysetAfterCreatedAt: afterCreatedAt,
+			KeysetAfterName:      afterName,
+			SortParameters:       sortAsc,
+		})
+		require.NoError(t, err)
+		hasMore := len(batch) > pageSize
+		if hasMore {
+			batch = batch[:pageSize]
+		}
+		for _, a := range batch {
+			seen[a.Name] = struct{}{}
+			ordered = append(ordered, a.Name)
+		}
+		if !hasMore || len(batch) == 0 {
+			break
+		}
+		last := batch[len(batch)-1]
+		afterCreatedAt = &last.CreatedAt
+		afterName = last.Name
+	}
+
+	assert.Len(t, seen, total, "keyset paging over tied created_at must cover every action exactly once")
+	assert.True(t, sort.IsSorted(sort.StringSlice(ordered)),
+		"keyset order must be a total order (no skips/overlaps)")
+
+	// Keyset is mutually exclusive with Offset.
+	now := time.Now()
+	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter:               NewRunActionsFilter(runID),
+		Limit:                10,
+		KeysetAfterCreatedAt: &now,
+		Offset:               5,
+	})
+	require.Error(t, err)
+
+	// Keyset requires the (created_at ASC, name ASC) sort; any other sort is rejected
+	// because the keyset WHERE would otherwise skip/duplicate rows across pages.
+	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter:               NewRunActionsFilter(runID),
+		Limit:                10,
+		KeysetAfterCreatedAt: &now,
+		KeysetAfterName:      "n0001",
+		SortParameters:       []interfaces.SortParameter{NewSortParameter("name", interfaces.SortOrderAscending)},
+	})
+	require.Error(t, err)
+}
+
+// TestListActions_OffsetPagination covers the offset paging used by the ListRuns/ListActions
+// RPC: the page token is the running offset. It forces tied created_at (the bulk-created
+// map-task case) to confirm the default sort's (run_name, name) tiebreaker keeps paging
+// stable — every action is returned exactly once with no skips or repeats.
+func TestListActions_OffsetPagination(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	runID := &common.RunIdentifier{Project: "proj1", Domain: "domain1", Name: "run1"}
+	const total = 250
+	for i := 0; i < total; i++ {
+		aid := &common.ActionIdentifier{Run: runID, Name: fmt.Sprintf("n%04d", i)}
+		_, err := actionRepo.CreateAction(ctx, models.NewActionModel(aid), false)
+		require.NoError(t, err)
+	}
+	_, err = db.Exec("UPDATE actions SET created_at = '2024-01-01T00:00:00Z'")
+	require.NoError(t, err)
+
+	const pageSize = 50
+	seen := map[string]struct{}{}
+	for offset := 0; ; offset += pageSize {
+		batch, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+			Filter: NewRunActionsFilter(runID),
+			Limit:  pageSize,
+			Offset: offset,
+		})
+		require.NoError(t, err)
+		hasMore := len(batch) > pageSize
+		if hasMore {
+			batch = batch[:pageSize]
+		}
+		for _, a := range batch {
+			_, dup := seen[a.Name]
+			require.False(t, dup, "action %s returned on more than one page", a.Name)
+			seen[a.Name] = struct{}{}
+		}
+		if !hasMore || len(batch) == 0 {
+			break
+		}
+	}
+	assert.Len(t, seen, total, "offset paging must cover every action exactly once")
+
+	// Negative offset is rejected.
+	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter: NewRunActionsFilter(runID), Limit: 10, Offset: -1,
+	})
+	require.Error(t, err)
+
+	// Offset is mutually exclusive with keyset.
+	now := time.Now()
+	_, err = actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+		Filter: NewRunActionsFilter(runID), Limit: 10, Offset: 5, KeysetAfterCreatedAt: &now,
+	})
+	require.Error(t, err)
+}
+
+// TestListActions_OffsetPaginationClientSortTiedCreatedAt guards against skipping/duplicating
+// rows when a client-supplied sort is not a total order. `created_at DESC` over bulk-created
+// map-task children (all tied on created_at) leaves ties in an arbitrary order per query, so
+// OFFSET paging would be unstable without the appended (run_name, name) tiebreakers.
+func TestListActions_OffsetPaginationClientSortTiedCreatedAt(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	runID := &common.RunIdentifier{Project: "proj1", Domain: "domain1", Name: "run1"}
+	const total = 250
+	for i := 0; i < total; i++ {
+		aid := &common.ActionIdentifier{Run: runID, Name: fmt.Sprintf("n%04d", i)}
+		_, err := actionRepo.CreateAction(ctx, models.NewActionModel(aid), false)
+		require.NoError(t, err)
+	}
+	_, err = db.Exec("UPDATE actions SET created_at = '2024-01-01T00:00:00Z'")
+	require.NoError(t, err)
+
+	sortDesc := []interfaces.SortParameter{NewSortParameter("created_at", interfaces.SortOrderDescending)}
+	const pageSize = 50
+	seen := map[string]struct{}{}
+	for offset := 0; ; offset += pageSize {
+		batch, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+			Filter:         NewRunActionsFilter(runID),
+			Limit:          pageSize,
+			Offset:         offset,
+			SortParameters: sortDesc,
+		})
+		require.NoError(t, err)
+		hasMore := len(batch) > pageSize
+		if hasMore {
+			batch = batch[:pageSize]
+		}
+		for _, a := range batch {
+			_, dup := seen[a.Name]
+			require.False(t, dup, "action %s returned on more than one page", a.Name)
+			seen[a.Name] = struct{}{}
+		}
+		if !hasMore || len(batch) == 0 {
+			break
+		}
+	}
+	assert.Len(t, seen, total, "client-sorted offset paging over tied created_at must cover every action exactly once")
+}
+
 func setupActionEventDB(t *testing.T) (*sqlx.DB, *actionRepo) {
 	db := setupActionDB(t)
-	r, err := NewActionRepo(db, testDbConfig)
+	r, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
 	require.NoError(t, err)
 	repo := r.(*actionRepo)
 	return db, repo
@@ -496,6 +969,33 @@ func TestInsertEvents_MultipleEventsForDifferentActions(t *testing.T) {
 	assert.Equal(t, "action2", got2.Name)
 }
 
+// A batch larger than Postgres' 65,535-bind-parameter budget (9 params/row ->
+// 7,281 rows) must be chunked into multiple INSERTs rather than failing whole.
+// RecordActionEvents accepts arbitrary event counts, so this is a real API path.
+func TestInsertEvents_ChunksOversizedBatch(t *testing.T) {
+	_, repo := setupActionEventDB(t)
+	ctx := context.Background()
+
+	const n = 7300 // > 7,281, forcing at least two chunks
+	events := make([]*models.ActionEvent, 0, n)
+	for i := 0; i < n; i++ {
+		e, err := models.NewActionEventModel(&workflow.ActionEvent{
+			Id:          testActionID,
+			Attempt:     0,
+			Phase:       common.ActionPhase_ACTION_PHASE_RUNNING,
+			Version:     uint32(i), // distinct versions so rows are not deduped
+			UpdatedTime: timestamppb.Now(),
+		})
+		require.NoError(t, err)
+		events = append(events, e)
+	}
+	require.NoError(t, repo.InsertEvents(ctx, events))
+
+	got, err := repo.ListEvents(ctx, testActionID, n+1)
+	require.NoError(t, err)
+	assert.Len(t, got, n, "all chunked rows must be inserted")
+}
+
 func TestInsertEvents_Empty(t *testing.T) {
 	_, repo := setupActionEventDB(t)
 	ctx := context.Background()
@@ -505,61 +1005,777 @@ func TestInsertEvents_Empty(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestNotifyActionUpdate_PayloadWithSpecialChars(t *testing.T) {
-	r := &actionRepo{
-
-		actionNotifyCh: make(chan string, 256),
-		runNotifyCh:    make(chan string, 256),
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	// Payload with single quotes that would cause SQL injection with string interpolation.
-	actionID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{
-			Org:     "org",
-			Project: "proj",
-			Domain:  "domain",
-			Name:    "run'; DROP TABLE actions; --",
+func TestNotifyUpdates_PayloadWithSpecialChars(t *testing.T) {
+	tests := []struct {
+		name        string
+		notify      func(*actionRepo, context.Context)
+		wantActions []string
+		wantRuns    []string
+	}{
+		{
+			name: "action",
+			notify: func(r *actionRepo, ctx context.Context) {
+				r.notifyActionUpdate(ctx, &common.ActionIdentifier{
+					Run: &common.RunIdentifier{
+						Org: "org", Project: "proj", Domain: "domain", Name: "run'; DROP TABLE actions; --",
+					},
+					Name: "action",
+				})
+			},
+			wantActions: []string{"proj/domain/run'; DROP TABLE actions; --/action"},
+			wantRuns:    []string{},
 		},
-		Name: "action",
+		{
+			name: "run",
+			notify: func(r *actionRepo, ctx context.Context) {
+				r.notifyRunUpdate(ctx, &common.RunIdentifier{
+					Org: "org", Project: "proj", Domain: "domain", Name: "run'); SELECT pg_sleep(10); --",
+				})
+			},
+			wantActions: []string{},
+			wantRuns:    []string{"proj/domain/run'); SELECT pg_sleep(10); --"},
+		},
 	}
 
-	r.notifyActionUpdate(ctx, actionID)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := newNotifyTestRepo(testNotificationConfig)
 
-	select {
-	case payload := <-r.actionNotifyCh:
-		assert.Equal(t, "proj/domain/run'; DROP TABLE actions; --/action", payload)
-	case <-ctx.Done():
-		t.Fatal("timed out waiting for payload on actionNotifyCh")
+			// Single quotes must be queued as payload data, never interpolated into SQL.
+			tt.notify(r, context.Background())
+
+			actions, runs := r.takePendingNotifications()
+			assert.Equal(t, tt.wantActions, actions)
+			assert.Equal(t, tt.wantRuns, runs)
+		})
 	}
 }
 
-func TestNotifyRunUpdate_PayloadWithSpecialChars(t *testing.T) {
-	r := &actionRepo{
+func TestNotifyUpdates_DistinctAndFIFO(t *testing.T) {
+	r := newNotifyTestRepo(testNotificationConfig)
+	ctx := context.Background()
 
-		actionNotifyCh: make(chan string, 256),
-		runNotifyCh:    make(chan string, 256),
+	for _, name := range []string{"first-action", "second-action", "first-action"} {
+		r.notifyActionUpdate(ctx, notifyTestActionID(name))
+	}
+	for _, name := range []string{"first-run", "second-run", "first-run"} {
+		r.notifyRunUpdate(ctx, &common.RunIdentifier{Project: "proj", Domain: "domain", Name: name})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	actions, runs := r.takePendingNotifications()
+	assert.Equal(t, []string{
+		"proj/domain/run/first-action",
+		"proj/domain/run/second-action",
+	}, actions)
+	assert.Equal(t, []string{
+		"proj/domain/first-run",
+		"proj/domain/second-run",
+	}, runs)
+}
+
+func TestMergePendingActions_DistinctAndFIFO(t *testing.T) {
+	r := newNotifyTestRepo(testNotificationConfig)
+
+	r.markActionPending("first")
+	r.markActionPending("second")
+	retry, _ := r.takePendingNotifications()
+	assert.Equal(t, []string{"first", "second"}, retry)
+
+	r.markActionPending("second")
+	r.markActionPending("third")
+	r.mergePendingActions(retry)
+
+	actions, _ := r.takePendingNotifications()
+	assert.Equal(t, []string{"first", "second", "third"}, actions)
+}
+
+func TestEnqueuePending_EvictsOldestWhenFull(t *testing.T) {
+	pending := make(map[string]struct{})
+	queue := make([]string, 0, 2)
+
+	enqueuePending(pending, &queue, "first", 2, nil, notificationBufferAction)
+	enqueuePending(pending, &queue, "second", 2, nil, notificationBufferAction)
+	enqueuePending(pending, &queue, "third", 2, nil, notificationBufferAction)
+
+	assert.NotContains(t, pending, "first")
+	assert.Contains(t, pending, "second")
+	assert.Contains(t, pending, "third")
+
+	enqueuePending(pending, &queue, "second", 2, nil, notificationBufferAction)
+	assert.Equal(t, []string{"second", "third"}, queue)
+}
+
+func TestNewNotificationMetricsNoop(t *testing.T) {
+	metrics, err := newNotificationMetrics(metricnoop.NewMeterProvider())
+	require.NoError(t, err)
+	assert.Nil(t, metrics)
+}
+
+func TestNotificationEvictionsMetric(t *testing.T) {
+	reader := sdkmetric.NewManualReader()
+	provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader))
+
+	metrics, err := newNotificationMetrics(provider)
+	require.NoError(t, err)
+	require.NotNil(t, metrics)
+
+	repo := &actionRepo{
+		pendingActions:      make(map[string]struct{}),
+		pendingActionQueue:  make([]string, 0, 2),
+		pendingRuns:         make(map[string]struct{}),
+		pendingRunQueue:     make([]string, 0, 2),
+		pendingCh:           make(chan struct{}, 1),
+		notificationConfig:  NotificationConfig{bufferLimit: 2},
+		notificationMetrics: metrics,
+	}
+
+	repo.markActionPending("action-1")
+	repo.markActionPending("action-2")
+	repo.markActionPending("action-3")
+	repo.markActionPending("action-2") // A duplicate does not evict another notification.
+
+	repo.markRunPending("run-1")
+	repo.markRunPending("run-2")
+	repo.mergePendingRuns([]string{"retry-1", "retry-2"})
+
+	sum, ok := collectNotificationMetric(t, reader, notificationDeletedMetricName).Data.(metricdata.Sum[int64])
+	require.True(t, ok)
+
+	counts := make(map[string]int64)
+	for _, point := range sum.DataPoints {
+		bufferFrom, ok := point.Attributes.Value(attribute.Key("buffer_from"))
+		require.True(t, ok)
+		counts[bufferFrom.AsString()] = point.Value
+	}
+	assert.Equal(t, map[string]int64{
+		string(notificationBufferAction): 1,
+		string(notificationBufferRun):    2,
+	}, counts)
+}
+
+func collectNotificationMetric(t *testing.T, reader *sdkmetric.ManualReader, name string) metricdata.Metrics {
+	t.Helper()
+	var resourceMetrics metricdata.ResourceMetrics
+	require.NoError(t, reader.Collect(context.Background(), &resourceMetrics))
+	for _, scopeMetrics := range resourceMetrics.ScopeMetrics {
+		for _, collectedMetric := range scopeMetrics.Metrics {
+			if collectedMetric.Name == name {
+				return collectedMetric
+			}
+		}
+	}
+	t.Fatalf("metric %q not found", name)
+	return metricdata.Metrics{}
+}
+
+func TestNotificationBufferLimitConfig(t *testing.T) {
+	r := newNotifyTestRepo(NewNotificationConfig(
+		defaultNotificationBufferSize,
+		testNotificationConfig.retryMinBackoff,
+		testNotificationConfig.retryMaxBackoff,
+		testNotificationConfig.watchBufferSize,
+	))
+
+	for i := 0; i <= defaultNotificationBufferSize; i++ {
+		r.markActionPending(fmt.Sprintf("action-%d", i))
+	}
+
+	actions, _ := r.takePendingNotifications()
+	require.Len(t, actions, defaultNotificationBufferSize)
+	assert.Equal(t, "action-1", actions[0])
+	assert.Equal(t, fmt.Sprintf("action-%d", defaultNotificationBufferSize), actions[len(actions)-1])
+}
+
+func TestNewNotificationConfig(t *testing.T) {
+	tests := map[string]struct {
+		bufferLimit     int
+		retryMinBackoff time.Duration
+		retryMaxBackoff time.Duration
+		watchBufferSize int
+		want            NotificationConfig
+	}{
+		"valid": {
+			bufferLimit:     1_000,
+			retryMinBackoff: time.Second,
+			retryMaxBackoff: 10 * time.Second,
+			watchBufferSize: 1_000,
+			want: NotificationConfig{
+				bufferLimit:     1_000,
+				retryMinBackoff: time.Second,
+				retryMaxBackoff: 10 * time.Second,
+				watchBufferSize: 1_000,
+			},
+		},
+		"zero watch buffer size": {
+			bufferLimit:     testNotificationBufferLimit,
+			retryMinBackoff: notifyRetryMinBackoff,
+			retryMaxBackoff: notifyRetryMaxBackoff,
+			want:            testNotificationConfig,
+		},
+		"zero buffer limit": {
+			retryMinBackoff: notifyRetryMinBackoff,
+			retryMaxBackoff: notifyRetryMaxBackoff,
+			want: NotificationConfig{
+				bufferLimit:     defaultNotificationBufferSize,
+				retryMinBackoff: notifyRetryMinBackoff,
+				retryMaxBackoff: notifyRetryMaxBackoff,
+				watchBufferSize: defaultWatchBufferSize,
+			},
+		},
+		"buffer limit below pending capacity": {
+			bufferLimit:     defaultNotificationBufferSize - 1,
+			retryMinBackoff: notifyRetryMinBackoff,
+			retryMaxBackoff: notifyRetryMaxBackoff,
+			want: NotificationConfig{
+				bufferLimit:     defaultNotificationBufferSize,
+				retryMinBackoff: notifyRetryMinBackoff,
+				retryMaxBackoff: notifyRetryMaxBackoff,
+				watchBufferSize: defaultWatchBufferSize,
+			},
+		},
+		"buffer limit equals pending capacity": {
+			bufferLimit:     defaultNotificationBufferSize,
+			retryMinBackoff: notifyRetryMinBackoff,
+			retryMaxBackoff: notifyRetryMaxBackoff,
+			want: NotificationConfig{
+				bufferLimit:     defaultNotificationBufferSize,
+				retryMinBackoff: notifyRetryMinBackoff,
+				retryMaxBackoff: notifyRetryMaxBackoff,
+				watchBufferSize: defaultWatchBufferSize,
+			},
+		},
+		"zero retry min backoff": {
+			bufferLimit:     testNotificationBufferLimit,
+			retryMaxBackoff: notifyRetryMaxBackoff,
+			want:            testNotificationConfig,
+		},
+		"zero retry max backoff": {
+			bufferLimit:     testNotificationBufferLimit,
+			retryMinBackoff: notifyRetryMinBackoff,
+			want:            testNotificationConfig,
+		},
+		"retry max below min": {
+			bufferLimit:     testNotificationBufferLimit,
+			retryMinBackoff: 2 * time.Second,
+			retryMaxBackoff: time.Second,
+			want:            testNotificationConfig,
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			actual := NewNotificationConfig(tt.bufferLimit, tt.retryMinBackoff, tt.retryMaxBackoff, tt.watchBufferSize)
+			require.Equal(t, tt.want, actual)
+		})
+	}
+}
+
+// A canceled request must not discard pending notifications.
+func TestNotifyActionUpdate_KeepsWakeupAfterContextCancel(t *testing.T) {
+	r := newNotifyTestRepo(testNotificationConfig)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	r.notifyActionUpdate(ctx, notifyTestActionID("cancelled-caller"))
+	r.notifyRunUpdate(ctx, &common.RunIdentifier{Project: "proj", Domain: "domain", Name: "run"})
+
+	actions, runs := r.takePendingNotifications()
+	assert.Contains(t, actions, "proj/domain/run/cancelled-caller")
+	assert.Contains(t, runs, "proj/domain/run")
+}
+
+// A failed pg_notify must keep the remaining batch pending for retry.
+func TestRunNotifyLoop_RetriesUndeliveredPayloads(t *testing.T) {
+	r := newNotifyTestRepo(testNotificationConfig)
+
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	runID := &common.RunIdentifier{
-		Org:     "org",
-		Project: "proj",
-		Domain:  "domain",
-		Name:    "run'); SELECT pg_sleep(10); --",
+	for i := 0; i < 3; i++ {
+		r.notifyActionUpdate(ctx, notifyTestActionID(fmt.Sprintf("undeliverable-%d", i)))
+	}
+	for i := 0; i < 2; i++ {
+		r.notifyRunUpdate(ctx, &common.RunIdentifier{
+			Project: "proj", Domain: "domain", Name: fmt.Sprintf("run-%d", i),
+		})
 	}
 
-	r.notifyRunUpdate(ctx, runID)
+	loopDone := make(chan struct{})
+	go func() {
+		defer close(loopDone)
+		r.runNotifyLoop(ctx, nil, nil)
+	}()
+
+	// Let the pump take the payloads, fail to deliver them, and requeue.
+	assert.Eventually(t, func() bool {
+		actions, runs := r.pendingCounts()
+		return actions == 3 && runs == 2
+	}, 5*time.Second, 20*time.Millisecond, "undelivered payloads must stay pending for retry")
+
+	cancel()
+	select {
+	case <-loopDone:
+	case <-time.After(5 * time.Second):
+		t.Fatal("runNotifyLoop did not return after its context was cancelled")
+	}
+}
+
+// A listener ping that fails during a Postgres outage must not stop notification delivery once pq reconnects.
+// dropListenerConnection keeps new connections to the test database refused and terminates the
+// connection named appName. The returned func lets connections back in.
+func dropListenerConnection(ctx context.Context, t *testing.T, appName string) (restore func()) {
+	t.Helper()
+	// A database cannot disallow its own connections, so run the outage SQL from the maintenance database.
+	adminCfg := testDbConfig.Postgres
+	adminCfg.DbName = "postgres"
+	admin, err := sql.Open("postgres", database.GetPostgresDsn(ctx, adminCfg))
+	require.NoError(t, err)
+	t.Cleanup(func() { admin.Close() }) //nolint:errcheck
+	allow := func(allowed bool) error {
+		_, err := admin.ExecContext(ctx, fmt.Sprintf("ALTER DATABASE %q WITH ALLOW_CONNECTIONS %t", testDbConfig.Postgres.DbName, allowed))
+		return err
+	}
+
+	require.NoError(t, allow(false))
+	t.Cleanup(func() { _ = allow(true) })
+	var terminated int
+	require.NoError(t, admin.QueryRowContext(ctx,
+		"SELECT count(*) FROM (SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE application_name = $1) t",
+		appName).Scan(&terminated))
+	require.Equal(t, 1, terminated, "expected to terminate exactly the listener connection")
+
+	return func() { require.NoError(t, allow(true)) }
+}
+
+func TestProcessNotifications_SurvivesPingFailureDuringOutage(t *testing.T) {
+	const appName = "flyte_listener_outage_test"
+	db := setupActionDB(t)
+	ctx := context.Background()
+
+	r := &actionRepo{
+		db:                           db,
+		dsn:                          database.GetPostgresDsn(ctx, testDbConfig.Postgres) + " application_name=" + appName,
+		listenerPingInterval:         100 * time.Millisecond,
+		listenerMinReconnectInterval: 100 * time.Millisecond,
+		runSubscribers:               make(map[*subscription]struct{}),
+		actionSubscribers:            make(map[*subscription]struct{}),
+	}
+	require.NoError(t, r.startPostgresListener())
+	t.Cleanup(func() { r.listener.Close() }) //nolint:errcheck
+	updates := subscribeActions(t, r, 16)
+
+	restore := dropListenerConnection(ctx, t, appName)
+	// Hold the outage across several ping ticks so Ping fails while pq has no connection.
+	time.Sleep(10 * r.listenerPingInterval)
+	restore()
+
+	// pq retries with backoff; keep notifying until the reader forwards one.
+	require.Eventually(t, func() bool {
+		_, err := db.ExecContext(ctx, "SELECT pg_notify('action_updates', 'after-outage')")
+		require.NoError(t, err)
+		select {
+		case got := <-updates:
+			return got == "after-outage"
+		case <-time.After(200 * time.Millisecond):
+			return false
+		}
+	}, 10*time.Second, 100*time.Millisecond, "notifications must reach subscribers after the listener reconnects")
+}
+
+// A nil notification (pq reconnected) must reach every subscriber, even one with a full buffer.
+func TestProcessNotifications_ResyncsSubscribersOnReconnect(t *testing.T) {
+	notify := make(chan *pq.Notification)
+	r := &actionRepo{
+		listener:             &pq.Listener{Notify: notify},
+		listenerPingInterval: time.Hour,
+		runSubscribers:       make(map[*subscription]struct{}),
+		actionSubscribers:    make(map[*subscription]struct{}),
+		notificationConfig:   NewNotificationConfig(testNotificationBufferLimit, notifyRetryMinBackoff, notifyRetryMaxBackoff, 1),
+	}
+	runSub := r.subscribe(r.runSubscribers)
+	actionSub := r.subscribe(r.actionSubscribers)
+	actionSub.notify <- "fills-the-buffer"
+
+	done := make(chan struct{})
+	go func() {
+		r.processNotifications()
+		close(done)
+	}()
+	notify <- nil
+	notify <- nil
+	close(notify)
+	<-done
+
+	assert.Len(t, runSub.resync, 1, "run subscriber must be asked to resync")
+	assert.Len(t, actionSub.resync, 1, "a full notify buffer must not drop the resync")
+}
+
+func TestWatchAllUpdates_SendNilOnResync(t *testing.T) {
+	r := &actionRepo{
+		runSubscribers:     make(map[*subscription]struct{}),
+		actionSubscribers:  make(map[*subscription]struct{}),
+		notificationConfig: testNotificationConfig,
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	runs := make(chan *models.Run, 1)
+	actions := make(chan *models.Action, 1)
+	go r.WatchAllRunUpdates(ctx, runs, make(chan error, 1))
+	go r.WatchAllActionUpdates(ctx, notifyTestActionID("a1").Run, actions, make(chan error, 1))
+	require.Eventually(t, func() bool {
+		r.mu.RLock()
+		defer r.mu.RUnlock()
+		return len(r.runSubscribers) == 1 && len(r.actionSubscribers) == 1
+	}, 5*time.Second, 10*time.Millisecond)
+
+	r.mu.RLock()
+	for sub := range r.runSubscribers {
+		sub.requestResync()
+	}
+	for sub := range r.actionSubscribers {
+		sub.requestResync()
+	}
+	r.mu.RUnlock()
 
 	select {
-	case payload := <-r.runNotifyCh:
-		assert.Equal(t, "proj/domain/run'); SELECT pg_sleep(10); --", payload)
-	case <-ctx.Done():
-		t.Fatal("timed out waiting for payload on runNotifyCh")
+	case got := <-runs:
+		assert.Nil(t, got)
+	case <-time.After(5 * time.Second):
+		t.Fatal("WatchAllRunUpdates must send nil on resync")
+	}
+	select {
+	case got := <-actions:
+		assert.Nil(t, got)
+	case <-time.After(5 * time.Second):
+		t.Fatal("WatchAllActionUpdates must send nil on resync")
+	}
+}
+
+func TestWatchActionUpdates_ResyncSendsCurrentState(t *testing.T) {
+	db := setupActionDB(t)
+	repoIface, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	r := repoIface.(*actionRepo)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	actionID := notifyTestActionID("resync-direct")
+	_, err = r.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	updates := make(chan *models.Action, 1)
+	go r.WatchActionUpdates(ctx, actionID, updates, make(chan error, 1))
+	require.Eventually(t, func() bool {
+		r.mu.RLock()
+		defer r.mu.RUnlock()
+		return len(r.actionSubscribers) == 1
+	}, 5*time.Second, 10*time.Millisecond)
+
+	r.mu.RLock()
+	for sub := range r.actionSubscribers {
+		sub.requestResync()
+	}
+	r.mu.RUnlock()
+
+	select {
+	case got := <-updates:
+		assert.Equal(t, actionID.Name, got.Name)
+	case <-time.After(5 * time.Second):
+		t.Fatal("resync must re-read the action and send it")
+	}
+}
+
+// An update whose NOTIFY is lost while the listener is down must still reach the watcher.
+func TestWatchActionUpdates_RecoversNotificationLostDuringOutage(t *testing.T) {
+	const appName = "flyte_listener_resync_test"
+	db := setupActionDB(t)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	r := &actionRepo{
+		db:                           db,
+		dsn:                          database.GetPostgresDsn(ctx, testDbConfig.Postgres) + " application_name=" + appName,
+		listenerPingInterval:         100 * time.Millisecond,
+		listenerMinReconnectInterval: 100 * time.Millisecond,
+		runSubscribers:               make(map[*subscription]struct{}),
+		actionSubscribers:            make(map[*subscription]struct{}),
+		pendingActions:               make(map[string]struct{}, defaultNotificationBufferSize),
+		pendingActionQueue:           make([]string, 0, defaultNotificationBufferSize),
+		pendingRuns:                  make(map[string]struct{}, defaultNotificationBufferSize),
+		pendingRunQueue:              make([]string, 0, defaultNotificationBufferSize),
+		pendingCh:                    make(chan struct{}, 1),
+		notificationConfig:           testNotificationConfig,
+	}
+	actionID := notifyTestActionID("resync-outage")
+	_, err := r.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	require.NoError(t, r.startPostgresListener())
+	t.Cleanup(func() { r.listener.Close() }) //nolint:errcheck
+
+	updates := make(chan *models.Action, 16)
+	go r.WatchActionUpdates(ctx, actionID, updates, make(chan error, 1))
+	require.Eventually(t, func() bool {
+		r.mu.RLock()
+		defer r.mu.RUnlock()
+		return len(r.actionSubscribers) == 1
+	}, 5*time.Second, 10*time.Millisecond)
+
+	// Hold a pooled connection so the update below still works while new connections are refused.
+	writer, err := db.Conn(ctx)
+	require.NoError(t, err)
+	t.Cleanup(func() { writer.Close() }) //nolint:errcheck
+
+	restore := dropListenerConnection(ctx, t, appName)
+
+	// Update the action and notify while nobody is listening: this NOTIFY is lost.
+	succeeded := int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED)
+	_, err = writer.ExecContext(ctx,
+		"UPDATE actions SET phase = $1 WHERE project = $2 AND domain = $3 AND run_name = $4 AND name = $5",
+		succeeded, actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+	require.NoError(t, err)
+	payload := fmt.Sprintf("%s/%s/%s/%s", actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+	_, err = writer.ExecContext(ctx, "SELECT pg_notify('action_updates', $1)", payload)
+	require.NoError(t, err)
+
+	time.Sleep(5 * r.listenerPingInterval)
+	restore()
+
+	// No further NOTIFY is sent: only the reconnect resync can deliver the new phase.
+	deadline := time.After(15 * time.Second)
+	for {
+		select {
+		case got := <-updates:
+			if got.Phase == succeeded {
+				return
+			}
+		case <-deadline:
+			t.Fatal("the watcher must see the update made while the listener was down")
+		}
+	}
+}
+
+// subscribeActions registers a raw subscriber the way WatchActionUpdates does.
+func subscribeActions(t *testing.T, r *actionRepo, size int) chan string {
+	t.Helper()
+	sub := &subscription{notify: make(chan string, size), resync: make(chan struct{}, 1)}
+	r.mu.Lock()
+	r.actionSubscribers[sub] = struct{}{}
+	r.mu.Unlock()
+	t.Cleanup(func() {
+		r.mu.Lock()
+		delete(r.actionSubscribers, sub)
+		r.mu.Unlock()
+	})
+	return sub.notify
+}
+
+func notifyTestActionID(name string) *common.ActionIdentifier {
+	return &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Org: "org", Project: "proj", Domain: "domain", Name: "run"},
+		Name: name,
+	}
+}
+
+// Notifications must not block when the pump is stalled.
+func TestNotifyActionUpdate_DoesNotBlockOnStalledPump(t *testing.T) {
+	r := newNotifyTestRepo(testNotificationConfig)
+
+	const updates = 5000
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for i := 0; i < updates; i++ {
+			r.notifyActionUpdate(ctx, notifyTestActionID(fmt.Sprintf("action-%d", i)))
+		}
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("notifyActionUpdate blocked while the notify pump was stalled")
+	}
+}
+
+// Run notifications must not block when the pump is stalled.
+func TestNotifyRunUpdate_DoesNotBlockOnStalledPump(t *testing.T) {
+	r := newNotifyTestRepo(testNotificationConfig)
+
+	const updates = 5000
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for i := 0; i < updates; i++ {
+			r.notifyRunUpdate(ctx, &common.RunIdentifier{
+				Org: "org", Project: "proj", Domain: "domain", Name: fmt.Sprintf("run-%d", i),
+			})
+		}
+	}()
+
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("notifyRunUpdate blocked while the notify pump was stalled")
+	}
+}
+
+// Phase changes must reach watchers through PostgreSQL notifications.
+func TestWatchActionUpdates_DeliversPhaseChange(t *testing.T) {
+	db := setupActionDB(t)
+	repo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	repoImpl, ok := repo.(*actionRepo)
+	require.True(t, ok)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	actionID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Project: "p", Domain: "d", Name: "run-watch"},
+		Name: "watched-action",
+	}
+	_, err = repo.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	updates := make(chan *models.Action, 8)
+	errs := make(chan error, 8)
+	go repo.WatchActionUpdates(ctx, actionID, updates, errs)
+
+	require.Eventually(t, func() bool {
+		repoImpl.mu.RLock()
+		defer repoImpl.mu.RUnlock()
+		return len(repoImpl.actionSubscribers) > 0
+	}, 2*time.Second, 10*time.Millisecond, "timed out waiting for watcher registration")
+
+	require.NoError(t, repo.UpdateActionPhase(ctx, actionID,
+		common.ActionPhase_ACTION_PHASE_RUNNING, 0, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
+
+	// CreateAction notifies as well, so the watcher can legitimately see the
+	// initial phase first. Wait for the transition we triggered.
+	deadline := time.After(15 * time.Second)
+	for {
+		select {
+		case got := <-updates:
+			if got.Phase == int32(common.ActionPhase_ACTION_PHASE_RUNNING) {
+				return
+			}
+		case err := <-errs:
+			t.Fatalf("watch reported an error: %v", err)
+		case <-deadline:
+			t.Fatal("phase change never reached the watcher")
+		}
+	}
+}
+
+// Concurrent writers must deliver every action notification.
+func TestNotifyPump_ConcurrentWritersDeliverEveryAction(t *testing.T) {
+	db := setupActionDB(t)
+	repoIface, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	repo, ok := repoIface.(*actionRepo)
+	require.True(t, ok)
+
+	const writers = 40
+	const perWriter = 25
+	const total = writers * perWriter
+
+	// Subscribe the way WatchActionUpdates does, so we observe what actually
+	// came back through pg_notify and the listener.
+	delivered := subscribeActions(t, repo, 4*total)
+
+	ctx := context.Background()
+	var wg sync.WaitGroup
+	for w := 0; w < writers; w++ {
+		wg.Add(1)
+		go func(w int) {
+			defer wg.Done()
+			for i := 0; i < perWriter; i++ {
+				repo.notifyActionUpdate(ctx, notifyTestActionID(fmt.Sprintf("a-%d-%d", w, i)))
+			}
+		}(w)
+	}
+	wg.Wait()
+
+	seen := make(map[string]struct{}, total)
+	deadline := time.After(60 * time.Second)
+	for len(seen) < total {
+		select {
+		case payload := <-delivered:
+			seen[payload] = struct{}{}
+		case <-deadline:
+			t.Fatalf("only %d of %d notifications were delivered", len(seen), total)
+		}
+	}
+
+	for w := 0; w < writers; w++ {
+		for i := 0; i < perWriter; i++ {
+			assert.Contains(t, seen, fmt.Sprintf("proj/domain/run/a-%d-%d", w, i))
+		}
+	}
+}
+
+// Phase updates must complete while the notification pump is stalled.
+func TestUpdateActionPhase_CompletesWithStalledPump(t *testing.T) {
+	db := setupActionDB(t)
+	r := newNotifyTestRepo(testNotificationConfig)
+	r.db = db
+
+	ctx := context.Background()
+	actionID := &common.ActionIdentifier{
+		Run:  &common.RunIdentifier{Project: "p", Domain: "d", Name: "run-stalled"},
+		Name: "stalled-action",
+	}
+	_, err := r.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	for i := 0; i < 300; i++ {
+		r.notifyActionUpdate(ctx, notifyTestActionID(fmt.Sprintf("backlog-%d", i)))
+	}
+
+	start := time.Now()
+	require.NoError(t, r.UpdateActionPhase(ctx, actionID,
+		common.ActionPhase_ACTION_PHASE_RUNNING, 0, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
+	assert.Less(t, time.Since(start), 2*time.Second, "the write must not wait on a stalled pump")
+
+	action, err := r.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_RUNNING), action.Phase,
+		"the row must still be written while the pump is stalled")
+
+	actions, _ := r.pendingCounts()
+	assert.Equal(t, 301, actions, "the notification must be queued rather than dropped")
+}
+
+func TestNotifyPump_DeliversPendingActionsFIFO(t *testing.T) {
+	r, sqlDB, conn := newNotifyRepoWithDB(t)
+	delivered := subscribeActions(t, r, 512)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	for i := 0; i < 500; i++ {
+		r.notifyActionUpdate(ctx, notifyTestActionID(fmt.Sprintf("action-%03d", i)))
+	}
+
+	go r.runNotifyLoop(ctx, sqlDB, conn)
+
+	for i := 0; i < 500; i++ {
+		select {
+		case payload := <-delivered:
+			assert.Equal(t, fmt.Sprintf("proj/domain/run/action-%03d", i), payload)
+		case <-time.After(15 * time.Second):
+			t.Fatalf("notification %d was never delivered", i)
+		}
 	}
 }
 
@@ -611,19 +1827,17 @@ func TestIsConnError(t *testing.T) {
 func TestRunNotifyLoop_NilConnNoPanic(t *testing.T) {
 	// Verify that runNotifyLoop handles a nil connection gracefully
 	// (e.g. after a failed reconnect) instead of panicking.
-	r := &actionRepo{
+	r := newNotifyTestRepo(testNotificationConfig)
 
-		actionNotifyCh: make(chan string, 256),
-		runNotifyCh:    make(chan string, 256),
-	}
+	// Queue a notification, then cancel so the loop exits after one attempt.
+	r.notifyActionUpdate(context.Background(), notifyTestActionID("action"))
 
-	// Send a notification, then close the channel so the loop exits.
-	r.actionNotifyCh <- "proj/domain/run/action"
-	close(r.actionNotifyCh)
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+	defer cancel()
 
 	// Pass a nil conn — should not panic.
 	assert.NotPanics(t, func() {
-		r.runNotifyLoop(nil, nil)
+		r.runNotifyLoop(ctx, nil, nil)
 	})
 }
 
@@ -663,7 +1877,7 @@ func TestInsertEvents_WithLogContext(t *testing.T) {
 // RecordActionEvents before the TaskAction finalizer is removed.
 func TestUpdateActionPhase_AbortedDoesNotInsertEvent(t *testing.T) {
 	db := setupActionDB(t)
-	actionRepo, err := NewActionRepo(db, testDbConfig)
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
 	require.NoError(t, err)
 	ctx := context.Background()
 
@@ -675,7 +1889,7 @@ func TestUpdateActionPhase_AbortedDoesNotInsertEvent(t *testing.T) {
 	require.NoError(t, err)
 
 	endTime := time.Now()
-	err = actionRepo.UpdateActionPhase(ctx, actionID, common.ActionPhase_ACTION_PHASE_ABORTED, 1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime)
+	err = actionRepo.UpdateActionPhase(ctx, actionID, common.ActionPhase_ACTION_PHASE_ABORTED, 1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil)
 	require.NoError(t, err)
 
 	// Phase column must be updated.
@@ -691,4 +1905,197 @@ func TestUpdateActionPhase_AbortedDoesNotInsertEvent(t *testing.T) {
 	).Scan(&count)
 	require.NoError(t, err)
 	assert.Equal(t, 0, count, "UpdateActionPhase(ABORTED) must not insert a synthetic action_events row")
+}
+
+// PAUSED sorts above every terminal phase in the enum, so the monotonic
+// `phase <= $n` guard would reject a signalled condition's transition to
+// SUCCEEDED and update zero rows. A no-op update also skips notifyActionUpdate,
+// so the console would never learn the condition resolved and would keep
+// offering the signal input.
+func TestUpdateActionPhase_PausedSettlesIntoTerminal(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	for _, tc := range []struct {
+		name     string
+		terminal common.ActionPhase
+	}{
+		{"signalled", common.ActionPhase_ACTION_PHASE_SUCCEEDED},
+		{"timed out", common.ActionPhase_ACTION_PHASE_TIMED_OUT},
+		{"aborted", common.ActionPhase_ACTION_PHASE_ABORTED},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			actionID := &common.ActionIdentifier{
+				Run: &common.RunIdentifier{
+					Org: "org1", Project: "proj1", Domain: "domain1", Name: "run1",
+				},
+				Name: "cond-" + tc.name,
+			}
+			_, err := actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
+			require.NoError(t, err)
+
+			require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
+				common.ActionPhase_ACTION_PHASE_PAUSED, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
+			paused, err := actionRepo.GetAction(ctx, actionID)
+			require.NoError(t, err)
+			require.Equal(t, int32(common.ActionPhase_ACTION_PHASE_PAUSED), paused.Phase)
+
+			endTime := time.Now()
+			require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
+				tc.terminal, 1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil))
+
+			action, err := actionRepo.GetAction(ctx, actionID)
+			require.NoError(t, err)
+			assert.Equal(t, int32(tc.terminal), action.Phase,
+				"a paused action must be able to settle into %s", tc.terminal)
+			assert.True(t, action.EndedAt.Valid)
+		})
+	}
+}
+
+// The paused exception is deliberately one-way: it lets a paused action settle,
+// not resume. A stale RUNNING event arriving after the pause must still be
+// rejected, exactly as the monotonic guard rejects it today.
+func TestUpdateActionPhase_PausedDoesNotResume(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org: "org1", Project: "proj1", Domain: "domain1", Name: "run1",
+		},
+		Name: "paused-action",
+	}
+	_, err = actionRepo.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
+		common.ActionPhase_ACTION_PHASE_PAUSED, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
+
+	require.NoError(t, actionRepo.UpdateActionPhase(ctx, actionID,
+		common.ActionPhase_ACTION_PHASE_RUNNING, 1, core.CatalogCacheStatus_CACHE_DISABLED, nil, nil))
+
+	action, err := actionRepo.GetAction(ctx, actionID)
+	require.NoError(t, err)
+	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_PAUSED), action.Phase,
+		"a non-terminal update must not move an action out of PAUSED")
+}
+
+// A condition's signalled value is written to detailed_info outside any phase
+// transition, so that write has to notify watchers on its own.
+func TestUpdateActionDetailedInfo_NotifiesWatchers(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	repo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	repoImpl := repo.(*actionRepo)
+
+	actionID := &common.ActionIdentifier{
+		Run: &common.RunIdentifier{
+			Org:     "org1",
+			Project: "proj1",
+			Domain:  "domain1",
+			Name:    "run1",
+		},
+		Name: "action1",
+	}
+
+	ctx := context.Background()
+
+	// Register the watcher before the action exists so the creation
+	// notification is deterministically ours to drain.
+	watchCtx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	updates := make(chan *models.Action, 2)
+	errs := make(chan error, 1)
+	go repo.WatchActionUpdates(watchCtx, actionID, updates, errs)
+
+	require.Eventually(t, func() bool {
+		repoImpl.mu.RLock()
+		defer repoImpl.mu.RUnlock()
+		return len(repoImpl.actionSubscribers) > 0
+	}, 2*time.Second, 10*time.Millisecond, "timed out waiting for watcher registration")
+
+	_, err = repo.CreateAction(ctx, models.NewActionModel(actionID), false)
+	require.NoError(t, err)
+
+	select {
+	case <-updates:
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for creation notification")
+	}
+
+	detailedInfo, err := proto.Marshal(&workflow.RunInfo{InputsUri: "s3://bucket/inputs.pb"})
+	require.NoError(t, err)
+	require.NoError(t, repo.UpdateActionDetailedInfo(ctx, actionID, detailedInfo))
+
+	select {
+	case action := <-updates:
+		require.Equal(t, actionID.Name, action.Name)
+		assert.Equal(t, detailedInfo, action.DetailedInfo)
+	case err := <-errs:
+		require.NoError(t, err)
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for detailed_info notification")
+	}
+}
+
+func TestCreateActionPromotesOnlyPendingParent(t *testing.T) {
+	db := setupActionDB(t)
+	repo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	for value, name := range common.ActionPhase_name {
+		t.Run(name, func(t *testing.T) {
+			parentID := &common.ActionIdentifier{
+				Run:  &common.RunIdentifier{Project: "parent-project", Domain: "dev", Name: name},
+				Name: "a0",
+			}
+			parent := models.NewActionModel(parentID)
+			parent.Phase = value
+			parent.Attempts = 3
+			parent.CacheStatus = core.CatalogCacheStatus_CACHE_MISS
+			terminal := value == int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_FAILED) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_ABORTED) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_RECOVERED)
+			if terminal {
+				parent.EndedAt = sql.NullTime{Time: time.Now(), Valid: true}
+			}
+			promote := value == int32(common.ActionPhase_ACTION_PHASE_QUEUED) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_INITIALIZING) ||
+				value == int32(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES)
+			before, err := repo.CreateAction(ctx, parent, false)
+			require.NoError(t, err)
+
+			childID := &common.ActionIdentifier{Run: parentID.Run, Name: "child"}
+			child := models.NewActionModel(childID)
+			child.ParentActionName = sql.NullString{String: "a0", Valid: true}
+			for i := 0; i < 2; i++ { // Initial recording and duplicate delivery.
+				_, err := repo.CreateAction(ctx, child, false)
+				require.NoError(t, err)
+				after, err := repo.GetAction(ctx, parentID)
+				require.NoError(t, err)
+				if !promote {
+					assert.Equal(t, before, after, "ineligible parent must remain untouched")
+				} else {
+					assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_RUNNING), after.Phase)
+					assert.Equal(t, before.Attempts, after.Attempts)
+					assert.Equal(t, before.CacheStatus, after.CacheStatus)
+					assert.Equal(t, before.CreatedAt, after.CreatedAt)
+					assert.Equal(t, before.EndedAt, after.EndedAt)
+					assert.Equal(t, before.DurationMs, after.DurationMs)
+				}
+			}
+		})
+	}
 }

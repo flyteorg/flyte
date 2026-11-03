@@ -98,6 +98,26 @@ type ExternalResource struct {
 type ReasonInfo struct {
 	Reason     string
 	OccurredAt *time.Time
+	// KubernetesEvent carries structured metadata about the Kubernetes object event this reason
+	// originated from, when applicable.
+	KubernetesEvent *K8sEventMetadata
+	// GpuFault is the GPU fault this reason reports, as data. It is set only for an event
+	// whose fault passed the trust rule in gpufault.FromPodEvent, so a consumer can rely on
+	// it without reading the reason text, and should not look for a fault in the text when
+	// it is unset.
+	GpuFault *core.GpuFault
+}
+
+// K8sEventMetadata describes the Kubernetes object event a reason originated from.
+type K8sEventMetadata struct {
+	// Type is the Kubernetes event type, "Normal" or "Warning".
+	Type string
+	// Reason is the machine-readable, CamelCase reason, e.g. "FailedMount".
+	Reason string
+	// SourceComponent is the emitting component, e.g. "kubelet" or "default-scheduler".
+	SourceComponent string
+	// Count is the number of occurrences the cluster had observed when the event was recorded.
+	Count int32
 }
 
 type TaskInfo struct {
@@ -170,12 +190,21 @@ func (p PhaseInfo) CleanupOnFailure() bool {
 
 func (p PhaseInfo) WithVersion(version uint32) PhaseInfo {
 	return PhaseInfo{
-		phase:   p.phase,
-		version: version,
-		info:    p.info,
-		err:     p.err,
-		reason:  p.reason,
+		phase:            p.phase,
+		version:          version,
+		info:             p.info,
+		err:              p.err,
+		reason:           p.reason,
+		cleanupOnFailure: p.cleanupOnFailure,
 	}
+}
+
+// WithCleanupOnFailure returns a copy of this PhaseInfo with the cleanup flag set,
+// for callers that rebuild a failure and must not lose the original's cleanup
+// requirement.
+func (p PhaseInfo) WithCleanupOnFailure() PhaseInfo {
+	p.cleanupOnFailure = true
+	return p
 }
 
 func (p *PhaseInfo) WithReason(reason string) {

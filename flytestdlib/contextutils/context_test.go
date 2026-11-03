@@ -95,6 +95,24 @@ func TestWithProjectDomain(t *testing.T) {
 	assert.Equal(t, "domain", ctx.Value(DomainKey))
 }
 
+func TestWithCluster(t *testing.T) {
+	ctx := context.Background()
+	assert.Nil(t, ctx.Value(OrganizationKey))
+	assert.Nil(t, ctx.Value(ClusterNameKey))
+
+	ctx = WithCluster(ctx, "org1", "cluster1")
+	assert.Equal(t, "org1", ctx.Value(OrganizationKey))
+	assert.Equal(t, "cluster1", ctx.Value(ClusterNameKey))
+
+	ctx = WithCluster(ctx, "org2", "cluster2")
+	assert.Equal(t, "org2", ctx.Value(OrganizationKey))
+	assert.Equal(t, "cluster2", ctx.Value(ClusterNameKey))
+
+	ctx = WithCluster(ctx, "", "")
+	assert.Equal(t, "", ctx.Value(OrganizationKey))
+	assert.Equal(t, "", ctx.Value(ClusterNameKey))
+}
+
 func TestWithTaskID(t *testing.T) {
 	ctx := context.Background()
 	assert.Nil(t, ctx.Value(TaskIDKey))
@@ -113,9 +131,8 @@ func TestGetFields(t *testing.T) {
 	ctx := context.Background()
 	ctx = WithRequestID(WithJobID(WithNamespace(ctx, "ns123"), "job123"), "req123")
 	ctx = WithProjectDomain(ctx, "proj1", "dev")
-	ctx = context.WithValue(ctx, OrganizationKey, "org1")
+	ctx = WithCluster(ctx, "org1", "cluster1")
 	ctx = context.WithValue(ctx, ServiceNameKey, "svc1")
-	ctx = context.WithValue(ctx, ClusterNameKey, "cluster1")
 	m := GetLogFields(ctx)
 	assert.Equal(t, "ns123", m[NamespaceKey.String()])
 	assert.Equal(t, "job123", m[JobIDKey.String()])

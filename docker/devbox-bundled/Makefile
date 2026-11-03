@@ -75,10 +75,14 @@ create_builder:
 		--driver docker-container --driver-opt image=moby/buildkit:master \
 		--platform linux/arm64,linux/amd64
 
+# Architectures to build the flyte-binary for. CI overrides this to the
+# runner's arch only (e.g. FLYTE_ARCHES=amd64) to skip the cross build.
+FLYTE_ARCHES ?= amd64 arm64
+
 .PHONY: flyte
 flyte: FLYTECONSOLE_VERSION := latest
 flyte: create_builder
-	$(foreach arch,amd64 arm64,$(call FLYTE_BINARY_BUILD,$(arch)))
+	$(foreach arch,$(FLYTE_ARCHES),$(call FLYTE_BINARY_BUILD,$(arch)))
 
 .PHONY: helm-repos
 helm-repos:
@@ -97,16 +101,24 @@ dep_update: SANDBOX_CHART_DIR := ../../charts/flyte-devbox
 dep_update: dep_build
 	cd $(SANDBOX_CHART_DIR)/charts && rm -rf docker-registry flyte-binary knative-serving && for f in *.tgz; do tar xzf "$$f"; done
 
+# Use the executor's pinned, Helm-v4-compatible kustomize instead of whatever
+# kustomize the developer happens to have on PATH.
+KUSTOMIZE := ../../executor/bin/kustomize
+
+.PHONY: kustomize
+kustomize:
+	$(MAKE) -C ../../executor kustomize
+
 .PHONY: manifests
-manifests: dep_update
+manifests: dep_update kustomize
 	mkdir -p manifests
-	kustomize build \
+	$(KUSTOMIZE) build \
 		--enable-helm \
 		--load-restrictor=LoadRestrictionsNone \
 		kustomize/complete > manifests/complete.yaml
 	@printf "\n---\n" >> manifests/complete.yaml
 	@cat kustomize/net-kourier.yaml >> manifests/complete.yaml
-	kustomize build \
+	$(KUSTOMIZE) build \
 		--enable-helm \
 		--load-restrictor=LoadRestrictionsNone \
 		kustomize/dev > manifests/dev.yaml
@@ -121,6 +133,7 @@ sync-crds:
 build: sync-crds flyte dep_update manifests
 	docker buildx build --builder flyte-devbox --load \
 		$(BUILDX_CACHE_FLAGS) \
+		$(if $(CACHEBUST),--build-arg CACHEBUST=$(CACHEBUST)) \
 		--tag flyte-devbox:latest .
 
 .PHONY: build-gpu
@@ -132,6 +145,9 @@ build-gpu: build
 		--build-arg BASE_IMAGE=base \
 		--tag flyte-devbox:gpu-latest .
 
+override DEVBOX_NAME := flyte-devbox
+override DEVBOX_CONTEXT := flyte-devbox
+
 # Port map
 # 6443 - k8s API server
 # 30000 - Docker Registry
@@ -139,6 +155,7 @@ build-gpu: build
 # 30002 - RustFS
 # 30080 - Flyte Proxy
 # 30081 - Kourier (Knative apps)
+# 30300 - Grafana (only serves something after `make monitoring`)
 .PHONY: start
 start: FLYTE_DEVBOX_IMAGE := flyte-devbox:latest
 start: FLYTE_DEV := False
@@ -159,6 +176,7 @@ start:
 			--publish "30002:30002" \
 			--publish "30080:30080" \
 			--publish "30081:30081" \
+			--publish "30300:30300" \
 			$(FLYTE_DEVBOX_IMAGE); \
 	fi
 	@echo "Waiting for kubeconfig..."
@@ -195,6 +213,41 @@ setup-knative:
 		--patch '{"data":{"allow-zero-initial-scale":"true"}}'
 	kubectl patch svc/kourier -n kourier-system --type merge \
 		--patch '{"spec":{"type":"NodePort","ports":[{"name":"http2","port":80,"targetPort":8080,"nodePort":30081}]}}'
+
+# Optional Grafana stack (collector -> Prometheus -> Grafana + the Flyte v2
+# dashboard). Not bundled in the image: the three upstream images add ~1.4 GB
+# unpacked, so they are pulled on demand instead. Requires a running devbox.
+.PHONY: monitoring
+monitoring:
+	@[ -n "$$(docker ps --filter name=^$(DEVBOX_NAME)$$ --format '{{.Names}}')" ] || \
+		{ echo "$(DEVBOX_NAME) is not running — run 'make devbox-run' first"; exit 1; }
+	kubectl --context $(DEVBOX_CONTEXT) apply -f monitoring/monitoring.yaml
+	@# Dashboards come from the repo-level monitoring/dashboards/.
+	kubectl --context $(DEVBOX_CONTEXT) -n monitoring create configmap grafana-dashboards \
+		--from-file=../../monitoring/dashboards/ --dry-run=client -o yaml | \
+		kubectl --context $(DEVBOX_CONTEXT) apply -f -
+	@# Point flyte at the collector so the dashboard has something to chart.
+	kubectl --context $(DEVBOX_CONTEXT) -n flyte patch cm flyte-binary-config --type merge --patch '{"data":{"200-otel.yaml":"otel:\n  type: otlpgrpc\n  otlpgrpc:\n    endpoint: http://otel-collector.monitoring.svc.cluster.local:4317\n  sampler: { parentSampler: traceid, traceIdRatio: 0.01 }\n"}}'
+	kubectl --context $(DEVBOX_CONTEXT) -n flyte rollout restart deploy flyte-binary
+	kubectl --context $(DEVBOX_CONTEXT) -n monitoring rollout status deploy/grafana --timeout=300s
+	kubectl --context $(DEVBOX_CONTEXT) -n flyte rollout status deploy/flyte-binary --timeout=300s
+	@echo
+	@if docker port $(DEVBOX_NAME) | grep -q "^30300/tcp"; then \
+		echo "Grafana:  http://localhost:30300/d/oss/flyte-execution   (anonymous admin)"; \
+	else \
+		echo "NOTE: this devbox predates the Grafana port being published, so"; \
+		echo "      http://localhost:30300 is not reachable yet. Recreate it:"; \
+		echo "        make devbox-stop && make devbox-run"; \
+	fi
+	@echo "Metrics appear ~60s after the first RPC traffic."
+
+
+.PHONY: monitoring-clean
+monitoring-clean:
+	-kubectl --context $(DEVBOX_CONTEXT) -n flyte patch cm flyte-binary-config --type json --patch '[{"op":"remove","path":"/data/200-otel.yaml"}]'
+	-kubectl --context $(DEVBOX_CONTEXT) -n flyte rollout restart deploy flyte-binary
+	-kubectl --context $(DEVBOX_CONTEXT) -n monitoring delete configmap grafana-dashboards
+	-kubectl --context $(DEVBOX_CONTEXT) delete -f monitoring/monitoring.yaml
 
 .PHONY: stop
 stop:

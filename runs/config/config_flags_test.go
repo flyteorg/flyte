@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/stretchr/testify/assert"
@@ -121,20 +122,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("server.host", testValue)
 			if vString, err := cmdFlags.GetString("server.host"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Server.Host)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_database.enableForeignKeyConstraintWhenMigrating", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("database.enableForeignKeyConstraintWhenMigrating", testValue)
-			if vBool, err := cmdFlags.GetBool("database.enableForeignKeyConstraintWhenMigrating"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.Database.EnableForeignKeyConstraintWhenMigrating)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -323,14 +310,58 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_actionsServiceUrl", func(t *testing.T) {
+	t.Run("Test_notificationBufferLimit", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("actionsServiceUrl", testValue)
-			if vString, err := cmdFlags.GetString("actionsServiceUrl"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ActionsServiceURL)
+			cmdFlags.Set("notificationBufferLimit", testValue)
+			if vInt, err := cmdFlags.GetInt("notificationBufferLimit"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.NotificationBufferLimit)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_notifyRetryMinBackoff", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "100ms"
+
+			cmdFlags.Set("notifyRetryMinBackoff", testValue)
+			if vString, err := cmdFlags.GetString("notifyRetryMinBackoff"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.NotifyRetryMinBackoff)
+				assert.Equal(t, 100*time.Millisecond, actual.NotifyRetryMinBackoff.Duration)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_notifyRetryMaxBackoff", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "200s"
+
+			cmdFlags.Set("notifyRetryMaxBackoff", testValue)
+			if vString, err := cmdFlags.GetString("notifyRetryMaxBackoff"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.NotifyRetryMaxBackoff)
+				assert.Equal(t, 200*time.Second, actual.NotifyRetryMaxBackoff.Duration)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_actionsService.url", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("actionsService.url", testValue)
+			if vString, err := cmdFlags.GetString("actionsService.url"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ActionsService.URL)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -527,6 +558,62 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("authMetadata.flyteClient.audience", testValue)
 			if vString, err := cmdFlags.GetString("authMetadata.flyteClient.audience"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AuthMetadata.FlyteClient.Audience)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_trustForwardedIdentityHeaders", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("trustForwardedIdentityHeaders", testValue)
+			if vBool, err := cmdFlags.GetBool("trustForwardedIdentityHeaders"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.TrustForwardedIdentityHeaders)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_identityHeaders.claimsJwtHeader", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("identityHeaders.claimsJwtHeader", testValue)
+			if vString, err := cmdFlags.GetString("identityHeaders.claimsJwtHeader"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.IdentityHeaders.ClaimsJWTHeader)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_identityHeaders.subjectHeader", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("identityHeaders.subjectHeader", testValue)
+			if vString, err := cmdFlags.GetString("identityHeaders.subjectHeader"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.IdentityHeaders.SubjectHeader)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_identityHeaders.emailHeader", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("identityHeaders.emailHeader", testValue)
+			if vString, err := cmdFlags.GetString("identityHeaders.emailHeader"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.IdentityHeaders.EmailHeader)
 
 			} else {
 				assert.FailNow(t, err.Error())

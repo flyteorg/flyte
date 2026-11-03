@@ -1,5 +1,7 @@
 from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
+from flyteidl2.common import identity_pb2 as _identity_pb2
+from flyteidl2.core import literals_pb2 as _literals_pb2
 from flyteidl2.workflow import run_definition_pb2 as _run_definition_pb2
 from google.rpc import status_pb2 as _status_pb2
 from google.protobuf.internal import containers as _containers
@@ -10,7 +12,7 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class RecordActionRequest(_message.Message):
-    __slots__ = ["action_id", "parent", "group", "subject", "input_uri", "task", "trace", "condition"]
+    __slots__ = ["action_id", "parent", "group", "subject", "input_uri", "task", "trace", "condition", "recovered_from"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     PARENT_FIELD_NUMBER: _ClassVar[int]
     GROUP_FIELD_NUMBER: _ClassVar[int]
@@ -19,6 +21,7 @@ class RecordActionRequest(_message.Message):
     TASK_FIELD_NUMBER: _ClassVar[int]
     TRACE_FIELD_NUMBER: _ClassVar[int]
     CONDITION_FIELD_NUMBER: _ClassVar[int]
+    RECOVERED_FROM_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     parent: str
     group: str
@@ -27,7 +30,8 @@ class RecordActionRequest(_message.Message):
     task: _run_definition_pb2.TaskAction
     trace: _run_definition_pb2.TraceAction
     condition: _run_definition_pb2.ConditionAction
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent: _Optional[str] = ..., group: _Optional[str] = ..., subject: _Optional[str] = ..., input_uri: _Optional[str] = ..., task: _Optional[_Union[_run_definition_pb2.TaskAction, _Mapping]] = ..., trace: _Optional[_Union[_run_definition_pb2.TraceAction, _Mapping]] = ..., condition: _Optional[_Union[_run_definition_pb2.ConditionAction, _Mapping]] = ...) -> None: ...
+    recovered_from: _identifier_pb2.ActionIdentifier
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent: _Optional[str] = ..., group: _Optional[str] = ..., subject: _Optional[str] = ..., input_uri: _Optional[str] = ..., task: _Optional[_Union[_run_definition_pb2.TaskAction, _Mapping]] = ..., trace: _Optional[_Union[_run_definition_pb2.TraceAction, _Mapping]] = ..., condition: _Optional[_Union[_run_definition_pb2.ConditionAction, _Mapping]] = ..., recovered_from: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ...) -> None: ...
 
 class RecordActionResponse(_message.Message):
     __slots__ = ["action_id", "status"]
@@ -50,12 +54,18 @@ class RecordActionStreamResponse(_message.Message):
     def __init__(self, response: _Optional[_Union[RecordActionResponse, _Mapping]] = ...) -> None: ...
 
 class UpdateActionStatusRequest(_message.Message):
-    __slots__ = ["action_id", "status"]
+    __slots__ = ["action_id", "status", "output", "principal", "abort_reason"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
+    OUTPUT_FIELD_NUMBER: _ClassVar[int]
+    PRINCIPAL_FIELD_NUMBER: _ClassVar[int]
+    ABORT_REASON_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     status: _run_definition_pb2.ActionStatus
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., status: _Optional[_Union[_run_definition_pb2.ActionStatus, _Mapping]] = ...) -> None: ...
+    output: _literals_pb2.Literal
+    principal: _identity_pb2.EnrichedIdentity
+    abort_reason: str
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., status: _Optional[_Union[_run_definition_pb2.ActionStatus, _Mapping]] = ..., output: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., principal: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., abort_reason: _Optional[str] = ...) -> None: ...
 
 class UpdateActionStatusResponse(_message.Message):
     __slots__ = ["action_id", "status"]

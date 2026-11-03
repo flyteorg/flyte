@@ -1,12 +1,20 @@
 package plugin
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/util/validation"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	flytesecret "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
@@ -41,6 +49,55 @@ func TestNewTaskExecutionMetadata_UsesProjectedRunContext(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "root-abc", meta.GetEnvironmentVariables()["TRACE_ID"])
 	require.True(t, meta.IsInterruptible())
+}
+
+func TestNewTaskExecutionMetadata_Interruptible(t *testing.T) {
+	marshalTemplate := func(t *testing.T, tmpl *core.TaskTemplate) []byte {
+		data, err := proto.Marshal(tmpl)
+		require.NoError(t, err)
+		return data
+	}
+	templateWith := func(t *testing.T, interruptible bool) []byte {
+		return marshalTemplate(t, &core.TaskTemplate{
+			Metadata: &core.TaskMetadata{
+				InterruptibleValue: &core.TaskMetadata_Interruptible{Interruptible: interruptible},
+			},
+		})
+	}
+	newMeta := func(t *testing.T, runLevel *bool, taskTemplate []byte) pluginsCore.TaskExecutionMetadata {
+		meta, err := NewTaskExecutionMetadata(&flyteorgv1.TaskAction{
+			Spec: flyteorgv1.TaskActionSpec{
+				Project:       "project",
+				Domain:        "development",
+				RunName:       "run-name",
+				ActionName:    "action-name",
+				RunOutputBase: "s3://bucket/run",
+				Interruptible: runLevel,
+				TaskTemplate:  taskTemplate,
+			},
+		})
+		require.NoError(t, err)
+		return meta
+	}
+
+	t.Run("defaults to false", func(t *testing.T) {
+		require.False(t, newMeta(t, nil, nil).IsInterruptible())
+	})
+
+	t.Run("template metadata applies when run level is unset", func(t *testing.T) {
+		require.True(t, newMeta(t, nil, templateWith(t, true)).IsInterruptible())
+		require.False(t, newMeta(t, nil, templateWith(t, false)).IsInterruptible())
+	})
+
+	t.Run("template without the flag leaves the default", func(t *testing.T) {
+		require.False(t, newMeta(t, nil, marshalTemplate(t, &core.TaskTemplate{Metadata: &core.TaskMetadata{}})).IsInterruptible())
+	})
+
+	t.Run("run level wins over template metadata", func(t *testing.T) {
+		runTrue, runFalse := true, false
+		require.True(t, newMeta(t, &runTrue, templateWith(t, false)).IsInterruptible())
+		require.False(t, newMeta(t, &runFalse, templateWith(t, true)).IsInterruptible())
+	})
 }
 
 func TestNewTaskExecutionMetadata_UserEnvVarsCannotClobberInternal(t *testing.T) {
@@ -102,4 +159,161 @@ func TestNewTaskExecutionMetadata_UsesTaskTemplateID(t *testing.T) {
 	require.Equal(t, taskID.GetDomain(), got.GetDomain())
 	require.Equal(t, taskID.GetName(), got.GetName())
 	require.Equal(t, taskID.GetVersion(), got.GetVersion())
+}
+
+func TestTaskExecutionID_GetGeneratedNameWith(t *testing.T) {
+	t.Run("within max length", func(t *testing.T) {
+		execID := &taskExecutionID{
+			generatedName: "short-name",
+		}
+		name, err := execID.GetGeneratedNameWith(0, 50)
+		require.NoError(t, err)
+		require.Equal(t, "short-name", name)
+	})
+
+	t.Run("exceeds max length uses FixedLengthUniqueID", func(t *testing.T) {
+		execID := &taskExecutionID{
+			generatedName: "a-very-long-generated-name-that-exceeds-the-max-length-limit-12345",
+		}
+		maxLength := 20
+		name, err := execID.GetGeneratedNameWith(0, maxLength)
+		require.NoError(t, err)
+		require.LessOrEqual(t, len(name), maxLength)
+
+		expected, err := encoding.FixedLengthUniqueID(execID.generatedName, maxLength)
+		require.NoError(t, err)
+		require.Equal(t, expected, name)
+	})
+
+	t.Run("max length too small returns error", func(t *testing.T) {
+		execID := &taskExecutionID{
+			generatedName: "long-name",
+		}
+		_, err := execID.GetGeneratedNameWith(0, 2)
+		require.Error(t, err)
+	})
+}
+
+func TestNewTaskExecutionMetadata_ManagedLabel(t *testing.T) {
+	// The manager cache selects on this label, so a Pod without it is invisible
+	// to the executor. Plugins merge these labels into the Pod templates they
+	// build, which is how operator-created Pods inherit it.
+	newMeta := func(labels map[string]string) pluginsCore.TaskExecutionMetadata {
+		meta, err := NewTaskExecutionMetadata(&flyteorgv1.TaskAction{
+			ObjectMeta: metav1.ObjectMeta{Labels: labels},
+			Spec: flyteorgv1.TaskActionSpec{
+				Project:       "project",
+				Domain:        "development",
+				RunName:       "run-name",
+				ActionName:    "action-name",
+				RunOutputBase: "s3://bucket/run",
+			},
+		})
+		require.NoError(t, err)
+		return meta
+	}
+
+	t.Run("always set", func(t *testing.T) {
+		require.Equal(t, flytek8s.ManagedLabelValue,
+			newMeta(nil).GetLabels()[flytek8s.ManagedLabelKey])
+	})
+
+	t.Run("matches the cache selector", func(t *testing.T) {
+		selector := labels.SelectorFromSet(labels.Set{
+			flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue,
+		})
+		require.True(t, selector.Matches(labels.Set(newMeta(nil).GetLabels())))
+	})
+
+	t.Run("user labels cannot override it", func(t *testing.T) {
+		meta := newMeta(map[string]string{flytek8s.ManagedLabelKey: "false"})
+		require.Equal(t, flytek8s.ManagedLabelValue,
+			meta.GetLabels()[flytek8s.ManagedLabelKey])
+	})
+}
+
+func TestNewTaskExecutionMetadata_StampsIdentifyingLabels(t *testing.T) {
+	taskTemplate, err := proto.Marshal(&core.TaskTemplate{
+		Id: &core.Identifier{Name: "my_module.my_task"},
+	})
+	require.NoError(t, err)
+
+	taskAction := &flyteorgv1.TaskAction{
+		Spec: flyteorgv1.TaskActionSpec{
+			Project:       "project",
+			Domain:        "development",
+			RunName:       "run-name",
+			ActionName:    "action-name",
+			RunOutputBase: "s3://bucket/run",
+			TaskTemplate:  taskTemplate,
+		},
+		Status: flyteorgv1.TaskActionStatus{Attempts: 3},
+	}
+
+	meta, err := NewTaskExecutionMetadata(taskAction)
+	require.NoError(t, err)
+
+	labels := meta.GetLabels()
+	require.Equal(t, "run-name", labels[RunLabel])
+	require.Equal(t, "action-name", labels[ActionLabel])
+	// Attempts are 1-based, and the third attempt is the second retry.
+	require.Equal(t, "3", labels[AttemptLabel])
+	require.Equal(t, "my_module.my_task", labels[TaskNameLabel])
+
+	// The labels injected for secret scoping are still there.
+	require.Equal(t, "project", labels[flytesecret.ProjectLabel])
+	require.Equal(t, "development", labels[flytesecret.DomainLabel])
+}
+
+func TestNewTaskExecutionMetadata_LabelsAreSanitizedAndOptional(t *testing.T) {
+	longName := strings.Repeat("a", 70)
+	taskTemplate, err := proto.Marshal(&core.TaskTemplate{
+		Id: &core.Identifier{Name: longName},
+	})
+	require.NoError(t, err)
+
+	taskAction := &flyteorgv1.TaskAction{
+		Spec: flyteorgv1.TaskActionSpec{
+			Project:      "project",
+			Domain:       "development",
+			RunName:      "run/name:with bad chars",
+			TaskTemplate: taskTemplate,
+		},
+	}
+
+	meta, err := NewTaskExecutionMetadata(taskAction)
+	require.NoError(t, err)
+
+	labels := meta.GetLabels()
+	require.Equal(t, "run-name-with-bad-chars", labels[RunLabel])
+	require.Len(t, labels[TaskNameLabel], 63)
+	// A first attempt that has not been recorded yet still reads as attempt 1.
+	require.Equal(t, "1", labels[AttemptLabel])
+	// An empty action name is left unstamped rather than stamped blank.
+	require.NotContains(t, labels, ActionLabel)
+
+	for key, value := range labels {
+		require.Empty(t, validation.IsValidLabelValue(value), "label %s has invalid value %q", key, value)
+	}
+}
+
+func TestNewTaskExecutionMetadata_CRDLabelsDoNotClobberIdentifyingLabels(t *testing.T) {
+	taskAction := &flyteorgv1.TaskAction{
+		ObjectMeta: metav1.ObjectMeta{
+			Labels: map[string]string{RunLabel: "spoofed", "team": "data"},
+		},
+		Spec: flyteorgv1.TaskActionSpec{
+			Project:    "project",
+			Domain:     "development",
+			RunName:    "run-name",
+			ActionName: "action-name",
+		},
+	}
+
+	meta, err := NewTaskExecutionMetadata(taskAction)
+	require.NoError(t, err)
+
+	labels := meta.GetLabels()
+	require.Equal(t, "run-name", labels[RunLabel])
+	require.Equal(t, "data", labels["team"])
 }

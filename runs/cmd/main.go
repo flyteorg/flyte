@@ -8,6 +8,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
@@ -17,27 +18,21 @@ import (
 
 func main() {
 	a := &app.App{
-		Name:  "runs-service",
+		Name:  runs.ServiceName,
 		Short: "Runs Service for Flyte",
 		Setup: func(ctx context.Context, sc *app.SetupContext) error {
 			cfg := runsconfig.GetConfig()
 			sc.Host = cfg.Server.Host
 			sc.Port = cfg.Server.Port
-			sc.Namespace = "flyte" // TODO: make configurable
 
-			db, err := database.GetDB(ctx, database.GetConfig())
+			if err := otelutils.RegisterProvidersWithContext(ctx, runs.ServiceName, otelutils.GetConfig()); err != nil {
+				return fmt.Errorf("failed to initialize database telemetry: %w", err)
+			}
+			db, err := database.GetDB(ctx, database.GetConfig(), runs.ServiceName)
 			if err != nil {
 				return fmt.Errorf("failed to initialize database: %w", err)
 			}
 			sc.DB = db
-
-			k8sClient, _, err := app.InitKubernetesClient(ctx, app.K8sConfig{
-				Namespace: sc.Namespace,
-			}, nil)
-			if err != nil {
-				return fmt.Errorf("failed to initialize Kubernetes client: %w", err)
-			}
-			sc.K8sClient = k8sClient
 
 			labeled.SetMetricKeys(contextutils.ProjectKey, contextutils.DomainKey, contextutils.WorkflowIDKey, contextutils.TaskIDKey)
 			dataStore, err := storage.NewDataStore(storage.GetConfig(), promutils.NewTestScope())

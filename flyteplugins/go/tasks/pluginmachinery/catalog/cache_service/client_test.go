@@ -129,14 +129,64 @@ func TestPutUsesOutputURI(t *testing.T) {
 		},
 	}, store, 0)
 
-	outputPrefix := mem.DataReference("s3://bucket/prefix")
+	// The test DataStore is in-memory (Type: mem), so use mem:// references — its primary scheme —
+	// rather than s3://, which the multi-scheme router would dial as a separate (unconfigured) backend.
+	outputPrefix := mem.DataReference("mem://bucket/prefix")
 	reader := ioutils.NewRemoteFileOutputReader(context.Background(), store, ioutils.NewReadOnlyOutputFilePaths(context.Background(), store, outputPrefix), 0)
-	require.NoError(t, store.WriteProtobuf(context.Background(), mem.DataReference("s3://bucket/prefix/outputs.pb"), mem.Options{}, &corepb.LiteralMap{}))
+	require.NoError(t, store.WriteProtobuf(context.Background(), mem.DataReference("mem://bucket/prefix/outputs.pb"), mem.Options{}, &corepb.LiteralMap{}))
 	status, err := client.Put(context.Background(), newCatalogKey(t), reader, catalog.Metadata{CreatedAt: timestamppb.Now()})
 	require.NoError(t, err)
 	assert.Equal(t, corepb.CatalogCacheStatus_CACHE_POPULATED, status.GetCacheStatus())
 	require.NotNil(t, got)
-	assert.Equal(t, "s3://bucket/prefix/outputs.pb", got.GetBaseRequest().GetOutput().GetOutputUri())
+	assert.Equal(t, "mem://bucket/prefix/outputs.pb", got.GetBaseRequest().GetOutput().GetOutputUri())
+}
+
+func TestPutSendsMaxCacheAge(t *testing.T) {
+	tests := []struct {
+		name        string
+		maxCacheAge time.Duration
+		overwrite   bool
+	}{
+		{name: "put without max age", maxCacheAge: 0},
+		{name: "put with max age", maxCacheAge: time.Hour},
+		{name: "update without max age", maxCacheAge: 0, overwrite: true},
+		{name: "update with max age", maxCacheAge: 2 * time.Hour, overwrite: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+			store := newTestDataStore(t)
+			var got *cacheservicepb.OverwriteOutput
+
+			client := NewWithServiceClient(&stubCacheService{
+				putFunc: func(
+					_ context.Context, req *connect.Request[cacheservicev2.PutCacheRequest],
+				) (*connect.Response[cacheservicepb.PutCacheResponse], error) {
+					got = req.Msg.GetBaseRequest().GetOverwrite()
+					return connect.NewResponse(&cacheservicepb.PutCacheResponse{}), nil
+				},
+			}, store, tt.maxCacheAge)
+
+			outputPrefix := mem.DataReference("mem://bucket/prefix")
+			paths := ioutils.NewReadOnlyOutputFilePaths(ctx, store, outputPrefix)
+			reader := ioutils.NewRemoteFileOutputReader(ctx, store, paths, 0)
+			outputs := mem.DataReference("mem://bucket/prefix/outputs.pb")
+			require.NoError(t, store.WriteProtobuf(ctx, outputs, mem.Options{}, &corepb.LiteralMap{}))
+
+			write := client.Put
+			if tt.overwrite {
+				write = client.Update
+			}
+			_, err := write(ctx, newCatalogKey(t), reader, catalog.Metadata{CreatedAt: timestamppb.Now()})
+			require.NoError(t, err)
+			require.NotNil(t, got)
+			assert.Equal(t, tt.overwrite, got.GetOverwrite())
+			// The cache service only replaces an existing entry when the request carries max_age,
+			// so an entry older than maxCacheAge is never refreshed without it.
+			assert.Equal(t, tt.maxCacheAge > 0, got.GetMaxAge() != nil)
+			assert.Equal(t, tt.maxCacheAge, got.GetMaxAge().AsDuration())
+		})
+	}
 }
 
 func TestGetOrExtendReservationPassesHeartbeat(t *testing.T) {

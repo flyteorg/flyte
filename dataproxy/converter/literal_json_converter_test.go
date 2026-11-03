@@ -2,11 +2,13 @@ package converter
 
 import (
 	"context"
+	"encoding/base64"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/vmihailenco/msgpack/v5"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -51,6 +53,29 @@ func TestLiteralsToJsonSchema(t *testing.T) {
 		assert.Equal(t, "string", testField["type"])
 		assert.Equal(t, "test_string value", testField["default"])
 		assert.Equal(t, "description", testField["description"])
+	})
+
+	t.Run("literal with no matching variable is skipped, shared ones preserved", func(t *testing.T) {
+		// Re-converting a run's inputs against a *different* task version (the
+		// launch-form version selector). The original run had {name, count}; the
+		// target version only declares {name}. The extra `count` literal must be
+		// skipped rather than failing the whole conversion, so `name` survives the
+		// switch. Regression guard for the asymmetric version-switch input loss.
+		literals := []*task.NamedLiteral{
+			{Name: "name", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "kept"}}}}}}},
+			{Name: "count", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 5}}}}}}},
+		}
+		variableMap := makeVariableMap(map[string]*core.Variable{
+			"name": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}}},
+		})
+
+		resp, err := LiteralsToLaunchFormJson(context.Background(), literals, variableMap)
+		require.NoError(t, err)
+
+		properties := resp.AsMap()["properties"].(map[string]any)
+		require.Contains(t, properties, "name")
+		assert.Equal(t, "kept", properties["name"].(map[string]any)["default"])
+		assert.NotContains(t, properties, "count")
 	})
 
 	t.Run("string literal", func(t *testing.T) {
@@ -290,7 +315,7 @@ func TestLiteralsToJsonSchema(t *testing.T) {
 		testDatetimeField := properties["test_datetime"].(map[string]any)
 		assert.Equal(t, "string", testDatetimeField["type"])
 		assert.Equal(t, "datetime", testDatetimeField["format"])
-		assert.Equal(t, now.UTC().Format(time.RFC3339), testDatetimeField["default"])
+		assert.Equal(t, now.UTC().Format(time.RFC3339Nano), testDatetimeField["default"])
 		assert.Equal(t, "A test datetime", testDatetimeField["description"])
 
 		jsonToLiteralsResult, err := LaunchFormJsonToLiterals(context.Background(), literalsToJsonResult)
@@ -303,7 +328,7 @@ func TestLiteralsToJsonSchema(t *testing.T) {
 		assert.Equal(t, "test_datetime", jsonToLiteralsResult[0].GetName())
 		assert.NotNil(t, jsonToLiteralsResult[0].GetValue())
 		resultTime := jsonToLiteralsResult[0].GetValue().GetScalar().GetPrimitive().GetDatetime().AsTime()
-		assert.Equal(t, now.UTC().Format(time.RFC3339), resultTime.UTC().Format(time.RFC3339))
+		assert.Equal(t, now.UTC().Format(time.RFC3339Nano), resultTime.UTC().Format(time.RFC3339Nano))
 	})
 
 	t.Run("duration literal", func(t *testing.T) {
@@ -537,13 +562,21 @@ func TestJSONValuesToLiterals(t *testing.T) {
 		assert.Contains(t, err.Error(), "missing value for variable")
 	})
 
-	t.Run("nil variableMap", func(t *testing.T) {
+	t.Run("nil variableMap is treated as empty (no inputs)", func(t *testing.T) {
+		// A task with no declared inputs has a nil variableMap; this should
+		// yield no literals rather than erroring.
+		empty, err := structpb.NewStruct(map[string]any{})
+		require.NoError(t, err)
+		literals, err := JSONValuesToLiterals(context.Background(), nil, empty)
+		require.NoError(t, err)
+		assert.Empty(t, literals)
+
+		// Any provided values have no matching variable, so they're ignored.
 		values, err := structpb.NewStruct(map[string]any{"foo": "bar"})
 		require.NoError(t, err)
-
-		_, err = JSONValuesToLiterals(context.Background(), nil, values)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "variableMap cannot be nil")
+		literals, err = JSONValuesToLiterals(context.Background(), nil, values)
+		require.NoError(t, err)
+		assert.Empty(t, literals)
 	})
 
 	t.Run("nil values", func(t *testing.T) {
@@ -554,6 +587,52 @@ func TestJSONValuesToLiterals(t *testing.T) {
 		_, err := JSONValuesToLiterals(context.Background(), variableMap, nil)
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "values cannot be nil")
+	})
+
+	t.Run("fractional value for integer is rejected", func(t *testing.T) {
+		variableMap := makeVariableMap(map[string]*core.Variable{
+			"num": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+		})
+
+		values, err := structpb.NewStruct(map[string]any{"num": 2.5})
+		require.NoError(t, err)
+
+		_, err = JSONValuesToLiterals(context.Background(), variableMap, values)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "not a whole number")
+	})
+
+	t.Run("int or float union keeps fractional value", func(t *testing.T) {
+		variableMap := makeVariableMap(map[string]*core.Variable{
+			"num": {Type: &core.LiteralType{Type: &core.LiteralType_UnionType{UnionType: &core.UnionType{
+				Variants: []*core.LiteralType{
+					{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
+					{Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT}},
+				},
+			}}}},
+		})
+
+		values, err := structpb.NewStruct(map[string]any{"num": 2.5})
+		require.NoError(t, err)
+
+		literals, err := JSONValuesToLiterals(context.Background(), variableMap, values)
+		require.NoError(t, err)
+		require.Len(t, literals, 1)
+		union := literals[0].GetValue().GetScalar().GetUnion()
+		require.NotNil(t, union)
+		assert.Equal(t, core.SimpleType_FLOAT, union.GetType().GetSimple())
+		assert.Equal(t, 2.5, union.GetValue().GetScalar().GetPrimitive().GetFloatValue())
+
+		values, err = structpb.NewStruct(map[string]any{"num": 3})
+		require.NoError(t, err)
+
+		literals, err = JSONValuesToLiterals(context.Background(), variableMap, values)
+		require.NoError(t, err)
+		require.Len(t, literals, 1)
+		union = literals[0].GetValue().GetScalar().GetUnion()
+		require.NotNil(t, union)
+		assert.Equal(t, core.SimpleType_INTEGER, union.GetType().GetSimple())
+		assert.Equal(t, int64(3), union.GetValue().GetScalar().GetPrimitive().GetInteger())
 	})
 }
 
@@ -594,4 +673,78 @@ func createSimpleDataclassLiteralSingleType() ([]*task.NamedLiteral, *core.Varia
 	})
 
 	return literals, variableMap
+}
+
+func TestMsgpackBinaryLiteralToJson(t *testing.T) {
+	// STRUCT is what the SDK uses for dicts it can't express as a LiteralMap
+	// (non-string keys) as well as for dataclasses/pydantic models.
+	structVariableMap := makeVariableMap(map[string]*core.Variable{
+		"o0": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRUCT}}},
+	})
+
+	binaryLiteral := func(value []byte) []*task.NamedLiteral {
+		return []*task.NamedLiteral{
+			{Name: "o0", Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+				Value: &core.Scalar_Binary{Binary: &core.Binary{Value: value, Tag: "msgpack"}},
+			}}}},
+		}
+	}
+
+	defaultValue := func(t *testing.T, literals []*task.NamedLiteral) any {
+		t.Helper()
+		result, err := LiteralsToLaunchFormJson(context.Background(), literals, structVariableMap)
+		require.NoError(t, err)
+		properties := result.AsMap()["properties"].(map[string]any)
+		return properties["o0"].(map[string]any)["default"]
+	}
+
+	t.Run("int-keyed map decodes instead of falling back to base64", func(t *testing.T) {
+		// dict[int, int] returned by a real task; keys are stringified for JSON
+		// and numbers land as float64 once through structpb.
+		raw, err := base64.StdEncoding.DecodeString("hQNuBGMBcwVRAl8=")
+		require.NoError(t, err)
+
+		assert.Equal(t, map[string]any{
+			"1": float64(115), "2": float64(95), "3": float64(110), "4": float64(99), "5": float64(81),
+		}, defaultValue(t, binaryLiteral(raw)))
+	})
+
+	t.Run("string-keyed map still decodes", func(t *testing.T) {
+		raw, err := msgpack.Marshal(map[string]any{"a": 1, "nested": map[string]any{"b": true}})
+		require.NoError(t, err)
+
+		assert.Equal(t, map[string]any{
+			"a": float64(1), "nested": map[string]any{"b": true},
+		}, defaultValue(t, binaryLiteral(raw)))
+	})
+
+	t.Run("non-msgpack bytes still fall back to base64", func(t *testing.T) {
+		raw := []byte{0xc1, 0xc1, 0xc1}
+		assert.Equal(t, base64.StdEncoding.EncodeToString(raw), defaultValue(t, binaryLiteral(raw)))
+	})
+}
+
+func TestDatetimeLiteralKeepsSubSecondPrecision(t *testing.T) {
+	ts := time.Date(2024, 5, 6, 7, 8, 9, 123456000, time.UTC)
+	literals := []*task.NamedLiteral{
+		{
+			Name: "dt",
+			Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{
+				Primitive: &core.Primitive{Value: &core.Primitive_Datetime{Datetime: timestamppb.New(ts)}},
+			}}}},
+		},
+	}
+	variableMap := makeVariableMap(map[string]*core.Variable{
+		"dt": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_DATETIME}}},
+	})
+
+	schema, err := LiteralsToLaunchFormJson(context.Background(), literals, variableMap)
+	require.NoError(t, err)
+	properties := schema.AsMap()["properties"].(map[string]any)
+	assert.Equal(t, "2024-05-06T07:08:09.123456Z", properties["dt"].(map[string]any)["default"])
+
+	roundTripped, err := LaunchFormJsonToLiterals(context.Background(), schema)
+	require.NoError(t, err)
+	require.Len(t, roundTripped, 1)
+	assert.True(t, ts.Equal(roundTripped[0].GetValue().GetScalar().GetPrimitive().GetDatetime().AsTime()))
 }

@@ -1,4 +1,5 @@
 from buf.validate import validate_pb2 as _validate_pb2
+from flyteidl2.core import tasks_pb2 as _tasks_pb2
 from google.protobuf import descriptor_pb2 as _descriptor_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
@@ -87,16 +88,6 @@ class BoolSetting(_message.Message):
     scope_level: ScopeLevel
     def __init__(self, state: _Optional[_Union[SettingState, str]] = ..., bool_value: bool = ..., scope_level: _Optional[_Union[ScopeLevel, str]] = ...) -> None: ...
 
-class StringListSetting(_message.Message):
-    __slots__ = ["state", "list_value", "scope_level"]
-    STATE_FIELD_NUMBER: _ClassVar[int]
-    LIST_VALUE_FIELD_NUMBER: _ClassVar[int]
-    SCOPE_LEVEL_FIELD_NUMBER: _ClassVar[int]
-    state: SettingState
-    list_value: StringValues
-    scope_level: ScopeLevel
-    def __init__(self, state: _Optional[_Union[SettingState, str]] = ..., list_value: _Optional[_Union[StringValues, _Mapping]] = ..., scope_level: _Optional[_Union[ScopeLevel, str]] = ...) -> None: ...
-
 class StringMapSetting(_message.Message):
     __slots__ = ["state", "map_value", "scope_level"]
     STATE_FIELD_NUMBER: _ClassVar[int]
@@ -117,13 +108,25 @@ class QuantitySetting(_message.Message):
     scope_level: ScopeLevel
     def __init__(self, state: _Optional[_Union[SettingState, str]] = ..., quantity_value: _Optional[str] = ..., scope_level: _Optional[_Union[ScopeLevel, str]] = ...) -> None: ...
 
+class AcceleratorSetting(_message.Message):
+    __slots__ = ["state", "accelerator_value", "scope_level"]
+    STATE_FIELD_NUMBER: _ClassVar[int]
+    ACCELERATOR_VALUE_FIELD_NUMBER: _ClassVar[int]
+    SCOPE_LEVEL_FIELD_NUMBER: _ClassVar[int]
+    state: SettingState
+    accelerator_value: _tasks_pb2.GPUAccelerator
+    scope_level: ScopeLevel
+    def __init__(self, state: _Optional[_Union[SettingState, str]] = ..., accelerator_value: _Optional[_Union[_tasks_pb2.GPUAccelerator, _Mapping]] = ..., scope_level: _Optional[_Union[ScopeLevel, str]] = ...) -> None: ...
+
 class RunSettings(_message.Message):
-    __slots__ = ["default_queue", "max_action_concurrency"]
+    __slots__ = ["default_queue", "max_action_concurrency", "run_base_dir"]
     DEFAULT_QUEUE_FIELD_NUMBER: _ClassVar[int]
     MAX_ACTION_CONCURRENCY_FIELD_NUMBER: _ClassVar[int]
+    RUN_BASE_DIR_FIELD_NUMBER: _ClassVar[int]
     default_queue: StringSetting
     max_action_concurrency: Int64Setting
-    def __init__(self, default_queue: _Optional[_Union[StringSetting, _Mapping]] = ..., max_action_concurrency: _Optional[_Union[Int64Setting, _Mapping]] = ...) -> None: ...
+    run_base_dir: StringSetting
+    def __init__(self, default_queue: _Optional[_Union[StringSetting, _Mapping]] = ..., max_action_concurrency: _Optional[_Union[Int64Setting, _Mapping]] = ..., run_base_dir: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
 
 class SecuritySettings(_message.Message):
     __slots__ = ["service_account"]
@@ -150,17 +153,27 @@ class TaskResourceDefaults(_message.Message):
     def __init__(self, cpu: _Optional[_Union[QuantitySetting, _Mapping]] = ..., gpu: _Optional[_Union[QuantitySetting, _Mapping]] = ..., memory: _Optional[_Union[QuantitySetting, _Mapping]] = ..., storage: _Optional[_Union[QuantitySetting, _Mapping]] = ...) -> None: ...
 
 class TaskResourceSettings(_message.Message):
-    __slots__ = ["min", "max", "mirror_limits_request"]
+    __slots__ = ["min", "max", "mirror_limits_request", "default_accelerator"]
     MIN_FIELD_NUMBER: _ClassVar[int]
     MAX_FIELD_NUMBER: _ClassVar[int]
     MIRROR_LIMITS_REQUEST_FIELD_NUMBER: _ClassVar[int]
+    DEFAULT_ACCELERATOR_FIELD_NUMBER: _ClassVar[int]
     min: TaskResourceDefaults
     max: TaskResourceDefaults
     mirror_limits_request: BoolSetting
-    def __init__(self, min: _Optional[_Union[TaskResourceDefaults, _Mapping]] = ..., max: _Optional[_Union[TaskResourceDefaults, _Mapping]] = ..., mirror_limits_request: _Optional[_Union[BoolSetting, _Mapping]] = ...) -> None: ...
+    default_accelerator: AcceleratorSetting
+    def __init__(self, min: _Optional[_Union[TaskResourceDefaults, _Mapping]] = ..., max: _Optional[_Union[TaskResourceDefaults, _Mapping]] = ..., mirror_limits_request: _Optional[_Union[BoolSetting, _Mapping]] = ..., default_accelerator: _Optional[_Union[AcceleratorSetting, _Mapping]] = ...) -> None: ...
+
+class AppSettings(_message.Message):
+    __slots__ = ["disallow_anonymous", "app_dns_strategy"]
+    DISALLOW_ANONYMOUS_FIELD_NUMBER: _ClassVar[int]
+    APP_DNS_STRATEGY_FIELD_NUMBER: _ClassVar[int]
+    disallow_anonymous: BoolSetting
+    app_dns_strategy: StringSetting
+    def __init__(self, disallow_anonymous: _Optional[_Union[BoolSetting, _Mapping]] = ..., app_dns_strategy: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
 
 class Settings(_message.Message):
-    __slots__ = ["run", "security", "storage", "task_resource", "labels", "annotations", "environment_variables"]
+    __slots__ = ["run", "security", "storage", "task_resource", "labels", "annotations", "environment_variables", "app", "pod_template_name"]
     RUN_FIELD_NUMBER: _ClassVar[int]
     SECURITY_FIELD_NUMBER: _ClassVar[int]
     STORAGE_FIELD_NUMBER: _ClassVar[int]
@@ -168,6 +181,8 @@ class Settings(_message.Message):
     LABELS_FIELD_NUMBER: _ClassVar[int]
     ANNOTATIONS_FIELD_NUMBER: _ClassVar[int]
     ENVIRONMENT_VARIABLES_FIELD_NUMBER: _ClassVar[int]
+    APP_FIELD_NUMBER: _ClassVar[int]
+    POD_TEMPLATE_NAME_FIELD_NUMBER: _ClassVar[int]
     run: RunSettings
     security: SecuritySettings
     storage: StorageSettings
@@ -175,4 +190,6 @@ class Settings(_message.Message):
     labels: StringMapSetting
     annotations: StringMapSetting
     environment_variables: StringMapSetting
-    def __init__(self, run: _Optional[_Union[RunSettings, _Mapping]] = ..., security: _Optional[_Union[SecuritySettings, _Mapping]] = ..., storage: _Optional[_Union[StorageSettings, _Mapping]] = ..., task_resource: _Optional[_Union[TaskResourceSettings, _Mapping]] = ..., labels: _Optional[_Union[StringMapSetting, _Mapping]] = ..., annotations: _Optional[_Union[StringMapSetting, _Mapping]] = ..., environment_variables: _Optional[_Union[StringMapSetting, _Mapping]] = ...) -> None: ...
+    app: AppSettings
+    pod_template_name: StringSetting
+    def __init__(self, run: _Optional[_Union[RunSettings, _Mapping]] = ..., security: _Optional[_Union[SecuritySettings, _Mapping]] = ..., storage: _Optional[_Union[StorageSettings, _Mapping]] = ..., task_resource: _Optional[_Union[TaskResourceSettings, _Mapping]] = ..., labels: _Optional[_Union[StringMapSetting, _Mapping]] = ..., annotations: _Optional[_Union[StringMapSetting, _Mapping]] = ..., environment_variables: _Optional[_Union[StringMapSetting, _Mapping]] = ..., app: _Optional[_Union[AppSettings, _Mapping]] = ..., pod_template_name: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...

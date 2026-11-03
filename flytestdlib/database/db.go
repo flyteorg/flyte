@@ -4,14 +4,16 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/XSAM/otelsql"
 	"github.com/jmoiron/sqlx"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 // GetDB uses the dbConfig to create a sqlx DB object. If the db doesn't exist for the dbConfig then a new one is created
-// using the default db for the provider. eg : postgres has default dbName as postgres
-func GetDB(ctx context.Context, dbConfig *DbConfig) (*sqlx.DB, error) {
+// using the default db for the provider. eg : postgres has default dbName as postgres.
+// serviceName selects the telemetry providers registered before opening the database.
+func GetDB(ctx context.Context, dbConfig *DbConfig, serviceName string) (*sqlx.DB, error) {
 	if dbConfig == nil {
 		panic("Cannot initialize database repository from empty db config")
 	}
@@ -21,23 +23,7 @@ func GetDB(ctx context.Context, dbConfig *DbConfig) (*sqlx.DB, error) {
 
 	switch {
 	case !(dbConfig.Postgres.IsEmpty()):
-		db, err = CreatePostgresDbIfNotExists(ctx, dbConfig.Postgres)
-		if err != nil {
-			return nil, err
-		}
-
-	case len(dbConfig.DeprecatedHost) > 0 || len(dbConfig.DeprecatedUser) > 0 || len(dbConfig.DeprecatedDbName) > 0:
-		pgConfig := PostgresConfig{
-			Host:         dbConfig.DeprecatedHost,
-			Port:         dbConfig.DeprecatedPort,
-			DbName:       dbConfig.DeprecatedDbName,
-			User:         dbConfig.DeprecatedUser,
-			Password:     dbConfig.DeprecatedPassword,
-			PasswordPath: dbConfig.DeprecatedPasswordPath,
-			ExtraOptions: dbConfig.DeprecatedExtraOptions,
-			Debug:        dbConfig.DeprecatedDebug,
-		}
-		db, err = CreatePostgresDbIfNotExists(ctx, pgConfig)
+		db, err = CreatePostgresDbIfNotExists(ctx, dbConfig.Postgres, TelemetryOptions(serviceName)...)
 		if err != nil {
 			return nil, err
 		}
@@ -51,7 +37,7 @@ func GetDB(ctx context.Context, dbConfig *DbConfig) (*sqlx.DB, error) {
 }
 
 // GetReadOnlyDB uses the dbConfig to create a sqlx DB object for the read replica passed via the config
-func GetReadOnlyDB(ctx context.Context, dbConfig *DbConfig) (*sqlx.DB, error) {
+func GetReadOnlyDB(ctx context.Context, dbConfig *DbConfig, options ...otelsql.Option) (*sqlx.DB, error) {
 	if dbConfig == nil {
 		panic("Cannot initialize database repository from empty db config")
 	}
@@ -60,7 +46,7 @@ func GetReadOnlyDB(ctx context.Context, dbConfig *DbConfig) (*sqlx.DB, error) {
 		return nil, fmt.Errorf("read replica host not provided in db config")
 	}
 
-	db, err := CreatePostgresReadOnlyDbConnection(ctx, dbConfig.Postgres)
+	db, err := CreatePostgresReadOnlyDbConnection(ctx, dbConfig.Postgres, options...)
 	if err != nil {
 		return nil, err
 	}

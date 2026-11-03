@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"runtime/debug"
 	"testing"
@@ -116,12 +115,12 @@ func TestCachedRawStore(t *testing.T) {
 			writeCalled = true
 			switch reference {
 			case "k2":
-				b, err := ioutil.ReadAll(raw)
+				b, err := io.ReadAll(raw)
 				assert.NoError(t, err)
 				assert.Equal(t, d2, b)
 				return nil
 			case "bigK":
-				b, err := ioutil.ReadAll(raw)
+				b, err := io.ReadAll(raw)
 				assert.NoError(t, err)
 				assert.Equal(t, bigD, b)
 				return nil
@@ -169,14 +168,14 @@ func TestCachedRawStore(t *testing.T) {
 	t.Run("ReadCachePopulate", func(t *testing.T) {
 		o, err := cStore.ReadRaw(ctx, k1)
 		assert.NoError(t, err)
-		b, err := ioutil.ReadAll(o)
+		b, err := io.ReadAll(o)
 		assert.NoError(t, err)
 		assert.Equal(t, d1, b)
 		assert.True(t, readCalled)
 		readCalled = false
 		o, err = cStore.ReadRaw(ctx, k1)
 		assert.NoError(t, err)
-		b, err = ioutil.ReadAll(o)
+		b, err = io.ReadAll(o)
 		assert.NoError(t, err)
 		assert.Equal(t, d1, b)
 		assert.False(t, readCalled)
@@ -196,7 +195,7 @@ func TestCachedRawStore(t *testing.T) {
 
 		o, err := cStore.ReadRaw(ctx, k2)
 		assert.NoError(t, err)
-		b, err := ioutil.ReadAll(o)
+		b, err := io.ReadAll(o)
 		assert.NoError(t, err)
 		assert.Equal(t, d2, b)
 		assert.False(t, readCalled)
@@ -211,7 +210,7 @@ func TestCachedRawStore(t *testing.T) {
 
 		o, err := cStore.ReadRaw(ctx, bigK)
 		assert.True(t, IsFailedWriteToCache(err))
-		b, err := ioutil.ReadAll(o)
+		b, err := io.ReadAll(o)
 		assert.NoError(t, err)
 		assert.Equal(t, bigD, b)
 		assert.True(t, readCalled)

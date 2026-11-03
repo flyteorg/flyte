@@ -1,6 +1,9 @@
 name: "Pull Request Labeler"
 
 on:
+  # SAFE EXCEPTION: pull_request_target is safe here because
+  # no untrusted code is checked out or executed. The labeler action
+  # only reads changed files via GitHub API and applies text labels.
   pull_request_target:
     types: [opened, reopened, synchronize]
 

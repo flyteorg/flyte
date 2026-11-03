@@ -4,24 +4,38 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
 )
 
 // AppConfig holds configuration for the control plane AppService.
 type AppConfig struct {
-	// InternalAppServiceURL is the base URL of the InternalAppService (data plane).
+	// Server configures the standalone App service HTTP listener.
+	Server ServerConfig `json:"server"`
+
+	// InternalAppService configures the InternalAppService client (data plane).
 	// In unified mode this is overridden by the shared mux BaseURL.
-	InternalAppServiceURL string `json:"internalAppServiceUrl" pflag:",URL of the internal app service"`
+	InternalAppService serviceclient.ServiceConfig `json:"internalAppService" pflag:",Internal app service client configuration"`
 
 	// CacheTTL is the TTL for the in-memory app status cache.
 	// Defaults to 30s. Set to 0 to disable caching.
 	CacheTTL time.Duration `json:"cacheTtl" pflag:",TTL for app status cache"`
 }
 
+// ServerConfig holds HTTP server configuration.
+type ServerConfig struct {
+	Port int    `json:"port" pflag:",Port to bind the HTTP server"`
+	Host string `json:"host" pflag:",Host to bind the HTTP server"`
+}
+
 const appConfigSectionKey = "apps"
 
 var defaultAppConfig = &AppConfig{
-	InternalAppServiceURL: "http://localhost:8091",
-	CacheTTL:              30 * time.Second,
+	Server: ServerConfig{
+		Host: "0.0.0.0",
+		Port: 8095,
+	},
+	InternalAppService: serviceclient.ServiceConfig{URL: "http://localhost:8091"},
+	CacheTTL:           30 * time.Second,
 }
 
 var appConfigSection = config.MustRegisterSection(appConfigSectionKey, defaultAppConfig)
@@ -72,6 +86,12 @@ type InternalAppConfig struct {
 	// WatchBufferSize is the buffer size for each subscriber's event channel.
 	// A larger value reduces the chance of dropped events under burst load.
 	WatchBufferSize int `json:"watchBufferSize" pflag:",Buffer size for watch subscriber channels"`
+
+	// DefaultServiceAccount is assigned to app pods that don't request one via their
+	// security context. Empty means the namespace's `default` ServiceAccount is used.
+	// Set this to the flyte service account (which carries the IRSA role) so app pods
+	// get cloud credentials/region for object storage.
+	DefaultServiceAccount string `json:"defaultServiceAccount" pflag:",Default k8s service account for app pods when the app does not set one"`
 }
 
 var defaultInternalAppConfig = &InternalAppConfig{

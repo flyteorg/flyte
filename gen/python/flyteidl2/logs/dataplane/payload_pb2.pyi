@@ -15,6 +15,12 @@ class LogLineOriginator(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     USER: _ClassVar[LogLineOriginator]
     SYSTEM: _ClassVar[LogLineOriginator]
 
+class LogLineSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    LOG_LINE_SOURCE_UNSPECIFIED: _ClassVar[LogLineSource]
+    LOG_LINE_SOURCE_LIVE: _ClassVar[LogLineSource]
+    LOG_LINE_SOURCE_PERSISTED: _ClassVar[LogLineSource]
+
 class LogsSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
     LIVE_OR_PERSISTED: _ClassVar[LogsSource]
@@ -23,6 +29,9 @@ class LogsSource(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
 UNKNOWN: LogLineOriginator
 USER: LogLineOriginator
 SYSTEM: LogLineOriginator
+LOG_LINE_SOURCE_UNSPECIFIED: LogLineSource
+LOG_LINE_SOURCE_LIVE: LogLineSource
+LOG_LINE_SOURCE_PERSISTED: LogLineSource
 LIVE_OR_PERSISTED: LogsSource
 LIVE_ONLY: LogsSource
 PERSISTED_ONLY: LogsSource
@@ -38,7 +47,7 @@ class PodResource(_message.Message):
     def __init__(self, namespace: _Optional[str] = ..., name: _Optional[str] = ..., container: _Optional[str] = ...) -> None: ...
 
 class LoggingContext(_message.Message):
-    __slots__ = ["cluster_name", "kubernetes_namespace", "kubernetes_pod_name", "kubernetes_container_name", "execution_attempt_start_time", "execution_attempt_end_time", "kubernetes_pod_labels", "order", "number_of_batches", "pod_name_prefix"]
+    __slots__ = ["cluster_name", "kubernetes_namespace", "kubernetes_pod_name", "kubernetes_container_name", "execution_attempt_start_time", "execution_attempt_end_time", "kubernetes_pod_labels", "order", "number_of_batches", "pod_name_prefix", "pod_name_prefixes"]
     class KubernetesPodLabelsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -56,6 +65,7 @@ class LoggingContext(_message.Message):
     ORDER_FIELD_NUMBER: _ClassVar[int]
     NUMBER_OF_BATCHES_FIELD_NUMBER: _ClassVar[int]
     POD_NAME_PREFIX_FIELD_NUMBER: _ClassVar[int]
+    POD_NAME_PREFIXES_FIELD_NUMBER: _ClassVar[int]
     cluster_name: str
     kubernetes_namespace: str
     kubernetes_pod_name: str
@@ -66,7 +76,8 @@ class LoggingContext(_message.Message):
     order: _list_pb2.Sort.Direction
     number_of_batches: int
     pod_name_prefix: str
-    def __init__(self, cluster_name: _Optional[str] = ..., kubernetes_namespace: _Optional[str] = ..., kubernetes_pod_name: _Optional[str] = ..., kubernetes_container_name: _Optional[str] = ..., execution_attempt_start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., execution_attempt_end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., kubernetes_pod_labels: _Optional[_Mapping[str, str]] = ..., order: _Optional[_Union[_list_pb2.Sort.Direction, str]] = ..., number_of_batches: _Optional[int] = ..., pod_name_prefix: _Optional[str] = ...) -> None: ...
+    pod_name_prefixes: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, cluster_name: _Optional[str] = ..., kubernetes_namespace: _Optional[str] = ..., kubernetes_pod_name: _Optional[str] = ..., kubernetes_container_name: _Optional[str] = ..., execution_attempt_start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., execution_attempt_end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., kubernetes_pod_labels: _Optional[_Mapping[str, str]] = ..., order: _Optional[_Union[_list_pb2.Sort.Direction, str]] = ..., number_of_batches: _Optional[int] = ..., pod_name_prefix: _Optional[str] = ..., pod_name_prefixes: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class ContainerIdentifier(_message.Message):
     __slots__ = ["cluster_name", "kubernetes_namespace", "kubernetes_pod_name", "kubernetes_container_name"]
@@ -105,26 +116,30 @@ class LiveLogsOptions(_message.Message):
     def __init__(self, log_pod_status: bool = ..., log_timestamps: bool = ...) -> None: ...
 
 class LogLine(_message.Message):
-    __slots__ = ["timestamp", "message", "originator"]
+    __slots__ = ["timestamp", "message", "originator", "short_pod_name"]
     TIMESTAMP_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
     ORIGINATOR_FIELD_NUMBER: _ClassVar[int]
+    SHORT_POD_NAME_FIELD_NUMBER: _ClassVar[int]
     timestamp: _timestamp_pb2.Timestamp
     message: str
     originator: LogLineOriginator
-    def __init__(self, timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., message: _Optional[str] = ..., originator: _Optional[_Union[LogLineOriginator, str]] = ...) -> None: ...
+    short_pod_name: str
+    def __init__(self, timestamp: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., message: _Optional[str] = ..., originator: _Optional[_Union[LogLineOriginator, str]] = ..., short_pod_name: _Optional[str] = ...) -> None: ...
 
 class LogLines(_message.Message):
-    __slots__ = ["lines", "container_index", "container", "structured_lines"]
+    __slots__ = ["lines", "container_index", "container", "structured_lines", "source"]
     LINES_FIELD_NUMBER: _ClassVar[int]
     CONTAINER_INDEX_FIELD_NUMBER: _ClassVar[int]
     CONTAINER_FIELD_NUMBER: _ClassVar[int]
     STRUCTURED_LINES_FIELD_NUMBER: _ClassVar[int]
+    SOURCE_FIELD_NUMBER: _ClassVar[int]
     lines: _containers.RepeatedScalarFieldContainer[str]
     container_index: int
     container: ContainerIdentifier
     structured_lines: _containers.RepeatedCompositeFieldContainer[LogLine]
-    def __init__(self, lines: _Optional[_Iterable[str]] = ..., container_index: _Optional[int] = ..., container: _Optional[_Union[ContainerIdentifier, _Mapping]] = ..., structured_lines: _Optional[_Iterable[_Union[LogLine, _Mapping]]] = ...) -> None: ...
+    source: LogLineSource
+    def __init__(self, lines: _Optional[_Iterable[str]] = ..., container_index: _Optional[int] = ..., container: _Optional[_Union[ContainerIdentifier, _Mapping]] = ..., structured_lines: _Optional[_Iterable[_Union[LogLine, _Mapping]]] = ..., source: _Optional[_Union[LogLineSource, str]] = ...) -> None: ...
 
 class LogContainersList(_message.Message):
     __slots__ = ["containers"]

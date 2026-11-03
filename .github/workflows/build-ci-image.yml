@@ -7,7 +7,7 @@ on:
     paths:
       - 'gen.Dockerfile'
       - '.github/workflows/build-ci-image.yml'
-  pull_request_target:
+  pull_request:
     branches:
       - main
     paths:
@@ -24,6 +24,10 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}/ci
   DEPOT_PROJECT_ID: ${{ vars.DEPOT_PROJECT_ID }}
+  PR_NUMBER: ${{ github.event.pull_request.number }}
+  # Fork PRs never get `id-token: write`, so Depot's OIDC auth is unavailable
+  # there and the build falls back to plain buildx (amd64, never pushed).
+  IS_FORK: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
 
 jobs:
   build:
@@ -41,10 +45,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
 
       - name: Validate Depot project id
+        if: ${{ env.IS_FORK != 'true' }}
         run: |
           if [ -z "${DEPOT_PROJECT_ID}" ]; then
             echo "::error::DEPOT_PROJECT_ID repo variable is not set. Add it under Settings → Secrets and variables → Actions → Variables." >&2
@@ -52,10 +56,11 @@ jobs:
           fi
 
       - name: Set up Depot
+        if: ${{ env.IS_FORK != 'true' }}
         uses: depot/setup-action@v1
 
       - name: Log in to GitHub Container Registry
-
+        if: ${{ env.IS_FORK != 'true' }}
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -82,8 +87,8 @@ jobs:
       - name: Set image tag output
         id: set-tag
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
-            echo "tag=pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "tag=pr-$PR_NUMBER" >> $GITHUB_OUTPUT
           elif [ "${{ github.ref }}" == "refs/heads/v2" ]; then
             echo "tag=v2" >> $GITHUB_OUTPUT
           elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
@@ -92,14 +97,31 @@ jobs:
             echo "tag=$(echo ${{ github.ref }} | sed 's/refs\/heads\///')" >> $GITHUB_OUTPUT
           fi
 
+      # Fork PRs: no Depot, no push — just prove gen.Dockerfile still builds.
+      - name: Set up Docker Buildx (forks)
+        if: ${{ env.IS_FORK == 'true' }}
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (forks)
+        if: ${{ env.IS_FORK == 'true' }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./gen.Dockerfile
+          platforms: linux/amd64
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Build and push Docker image
         id: build
+        if: ${{ env.IS_FORK != 'true' }}
         uses: depot/build-push-action@v1
         with:
           project: ${{ env.DEPOT_PROJECT_ID }}
           context: .
           file: ./gen.Dockerfile
-          push: true
+          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           # Native multi-arch on Depot — no QEMU emulation.
@@ -108,10 +130,11 @@ jobs:
           # so no cache-from/cache-to plumbing is needed.
 
       - name: Image digest
+        if: ${{ env.IS_FORK != 'true' }}
         run: echo "Image built with digest ${{ steps.build.outputs.digest }}"
 
       - name: Comment on PR with image tag
-        if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         uses: actions/github-script@v7
         with:
           script: |

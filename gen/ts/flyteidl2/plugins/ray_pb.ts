@@ -2,9 +2,11 @@
 // @generated from file flyteidl2/plugins/ray.proto (package flyteidl2.plugins, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
-import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
-import type { ExtendedResources, K8sPod } from "../core/tasks_pb.ts";
+import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
+import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
+import type { KeyValuePair } from "../core/literals_pb.ts";
+import { file_flyteidl2_core_literals } from "../core/literals_pb.ts";
+import type { ExtendedResources, K8sPod, Resources } from "../core/tasks_pb.ts";
 import { file_flyteidl2_core_tasks } from "../core/tasks_pb.ts";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -12,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/plugins/ray.proto.
  */
 export const file_flyteidl2_plugins_ray: GenFile = /*@__PURE__*/
-  fileDesc("ChtmbHl0ZWlkbDIvcGx1Z2lucy9yYXkucHJvdG8SEWZseXRlaWRsMi5wbHVnaW5zIrgBCgZSYXlKb2ISMgoLcmF5X2NsdXN0ZXIYASABKAsyHS5mbHl0ZWlkbDIucGx1Z2lucy5SYXlDbHVzdGVyEhcKC3J1bnRpbWVfZW52GAIgASgJQgIYARIjChtzaHV0ZG93bl9hZnRlcl9qb2JfZmluaXNoZXMYAyABKAgSIgoadHRsX3NlY29uZHNfYWZ0ZXJfZmluaXNoZWQYBCABKAUSGAoQcnVudGltZV9lbnZfeWFtbBgFIAEoCSKiAQoKUmF5Q2x1c3RlchI5Cg9oZWFkX2dyb3VwX3NwZWMYASABKAsyIC5mbHl0ZWlkbDIucGx1Z2lucy5IZWFkR3JvdXBTcGVjEj0KEXdvcmtlcl9ncm91cF9zcGVjGAIgAygLMiIuZmx5dGVpZGwyLnBsdWdpbnMuV29ya2VyR3JvdXBTcGVjEhoKEmVuYWJsZV9hdXRvc2NhbGluZxgDIAEoCCL+AQoNSGVhZEdyb3VwU3BlYxJOChByYXlfc3RhcnRfcGFyYW1zGAEgAygLMjQuZmx5dGVpZGwyLnBsdWdpbnMuSGVhZEdyb3VwU3BlYy5SYXlTdGFydFBhcmFtc0VudHJ5EicKB2s4c19wb2QYAiABKAsyFi5mbHl0ZWlkbDIuY29yZS5LOHNQb2QSPQoSZXh0ZW5kZWRfcmVzb3VyY2VzGAMgASgLMiEuZmx5dGVpZGwyLmNvcmUuRXh0ZW5kZWRSZXNvdXJjZXMaNQoTUmF5U3RhcnRQYXJhbXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBItQCCg9Xb3JrZXJHcm91cFNwZWMSEgoKZ3JvdXBfbmFtZRgBIAEoCRIQCghyZXBsaWNhcxgCIAEoBRIUCgxtaW5fcmVwbGljYXMYAyABKAUSFAoMbWF4X3JlcGxpY2FzGAQgASgFElAKEHJheV9zdGFydF9wYXJhbXMYBSADKAsyNi5mbHl0ZWlkbDIucGx1Z2lucy5Xb3JrZXJHcm91cFNwZWMuUmF5U3RhcnRQYXJhbXNFbnRyeRInCgdrOHNfcG9kGAYgASgLMhYuZmx5dGVpZGwyLmNvcmUuSzhzUG9kEj0KEmV4dGVuZGVkX3Jlc291cmNlcxgHIAEoCzIhLmZseXRlaWRsMi5jb3JlLkV4dGVuZGVkUmVzb3VyY2VzGjUKE1JheVN0YXJ0UGFyYW1zRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4AUK/AQoVY29tLmZseXRlaWRsMi5wbHVnaW5zQghSYXlQcm90b0gCUAFaNWdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9wbHVnaW5zogIDRlBYqgIRRmx5dGVpZGwyLlBsdWdpbnPKAhFGbHl0ZWlkbDJcUGx1Z2luc+ICHUZseXRlaWRsMlxQbHVnaW5zXEdQQk1ldGFkYXRh6gISRmx5dGVpZGwyOjpQbHVnaW5zYgZwcm90bzM", [file_flyteidl2_core_tasks]);
+  fileDesc("ChtmbHl0ZWlkbDIvcGx1Z2lucy9yYXkucHJvdG8SEWZseXRlaWRsMi5wbHVnaW5zIrgBCgZSYXlKb2ISMgoLcmF5X2NsdXN0ZXIYASABKAsyHS5mbHl0ZWlkbDIucGx1Z2lucy5SYXlDbHVzdGVyEhcKC3J1bnRpbWVfZW52GAIgASgJQgIYARIjChtzaHV0ZG93bl9hZnRlcl9qb2JfZmluaXNoZXMYAyABKAgSIgoadHRsX3NlY29uZHNfYWZ0ZXJfZmluaXNoZWQYBCABKAUSGAoQcnVudGltZV9lbnZfeWFtbBgFIAEoCSLzAgoRQXV0b3NjYWxlck9wdGlvbnMSSgoOdXBzY2FsaW5nX21vZGUYASABKA4yMi5mbHl0ZWlkbDIucGx1Z2lucy5BdXRvc2NhbGVyT3B0aW9ucy5VcHNjYWxpbmdNb2RlEhwKFGlkbGVfdGltZW91dF9zZWNvbmRzGAIgASgFEikKA2VudhgDIAMoCzIcLmZseXRlaWRsMi5jb3JlLktleVZhbHVlUGFpchINCgVpbWFnZRgEIAEoCRIsCglyZXNvdXJjZXMYBSABKAsyGS5mbHl0ZWlkbDIuY29yZS5SZXNvdXJjZXMiiwEKDVVwc2NhbGluZ01vZGUSHgoaVVBTQ0FMSU5HX01PREVfVU5TUEVDSUZJRUQQABIaChZVUFNDQUxJTkdfTU9ERV9ERUZBVUxUEAESHQoZVVBTQ0FMSU5HX01PREVfQUdHUkVTU0lWRRACEh8KG1VQU0NBTElOR19NT0RFX0NPTlNFUlZBVElWRRADIuQBCgpSYXlDbHVzdGVyEjkKD2hlYWRfZ3JvdXBfc3BlYxgBIAEoCzIgLmZseXRlaWRsMi5wbHVnaW5zLkhlYWRHcm91cFNwZWMSPQoRd29ya2VyX2dyb3VwX3NwZWMYAiADKAsyIi5mbHl0ZWlkbDIucGx1Z2lucy5Xb3JrZXJHcm91cFNwZWMSGgoSZW5hYmxlX2F1dG9zY2FsaW5nGAMgASgIEkAKEmF1dG9zY2FsZXJfb3B0aW9ucxgEIAEoCzIkLmZseXRlaWRsMi5wbHVnaW5zLkF1dG9zY2FsZXJPcHRpb25zIv4BCg1IZWFkR3JvdXBTcGVjEk4KEHJheV9zdGFydF9wYXJhbXMYASADKAsyNC5mbHl0ZWlkbDIucGx1Z2lucy5IZWFkR3JvdXBTcGVjLlJheVN0YXJ0UGFyYW1zRW50cnkSJwoHazhzX3BvZBgCIAEoCzIWLmZseXRlaWRsMi5jb3JlLks4c1BvZBI9ChJleHRlbmRlZF9yZXNvdXJjZXMYAyABKAsyIS5mbHl0ZWlkbDIuY29yZS5FeHRlbmRlZFJlc291cmNlcxo1ChNSYXlTdGFydFBhcmFtc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEi1AIKD1dvcmtlckdyb3VwU3BlYxISCgpncm91cF9uYW1lGAEgASgJEhAKCHJlcGxpY2FzGAIgASgFEhQKDG1pbl9yZXBsaWNhcxgDIAEoBRIUCgxtYXhfcmVwbGljYXMYBCABKAUSUAoQcmF5X3N0YXJ0X3BhcmFtcxgFIAMoCzI2LmZseXRlaWRsMi5wbHVnaW5zLldvcmtlckdyb3VwU3BlYy5SYXlTdGFydFBhcmFtc0VudHJ5EicKB2s4c19wb2QYBiABKAsyFi5mbHl0ZWlkbDIuY29yZS5LOHNQb2QSPQoSZXh0ZW5kZWRfcmVzb3VyY2VzGAcgASgLMiEuZmx5dGVpZGwyLmNvcmUuRXh0ZW5kZWRSZXNvdXJjZXMaNQoTUmF5U3RhcnRQYXJhbXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBQr8BChVjb20uZmx5dGVpZGwyLnBsdWdpbnNCCFJheVByb3RvSAJQAVo1Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3BsdWdpbnOiAgNGUFiqAhFGbHl0ZWlkbDIuUGx1Z2luc8oCEUZseXRlaWRsMlxQbHVnaW5z4gIdRmx5dGVpZGwyXFBsdWdpbnNcR1BCTWV0YWRhdGHqAhJGbHl0ZWlkbDI6OlBsdWdpbnNiBnByb3RvMw", [file_flyteidl2_core_literals, file_flyteidl2_core_tasks]);
 
 /**
  * RayJobSpec defines the desired state of RayJob
@@ -67,6 +69,80 @@ export const RayJobSchema: GenMessage<RayJob> = /*@__PURE__*/
   messageDesc(file_flyteidl2_plugins_ray, 0);
 
 /**
+ * @generated from message flyteidl2.plugins.AutoscalerOptions
+ */
+export type AutoscalerOptions = Message<"flyteidl2.plugins.AutoscalerOptions"> & {
+  /**
+   * @generated from field: flyteidl2.plugins.AutoscalerOptions.UpscalingMode upscaling_mode = 1;
+   */
+  upscalingMode: AutoscalerOptions_UpscalingMode;
+
+  /**
+   * @generated from field: int32 idle_timeout_seconds = 2;
+   */
+  idleTimeoutSeconds: number;
+
+  /**
+   * autoscaler sidecar env vars
+   *
+   * @generated from field: repeated flyteidl2.core.KeyValuePair env = 3;
+   */
+  env: KeyValuePair[];
+
+  /**
+   * custom autoscaler image
+   *
+   * @generated from field: string image = 4;
+   */
+  image: string;
+
+  /**
+   * autoscaler container resources
+   *
+   * @generated from field: flyteidl2.core.Resources resources = 5;
+   */
+  resources?: Resources;
+};
+
+/**
+ * Describes the message flyteidl2.plugins.AutoscalerOptions.
+ * Use `create(AutoscalerOptionsSchema)` to create a new message.
+ */
+export const AutoscalerOptionsSchema: GenMessage<AutoscalerOptions> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_plugins_ray, 1);
+
+/**
+ * @generated from enum flyteidl2.plugins.AutoscalerOptions.UpscalingMode
+ */
+export enum AutoscalerOptions_UpscalingMode {
+  /**
+   * @generated from enum value: UPSCALING_MODE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: UPSCALING_MODE_DEFAULT = 1;
+   */
+  DEFAULT = 1,
+
+  /**
+   * @generated from enum value: UPSCALING_MODE_AGGRESSIVE = 2;
+   */
+  AGGRESSIVE = 2,
+
+  /**
+   * @generated from enum value: UPSCALING_MODE_CONSERVATIVE = 3;
+   */
+  CONSERVATIVE = 3,
+}
+
+/**
+ * Describes the enum flyteidl2.plugins.AutoscalerOptions.UpscalingMode.
+ */
+export const AutoscalerOptions_UpscalingModeSchema: GenEnum<AutoscalerOptions_UpscalingMode> = /*@__PURE__*/
+  enumDesc(file_flyteidl2_plugins_ray, 1, 0);
+
+/**
  * Define Ray cluster defines the desired state of RayCluster
  *
  * @generated from message flyteidl2.plugins.RayCluster
@@ -92,6 +168,11 @@ export type RayCluster = Message<"flyteidl2.plugins.RayCluster"> & {
    * @generated from field: bool enable_autoscaling = 3;
    */
   enableAutoscaling: boolean;
+
+  /**
+   * @generated from field: flyteidl2.plugins.AutoscalerOptions autoscaler_options = 4;
+   */
+  autoscalerOptions?: AutoscalerOptions;
 };
 
 /**
@@ -99,7 +180,7 @@ export type RayCluster = Message<"flyteidl2.plugins.RayCluster"> & {
  * Use `create(RayClusterSchema)` to create a new message.
  */
 export const RayClusterSchema: GenMessage<RayCluster> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_ray, 1);
+  messageDesc(file_flyteidl2_plugins_ray, 2);
 
 /**
  * HeadGroupSpec are the spec for the head pod
@@ -136,7 +217,7 @@ export type HeadGroupSpec = Message<"flyteidl2.plugins.HeadGroupSpec"> & {
  * Use `create(HeadGroupSpecSchema)` to create a new message.
  */
 export const HeadGroupSpecSchema: GenMessage<HeadGroupSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_ray, 2);
+  messageDesc(file_flyteidl2_plugins_ray, 3);
 
 /**
  * WorkerGroupSpec are the specs for the worker pods
@@ -201,5 +282,5 @@ export type WorkerGroupSpec = Message<"flyteidl2.plugins.WorkerGroupSpec"> & {
  * Use `create(WorkerGroupSpecSchema)` to create a new message.
  */
 export const WorkerGroupSpecSchema: GenMessage<WorkerGroupSpec> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_plugins_ray, 3);
+  messageDesc(file_flyteidl2_plugins_ray, 4);
 

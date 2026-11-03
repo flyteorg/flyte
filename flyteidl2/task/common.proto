@@ -3,8 +3,10 @@ syntax = "proto3";
 package flyteidl2.task;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/core/artifact_id.proto";
 import "flyteidl2/core/interface.proto";
 import "flyteidl2/core/literals.proto";
+import "flyteidl2/core/types.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task";
@@ -63,6 +65,30 @@ enum TriggerAutomationSpecType {
   TYPE_UNSPECIFIED = 0;
   TYPE_NONE = 1;
   TYPE_SCHEDULE = 2;
+  TYPE_ARTIFACT = 3;
+}
+
+// Fires a run when a new version of the named artifact is created.
+message ArtifactTrigger {
+  // Name of the artifact to watch, scoped to the trigger's org/project/domain.
+  string artifact_name = 1 [(buf.validate.field).string.min_len = 1];
+
+  // Optional: fire only when exactly this version is created. Empty means any new version.
+  string version = 2;
+
+  // Name of the task input variable that the triggering artifact's value will be supplied to
+  // when the run is kicked off. Mirrors Schedule.kickoff_time_input_arg. Optional; empty means
+  // the artifact is not bound to any input.
+  string input_arg = 3;
+
+  // Optional: fire only for versions whose string partitions carry every one of these
+  // key/value pairs, e.g. {"region": "us"}. Empty means every partition fires.
+  map<string, string> partitions = 4;
+
+  // Task input name -> partition key. When the trigger fires, each named input receives the
+  // triggering version's value of that partition: a datetime for the time partition, a string
+  // for a string partition. A version flagged with a partition schema mismatch never fires.
+  map<string, string> partition_input_args = 5;
 }
 
 message TriggerAutomationSpec {
@@ -74,7 +100,9 @@ message TriggerAutomationSpec {
   oneof automation {
     Schedule schedule = 2;
 
-    // In future will be extended with other automation types: webhook, artifacts, etc.
+    ArtifactTrigger artifact = 3;
+
+    // In future will be extended with other automation types: webhook, etc.
   }
 }
 
@@ -110,8 +138,56 @@ message Inputs {
   repeated flyteidl2.core.KeyValuePair context = 2;
 }
 
+// Declares that a named output of the producing action is a new artifact
+// version. The output's literal (in Outputs.literals) is the artifact's value;
+// org/project/domain come from the producing action's scope at registration.
+message ProducedArtifact {
+  // Name of the NamedLiteral in Outputs.literals this declaration refers to.
+  string output = 1 [(buf.validate.field).string.min_len = 1];
+
+  // Artifact name to register under.
+  string name = 2 [(buf.validate.field).string.min_len = 1];
+
+  // Optional explicit version. Empty means the backend derives one
+  // (<run>-<action>-<attempt>).
+  string version = 3;
+
+  // Descriptive payload, copied verbatim into ArtifactSpec.info.
+  flyteidl2.core.ArtifactInfo info = 4;
+
+  // The declared Flyte type of the output, copied into ArtifactSpec.type.
+  // The producing SDK is authoritative for this.
+  flyteidl2.core.LiteralType type = 5;
+
+  // Optional artifact versions the produced version was derived from, copied
+  // verbatim into ArtifactSpec.parent_artifacts. Set by the producing task
+  // when it derives a new version from versions it consumed; one entry is
+  // plain derivation, several record a merge, so the resulting lineage forms
+  // a DAG instead of reading as a linear chain. Order is preserved: the first
+  // entry is the primary parent. Empty key fields inherit the produced
+  // artifact's own scope and name, so a bare {version: "v1"} declares the
+  // previous version of this same artifact as a parent; a set name records
+  // cross-artifact derivation. Only the name may differ: non-empty scope
+  // fields (org/project/domain) must match the produced artifact's own scope.
+  repeated flyteidl2.core.ArtifactVersionId parent_artifacts = 6 [(buf.validate.field).repeated.max_items = 32];
+
+  // String partitions of the produced version, copied verbatim into
+  // ArtifactSpec.partitions.
+  flyteidl2.core.Partitions partitions = 7;
+
+  // Time partition of the produced version, copied verbatim into
+  // ArtifactSpec.time_partition.
+  flyteidl2.core.TimePartition time_partition = 8;
+}
+
 // Output payload for an action.
 message Outputs {
   // Ordered outputs. THIS FIELD MUST REMAIN FIRST as this would break Run service assumptions if it were to move.
   repeated NamedLiteral literals = 1;
+
+  // Artifact registration declarations for outputs wrapped as artifacts by the
+  // producing task. Field 3 (not 2) on purpose: outputs.pb blobs are sometimes
+  // cross-decoded as task.Inputs, where field 2 is `context`; field 3 is unused
+  // there, so this never aliases.
+  repeated ProducedArtifact produced_artifacts = 3;
 }

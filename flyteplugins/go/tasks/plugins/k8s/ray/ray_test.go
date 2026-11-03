@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	batchv1 "k8s.io/api/batch/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -29,6 +30,10 @@ import (
 	k8smocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
@@ -115,6 +120,12 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.Reso
 }
 
 func dummyRayTaskContextInterruptible(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage, serviceAccount string, interruptible bool) pluginsCore.TaskExecutionContext {
+	// The executor stamps the managed label on every task's metadata, so the default context does too.
+	return dummyRayTaskContextWithLabels(taskTemplate, resources, extendedResources, containerImage, serviceAccount, interruptible,
+		map[string]string{"label-1": "val1", flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue})
+}
+
+func dummyRayTaskContextWithLabels(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources, containerImage, serviceAccount string, interruptible bool, executionLabels map[string]string) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
@@ -156,7 +167,7 @@ func dummyRayTaskContextInterruptible(taskTemplate *core.TaskTemplate, resources
 	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
 	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
 	taskExecutionMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
-	taskExecutionMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetLabels().Return(executionLabels)
 	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
@@ -204,8 +215,8 @@ func TestBuildResourceRay(t *testing.T) {
 			"dashboard-host": "0.0.0.0", "disable-usage-stats": "true", "include-dashboard": "true",
 			"node-ip-address": "$MY_POD_IP", "num-cpus": "1",
 		})
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1"})
+	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1", flytek8s.PrimaryContainerKey: RayHeadContainerName})
+	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1", flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
 
 	workerReplica := int32(3)
@@ -215,8 +226,8 @@ func TestBuildResourceRay(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].GroupName, workerGroupName)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.ServiceAccountName, serviceAccount)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"disable-usage-stats": "true", "node-ip-address": "$MY_POD_IP"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1"})
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1", flytek8s.PrimaryContainerKey: RayWorkerContainerName})
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1", flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
 
 	// Make sure the default service account is being used if SA is not provided in the task context
@@ -227,6 +238,51 @@ func TestBuildResourceRay(t *testing.T) {
 	ray, ok = RayResource.(*rayv1.RayJob)
 	assert.True(t, ok)
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName, GetConfig().ServiceAccount)
+}
+
+func TestBuildResourceRaySubmissionMode(t *testing.T) {
+	// SetConfig mutates global plugin config; restore it so later tests are unaffected.
+	originalConfig := GetConfig()
+	defer func() { assert.NoError(t, SetConfig(originalConfig)) }()
+
+	rayJobResourceHandler := rayJobResourceHandler{}
+	taskTemplate := dummyRayTaskTemplate("ray-submission-default", dummyRayCustomObj())
+	rayCtx := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+
+	buildWithMode := func(mode string) (*rayv1.RayJob, error) {
+		cfg := *GetConfig()
+		cfg.SubmissionMode = mode
+		if err := SetConfig(&cfg); err != nil {
+			return nil, err
+		}
+		rayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+		if err != nil {
+			return nil, err
+		}
+		ray, ok := rayResource.(*rayv1.RayJob)
+		assert.True(t, ok)
+		return ray, nil
+	}
+
+	for _, mode := range []string{"K8sJobMode", ""} {
+		ray, err := buildWithMode(mode)
+		assert.Nil(t, err)
+		assert.Equal(t, rayv1.K8sJobMode, ray.Spec.SubmissionMode)
+		assert.NotNil(t, ray.Spec.SubmitterPodTemplate)
+	}
+
+	ray, err := buildWithMode("HTTPMode")
+	assert.Nil(t, err)
+	assert.Equal(t, rayv1.HTTPMode, ray.Spec.SubmissionMode)
+	assert.Nil(t, ray.Spec.SubmitterPodTemplate)
+
+	ray, err = buildWithMode("SidecarMode")
+	assert.Nil(t, err)
+	assert.Equal(t, rayv1.SidecarMode, ray.Spec.SubmissionMode)
+	assert.Nil(t, ray.Spec.SubmitterPodTemplate)
+
+	_, err = buildWithMode("HttpMode")
+	assert.ErrorContains(t, err, "invalid ray submission mode")
 }
 
 var (
@@ -480,6 +536,47 @@ func TestBuildResourceRayDefaultAffinityDilution(t *testing.T) {
 	require.GreaterOrEqual(t, len(terms), 2, "expected the custom affinity term to be appended as a separate term")
 	// If this fails, DefaultAffinity is diluted (bug). If it passes, no bug.
 	assertEveryTermHasRequirement(t, workerSpec, defaultAffinityReq)
+}
+
+func TestBuildResourceRay_DisablesLogNoiseEnv(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+	rayCtx := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+
+	rayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), rayCtx)
+	require.NoError(t, err)
+	ray, ok := rayResource.(*rayv1.RayJob)
+	require.True(t, ok)
+
+	// envOf returns the named container's env vars as name->value. The log-noise vars must land
+	// on the Ray container itself, not an injected sidecar, so select by container name rather
+	// than scanning every container in the pod.
+	envOf := func(containers []corev1.Container, containerName string) map[string]string {
+		for _, c := range containers {
+			if c.Name == containerName {
+				env := make(map[string]string, len(c.Env))
+				for _, e := range c.Env {
+					env[e.Name] = e.Value
+				}
+				return env
+			}
+		}
+		return nil
+	}
+
+	require.NotEmpty(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs, "expected at least one worker group")
+	headEnv := envOf(ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Containers, RayHeadContainerName)
+	workerEnv := envOf(ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Containers, "ray-worker")
+	require.NotNil(t, headEnv, "head pod is missing the %s container", RayHeadContainerName)
+	require.NotNil(t, workerEnv, "worker pod is missing the ray-worker container")
+
+	for _, env := range []struct{ name, value string }{
+		{"RAY_COLOR_PREFIX", "0"},
+		{"RAY_DATA_DISABLE_PROGRESS_BARS", "1"},
+	} {
+		assert.Equal(t, env.value, headEnv[env.name], "head container must set %s", env.name)
+		assert.Equal(t, env.value, workerEnv[env.name], "worker container must set %s", env.name)
+	}
 }
 
 func TestBuildResourceRayContainerImage(t *testing.T) {
@@ -1188,8 +1285,8 @@ func TestDefaultStartParameters(t *testing.T) {
 			"dashboard-host": "0.0.0.0", "disable-usage-stats": "true", "include-dashboard": "true",
 			"node-ip-address": "$MY_POD_IP",
 		})
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1"})
+	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1", flytek8s.PrimaryContainerKey: RayHeadContainerName})
+	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1", flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
 
 	workerReplica := int32(3)
@@ -1199,8 +1296,8 @@ func TestDefaultStartParameters(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].GroupName, workerGroupName)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.ServiceAccountName, serviceAccount)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"disable-usage-stats": "true", "node-ip-address": "$MY_POD_IP"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1"})
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1"})
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1", flytek8s.PrimaryContainerKey: RayWorkerContainerName})
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1", flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
 }
 
@@ -1463,6 +1560,8 @@ func newPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 }
 
 func init() {
+	labeled.SetMetricKeys(contextutils.NamespaceKey)
+
 	f := defaultConfig
 	f.Logs = logs.LogConfig{
 		IsKubernetesEnabled: true,
@@ -1491,7 +1590,7 @@ func TestGetTaskPhase(t *testing.T) {
 		{rayv1.JobDeploymentStatusSuspending, pluginsCore.PhaseQueued, false},
 	}
 
-	startTime := time.Date(2024, 0, 0, 0, 0, 0, 0, time.UTC)
+	startTime := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 	endTime := startTime.Add(time.Hour)
 	podName, contName, initCont := "ray-clust-ray-head", "ray-head", "init"
 	logCtx := &core.LogContext{
@@ -1557,6 +1656,166 @@ func TestGetTaskPhase(t *testing.T) {
 				assert.Equal(t, tc.expectedCorePhase.String(), phaseInfo.Phase().String())
 				assert.Equal(t, logCtx, phaseInfo.Info().LogContext)
 			}
+		})
+	}
+}
+
+// TestGetTaskPhase_RecoverableErrorFile verifies that a failed RayJob is mapped to a *retryable*
+// failure when the task wrote a RECOVERABLE error.pb (e.g. user code raised
+// FlyteRecoverableException) and stays terminal when the error file marks a non-recoverable error
+// or is absent. This mirrors how the k8s plugin manager honors the error file for container/pod
+// tasks on the success path, which a terminal RayJob phase would otherwise bypass.
+func TestGetTaskPhase_RecoverableErrorFile(t *testing.T) {
+	ctx := context.Background()
+	handler := rayJobResourceHandler{}
+
+	newFailedRayJob := func() *rayv1.RayJob {
+		startTime := metav1.NewTime(time.Now())
+		return &rayv1.RayJob{
+			Spec: rayv1.RayJobSpec{
+				RayClusterSpec: &rayv1.RayClusterSpec{
+					HeadGroupSpec: rayv1.HeadGroupSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{Name: "ray-head", Image: "rayproject/ray:latest"},
+								},
+							},
+						},
+					},
+				},
+			},
+			Status: rayv1.RayJobStatus{
+				JobDeploymentStatus: rayv1.JobDeploymentStatusFailed,
+				RayClusterName:      "ray-clust",
+				Reason:              "AppFailed",
+				Message:             "Job entrypoint command failed with exit code 1",
+				StartTime:           &startTime,
+			},
+		}
+	}
+
+	newErrorDoc := func(kind core.ContainerError_Kind) *core.ErrorDocument {
+		return &core.ErrorDocument{Error: &core.ContainerError{
+			Code:    "USER:Unknown",
+			Message: "boom",
+			Kind:    kind,
+			Origin:  core.ExecutionError_USER,
+		}}
+	}
+
+	for _, tc := range []struct {
+		name          string
+		errorDoc      *core.ErrorDocument
+		expectedPhase pluginsCore.Phase
+	}{
+		{"recoverable error.pb maps to retryable failure", newErrorDoc(core.ContainerError_RECOVERABLE), pluginsCore.PhaseRetryableFailure},
+		{"non-recoverable error.pb stays terminal", newErrorDoc(core.ContainerError_NON_RECOVERABLE), pluginsCore.PhasePermanentFailure},
+		{"absent error.pb stays terminal", nil, pluginsCore.PhasePermanentFailure},
+		{"malformed error.pb (nil Error) stays terminal", &core.ErrorDocument{}, pluginsCore.PhasePermanentFailure},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			pluginCtx := rayPluginContextWithErrorDoc(k8s.PluginState{}, tc.errorDoc)
+			phaseInfo, err := handler.GetTaskPhase(ctx, pluginCtx, newFailedRayJob())
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedPhase.String(), phaseInfo.Phase().String())
+		})
+	}
+}
+
+// TestGetTaskPhase_DeploymentStatusTransitionGracePeriodExceeded verifies that task errors take
+// precedence over KubeRay's status-transition fallback.
+func TestGetTaskPhase_DeploymentStatusTransitionGracePeriodExceeded(t *testing.T) {
+	ctx := context.Background()
+	handler := rayJobResourceHandler{}
+
+	newErrorDoc := func(kind core.ContainerError_Kind) *core.ErrorDocument {
+		return &core.ErrorDocument{Error: &core.ContainerError{
+			Code:    "USER:Unknown",
+			Message: "boom",
+			Kind:    kind,
+			Origin:  core.ExecutionError_USER,
+		}}
+	}
+
+	newFailedRayJob := func(reason rayv1.JobFailedReason, message string) *rayv1.RayJob {
+		startTime := metav1.NewTime(time.Now())
+		return &rayv1.RayJob{
+			Spec: rayv1.RayJobSpec{
+				RayClusterSpec: &rayv1.RayClusterSpec{
+					HeadGroupSpec: rayv1.HeadGroupSpec{
+						Template: corev1.PodTemplateSpec{
+							Spec: corev1.PodSpec{
+								Containers: []corev1.Container{
+									{Name: "ray-head", Image: "rayproject/ray:latest"},
+								},
+							},
+						},
+					},
+				},
+			},
+			Status: rayv1.RayJobStatus{
+				JobDeploymentStatus: rayv1.JobDeploymentStatusFailed,
+				RayClusterName:      "ray-clust",
+				Reason:              reason,
+				Message:             message,
+				StartTime:           &startTime,
+			},
+		}
+	}
+
+	for _, tc := range []struct {
+		name            string
+		reason          rayv1.JobFailedReason
+		message         string
+		errorDoc        *core.ErrorDocument
+		expectedPhase   pluginsCore.Phase
+		expectedKind    core.ExecutionError_ErrorKind
+		expectedCleanup bool
+	}{
+		{
+			name:            "status transition grace period exceeded is a retryable system failure",
+			reason:          rayv1.JobDeploymentStatusTransitionGracePeriodExceeded,
+			message:         "The JobDeploymentStatus transition from Running to Complete exceeded the grace period",
+			expectedPhase:   pluginsCore.PhaseRetryableFailure,
+			expectedKind:    core.ExecutionError_SYSTEM,
+			expectedCleanup: true,
+		},
+		{
+			name:            "non-recoverable task error stays a terminal user failure",
+			reason:          rayv1.JobDeploymentStatusTransitionGracePeriodExceeded,
+			message:         "The JobDeploymentStatus transition from Running to Failed exceeded the grace period",
+			errorDoc:        newErrorDoc(core.ContainerError_NON_RECOVERABLE),
+			expectedPhase:   pluginsCore.PhasePermanentFailure,
+			expectedKind:    core.ExecutionError_USER,
+			expectedCleanup: false,
+		},
+		{
+			name:            "recoverable task error stays a retryable user failure",
+			reason:          rayv1.JobDeploymentStatusTransitionGracePeriodExceeded,
+			message:         "The JobDeploymentStatus transition from Running to Failed exceeded the grace period",
+			errorDoc:        newErrorDoc(core.ContainerError_RECOVERABLE),
+			expectedPhase:   pluginsCore.PhaseRetryableFailure,
+			expectedKind:    core.ExecutionError_USER,
+			expectedCleanup: false,
+		},
+		{
+			name:            "app failure stays a terminal user failure",
+			reason:          rayv1.AppFailed,
+			message:         "Job entrypoint command failed with exit code 1",
+			expectedPhase:   pluginsCore.PhasePermanentFailure,
+			expectedKind:    core.ExecutionError_USER,
+			expectedCleanup: false,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			pluginCtx := rayPluginContextWithErrorDoc(k8s.PluginState{}, tc.errorDoc)
+			phaseInfo, err := handler.GetTaskPhase(ctx, pluginCtx, newFailedRayJob(tc.reason, tc.message))
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedPhase.String(), phaseInfo.Phase().String())
+			assert.Equal(t, tc.expectedKind, phaseInfo.Err().GetKind())
+			assert.Equal(t, tc.expectedCleanup, phaseInfo.CleanupOnFailure())
+			assert.Contains(t, phaseInfo.Err().GetMessage(), tc.message)
 		})
 	}
 }
@@ -1947,9 +2206,9 @@ func TestGetPropertiesRay(t *testing.T) {
 	assert.Equal(t, expected, rayJobResourceHandler.GetProperties())
 }
 
-func rayPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
+func rayPluginContextWithErrorDoc(pluginState k8s.PluginState, errorDoc *core.ErrorDocument) *k8smocks.PluginContext {
 	pluginCtx := newPluginContext(pluginState)
-	startTime := time.Date(2024, 0, 0, 0, 0, 0, 0, time.UTC)
+	startTime := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 	endTime := startTime.Add(time.Hour)
 	podName, contName, initCont := "ray-clust-ray-head", "ray-head", "init"
 	podList := []runtime.Object{
@@ -1958,7 +2217,11 @@ func rayPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 			Status:     corev1.PodStatus{Phase: corev1.PodPending},
 		},
 		&corev1.Pod{
-			ObjectMeta: metav1.ObjectMeta{Namespace: "ns", Name: podName},
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "ns",
+				Name:      podName,
+				Labels:    map[string]string{rayClusterLabelKey: "ray-clust"},
+			},
 			Spec: corev1.PodSpec{
 				Containers: []corev1.Container{
 					{Name: contName},
@@ -1993,7 +2256,33 @@ func rayPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
 	}
 	reader := fake.NewFakeClient(podList...)
 	pluginCtx.EXPECT().K8sReader().Return(reader)
+	wireErrorFile(pluginCtx, errorDoc)
 	return pluginCtx
+}
+
+// rayPluginContext builds a plugin context whose task error file is absent (the common case).
+func rayPluginContext(pluginState k8s.PluginState) *k8smocks.PluginContext {
+	return rayPluginContextWithErrorDoc(pluginState, nil)
+}
+
+// wireErrorFile backs the plugin context's OutputWriter/DataStore with an in-memory store. A
+// non-nil errorDoc is written to the task's error.pb path so GetTaskPhase can read it back; a nil
+// errorDoc leaves the store empty, modeling a task that produced no error file.
+func wireErrorFile(pluginCtx *k8smocks.PluginContext, errorDoc *core.ErrorDocument) {
+	store, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+	if err != nil {
+		panic(err)
+	}
+	errPath := storage.DataReference("/error.pb")
+	if errorDoc != nil {
+		if err := store.WriteProtobuf(context.Background(), errPath, storage.Options{}, errorDoc); err != nil {
+			panic(err)
+		}
+	}
+	ow := &pluginIOMocks.OutputWriter{}
+	ow.EXPECT().GetErrorPath().Return(errPath).Maybe()
+	pluginCtx.EXPECT().OutputWriter().Return(ow).Maybe()
+	pluginCtx.EXPECT().DataStore().Return(store).Maybe()
 }
 
 func transformStructToStructPB(t *testing.T, obj interface{}) *structpb.Struct {
@@ -2132,6 +2421,85 @@ func TestGetTaskPhaseContainerNameConstant(t *testing.T) {
 	assert.Equal(t, RayHeadContainerName, headPodLogContext.Containers[0].ContainerName)
 }
 
+// A RayJob's pods are its RayCluster's plus, in K8sJobMode, the submitter pod that has the
+// driver's output. Another job's pods are ignored even when their names start with this job's.
+func TestGetTaskPhaseSelectsOnlyThisJobsPods(t *testing.T) {
+	ctx := context.Background()
+	rayJobName := "test-rayjob"
+	rayClusterName := rayJobName + "-abcde"
+	headPodName := rayClusterName + "-head-xyz12"
+	submitterPodName := rayJobName + "-qwert"
+
+	mkHeadPod := func(clusterName, podName string, ready bool) *corev1.Pod {
+		return &corev1.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      podName,
+				Namespace: "ns",
+				Labels:    map[string]string{rayClusterLabelKey: clusterName},
+			},
+			Spec: corev1.PodSpec{Containers: []corev1.Container{{Name: RayHeadContainerName}}},
+			Status: corev1.PodStatus{
+				Phase: corev1.PodRunning,
+				ContainerStatuses: []corev1.ContainerStatus{{
+					Name:  RayHeadContainerName,
+					Ready: ready,
+					State: corev1.ContainerState{Running: &corev1.ContainerStateRunning{}},
+				}},
+			},
+		}
+	}
+	mkSubmitterPod := func(jobName, podName string) *corev1.Pod {
+		return &corev1.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      podName,
+				Namespace: "ns",
+				Labels:    map[string]string{batchv1.JobNameLabel: jobName},
+			},
+			Status: corev1.PodStatus{Phase: corev1.PodRunning},
+		}
+	}
+	pluginCtx := rayPluginContextWithPods(k8s.PluginState{},
+		mkHeadPod(rayClusterName, headPodName, true),
+		mkSubmitterPod(rayJobName, submitterPodName),
+		mkHeadPod(rayJobName+"-2-fghij", rayJobName+"-2-fghij-head-uvw34", false),
+		mkSubmitterPod(rayJobName+"-2", rayJobName+"-2-asdfg"),
+	)
+	wireErrorFile(pluginCtx, nil)
+
+	ready, err := isRayHeadReady(ctx, rayJobName, rayClusterName, pluginCtx)
+	assert.NoError(t, err)
+	assert.True(t, ready)
+
+	startTime := metav1.NewTime(time.Now())
+	rayObject := &rayv1.RayJob{
+		ObjectMeta: metav1.ObjectMeta{Name: rayJobName, Namespace: "ns"},
+		Spec: rayv1.RayJobSpec{
+			RayClusterSpec: &rayv1.RayClusterSpec{
+				HeadGroupSpec: rayv1.HeadGroupSpec{
+					Template: corev1.PodTemplateSpec{
+						Spec: corev1.PodSpec{Containers: []corev1.Container{{Name: RayHeadContainerName}}},
+					},
+				},
+			},
+		},
+		Status: rayv1.RayJobStatus{
+			JobDeploymentStatus: rayv1.JobDeploymentStatusRunning,
+			RayClusterName:      rayClusterName,
+			StartTime:           &startTime,
+		},
+	}
+	phaseInfo, err := rayJobResourceHandler{}.GetTaskPhase(ctx, pluginCtx, rayObject)
+	assert.NoError(t, err)
+	require.NotNil(t, phaseInfo.Info())
+	logCtx := phaseInfo.Info().LogContext
+	var podNames []string
+	for _, p := range logCtx.GetPods() {
+		podNames = append(podNames, p.GetPodName())
+	}
+	assert.ElementsMatch(t, []string{headPodName, submitterPodName}, podNames)
+	assert.Equal(t, headPodName, logCtx.GetPrimaryPodName())
+}
+
 func TestIsTerminal(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
 	ctx := context.Background()
@@ -2239,4 +2607,129 @@ func TestGetCompletionTime_WrongResourceType(t *testing.T) {
 	assert.Error(t, err)
 	assert.True(t, result.IsZero())
 	assert.Contains(t, err.Error(), "unexpected resource type")
+}
+
+// TestBuildResourceRayManagedLabelNotOverridable verifies that a task cannot drop the label
+// the executor's Pod cache selects on by setting it in its own k8s_pod metadata. A head or
+// worker Pod without the label is invisible to the executor that created it.
+func TestBuildResourceRayManagedLabelNotOverridable(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+
+	rayJobObj := dummyRayCustomObj()
+	overrides := &core.K8SPod{
+		Metadata: &core.K8SObjectMetadata{
+			Labels: map[string]string{flytek8s.ManagedLabelKey: "false"},
+		},
+	}
+	rayJobObj.RayCluster.HeadGroupSpec.K8SPod = overrides
+	rayJobObj.RayCluster.WorkerGroupSpec[0].K8SPod = overrides
+
+	taskTemplate := dummyRayTaskTemplate("ray-id", rayJobObj)
+	rayCtx := dummyRayTaskContext(taskTemplate, resourceRequirements, nil, "", serviceAccount)
+
+	resource, err := rayJobResourceHandler{}.BuildResource(context.TODO(), rayCtx)
+	assert.NoError(t, err)
+	rayJob, ok := resource.(*rayv1.RayJob)
+	assert.True(t, ok)
+
+	headLabels := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.GetLabels()
+	assert.Equal(t, flytek8s.ManagedLabelValue, headLabels[flytek8s.ManagedLabelKey])
+
+	workerLabels := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.GetLabels()
+	assert.Equal(t, flytek8s.ManagedLabelValue, workerLabels[flytek8s.ManagedLabelKey])
+}
+
+// TestBuildResourceRayUnmanagedTask verifies that a task whose metadata isn't marked as
+// managed builds Pods without the managed label, so a framework that runs this plugin
+// without the executor's Pod cache never has its pods claim to be managed.
+func TestBuildResourceRayUnmanagedTask(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+
+	taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+	rayCtx := dummyRayTaskContextWithLabels(taskTemplate, resourceRequirements, nil, "", serviceAccount, true,
+		map[string]string{"label-1": "val1"})
+
+	resource, err := rayJobResourceHandler{}.BuildResource(context.TODO(), rayCtx)
+	assert.NoError(t, err)
+	rayJob, ok := resource.(*rayv1.RayJob)
+	assert.True(t, ok)
+
+	assert.NotContains(t, rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.GetLabels(), flytek8s.ManagedLabelKey)
+	assert.NotContains(t, rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.GetLabels(), flytek8s.ManagedLabelKey)
+}
+
+func TestBuildAutoscalerOptions(t *testing.T) {
+	t.Run("nil input returns nil", func(t *testing.T) {
+		assert.Nil(t, buildAutoscalerOptions(nil))
+	})
+
+	t.Run("idle timeout propagated", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{IdleTimeoutSeconds: 30})
+		require.NotNil(t, result)
+		require.NotNil(t, result.IdleTimeoutSeconds)
+		assert.Equal(t, int32(30), *result.IdleTimeoutSeconds)
+	})
+
+	t.Run("upscaling mode set when non-empty", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{UpscalingMode: plugins.AutoscalerOptions_UPSCALING_MODE_CONSERVATIVE})
+		require.NotNil(t, result)
+		require.NotNil(t, result.UpscalingMode)
+		assert.Equal(t, rayv1.UpscalingMode("Conservative"), *result.UpscalingMode)
+	})
+
+	t.Run("upscaling mode nil when empty", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{UpscalingMode: plugins.AutoscalerOptions_UPSCALING_MODE_UNSPECIFIED})
+		require.NotNil(t, result)
+		assert.Nil(t, result.UpscalingMode)
+	})
+
+	t.Run("image set when non-empty", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{Image: "my-image:latest"})
+		require.NotNil(t, result)
+		require.NotNil(t, result.Image)
+		assert.Equal(t, "my-image:latest", *result.Image)
+	})
+
+	t.Run("idle timeout zero should not be set", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{})
+		require.NotNil(t, result)
+		assert.Nil(t, result.IdleTimeoutSeconds)
+	})
+
+	t.Run("image nil when empty", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{Image: ""})
+		require.NotNil(t, result)
+		assert.Nil(t, result.Image)
+	})
+
+	t.Run("resources requests and limits converted", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{
+			Resources: &core.Resources{
+				Requests: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "250m"},
+					{Name: core.Resources_MEMORY, Value: "512Mi"},
+				},
+				Limits: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "1"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
+				},
+			},
+		})
+		require.NotNil(t, result)
+		require.NotNil(t, result.Resources)
+		assert.Equal(t, resource.MustParse("250m"), result.Resources.Requests[corev1.ResourceCPU])
+		assert.Equal(t, resource.MustParse("512Mi"), result.Resources.Requests[corev1.ResourceMemory])
+		assert.Equal(t, resource.MustParse("1"), result.Resources.Limits[corev1.ResourceCPU])
+		assert.Equal(t, resource.MustParse("1Gi"), result.Resources.Limits[corev1.ResourceMemory])
+	})
+
+	t.Run("env literal value", func(t *testing.T) {
+		result := buildAutoscalerOptions(&plugins.AutoscalerOptions{
+			Env: []*core.KeyValuePair{{Key: "FOO", Value: "bar"}},
+		})
+		require.NotNil(t, result)
+		require.Len(t, result.Env, 1)
+		assert.Equal(t, "FOO", result.Env[0].Name)
+		assert.Equal(t, "bar", result.Env[0].Value)
+	})
 }

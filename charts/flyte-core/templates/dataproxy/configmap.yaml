@@ -1,0 +1,27 @@
+{{- if and (not (include "flyte-core.externalConfiguration" .)) .Values.components.dataproxy.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flyte-core.componentConfigMapName" (dict "root" . "component" "dataproxy") }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "flyte-core.componentLabels" (dict "root" . "component" "dataproxy") | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+data:
+  000-core.yaml: |
+    {{- include "flyte-core.config.logger" . | nindent 4 }}
+    actions:
+      kubernetes:
+        {{- tpl (toYaml .Values.configuration.kubernetes) . | nindent 8 }}
+    dataproxy:
+      {{- tpl (toYaml .Values.configuration.dataproxy) . | nindent 6 }}
+  003-storage.yaml: |
+    {{- include "flyte-core.config.storage" . | nindent 4 }}
+  {{- with .Values.configuration.inline }}
+  100-inline.yaml: |
+    {{- tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+{{- end }}

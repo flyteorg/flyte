@@ -2815,6 +2815,8 @@ func (m *ListRunsRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for PausedActionsOnly
+
 	switch v := m.ScopeBy.(type) {
 	case *ListRunsRequest_Org:
 		if v == nil {
@@ -3637,33 +3639,91 @@ func (m *ListActionsRequest) validate(all bool) error {
 		}
 	}
 
-	if all {
-		switch v := interface{}(m.GetRunId()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, ListActionsRequestValidationError{
-					field:  "RunId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
+	switch v := m.ScopeBy.(type) {
+	case *ListActionsRequest_RunId:
+		if v == nil {
+			err := ListActionsRequestValidationError{
+				field:  "ScopeBy",
+				reason: "oneof value cannot be a typed-nil",
 			}
-		case interface{ Validate() error }:
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetRunId()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListActionsRequestValidationError{
+						field:  "RunId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListActionsRequestValidationError{
+						field:  "RunId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetRunId()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				errors = append(errors, ListActionsRequestValidationError{
+				return ListActionsRequestValidationError{
 					field:  "RunId",
 					reason: "embedded message failed validation",
 					cause:  err,
-				})
+				}
 			}
 		}
-	} else if v, ok := interface{}(m.GetRunId()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return ListActionsRequestValidationError{
-				field:  "RunId",
-				reason: "embedded message failed validation",
-				cause:  err,
+
+	case *ListActionsRequest_QueueId:
+		if v == nil {
+			err := ListActionsRequestValidationError{
+				field:  "ScopeBy",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetQueueId()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListActionsRequestValidationError{
+						field:  "QueueId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListActionsRequestValidationError{
+						field:  "QueueId",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetQueueId()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListActionsRequestValidationError{
+					field:  "QueueId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
+
+	default:
+		_ = v // ensures v is used
 	}
 
 	if len(errors) > 0 {
@@ -3803,6 +3863,10 @@ func (m *ListActionsResponse) validate(all bool) error {
 	}
 
 	// no validation rules for Token
+
+	if m.TotalCount != nil {
+		// no validation rules for TotalCount
+	}
 
 	if len(errors) > 0 {
 		return ListActionsResponseMultiError(errors)
@@ -4615,6 +4679,8 @@ func (m *WatchWindowedActionsResponse) validate(all bool) error {
 
 	// no validation rules for ResyncHint
 
+	// no validation rules for HydrationComplete
+
 	if len(errors) > 0 {
 		return WatchWindowedActionsResponseMultiError(errors)
 	}
@@ -4935,6 +5001,37 @@ func (m *ActionLeaf) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return ActionLeafValidationError{
 				field:  "Duration",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Phase
+
+	if all {
+		switch v := interface{}(m.GetStartTime()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionLeafValidationError{
+					field:  "StartTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionLeafValidationError{
+					field:  "StartTime",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetStartTime()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionLeafValidationError{
+				field:  "StartTime",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -7101,8 +7198,6 @@ func (m *WatchWindowedActionsRequest_UpdateWindow) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for SelectedItemId
-
 	// no validation rules for OverscanBefore
 
 	// no validation rules for OverscanAfter
@@ -7154,6 +7249,35 @@ func (m *WatchWindowedActionsRequest_UpdateWindow) validate(all bool) error {
 	}
 
 	// no validation rules for NameFilter
+
+	switch v := m.WindowAnchor.(type) {
+	case *WatchWindowedActionsRequest_UpdateWindow_SelectedItemId:
+		if v == nil {
+			err := WatchWindowedActionsRequest_UpdateWindowValidationError{
+				field:  "WindowAnchor",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for SelectedItemId
+	case *WatchWindowedActionsRequest_UpdateWindow_AnchorFlatIndex:
+		if v == nil {
+			err := WatchWindowedActionsRequest_UpdateWindowValidationError{
+				field:  "WindowAnchor",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+		// no validation rules for AnchorFlatIndex
+	default:
+		_ = v // ensures v is used
+	}
 
 	if len(errors) > 0 {
 		return WatchWindowedActionsRequest_UpdateWindowMultiError(errors)

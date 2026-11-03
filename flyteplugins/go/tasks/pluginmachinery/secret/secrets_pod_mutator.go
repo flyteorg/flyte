@@ -67,6 +67,14 @@ func (s *SecretsPodMutator) Mutate(ctx context.Context, pod *corev1.Pod) (newP *
 	return pod, len(secrets) > 0, nil
 }
 
+// InvalidateCache asks every enabled injector to drop its copy of the named secret, so a
+// subsequent pod admission picks up the new value instead of waiting out the cache TTL.
+func (s *SecretsPodMutator) InvalidateCache(ctx context.Context, org, domain, project, secretName string) {
+	for _, secretManagerType := range s.enabledSecretManagerTypes {
+		s.injectors[secretManagerType].InvalidateCache(ctx, org, domain, project, secretName)
+	}
+}
+
 func (s *SecretsPodMutator) LabelSelector() *metav1.LabelSelector {
 	return &metav1.LabelSelector{
 		MatchLabels: map[string]string{
@@ -98,8 +106,37 @@ func (s *SecretsPodMutator) injectSecret(ctx context.Context, secret *core.Secre
 	return pod, false, err
 }
 
+// Option customizes NewSecretsMutatorWithOptions.
+type Option func(*mutatorOptions)
+
+type mutatorOptions struct {
+	limitNamespace string
+}
+
+// WithLimitNamespace confines the embedded secret manager's Secret informer to the namespace task
+// pods run in (plus the namespaces it always needs, see secretInformerNamespaces), instead of
+// watching Secrets cluster-wide. "" or AllNamespaces means no limit.
+func WithLimitNamespace(namespace string) Option {
+	return func(o *mutatorOptions) {
+		o.limitNamespace = namespace
+	}
+}
+
 // NewSecretsMutator creates a new SecretsMutator with all available plugins.
+// It is equivalent to NewSecretsMutatorWithOptions with no options.
 func NewSecretsMutator(ctx context.Context, cfg *config.Config, podNamespace string, scope promutils.Scope) (*SecretsPodMutator, error) {
+	return NewSecretsMutatorWithOptions(ctx, cfg, podNamespace, scope)
+}
+
+// NewSecretsMutatorWithOptions creates a new SecretsMutator with all available plugins.
+func NewSecretsMutatorWithOptions(
+	ctx context.Context, cfg *config.Config, podNamespace string, scope promutils.Scope, opts ...Option,
+) (*SecretsPodMutator, error) {
+	o := mutatorOptions{}
+	for _, opt := range opts {
+		opt(&o)
+	}
+
 	enabledSecretManagerTypes := []config.SecretManagerType{
 		config.SecretManagerTypeGlobal,
 	}
@@ -113,7 +150,7 @@ func NewSecretsMutator(ctx context.Context, cfg *config.Config, podNamespace str
 	globalSecretManagerConfig := secretmanager.GetConfig()
 	for _, secretManagerType := range enabledSecretManagerTypes {
 		injector, err := newSecretsInjector(ctx, secretManagerType, cfg, globalSecretManagerConfig, podNamespace,
-			scope.NewSubScope("secret_injector"))
+			o.limitNamespace, scope.NewSubScope("secret_injector"))
 		if err != nil {
 			return nil, err
 		}
@@ -124,4 +161,15 @@ func NewSecretsMutator(ctx context.Context, cfg *config.Config, podNamespace str
 		enabledSecretManagerTypes,
 		injectors,
 	}, nil
+}
+
+// NewSecretsMutatorFromInjectors creates a SecretsPodMutator from pre-built injectors, applied in
+// the order of enabledTypes. Useful for tests and for callers that build injectors themselves.
+func NewSecretsMutatorFromInjectors(
+	enabledTypes []config.SecretManagerType, injectors map[config.SecretManagerType]SecretsInjector,
+) *SecretsPodMutator {
+	return &SecretsPodMutator{
+		enabledSecretManagerTypes: enabledTypes,
+		injectors:                 injectors,
+	}
 }

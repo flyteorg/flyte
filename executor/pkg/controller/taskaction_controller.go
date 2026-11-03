@@ -21,6 +21,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"reflect"
 	"strings"
 	"time"
@@ -30,26 +31,34 @@ import (
 
 	"connectrpc.com/connect"
 	"go.opentelemetry.io/otel/metric"
+	"google.golang.org/protobuf/proto"
+
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/utils/clock"
 	ctrl "sigs.k8s.io/controller-runtime"
 	ctrlcache "sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
+	pluginserrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
+	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -57,13 +66,22 @@ const (
 	TaskActionDefaultRequeueDuration = 10 * time.Second
 	taskActionFinalizer              = "flyte.org/plugin-finalizer"
 
-	// DefaultMaxSystemFailures bounds consecutive system errors before the
-	// TaskAction is forced to PermanentFailure.
+	// DefaultMaxSystemFailures bounds the system errors one attempt may take
+	// before the TaskAction is forced to PermanentFailure.
 	DefaultMaxSystemFailures uint32 = 3
 
 	// MaxSystemFailuresExceededCode is the ExecutionError.Code stamped on
 	// TaskActions that hit the system-failure ceiling.
 	MaxSystemFailuresExceededCode = "MaxSystemFailuresExceeded"
+
+	// TaskExecutionTimedOutCode is the stable ExecutionError.Code for a task
+	// attempt that exhausts its configured max runtime.
+	TaskExecutionTimedOutCode = "TaskExecutionTimedOut"
+
+	// TaskDeadlineExceededCode is the stable ExecutionError.Code for an action
+	// that does not finish within its deadline across all attempts. The SDKs map
+	// it to their deadline-exceeded error.
+	TaskDeadlineExceededCode = "DEADLINE_EXCEEDED"
 
 	// LabelTerminationStatus marks a TaskAction as terminated for GC discovery.
 	LabelTerminationStatus = "flyte.org/termination-status"
@@ -96,10 +114,50 @@ type TaskActionReconciler struct {
 	CatalogClient     catalog.AsyncClient
 	Catalog           catalog.Client
 	eventsClient      workflowconnect.EventsProxyServiceClient
+	eventBatcher      *eventBatcher
 	cluster           string
 	MaxSystemFailures uint32
-	metrics           *taskActionMetrics
+	// RequeueDuration overrides how long to wait before reconciling a running
+	// TaskAction again. Any non-positive value means TaskActionDefaultRequeueDuration.
+	RequeueDuration time.Duration
+	Clock           clock.Clock
+	metrics         *taskActionMetrics
 }
+
+// recordEvent persists a single ActionEvent, blocking until it is durably
+// written. It routes through the coalescing eventBatcher when configured
+// so concurrent reconciles' events collapse into a few multi-row commits;
+// callers still block until their batch commits, so at-least-once semantics are
+// identical to a direct Record (on error the reconcile requeues and re-emits,
+// deduped server-side by ON CONFLICT DO NOTHING). Falls back to a direct Record
+// when no batcher is set (unit tests).
+func (r *TaskActionReconciler) recordEvent(ctx context.Context, event *workflow.ActionEvent) error {
+	if err := event.Validate(); err != nil {
+		return connect.NewError(connect.CodeInvalidArgument, err)
+	}
+	if r.eventBatcher != nil {
+		return r.eventBatcher.Record(ctx, event)
+	}
+	_, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
+		Events: []*workflow.ActionEvent{event},
+	}))
+	return err
+}
+
+// systemRetryReason is the reason on the Queued event published when an attempt is
+// relaunched in place after a system failure.
+const systemRetryReason = "restarting task after system failure"
+
+// systemRetryEventVersionBase is where the versions of system-retry events start.
+//
+// Action events are stored under (action, attempt, phase, version) and a duplicate key is
+// dropped on insert. A system retry keeps the attempt it is retrying and reports the same
+// Queued phase the launch events of that attempt already used, so it needs versions that
+// cannot collide with theirs. Plugins number their versions upwards from zero, one step at
+// a time, so a billion versions away is somewhere they cannot reach. The ceiling is the
+// store's, which keeps this column in a signed 32-bit integer: anything at or above 1<<31
+// fails to encode.
+const systemRetryEventVersionBase uint32 = 1 << 30
 
 // isSystemRetryableFailure reports whether the plugin transition is a
 // PhaseRetryableFailure with kind=SYSTEM (as produced by PhaseInfoSystemRetryableFailure).
@@ -125,6 +183,519 @@ func (r *TaskActionReconciler) maxSystemFailures() uint32 {
 	return r.MaxSystemFailures
 }
 
+// requeueDuration is how long to wait before reconciling a running TaskAction
+// again. Any non-positive value falls back to TaskActionDefaultRequeueDuration.
+// It is also the cache reservation heartbeat requested from cache_service; see
+// cacheReservationHeartbeat for what that does and does not guarantee.
+func (r *TaskActionReconciler) requeueDuration() time.Duration {
+	if r.RequeueDuration <= 0 {
+		return TaskActionDefaultRequeueDuration
+	}
+	return r.RequeueDuration
+}
+
+func (r *TaskActionReconciler) now() time.Time {
+	if r.Clock != nil {
+		return r.Clock.Now()
+	}
+	return time.Now()
+}
+
+// mutateTaskActionState updates the CR state only when the Put/Reset is called by plugin in this reconcile round
+func mutateTaskActionState(taskAction *flyteorgv1.TaskAction, stateMgr *plugin.PluginStateManager) {
+	state, stateVersion, stateWritten := stateMgr.GetNewState()
+	if stateWritten {
+		taskAction.Status.PluginState = state
+		taskAction.Status.PluginStateVersion = stateVersion
+	}
+}
+
+// taskTimeouts are the time bounds a task template declares. Zero means unbounded.
+type taskTimeouts struct {
+	// maxRuntime bounds one attempt, from the moment it is seen Running (TaskMetadata.timeout).
+	maxRuntime time.Duration
+	// deadline bounds the whole action, from when it was first queued to a terminal
+	// phase, across every attempt (TaskMetadata.timeouts.deadline).
+	deadline time.Duration
+}
+
+// timeoutsFromTaskTemplate reads the per-attempt max runtime and the action deadline.
+func timeoutsFromTaskTemplate(data []byte) (taskTimeouts, error) {
+	if len(data) == 0 {
+		return taskTimeouts{}, nil
+	}
+
+	taskTemplate := &core.TaskTemplate{}
+	if err := proto.Unmarshal(data, taskTemplate); err != nil {
+		return taskTimeouts{}, fmt.Errorf("unmarshal task template: %w", err)
+	}
+
+	maxRuntime, err := nonNegativeDuration(taskTemplate.GetMetadata().GetTimeout())
+	if err != nil {
+		return taskTimeouts{}, fmt.Errorf("invalid task timeout: %w", err)
+	}
+	deadline, err := nonNegativeDuration(taskTemplate.GetMetadata().GetTimeouts().GetDeadline())
+	if err != nil {
+		return taskTimeouts{}, fmt.Errorf("invalid task deadline: %w", err)
+	}
+	return taskTimeouts{maxRuntime: maxRuntime, deadline: deadline}, nil
+}
+
+// nonNegativeDuration converts an optional proto duration, treating nil as zero.
+func nonNegativeDuration(d *durationpb.Duration) (time.Duration, error) {
+	if d == nil {
+		return 0, nil
+	}
+	if err := d.CheckValid(); err != nil {
+		return 0, err
+	}
+	if d.AsDuration() < 0 {
+		return 0, fmt.Errorf("duration must not be negative")
+	}
+	return d.AsDuration(), nil
+}
+
+// retryBackoffFromTaskTemplate reads TaskMetadata.retries.backoff — the pacing between user retries.
+func retryBackoffFromTaskTemplate(data []byte) (*core.Backoff, error) {
+	if len(data) == 0 {
+		return nil, nil
+	}
+
+	taskTemplate := &core.TaskTemplate{}
+	if err := proto.Unmarshal(data, taskTemplate); err != nil {
+		return nil, fmt.Errorf("unmarshal task template: %w", err)
+	}
+	return taskTemplate.GetMetadata().GetRetries().GetBackoff(), nil
+}
+
+// validateRetryBackoff enforces the Backoff contract from flyteidl2/core/literals.proto:
+// non-negative durations, a finite factor >= 1, and a cap whenever factor > 1.
+func validateRetryBackoff(backoff *core.Backoff) error {
+	if backoff == nil {
+		return nil
+	}
+	if base := backoff.GetBase(); base != nil && (base.CheckValid() != nil || base.AsDuration() < 0) {
+		return fmt.Errorf("invalid retry backoff: base must be a non-negative duration, got %v", base)
+	}
+	if limit := backoff.GetCap(); limit != nil && (limit.CheckValid() != nil || limit.AsDuration() < 0) {
+		return fmt.Errorf("invalid retry backoff: cap must be a non-negative duration, got %v", limit)
+	}
+	if backoff.Factor != nil {
+		factor := backoff.GetFactor()
+		if math.IsNaN(factor) || math.IsInf(factor, 0) || factor < 1 {
+			return fmt.Errorf("invalid retry backoff: factor must be a finite number >= 1, got %v", factor)
+		}
+		if factor > 1 && backoff.GetCap() == nil {
+			return fmt.Errorf("invalid retry backoff: cap is required when factor > 1")
+		}
+	}
+	return nil
+}
+
+// retryBackoffDelay is how long the retry-th user retry (0-indexed) waits before it
+// launches: min(base * factor**retry, cap), the formula the SDKs document for
+// Backoff. A factor at or below 1 (or none) keeps the delay constant. The backoff has
+// already passed validateRetryBackoff, so a growing delay always has a cap.
+func retryBackoffDelay(backoff *core.Backoff, retry uint32) time.Duration {
+	base := backoff.GetBase()
+	if base == nil || base.CheckValid() != nil || base.AsDuration() <= 0 {
+		return 0
+	}
+	seconds := base.AsDuration().Seconds()
+	if factor := backoff.GetFactor(); factor > 1 {
+		seconds *= math.Pow(factor, float64(retry))
+	}
+	if limit := backoff.GetCap(); limit != nil && limit.CheckValid() == nil {
+		seconds = math.Min(seconds, limit.AsDuration().Seconds())
+	}
+	return time.Duration(seconds * float64(time.Second))
+}
+
+// scheduleNextAttempt stamps Status.NextAttemptAt for the retry replacing a failed
+// attempt, per the task's retry backoff. failedAttempts is how many attempts have
+// failed so far, so the retry being scheduled is the (failedAttempts-1)-th, 0-indexed.
+// Without a backoff, or with one the proto contract rejects, the retry launches at
+// once: an executor upgrade must not fail an in-flight action over its pacing.
+func (r *TaskActionReconciler) scheduleNextAttempt(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	failedAttempts uint32,
+) {
+	taskAction.Status.NextAttemptAt = nil
+	backoff, err := retryBackoffFromTaskTemplate(taskAction.Spec.TaskTemplate)
+	if err == nil {
+		err = validateRetryBackoff(backoff)
+	}
+	if err != nil {
+		log.FromContext(ctx).Error(err, "ignoring the retry backoff, retrying without delay")
+		return
+	}
+	if delay := retryBackoffDelay(backoff, failedAttempts-1); delay > 0 {
+		nextAttemptAt := metav1.NewTime(r.now().Add(delay))
+		taskAction.Status.NextAttemptAt = &nextAttemptAt
+	}
+}
+
+// backoffRemaining is how long a retried attempt still has to wait before it may launch.
+func (r *TaskActionReconciler) backoffRemaining(taskAction *flyteorgv1.TaskAction) time.Duration {
+	if taskAction.Status.NextAttemptAt == nil {
+		return 0
+	}
+	return taskAction.Status.NextAttemptAt.Sub(r.now())
+}
+
+// taskAttemptDeadline return the deadline of current attempt
+func taskAttemptDeadline(taskAction *flyteorgv1.TaskAction, maxRuntime time.Duration) (time.Time, bool) {
+	if maxRuntime <= 0 || taskAction.Status.AttemptStartedAt == nil {
+		return time.Time{}, false
+	}
+	return taskAction.Status.AttemptStartedAt.Add(maxRuntime), true
+}
+
+// actionDeadline returns the absolute deadline of the whole action. It is anchored
+// on the TaskAction's creation, the moment the action was first queued, because
+// the TaskAction lives across every attempt of the action.
+func actionDeadline(taskAction *flyteorgv1.TaskAction, deadline time.Duration) (time.Time, bool) {
+	if deadline <= 0 || taskAction.CreationTimestamp.IsZero() {
+		return time.Time{}, false
+	}
+	return taskAction.CreationTimestamp.Add(deadline), true
+}
+
+// effectiveDeadline returns whichever of the attempt's max runtime and the action
+// deadline expires first.
+func effectiveDeadline(taskAction *flyteorgv1.TaskAction, timeouts taskTimeouts) (time.Time, bool) {
+	attemptEnd, hasAttemptEnd := taskAttemptDeadline(taskAction, timeouts.maxRuntime)
+	actionEnd, hasActionEnd := actionDeadline(taskAction, timeouts.deadline)
+	switch {
+	case hasAttemptEnd && hasActionEnd:
+		if actionEnd.Before(attemptEnd) {
+			return actionEnd, true
+		}
+		return attemptEnd, true
+	case hasActionEnd:
+		return actionEnd, true
+	default:
+		return attemptEnd, hasAttemptEnd
+	}
+}
+
+// isDeadlineTimeout reports whether the pending timeout in Status.TimeoutAt was the
+// action deadline rather than the attempt's max runtime. TimeoutAt holds the earlier
+// of the two, so it reached the action deadline only if the deadline fired.
+func isDeadlineTimeout(taskAction *flyteorgv1.TaskAction, timeouts taskTimeouts) bool {
+	actionEnd, ok := actionDeadline(taskAction, timeouts.deadline)
+	return ok && taskAction.Status.TimeoutAt != nil && !taskAction.Status.TimeoutAt.Time.Before(actionEnd)
+}
+
+// backoffRequeue is the requeue for a retry still waiting out its backoff, cut short
+// by the action deadline: a backoff must not carry the action past its deadline.
+func (r *TaskActionReconciler) backoffRequeue(
+	taskAction *flyteorgv1.TaskAction,
+	timeouts taskTimeouts,
+	remaining time.Duration,
+) ctrl.Result {
+	if actionEnd, ok := actionDeadline(taskAction, timeouts.deadline); ok {
+		if untilDeadline := actionEnd.Sub(r.now()); untilDeadline < remaining {
+			remaining = untilDeadline
+		}
+	}
+	if remaining <= 0 {
+		return ctrl.Result{Requeue: true}
+	}
+	return ctrl.Result{RequeueAfter: remaining}
+}
+
+// timeoutAwareRequeue is called whenever the controller is going to requeue a CR
+func (r *TaskActionReconciler) timeoutAwareRequeue(
+	taskAction *flyteorgv1.TaskAction,
+	timeouts taskTimeouts,
+) ctrl.Result {
+	requeueAfter := r.requeueDuration()
+	// Nothing happens while a retry waits out its backoff, so come back when it ends.
+	if remaining := r.backoffRemaining(taskAction); remaining > 0 {
+		requeueAfter = remaining
+	}
+	deadline, ok := effectiveDeadline(taskAction, timeouts)
+	// No timeout set for the action, we can requeue directly
+	if !ok {
+		return ctrl.Result{RequeueAfter: requeueAfter}
+	}
+
+	untilDeadline := deadline.Sub(r.now())
+	if untilDeadline <= 0 {
+		return ctrl.Result{Requeue: true}
+	}
+	// We must make sure the requeue interval not exceeding the timeout timestampt
+	if untilDeadline < requeueAfter {
+		requeueAfter = untilDeadline
+	}
+	return ctrl.Result{RequeueAfter: requeueAfter}
+}
+
+// attemptOverran reports whether the attempt's deadline has passed without a
+// result that provably predates it.
+func attemptOverran(info pluginsCore.PhaseInfo, deadline, now time.Time) bool {
+	if now.Before(deadline) {
+		return false
+	}
+	if !info.Phase().IsTerminal() {
+		return true
+	}
+	taskInfo := info.Info()
+	if taskInfo == nil || taskInfo.OccurredAt == nil || taskInfo.OccurredAt.IsZero() {
+		return true
+	}
+	return taskInfo.OccurredAt.After(deadline)
+}
+
+// getPhaseLastTransitionTime return the last transition time of a phase
+func getPhaseLastTransitionTime(
+	taskAction *flyteorgv1.TaskAction,
+	phase flyteorgv1.TaskActionConditionReason,
+) (time.Time, bool) {
+	for i := len(taskAction.Status.PhaseHistory) - 1; i >= 0; i-- {
+		transition := taskAction.Status.PhaseHistory[i]
+		if transition.Phase != string(phase) {
+			continue
+		}
+		if transition.OccurredAt.IsZero() {
+			return time.Time{}, false
+		}
+		return transition.OccurredAt.Time, true
+	}
+	return time.Time{}, false
+}
+
+// recordAttemptStart anchors the attempt clock the first time this attempt is
+// seen Running.
+func (r *TaskActionReconciler) recordAttemptStart(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	info pluginsCore.PhaseInfo,
+	isCRPhaseRunning bool,
+) error {
+	// Skip if startedAt already marked in CR
+	if taskAction.Status.AttemptStartedAt != nil {
+		return nil
+	}
+	isPluginPhaseRunning := info.Phase() == pluginsCore.PhaseRunning
+	// Skip if the plugin state and CR state is not in running phase yet
+	if !isPluginPhaseRunning && !isCRPhaseRunning {
+		return nil
+	}
+
+	var markedPhaseRunningTime time.Time
+	var isMarkedRunning bool
+	startedAt := r.now()
+	if isPluginPhaseRunning {
+		// Plugin phase turned into running but haven't marked CR started at, so we mark CR running here
+		if taskInfo := info.Info(); taskInfo != nil && taskInfo.OccurredAt != nil && !taskInfo.OccurredAt.IsZero() {
+			markedPhaseRunningTime, isMarkedRunning = *taskInfo.OccurredAt, true
+		}
+	} else {
+		// This is for backward compatible. For the users upgrade the backend while CR's are still running,
+		// we should make sure those CR's startedAt are marked too.
+		markedPhaseRunningTime, isMarkedRunning = getPhaseLastTransitionTime(taskAction, flyteorgv1.ConditionReasonExecuting)
+	}
+
+	// Make sure the running phase time comes after queued time
+	markedPhaseQueuedTime, isMarkedQueued := getPhaseLastTransitionTime(taskAction, flyteorgv1.ConditionReasonQueued)
+	if isMarkedRunning && isMarkedQueued && !markedPhaseRunningTime.Before(markedPhaseQueuedTime) {
+		startedAt = markedPhaseRunningTime
+	}
+
+	// Persisted startedAt into CRD
+	return r.persistAttemptStartedAt(ctx, taskAction, startedAt)
+}
+
+// persistAttemptStartedAt writes Status.AttemptStartedAt, keeping any value a
+// concurrent reconcile already committed so the attempt clock cannot be pushed
+// forward, and mirrors the winner back onto taskAction.
+func (r *TaskActionReconciler) persistAttemptStartedAt(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	startedAt time.Time,
+) error {
+	finalStartedAt := metav1.NewTime(startedAt)
+	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
+		if latest.Status.AttemptStartedAt == nil {
+			latest.Status.AttemptStartedAt = &finalStartedAt
+		}
+		finalStartedAt = *latest.Status.AttemptStartedAt
+	}); err != nil {
+		return err
+	}
+	taskAction.Status.AttemptStartedAt = &finalStartedAt
+	return nil
+}
+
+// markTimeoutPending records the deadline that expired, together with any plugin
+// state this reconcile produced — one write, because losing that state would
+// leave the subsequent Abort unable to find the resource it must tear down.
+func (r *TaskActionReconciler) markTimeoutPending(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	deadline time.Time,
+	stateMgr *plugin.PluginStateManager,
+) error {
+	finalDeadline := metav1.NewTime(deadline)
+	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
+		if latest.Status.TimeoutAt == nil {
+			latest.Status.TimeoutAt = &finalDeadline
+		}
+		finalDeadline = *latest.Status.TimeoutAt
+		mutateTaskActionState(latest, stateMgr)
+	}); err != nil {
+		return err
+	}
+
+	taskAction.Status.TimeoutAt = &finalDeadline
+	mutateTaskActionState(taskAction, stateMgr)
+	return nil
+}
+
+// setAttemptTimeout ends the current attempt at deadline. Persisting
+// Status.TimeoutAt first lets a later reconcile resume the cleanup.
+func (r *TaskActionReconciler) setAttemptTimeout(
+	ctx context.Context,
+	taskAction, original *flyteorgv1.TaskAction,
+	p pluginsCore.Plugin,
+	tCtx pluginsCore.TaskExecutionContext,
+	stateMgr *plugin.PluginStateManager,
+	timeouts taskTimeouts,
+	deadline time.Time,
+) (ctrl.Result, error) {
+	if err := r.markTimeoutPending(ctx, taskAction, deadline, stateMgr); err != nil {
+		return ctrl.Result{}, err
+	}
+	return r.reconcileTimedOutAttempt(ctx, taskAction, original, p, tCtx, timeouts)
+}
+
+func (r *TaskActionReconciler) reconcileTimedOutAttempt(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	original *flyteorgv1.TaskAction,
+	p pluginsCore.Plugin,
+	tCtx pluginsCore.TaskExecutionContext,
+	timeouts taskTimeouts,
+) (ctrl.Result, error) {
+	logger := log.FromContext(ctx)
+
+	currentAttempts := observedAttempts(taskAction)
+	maxAttempts := tCtx.TaskExecutionMetadata().GetMaxAttempts()
+	// The action deadline bounds every attempt, so once it fires nothing is retried.
+	deadlineExceeded := isDeadlineTimeout(taskAction, timeouts)
+	willRetry := !deadlineExceeded && currentAttempts < maxAttempts
+
+	// A serializable cache reservation has to survive the gap between tearing
+	// this attempt down and the next one starting, or another action takes the
+	// key mid-cleanup. Extend it before anything destructive so a failure here
+	// costs nothing; a terminal timeout releases it further down instead.
+	if willRetry {
+		if err := r.maintainCacheReservation(ctx, taskAction, tCtx); err != nil {
+			logger.Error(err, "failed to maintain cache reservation during timeout cleanup, will retry")
+			return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+		}
+	}
+
+	if err := p.Abort(ctx, tCtx); err != nil {
+		logger.Error(err, "failed to abort timed out task attempt, will retry")
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+	}
+	if err := p.Finalize(ctx, tCtx); err != nil {
+		logger.Error(err, "failed to finalize timed out task attempt, will retry")
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+	}
+
+	deadline := taskAction.Status.TimeoutAt.Time
+	timeoutCode := TaskExecutionTimedOutCode
+	timeoutMessage := fmt.Sprintf(
+		"task attempt %d exceeded its max runtime of %s",
+		currentAttempts,
+		timeouts.maxRuntime,
+	)
+	if deadlineExceeded {
+		timeoutCode = TaskDeadlineExceededCode
+		timeoutMessage = fmt.Sprintf(
+			"task exceeded its deadline of %s across all attempts (attempt %d)",
+			timeouts.deadline,
+			currentAttempts,
+		)
+	}
+	timeoutInfo := pluginsCore.PhaseInfoRetryableFailure(
+		timeoutCode,
+		timeoutMessage,
+		&pluginsCore.TaskInfo{OccurredAt: &deadline},
+	)
+
+	if willRetry {
+		// Publish TIMED_OUT for this attempt before advancing the status.
+		timeoutEvent := r.buildActionEvent(ctx, taskAction, timeoutInfo)
+		if err := r.recordEvent(ctx, timeoutEvent); err != nil {
+			logger.Error(err, "failed to persist timed out attempt event, will retry")
+			return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+		}
+
+		phaseInfo := pluginsCore.PhaseInfoQueued(
+			r.now(),
+			pluginsCore.DefaultPhaseVersion,
+			"restarting task after max-runtime timeout",
+		)
+		taskAction.Status.Attempts = currentAttempts + 1
+		taskAction.Status.AttemptStartedAt = nil
+		taskAction.Status.TimeoutAt = nil
+		taskAction.Status.PluginState = nil
+		taskAction.Status.PluginStateVersion = 0
+		r.scheduleNextAttempt(ctx, taskAction, currentAttempts)
+		// Same rule as an in-place restart: a fresh attempt does not inherit
+		// the previous one's system-failure count.
+		taskAction.Status.SystemFailures = 0
+		taskAction.Status.CacheStatus = observedCacheStatus(phaseInfo.Info())
+		if err := r.applyTimeoutPhase(ctx, taskAction, original, phaseInfo); err != nil {
+			return ctrl.Result{}, err
+		}
+		if remaining := r.backoffRemaining(taskAction); remaining > 0 {
+			return r.backoffRequeue(taskAction, timeouts, remaining), nil
+		}
+		return ctrl.Result{Requeue: true}, nil
+	}
+
+	if err := r.releaseTaskCacheReservation(ctx, taskAction, tCtx); err != nil {
+		logger.Error(err, "failed to release cache reservation after terminal timeout, will retry")
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+	}
+
+	phaseInfo := pluginsCore.PhaseInfoFailed(
+		pluginsCore.PhasePermanentFailure,
+		timeoutInfo.Err(),
+		timeoutInfo.Info(),
+	)
+	if err := r.applyTimeoutPhase(ctx, taskAction, original, phaseInfo); err != nil {
+		return ctrl.Result{}, err
+	}
+	if err := r.ensureTerminalLabels(ctx, taskAction); err != nil {
+		return ctrl.Result{}, err
+	}
+	return ctrl.Result{}, nil
+}
+
+// applyTimeoutPhase maps phaseInfo onto the TaskAction and persists it, shared by
+// the retry and terminal outcomes of a timeout so the two cannot drift.
+func (r *TaskActionReconciler) applyTimeoutPhase(
+	ctx context.Context,
+	taskAction, original *flyteorgv1.TaskAction,
+	phaseInfo pluginsCore.PhaseInfo,
+) error {
+	mapPhaseToConditions(taskAction, phaseInfo)
+	taskAction.Status.PluginPhase = phaseInfo.Phase().String()
+	taskAction.Status.PluginPhaseVersion = phaseInfo.Version()
+	if actionSpec, _ := taskAction.Spec.GetActionSpec(); actionSpec != nil {
+		taskAction.Status.StateJSON = createStateJSON(actionSpec, phaseInfo.Phase().String())
+	}
+	return r.updateTaskActionStatus(ctx, original, taskAction, phaseInfo)
+}
+
 // resetPluginResource aborts any in-flight plugin resource and clears persisted
 // plugin state so the next reconcile starts fresh from PluginPhaseNotStarted.
 func (r *TaskActionReconciler) resetPluginResource(
@@ -140,9 +711,72 @@ func (r *TaskActionReconciler) resetPluginResource(
 	taskAction.Status.PluginStateVersion = 0
 }
 
+// recordSystemRetry publishes the system failure an attempt is about to be retried
+// from, in place and under the same attempt number. The action is reported Queued,
+// which is where the relaunch takes it, and the failure travels as a warning cluster
+// event carrying the plugin's code and message, so it lands in the attempt's event
+// stream where the user can read it. The attempt's logs ride along, so the pod that
+// failed stays reachable from the event.
+func (r *TaskActionReconciler) recordSystemRetry(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	failure pluginsCore.PhaseInfo,
+) error {
+	occurredAt := r.now()
+	failureInfo := failure.Info()
+	if failureInfo != nil && failureInfo.OccurredAt != nil {
+		occurredAt = *failureInfo.OccurredAt
+	}
+	info := &pluginsCore.TaskInfo{
+		OccurredAt: &occurredAt,
+		AdditionalReasons: []pluginsCore.ReasonInfo{{
+			Reason:     systemErrorFromPhaseInfo(failure).Error(),
+			OccurredAt: &occurredAt,
+			KubernetesEvent: &pluginsCore.K8sEventMetadata{
+				Type:   corev1.EventTypeWarning,
+				Reason: failure.Err().GetCode(),
+			},
+		}},
+	}
+	if failureInfo != nil {
+		info.Logs = failureInfo.Logs
+		info.LogContext = failureInfo.LogContext
+	}
+	// The system-retry count places this retry within the reserved range: it holds until
+	// the retry is persisted, so republishing after a failed status update lands on the
+	// same row and stays idempotent, and it moves on with every retry after that. The
+	// system-failure count would not do: it also counts Plugin.Handle errors, which publish
+	// no event, and goes back to zero on a new attempt.
+	version := systemRetryEventVersionBase + taskAction.Status.SystemRetries
+	queued := pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, version, systemRetryReason, info)
+	return r.recordEvent(ctx, r.buildActionEvent(ctx, taskAction, queued))
+}
+
+// nonRetryableErrorCodes are plugin error codes whose failures are deterministic:
+// the same input produces the same error, so retrying cannot change the outcome.
+// Note this only matches errors returned directly by a plugin; errors built from
+// a failure phase go through systemErrorFromPhaseInfo, which flattens the code
+// into the message text.
+var nonRetryableErrorCodes = []stdErrors.ErrorCode{
+	pluginserrors.BadTaskSpecification,
+	pluginserrors.MetadataTooLarge,
+	pluginserrors.AppleSiliconNotAvailable,
+}
+
+// nonRetryableCode reports the first non-retryable code found in err's cause chain.
+func nonRetryableCode(err error) (stdErrors.ErrorCode, bool) {
+	for _, code := range nonRetryableErrorCodes {
+		if stdErrors.IsCausedBy(err, code) {
+			return code, true
+		}
+	}
+	return "", false
+}
+
 // recordSystemError increments Status.SystemFailures and either requeues for
 // another attempt or, once the configured threshold is exceeded, converts the
-// TaskAction to a permanent failure. It does not touch the underlying plugin
+// TaskAction to a permanent failure. Errors carrying a non-retryable code skip
+// the counter entirely and fail immediately. It does not touch the underlying plugin
 // resource — callers that observed a failure phase should invoke
 // resetPluginResource first.
 func (r *TaskActionReconciler) recordSystemError(
@@ -151,8 +785,19 @@ func (r *TaskActionReconciler) recordSystemError(
 	original *flyteorgv1.TaskAction,
 	pluginID string,
 	handleErr error,
+	timeouts taskTimeouts,
 ) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
+
+	if code, ok := nonRetryableCode(handleErr); ok {
+		logger.Error(handleErr, "non-retryable plugin error, failing TaskAction", "plugin", pluginID, "code", code)
+		return r.finalizePermanentFailure(ctx, taskAction, original, &core.ExecutionError{
+			Kind:    core.ExecutionError_USER,
+			Code:    code,
+			Message: handleErr.Error(),
+		})
+	}
+
 	logger.Error(handleErr, "system error from plugin", "plugin", pluginID)
 	if r.Recorder != nil {
 		r.Recorder.Eventf(taskAction, nil, corev1.EventTypeWarning, string(FailedPluginHandle), "HandlingPlugin",
@@ -177,7 +822,7 @@ func (r *TaskActionReconciler) recordSystemError(
 			logger.Error(updErr, "failed to persist SystemFailures counter")
 		}
 	}
-	return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	return r.timeoutAwareRequeue(taskAction, timeouts), nil
 }
 
 // finalizePermanentFailure converts the TaskAction to a terminal PermanentFailure
@@ -229,6 +874,7 @@ func NewTaskActionReconciler(
 		PluginRegistry: registry,
 		DataStore:      dataStore,
 		eventsClient:   eventsClient,
+		eventBatcher:   newEventBatcher(eventsClient, otelutils.GetTracerProvider("executor")), // matches otelServiceName in executor/setup.go; noop until registered
 		cluster:        cluster,
 		metrics:        metrics,
 	}
@@ -242,8 +888,6 @@ func NewTaskActionReconciler(
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
 func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	logger := log.FromContext(ctx)
-
 	// Fetch the TaskAction instance
 	taskAction := &flyteorgv1.TaskAction{}
 	start := time.Now()
@@ -271,9 +915,29 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, nil
 	}
 
+	// Per-type dispatch. Conditions have no plugin and no pod; they reach
+	// terminal state via Signal or timeout, so they bypass the plugin path
+	// (including validateTaskAction, which requires taskType/taskTemplate).
+	switch taskAction.Spec.ActionType {
+	case flyteorgv1.ActionTypeCondition:
+		return r.reconcileCondition(ctx, taskAction, originalTaskActionInstance)
+	default: // "" or "task"
+		return r.reconcileTask(ctx, taskAction, originalTaskActionInstance)
+	}
+}
+
+// reconcileTask drives a plugin-backed task action. This is the pre-existing
+// Reconcile body, extracted verbatim for per-action-type dispatch.
+func (r *TaskActionReconciler) reconcileTask(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	originalTaskActionInstance *flyteorgv1.TaskAction,
+) (ctrl.Result, error) {
+	logger := log.FromContext(ctx)
+
 	// Validate spec fields and resolve plugin before adding the finalizer
 	// If either fails, the resource is marked terminal and not requeued — no finalizer to clean up
-	p, reason, err := validateTaskAction(taskAction, r.PluginRegistry)
+	p, timeouts, reason, err := validateTaskAction(taskAction, r.PluginRegistry)
 	if err != nil {
 		logger.Error(err, "TaskAction validation failed")
 		eventType := FailedValidation
@@ -283,16 +947,16 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		r.Recorder.Eventf(taskAction, nil, corev1.EventTypeWarning, string(eventType), "ValidatingTaskAction", "%v", err)
 		setCondition(taskAction, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue, reason, err.Error())
 		setCondition(taskAction, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse, reason, err.Error())
-		start = time.Now()
-		updErr := r.Status().Update(ctx, taskAction) // error intentionally ignored: terminal either way
+		start := time.Now()
+		updErr := r.Status().Update(ctx, taskAction)
 		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
-		return ctrl.Result{}, nil // terminal — do not requeue
+		return ctrl.Result{}, updErr
 	}
 
 	// Ensure finalizer is present (once validation passes)
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		controllerutil.AddFinalizer(taskAction, taskActionFinalizer)
-		start = time.Now()
+		start := time.Now()
 		updErr := r.Update(ctx, taskAction)
 		r.metrics.recordK8sOp(ctx, opUpdate, start, updErr)
 		if updErr != nil {
@@ -301,6 +965,15 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		}
 		return ctrl.Result{}, nil
 	}
+
+	// A retried attempt waits out its retry backoff before the plugin launches it,
+	// unless the action deadline passes first: then it is timed out below instead.
+	actionEnd, hasActionDeadline := actionDeadline(taskAction, timeouts.deadline)
+	actionDeadlinePassed := hasActionDeadline && !r.now().Before(actionEnd)
+	if remaining := r.backoffRemaining(taskAction); remaining > 0 && !actionDeadlinePassed {
+		return r.backoffRequeue(taskAction, timeouts, remaining), nil
+	}
+	taskAction.Status.NextAttemptAt = nil
 
 	// Build PluginStateManager from persisted state
 	stateMgr := plugin.NewPluginStateManager(
@@ -319,46 +992,110 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	)
 	if err != nil {
 		logger.Error(err, "failed to build task execution context")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		return r.timeoutAwareRequeue(taskAction, timeouts), nil
 	}
+
+	// A recorded deadline means an earlier reconcile already committed to ending
+	// this attempt. Resume that cleanup rather than handling the plugin again.
+	if taskAction.Status.TimeoutAt != nil {
+		return r.reconcileTimedOutAttempt(
+			ctx,
+			taskAction,
+			originalTaskActionInstance,
+			p,
+			tCtx,
+			timeouts,
+		)
+	}
+	// Past the action deadline, an attempt that has not launched anything yet (a new
+	// action, or a retry that waited out its backoff) is timed out without being
+	// launched. One that has goes through Handle first, so a result that finished
+	// before the deadline still wins.
+	if actionDeadlinePassed && len(taskAction.Status.PluginState) == 0 {
+		return r.setAttemptTimeout(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, timeouts, actionEnd)
+	}
+	alreadyRunning := taskAction.Status.PluginPhase == pluginsCore.PhaseRunning.String()
 
 	// cacheShortCircuited is true when cache handling already decided the outcome,
 	// either via cache hit or waiting on the reservation owner.
 	var cacheShortCircuited bool
-	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx)
+	deadline, hasDeadline := effectiveDeadline(taskAction, timeouts)
+	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, alreadyRunning)
 	if err != nil {
 		logger.Error(err, "cache pre-execution handling failed")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		// Yield to the deadline if there is one: a cache that keeps failing must
+		// not be able to hold an attempt open past its max runtime or deadline.
+		if hasDeadline && !r.now().Before(deadline) {
+			return r.setAttemptTimeout(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, timeouts, deadline)
+		}
+		return r.timeoutAwareRequeue(taskAction, timeouts), nil
 	}
 	// Even when cache handling short-circuits execution, we still continue through the
 	// shared reconcile tail below so the derived transition updates conditions, status,
 	// and emitted action events in the same way as the normal plugin path.
 
 	// Invoke plugin.Handle only when cache handling did not short-circuit execution.
+	var handleErr error
 	if !cacheShortCircuited {
-		transition, err = p.Handle(ctx, tCtx)
-		if err != nil {
-			return r.recordSystemError(ctx, taskAction, originalTaskActionInstance, p.GetID(), err)
+		transition, handleErr = p.Handle(ctx, tCtx)
+	}
+
+	if handleErr == nil {
+		if err := r.recordAttemptStart(ctx, taskAction, transition.Info(), alreadyRunning); err != nil {
+			return ctrl.Result{}, err
 		}
+	}
+
+	// Enforce the per-attempt max runtime and the action deadline. A Handle failure at or past the
+	// deadline can no longer establish that the attempt finished in time, so it
+	// ends the attempt too instead of consuming a system-failure retry.
+	if hasDeadline {
+		if overran := attemptOverran(transition.Info(), deadline, r.now()); overran {
+			return r.setAttemptTimeout(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, timeouts, deadline)
+		}
+	}
+
+	if handleErr != nil {
+		return r.recordSystemError(ctx, taskAction, originalTaskActionInstance, p.GetID(), handleErr, timeouts)
 	}
 
 	if transition, err = r.finalizeCacheAfterExecution(ctx, taskAction, tCtx, transition, cacheShortCircuited); err != nil {
 		logger.Error(err, "cache post-execution handling failed")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		return r.timeoutAwareRequeue(taskAction, timeouts), nil
 	}
 
 	// Map transition phase to TaskAction conditions
 	phaseInfo := transition.Info()
 
 	if !cacheShortCircuited && isSystemRetryableFailure(phaseInfo) {
+		// The attempt is relaunched in place and nothing past this point reports
+		// the failure that caused it: recordSystemError persists a counter and a
+		// Kubernetes event on the TaskAction, not an action event. Publish it
+		// first, so the user can read why the action went back to Queued. The
+		// event only explains the retry, so a failure to publish is logged and
+		// left behind: holding the attempt back for it would turn a missing
+		// explanation into a stuck task.
+		if err := r.recordSystemRetry(ctx, taskAction, phaseInfo); err != nil {
+			logger.Error(err, "failed to publish system retry event, continuing with the retry")
+		}
+		// Spent whether or not the event went out: a skipped version costs nothing, a
+		// reused one drops the next retry's event. recordSystemError persists it along
+		// with the failure count.
+		taskAction.Status.SystemRetries++
 		r.resetPluginResource(ctx, taskAction, p, tCtx)
-		return r.recordSystemError(ctx, taskAction, originalTaskActionInstance, p.GetID(), systemErrorFromPhaseInfo(phaseInfo))
+		return r.recordSystemError(
+			ctx,
+			taskAction,
+			originalTaskActionInstance,
+			p.GetID(),
+			systemErrorFromPhaseInfo(phaseInfo),
+			timeouts,
+		)
 	}
 
-	// Reset the consecutive system-failure counter on any non-system-error
-	// transition so transient blips earlier in the lifecycle don't accumulate
-	// toward the permanent-failure threshold.
-	taskAction.Status.SystemFailures = 0
+	// Whether the plugin asked for its resource to be deleted if this failure ends the task.
+	// Read it before the retry block below, which rebuilds a final failure without the flag.
+	cleanupOnFailure := phaseInfo.CleanupOnFailure()
 
 	// In-place task restart on USER-kind retryable failure: bump Status.Attempts
 	// and relaunch the pod under the same TaskAction.
@@ -368,6 +1105,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		maxAttempts := tCtx.TaskExecutionMetadata().GetMaxAttempts()
 
 		if currentAttempts < maxAttempts {
+			restartedAt := r.now()
 			// Abort (delete) the current pod before incrementing attempts.
 			// tCtx was built with the current attempt number so Abort targets the right pod.
 			if abortErr := p.Abort(ctx, tCtx); abortErr != nil {
@@ -375,9 +1113,14 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 			}
 			// Track the new attempt count; applied to Status.Attempts after the stateMgr block.
 			restartAttempts = currentAttempts + 1
-			logger.Info("restarting task in-place", "attempt", currentAttempts+1, "maxAttempts", maxAttempts)
+			// Not a system failure (those returned above), so the new attempt starts with a
+			// clean system-failure count.
+			taskAction.Status.SystemFailures = 0
+			r.scheduleNextAttempt(ctx, taskAction, currentAttempts)
+			logger.Info("restarting task in-place",
+				"attempt", currentAttempts+1, "maxAttempts", maxAttempts, "nextAttemptAt", taskAction.Status.NextAttemptAt)
 			// Override the transition to Queued so the TaskAction stays non-terminal.
-			transition = pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "restarting task"))
+			transition = pluginsCore.DoTransition(queuedForInPlaceRestart(phaseInfo, restartedAt))
 			phaseInfo = transition.Info()
 		} else {
 			// All retries exhausted — convert to a permanent (terminal) failure.
@@ -393,6 +1136,16 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 			phaseInfo = transition.Info()
 		}
 	}
+	// A task that fails for good keeps its resource until the TaskAction is garbage collected.
+	// A plugin asks for cleanup when that resource would otherwise keep going: a gang an admission
+	// gate took back is re-admitted by the gate and would run again for a task that has already
+	// failed. Delete it now, as a retry above already does.
+	if !cacheShortCircuited && cleanupOnFailure && phaseInfo.Phase() == pluginsCore.PhasePermanentFailure {
+		if abortErr := p.Abort(ctx, tCtx); abortErr != nil {
+			logger.Error(abortErr, "failed to clean up the resource of a failed task")
+		}
+	}
+
 	mapPhaseToConditions(taskAction, phaseInfo)
 
 	// Update StateJSON for observability
@@ -413,6 +1166,8 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		taskAction.Status.Attempts = restartAttempts
 		taskAction.Status.PluginState = nil
 		taskAction.Status.PluginStateVersion = 0
+		taskAction.Status.AttemptStartedAt = nil
+		taskAction.Status.TimeoutAt = nil
 	}
 
 	taskAction.Status.PluginPhase = phaseInfo.Phase().String()
@@ -431,7 +1186,7 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		}
 	}
 
-	return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	return r.timeoutAwareRequeue(taskAction, timeouts), nil
 }
 
 // ensureTerminalLabels adds GC-related labels to a terminal TaskAction if not already present.
@@ -466,6 +1221,7 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		return ctrl.Result{}, nil
 	}
+	terminal := isTerminal(taskAction)
 
 	p, err := r.PluginRegistry.ResolvePlugin(taskAction.Spec.TaskType)
 	if err != nil {
@@ -488,14 +1244,17 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 		return r.removeFinalizer(ctx, taskAction)
 	}
 
-	if err := p.Abort(ctx, tCtx); err != nil {
-		logger.Error(err, "plugin Abort failed, will retry")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+	// A terminal action already has its outcome; aborting it would report it as ABORTED.
+	if !terminal {
+		if err := p.Abort(ctx, tCtx); err != nil {
+			logger.Error(err, "plugin Abort failed, will retry")
+			return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+		}
 	}
 
 	if err := p.Finalize(ctx, tCtx); err != nil {
 		logger.Error(err, "plugin Finalize failed, will retry")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 	}
 
 	if cacheCfg, ok, err := buildTaskCacheConfig(ctx, taskAction, tCtx); err != nil {
@@ -506,17 +1265,19 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 		}
 	}
 
+	if terminal {
+		return r.removeFinalizer(ctx, taskAction)
+	}
+
 	abortTime := time.Now()
 	abortPhaseInfo := pluginsCore.PhaseInfoAborted(abortTime, pluginsCore.DefaultPhaseVersion, "aborted")
 	actionEvent := r.buildActionEvent(ctx, taskAction, abortPhaseInfo)
 	// buildActionEvent derives UpdatedTime from PhaseHistory, which doesn't include the
 	// abort transition. Override it so mergeEvents uses the actual abort time as end_time.
 	actionEvent.UpdatedTime = timestamppb.New(abortTime)
-	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
-		Events: []*workflow.ActionEvent{actionEvent},
-	})); err != nil {
+	if err := r.recordEvent(ctx, actionEvent); err != nil {
 		logger.Error(err, "failed to emit abort event, will retry")
-		return ctrl.Result{RequeueAfter: TaskActionDefaultRequeueDuration}, nil
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 	}
 
 	return r.removeFinalizer(ctx, taskAction)
@@ -547,9 +1308,7 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	}
 
 	actionEvent := r.buildActionEvent(ctx, newTaskAction, phaseInfo)
-	if _, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
-		Events: []*workflow.ActionEvent{actionEvent},
-	})); err != nil {
+	if err := r.recordEvent(ctx, actionEvent); err != nil {
 		r.Recorder.Eventf(
 			newTaskAction,
 			nil,
@@ -564,27 +1323,49 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 		return err
 	}
 
-	// The retry.RetryOnConflict will refetch the k8s resource to get the latest resource version
-	// This will resolve the conflict error caused by k8s optimistic lock when 2 reconcile loops updating the same CRD
-	if err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		latest := &flyteorgv1.TaskAction{}
-		start := time.Now()
-		getErr := r.Get(ctx, client.ObjectKeyFromObject(newTaskAction), latest)
-		r.metrics.recordK8sOp(ctx, opGet, start, getErr)
-		if getErr != nil {
-			return getErr
-		}
-		latest.Status = newTaskAction.Status
-		start = time.Now()
-		updErr := r.Status().Update(ctx, latest)
-		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
-		return updErr
+	if err := r.persistStatusWithRetry(ctx, newTaskAction, func(latest *flyteorgv1.TaskAction) {
+		applyReconciledStatus(latest, newTaskAction)
 	}); err != nil {
 		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
 		return err
 	}
 
 	return nil
+}
+
+// applyReconciledStatus writes the reconciled status onto the re-fetched
+// TaskAction, keeping the fields the actions service owns: the address its
+// worker reported may land after this reconcile read the TaskAction, and
+// copying the whole status would erase it. The controller never clears the
+// address itself; a retry or relaunch hides it by moving Attempts or
+// SystemRetries past the ones it was reported for.
+func applyReconciledStatus(latest, reconciled *flyteorgv1.TaskAction) {
+	address := latest.Status.Address
+	latest.Status = reconciled.Status
+	latest.Status.Address = address
+}
+
+// persistStatusWithRetry re-fetches the TaskAction and applies the status
+// mutation on each Status().Update attempt, retrying on conflict.
+func (r *TaskActionReconciler) persistStatusWithRetry(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	apply func(latest *flyteorgv1.TaskAction),
+) error {
+	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		latest := &flyteorgv1.TaskAction{}
+		start := time.Now()
+		getErr := r.Get(ctx, client.ObjectKeyFromObject(taskAction), latest)
+		r.metrics.recordK8sOp(ctx, opGet, start, getErr)
+		if getErr != nil {
+			return getErr
+		}
+		apply(latest)
+		start = time.Now()
+		updErr := r.Status().Update(ctx, latest)
+		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
+		return updErr
+	})
 }
 
 func (r *TaskActionReconciler) buildActionEvent(
@@ -615,6 +1396,12 @@ func (r *TaskActionReconciler) buildActionEvent(
 		Outputs:       outputRefs(ctx, taskAction),
 		ClusterEvents: toClusterEvents(phaseInfo, updatedTime),
 		ReportedTime:  timestamppb.New(time.Now()),
+	}
+	if isTaskExecutionTimedOut(phaseInfo) {
+		event.Phase = common.ActionPhase_ACTION_PHASE_TIMED_OUT
+		if taskAction.Status.TimeoutAt != nil {
+			event.UpdatedTime = timestamppb.New(taskAction.Status.TimeoutAt.Time)
+		}
 	}
 
 	if info != nil {
@@ -689,9 +1476,14 @@ func toActionErrorInfo(err *core.ExecutionError) *workflow.ErrorInfo {
 	if err == nil {
 		return nil
 	}
+	// Code and GpuFault are carried through as they are. They are the parts of the
+	// failure the user can act on, and this event is the only place they reach the
+	// console and the SDK from.
 	out := &workflow.ErrorInfo{
-		Message: err.GetMessage(),
-		Kind:    workflow.ErrorInfo_KIND_UNSPECIFIED,
+		Message:  err.GetMessage(),
+		Kind:     workflow.ErrorInfo_KIND_UNSPECIFIED,
+		Code:     err.GetCode(),
+		GpuFault: err.GetGpuFault(),
 	}
 	switch err.GetKind() {
 	case core.ExecutionError_USER:
@@ -720,6 +1512,31 @@ func errorStateFromExecError(err *core.ExecutionError) *flyteorgv1.ErrorState {
 		Kind:    kind,
 		Message: err.GetMessage(),
 	}
+}
+
+func isTaskExecutionTimedOut(info pluginsCore.PhaseInfo) bool {
+	if info.Err() == nil {
+		return false
+	}
+	code := info.Err().GetCode()
+	return code == TaskExecutionTimedOutCode || code == TaskDeadlineExceededCode
+}
+
+// queuedForInPlaceRestart turns the failure an attempt reported into the Queued phase the
+// in-place restart continues from.
+//
+// The reasons the failed attempt accumulated come along. They are the only account of what
+// happened to it that reaches the user on this path, because the failure itself is being
+// replaced here and never reported: for a GPU fault that is the line naming which worker
+// the hardware failed on, and losing it leaves the user with a task that silently restarted.
+// The rest of the failed attempt's task info is deliberately left behind, since its logs
+// and custom info describe the pod that just went away rather than the one being queued.
+func queuedForInPlaceRestart(failed pluginsCore.PhaseInfo, at time.Time) pluginsCore.PhaseInfo {
+	info := &pluginsCore.TaskInfo{OccurredAt: &at}
+	if failedInfo := failed.Info(); failedInfo != nil {
+		info.AdditionalReasons = failedInfo.AdditionalReasons
+	}
+	return pluginsCore.PhaseInfoQueuedWithTaskInfo(at, pluginsCore.DefaultPhaseVersion, "restarting task", info)
 }
 
 func toClusterEvents(phaseInfo pluginsCore.PhaseInfo, fallbackTime *timestamppb.Timestamp) []*workflow.ClusterEvent {
@@ -754,9 +1571,30 @@ func toClusterEvents(phaseInfo pluginsCore.PhaseInfo, fallbackTime *timestamppb.
 		} else {
 			e.OccurredAt = fallbackTime
 		}
+		if k8sEvent := reason.KubernetesEvent; k8sEvent != nil {
+			e.Type = clusterEventType(k8sEvent.Type)
+			e.Reason = k8sEvent.Reason
+			e.SourceComponent = k8sEvent.SourceComponent
+			e.Count = k8sEvent.Count
+		}
+		// The fault is carried over as the plugin attached it, which it does only for an
+		// event it trusts. The message is never parsed for one here.
+		e.GpuFault = reason.GpuFault
 		out = append(out, e)
 	}
 	return out
+}
+
+// clusterEventType maps a Kubernetes event type onto the cluster event's own.
+func clusterEventType(eventType string) workflow.ClusterEvent_Type {
+	switch eventType {
+	case corev1.EventTypeNormal:
+		return workflow.ClusterEvent_TYPE_NORMAL
+	case corev1.EventTypeWarning:
+		return workflow.ClusterEvent_TYPE_WARNING
+	default:
+		return workflow.ClusterEvent_TYPE_UNSPECIFIED
+	}
 }
 
 func cacheStatusFromExternalResources(resources []*pluginsCore.ExternalResource) core.CatalogCacheStatus {
@@ -773,15 +1611,18 @@ func cacheStatusFromExternalResources(resources []*pluginsCore.ExternalResource)
 }
 
 // taskActionStatusChanged reports whether any status field has changed between old and new,
-// covering plugin phase, state, state version, observability JSON, conditions, and phase history.
+// covering plugin phase/state, state version, conditions, and phase history.
 func taskActionStatusChanged(oldStatus, newStatus flyteorgv1.TaskActionStatus) bool {
-	if oldStatus.StateJSON != newStatus.StateJSON ||
-		oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
+	if oldStatus.PluginStateVersion != newStatus.PluginStateVersion ||
 		oldStatus.PluginPhase != newStatus.PluginPhase ||
 		oldStatus.PluginPhaseVersion != newStatus.PluginPhaseVersion ||
 		oldStatus.Attempts != newStatus.Attempts ||
 		oldStatus.SystemFailures != newStatus.SystemFailures ||
-		oldStatus.CacheStatus != newStatus.CacheStatus {
+		oldStatus.SystemRetries != newStatus.SystemRetries ||
+		oldStatus.CacheStatus != newStatus.CacheStatus ||
+		!oldStatus.AttemptStartedAt.Equal(newStatus.AttemptStartedAt) ||
+		!oldStatus.TimeoutAt.Equal(newStatus.TimeoutAt) ||
+		!oldStatus.NextAttemptAt.Equal(newStatus.NextAttemptAt) {
 		return true
 	}
 
@@ -829,16 +1670,20 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 			flyteorgv1.ConditionReasonCompleted, msg)
 
 	case pluginsCore.PhasePermanentFailure:
-		phaseName = string(flyteorgv1.ConditionReasonPermanentFailure)
+		reason := flyteorgv1.ConditionReasonPermanentFailure
+		if isTaskExecutionTimedOut(info) {
+			reason = flyteorgv1.ConditionReasonTimedOut
+		}
+		phaseName = string(reason)
 		msg = info.Reason()
 		if info.Err() != nil {
 			msg = info.Err().GetMessage()
 			ta.Status.ErrorState = errorStateFromExecError(info.Err())
 		}
 		setCondition(ta, flyteorgv1.ConditionTypeProgressing, metav1.ConditionFalse,
-			flyteorgv1.ConditionReasonPermanentFailure, msg)
+			reason, msg)
 		setCondition(ta, flyteorgv1.ConditionTypeFailed, metav1.ConditionTrue,
-			flyteorgv1.ConditionReasonPermanentFailure, msg)
+			reason, msg)
 
 	case pluginsCore.PhaseRetryableFailure:
 		phaseName = string(flyteorgv1.ConditionReasonRetryableFailure)
@@ -859,17 +1704,22 @@ func mapPhaseToConditions(ta *flyteorgv1.TaskAction, info pluginsCore.PhaseInfo)
 			flyteorgv1.ConditionReasonAborted, msg)
 	}
 
-	// Append to PhaseHistory if this is a new phase (dedup by checking last entry).
 	if phaseName != "" {
-		n := len(ta.Status.PhaseHistory)
-		if n == 0 || ta.Status.PhaseHistory[n-1].Phase != phaseName {
-			ta.Status.PhaseHistory = append(ta.Status.PhaseHistory, flyteorgv1.PhaseTransition{
-				Phase:      phaseName,
-				OccurredAt: metav1.Now(),
-				Message:    msg,
-			})
-		}
+		appendPhaseHistory(ta, phaseName, msg)
 	}
+}
+
+// appendPhaseHistory appends a phase transition to the status timeline,
+// deduping against the last entry.
+func appendPhaseHistory(ta *flyteorgv1.TaskAction, phase, msg string) {
+	if n := len(ta.Status.PhaseHistory); n > 0 && ta.Status.PhaseHistory[n-1].Phase == phase {
+		return
+	}
+	ta.Status.PhaseHistory = append(ta.Status.PhaseHistory, flyteorgv1.PhaseTransition{
+		Phase:      phase,
+		OccurredAt: metav1.Now(),
+		Message:    msg,
+	})
 }
 
 // isTerminal returns true if the TaskAction has reached a terminal condition.
@@ -918,11 +1768,12 @@ func createStateJSON(actionSpec *workflow.ActionSpec, phase string) string {
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *TaskActionReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *TaskActionReconciler) SetupWithManager(mgr ctrl.Manager, maxConcurrentReconciles int) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&flyteorgv1.TaskAction{}).
 		Owns(&corev1.Pod{}).
 		Named("taskaction").
+		WithOptions(controller.Options{MaxConcurrentReconciles: maxConcurrentReconciles}).
 		Complete(r)
 }
 
@@ -934,7 +1785,9 @@ type pluginResolver interface {
 // validateTaskAction checks that all required spec fields are populated and that a plugin
 // is registered for the given task type. Both checks happen before the finalizer is added,
 // so a failure here leaves the resource finalizer-free and trivially deletable.
-func validateTaskAction(taskAction *flyteorgv1.TaskAction, registry pluginResolver) (pluginsCore.Plugin, flyteorgv1.TaskActionConditionReason, error) {
+// It also returns the per-attempt max runtime parsed out of the task template so
+// the caller does not have to deserialize it a second time.
+func validateTaskAction(taskAction *flyteorgv1.TaskAction, registry pluginResolver) (pluginsCore.Plugin, taskTimeouts, flyteorgv1.TaskActionConditionReason, error) {
 	var missing []string
 	if taskAction.Spec.RunName == "" {
 		missing = append(missing, "runName")
@@ -961,17 +1814,20 @@ func validateTaskAction(taskAction *flyteorgv1.TaskAction, registry pluginResolv
 		missing = append(missing, "runOutputBase")
 	}
 	if len(missing) > 0 {
-		return nil, flyteorgv1.ConditionReasonInvalidSpec,
+		return nil, taskTimeouts{}, flyteorgv1.ConditionReasonInvalidSpec,
 			fmt.Errorf("required spec fields are empty: %v", missing)
 	}
-
+	timeouts, err := timeoutsFromTaskTemplate(taskAction.Spec.TaskTemplate)
+	if err != nil {
+		return nil, taskTimeouts{}, flyteorgv1.ConditionReasonInvalidSpec, err
+	}
 	p, err := registry.ResolvePlugin(taskAction.Spec.TaskType)
 	if err != nil {
-		return nil, flyteorgv1.ConditionReasonPluginNotFound,
+		return nil, taskTimeouts{}, flyteorgv1.ConditionReasonPluginNotFound,
 			fmt.Errorf("no plugin found for task type %q: %w", taskAction.Spec.TaskType, err)
 	}
 
-	return p, "", nil
+	return p, timeouts, "", nil
 }
 
 // setCondition sets or updates a condition on the TaskAction.

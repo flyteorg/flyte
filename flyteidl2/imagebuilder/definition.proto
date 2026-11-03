@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.imagebuilder;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/common/identifier.proto";
 import "flyteidl2/core/security.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/imagebuilder";
@@ -17,6 +18,10 @@ message Image {
   ImageIdentifier id = 1;
   // Fully qualified, pullable, image name
   string fqin = 2;
+  // Identifier of the remote build run that produced this image.
+  // Unset for images that were not built by the image builder service or
+  // that were built before this field was introduced.
+  flyteidl2.common.RunIdentifier build_run = 3;
 }
 
 // AptPackages defines a list of apt packages to install in the image.

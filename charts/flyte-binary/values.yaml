@@ -15,9 +15,19 @@ flyte-core-components:
       port: 8090
     watchBufferSize: 100
     storagePrefix: "s3://flyte-data"
+    # Run attribution (executed_by) is read from the auth headers the proxy forwards.
+    # Defaults match AWS ALB authenticate-oidc. Behind oauth2-proxy / Traefik
+    # forward-auth instead, uncomment this block to read the plain-value headers
+    # those proxies set (the Authorization: Bearer SDK path always works regardless):
+    # identityHeaders:
+    #   claimsJwtHeader: ""               # no claims JWT on this path
+    #   subjectHeader: X-Auth-Request-User
+    #   emailHeader: X-Auth-Request-Email
 
   actions:
     kubernetes:
+      # namespace Where task pods run. The chart renders the co-pilot storage Secret here
+      # too, so when this is not the release namespace it must exist before `helm install`.
       namespace: "flyte"
       kubeconfig: ""
     watchBufferSize: 100
@@ -31,9 +41,21 @@ flyte-core-components:
     download:
       maxExpiresIn: 1h
 
+  # Flyte-native secrets (flyte create secret): the secret service writes Kubernetes
+  # Secrets into this namespace, and the pod webhook's embedded secret manager reads
+  # them back from the same namespace (webhook.embeddedSecretManagerConfig.k8sConfig
+  # in the ConfigMap template). Keep the two in sync. Rendered through tpl, so it
+  # defaults to the release namespace.
   secret:
+    # webhook Where the secret service posts to drop the pod webhook's cached secret values
+    # after a write, so the next admitted pod sees the new value instead of waiting out the
+    # cache TTL. This is the webhook's cache invalidation port (9444), not admission (9443).
+    # The headless Service resolves to every webhook pod, so all replicas are invalidated; a
+    # ClusterIP Service would reach exactly one. Set webhook.url to "" to disable invalidation.
+    webhook:
+      url: 'http://{{ include "flyte-binary.webhook.headlessServiceName" . }}.{{ .Release.Namespace }}.svc:9444'
     kubernetes:
-      namespace: "flyte"
+      namespace: '{{ .Release.Namespace }}'
       kubeconfig: ""
       qps: 100
       burst: 200
@@ -84,6 +106,8 @@ configuration:
         # Useful for s3-compatible blob stores (e.g. minio)
         v2Signing: false
         # endpoint URL of S3-compatible service
+        # Leave empty for Amazon S3; for other s3-compatible blob stores (e.g. Backblaze B2,
+        # Cloudflare R2, MinIO) set the provider URL, for example https://s3.example-region.example.com
         endpoint: ""
         # authType Type of authentication to use for connecting to S3-compatible service (Supported values: iam, accesskey)
         authType: "iam"
@@ -91,6 +115,8 @@ configuration:
         accessKey: ""
         # secretKey Secret key for authenticating with S3-compatible service
         secretKey: ""
+        # secretKeyPath Path to a file containing the secret key for authenticating with S3-compatible service
+        secretKeyPath: ""
       # gcs Provider configuration for GCS object store
       gcs:
         # project Google Cloud project in which bucket resides
@@ -126,12 +152,25 @@ configuration:
       custom: []
   # co-pilot Configuration for Flyte CoPilot
   co-pilot:
-    # image Configure image to use for CoPilot sidecar
+    # image Configure image to use for CoPilot sidecar.
+    # The flyte-copilot binary ships inside the flyte single-binary image
+    # (at /bin/flyte-copilot), so this defaults to the same image as the main
+    # deployment and is bumped in lockstep with it (# FLYTE_TAG).
     image:
       # repository CoPilot sidecar image repository
-      repository: cr.flyte.org/flyteorg/flytecopilot  # FLYTECOPILOT_IMAGE
+      repository: cr.flyte.org/flyteorg/flyte-binary-v2  # FLYTE_IMAGE
       # tag CoPilot sidecar image tag
-      tag: v1.16.4  # FLYTECOPILOT_TAG
+      tag: latest  # FLYTE_TAG
+    # storageSecretRef Name of an existing Secret holding co-pilot's complete storage
+    # configuration — stow settings and credentials — in one or more .yaml keys. The whole
+    # Secret is mounted into the co-pilot containers and every .yaml key in it is read, so
+    # it must hold nothing else. Leave empty to have the chart render that Secret itself;
+    # set it when using storage.providerConfig.s3.secretKeyPath, which names a file that
+    # exists only in this deployment's container and so cannot be read from a task pod.
+    # Cannot be combined with externalConfigMap or externalSecretRef: the chart renders no
+    # ConfigMap to carry the co-pilot key then, so set that key in your own configuration
+    # instead. The chart fails the install rather than ignoring this value in silence.
+    storageSecretRef: ""
   # connectorService Flyte Connector configuration
   connectorService:
     defaultConnector:
@@ -286,6 +325,11 @@ service:
   # extraPorts Additional ports to add to Flyte service
   extraPorts: []
 
+# telemetry Crash reports and usage counts Flyte sends to its maintainers, and the console's analytics tags.
+telemetry:
+  # -- Set to false to opt out. Sets DO_NOT_TRACK=1 (https://donottrack.sh) on the backend and the console; the backend passes it on to the task and app pods it creates.
+  enabled: true
+
 # console Configure the Flyte web console (flyteconsole v2)
 # The console is a static SPA served at `console.basePath` (default /v2). It has
 # no backend configuration of its own and talks to the Flyte API same-origin, so
@@ -309,6 +353,16 @@ console:
   basePath: /v2
   # containerPort Port the console container listens on
   containerPort: 8080
+  # env Environment variables for the console container.
+  # `OIDC_LOGOUT_URL` — your identity provider's logout endpoint, so Sign out ends the
+  # IdP session and not just the proxy's (e.g. `https://<okta-org>/login/signout`).
+  # `LOGOUT_CLEAR_COOKIES` — comma-separated session cookies Sign out expires. Defaults
+  # to AWS ALB's `AWSELBAuthSessionCookie-0..3` (its documented maximum: 4K per shard,
+  # 16K total); override if the listener rule sets a custom `SessionCookieName`.
+  # Proxies with their own sign-out endpoint
+  # (oauth2-proxy, GCP IAP, Cloudflare Access) clear their cookie themselves: point
+  # `OIDC_LOGOUT_URL` at that endpoint and set this to `""`.
+  env: []
   # service Configure service for the console
   service:
     # type Kubernetes service type
@@ -366,6 +420,8 @@ ingress:
   apiJwtIngress:
     # enabled Create the JWT (Bearer) API ingress
     enabled: false
+    # host Hostname for the JWT API ingress. Overrides `ingress.host`
+    host: ""
     # annotations Annotations for the JWT API ingress (controller/JWT config)
     annotations: {}
     # ingressClassName Ingress class for the JWT API ingress. Overrides `ingressClassName`
@@ -380,6 +436,8 @@ ingress:
   wellknownIngress:
     # enabled Create the unauthenticated auth-discovery ingress
     enabled: false
+    # host Hostname for the auth-discovery ingress. Overrides `ingress.host`
+    host: ""
     # annotations Annotations for the auth-discovery ingress (controller config)
     annotations: {}
     # ingressClassName Ingress class for the auth-discovery ingress. Overrides `ingressClassName`
@@ -416,13 +474,6 @@ enabled_plugins:
   tasks:
     # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
     task-plugins:
-      # -- [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config).
-      # Enable sagemaker*, athena if you install the backend plugins
-      enabled-plugins:
-        - container
-        - sidecar
-        - connector-service
-        - echo
       default-for-task-types:
         container: container
         sidecar: sidecar

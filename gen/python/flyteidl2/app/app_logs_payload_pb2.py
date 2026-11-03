@@ -17,7 +17,7 @@ from flyteidl2.app import replica_definition_pb2 as flyteidl2_dot_app_dot_replic
 from flyteidl2.logs.dataplane import payload_pb2 as flyteidl2_dot_logs_dot_dataplane_dot_payload__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n$flyteidl2/app/app_logs_payload.proto\x12\rflyteidl2.app\x1a\x1b\x62uf/validate/validate.proto\x1a\"flyteidl2/app/app_definition.proto\x1a&flyteidl2/app/replica_definition.proto\x1a&flyteidl2/logs/dataplane/payload.proto\"\x99\x01\n\x0fTailLogsRequest\x12\x32\n\x06\x61pp_id\x18\x01 \x01(\x0b\x32\x19.flyteidl2.app.IdentifierH\x00R\x05\x61ppId\x12\x41\n\nreplica_id\x18\x02 \x01(\x0b\x32 .flyteidl2.app.ReplicaIdentifierH\x00R\treplicaIdB\x0f\n\x06target\x12\x05\xbaH\x02\x08\x01\"U\n\x15ReplicaIdentifierList\x12<\n\x08replicas\x18\x01 \x03(\x0b\x32 .flyteidl2.app.ReplicaIdentifierR\x08replicas\"\xbb\x01\n\x08LogLines\x12\x18\n\x05lines\x18\x01 \x03(\tB\x02\x18\x01R\x05lines\x12G\n\nreplica_id\x18\x02 \x01(\x0b\x32 .flyteidl2.app.ReplicaIdentifierB\x06\xbaH\x03\xc8\x01\x01R\treplicaId\x12L\n\x10structured_lines\x18\x03 \x03(\x0b\x32!.flyteidl2.logs.dataplane.LogLineR\x0fstructuredLines\"<\n\rLogLinesBatch\x12+\n\x04logs\x18\x01 \x03(\x0b\x32\x17.flyteidl2.app.LogLinesR\x04logs\"\xe6\x01\n\x10TailLogsResponse\x12\x42\n\x08replicas\x18\x01 \x01(\x0b\x32$.flyteidl2.app.ReplicaIdentifierListH\x00R\x08replicas\x12\x45\n\tlog_lines\x18\x02 \x01(\x0b\x32\".flyteidl2.logs.dataplane.LogLinesB\x02\x18\x01H\x00R\x08logLines\x12\x38\n\x07\x62\x61tches\x18\x03 \x01(\x0b\x32\x1c.flyteidl2.app.LogLinesBatchH\x00R\x07\x62\x61tchesB\r\n\x04resp\x12\x05\xbaH\x02\x08\x01\x42\xb2\x01\n\x11\x63om.flyteidl2.appB\x13\x41ppLogsPayloadProtoH\x02P\x01Z1github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app\xa2\x02\x03\x46\x41X\xaa\x02\rFlyteidl2.App\xca\x02\rFlyteidl2\\App\xe2\x02\x19\x46lyteidl2\\App\\GPBMetadata\xea\x02\x0e\x46lyteidl2::Appb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n$flyteidl2/app/app_logs_payload.proto\x12\rflyteidl2.app\x1a\x1b\x62uf/validate/validate.proto\x1a\"flyteidl2/app/app_definition.proto\x1a&flyteidl2/app/replica_definition.proto\x1a&flyteidl2/logs/dataplane/payload.proto\"\xd7\x01\n\x0fTailLogsRequest\x12\x32\n\x06\x61pp_id\x18\x01 \x01(\x0b\x32\x19.flyteidl2.app.IdentifierH\x00R\x05\x61ppId\x12\x41\n\nreplica_id\x18\x02 \x01(\x0b\x32 .flyteidl2.app.ReplicaIdentifierH\x00R\treplicaId\x12<\n\x06source\x18\x03 \x01(\x0e\x32$.flyteidl2.logs.dataplane.LogsSourceR\x06sourceB\x0f\n\x06target\x12\x05\xbaH\x02\x08\x01\"U\n\x15ReplicaIdentifierList\x12<\n\x08replicas\x18\x01 \x03(\x0b\x32 .flyteidl2.app.ReplicaIdentifierR\x08replicas\"\xfc\x01\n\x08LogLines\x12\x18\n\x05lines\x18\x01 \x03(\tB\x02\x18\x01R\x05lines\x12G\n\nreplica_id\x18\x02 \x01(\x0b\x32 .flyteidl2.app.ReplicaIdentifierB\x06\xbaH\x03\xc8\x01\x01R\treplicaId\x12L\n\x10structured_lines\x18\x03 \x03(\x0b\x32!.flyteidl2.logs.dataplane.LogLineR\x0fstructuredLines\x12?\n\x06source\x18\x04 \x01(\x0e\x32\'.flyteidl2.logs.dataplane.LogLineSourceR\x06source\"<\n\rLogLinesBatch\x12+\n\x04logs\x18\x01 \x03(\x0b\x32\x17.flyteidl2.app.LogLinesR\x04logs\"\xe6\x01\n\x10TailLogsResponse\x12\x42\n\x08replicas\x18\x01 \x01(\x0b\x32$.flyteidl2.app.ReplicaIdentifierListH\x00R\x08replicas\x12\x45\n\tlog_lines\x18\x02 \x01(\x0b\x32\".flyteidl2.logs.dataplane.LogLinesB\x02\x18\x01H\x00R\x08logLines\x12\x38\n\x07\x62\x61tches\x18\x03 \x01(\x0b\x32\x1c.flyteidl2.app.LogLinesBatchH\x00R\x07\x62\x61tchesB\r\n\x04resp\x12\x05\xbaH\x02\x08\x01\x42\xb2\x01\n\x11\x63om.flyteidl2.appB\x13\x41ppLogsPayloadProtoH\x02P\x01Z1github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app\xa2\x02\x03\x46\x41X\xaa\x02\rFlyteidl2.App\xca\x02\rFlyteidl2\\App\xe2\x02\x19\x46lyteidl2\\App\\GPBMetadata\xea\x02\x0e\x46lyteidl2::Appb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -36,13 +36,13 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _TAILLOGSRESPONSE.fields_by_name['log_lines']._options = None
   _TAILLOGSRESPONSE.fields_by_name['log_lines']._serialized_options = b'\030\001'
   _globals['_TAILLOGSREQUEST']._serialized_start=201
-  _globals['_TAILLOGSREQUEST']._serialized_end=354
-  _globals['_REPLICAIDENTIFIERLIST']._serialized_start=356
-  _globals['_REPLICAIDENTIFIERLIST']._serialized_end=441
-  _globals['_LOGLINES']._serialized_start=444
-  _globals['_LOGLINES']._serialized_end=631
-  _globals['_LOGLINESBATCH']._serialized_start=633
-  _globals['_LOGLINESBATCH']._serialized_end=693
-  _globals['_TAILLOGSRESPONSE']._serialized_start=696
-  _globals['_TAILLOGSRESPONSE']._serialized_end=926
+  _globals['_TAILLOGSREQUEST']._serialized_end=416
+  _globals['_REPLICAIDENTIFIERLIST']._serialized_start=418
+  _globals['_REPLICAIDENTIFIERLIST']._serialized_end=503
+  _globals['_LOGLINES']._serialized_start=506
+  _globals['_LOGLINES']._serialized_end=758
+  _globals['_LOGLINESBATCH']._serialized_start=760
+  _globals['_LOGLINESBATCH']._serialized_end=820
+  _globals['_TAILLOGSRESPONSE']._serialized_start=823
+  _globals['_TAILLOGSRESPONSE']._serialized_end=1053
 # @@protoc_insertion_point(module_scope)

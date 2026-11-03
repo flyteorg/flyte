@@ -154,3 +154,6 @@ func NewAzureSecretManagerInjector(cfg config.AzureSecretManagerConfig) AzureSec
 		cfg: cfg,
 	}
 }
+
+// InvalidateCache is a no-op: this injector resolves secrets on every Inject and caches nothing.
+func (a AzureSecretManagerInjector) InvalidateCache(_ context.Context, _, _, _, _ string) {}

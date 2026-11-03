@@ -1,6 +1,8 @@
 from buf.validate import validate_pb2 as _validate_pb2
+from flyteidl2.core import artifact_id_pb2 as _artifact_id_pb2
 from flyteidl2.core import interface_pb2 as _interface_pb2
 from flyteidl2.core import literals_pb2 as _literals_pb2
+from flyteidl2.core import types_pb2 as _types_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
@@ -22,6 +24,7 @@ class TriggerAutomationSpecType(int, metaclass=_enum_type_wrapper.EnumTypeWrappe
     TYPE_UNSPECIFIED: _ClassVar[TriggerAutomationSpecType]
     TYPE_NONE: _ClassVar[TriggerAutomationSpecType]
     TYPE_SCHEDULE: _ClassVar[TriggerAutomationSpecType]
+    TYPE_ARTIFACT: _ClassVar[TriggerAutomationSpecType]
 FIXED_RATE_UNIT_UNSPECIFIED: FixedRateUnit
 FIXED_RATE_UNIT_MINUTE: FixedRateUnit
 FIXED_RATE_UNIT_HOUR: FixedRateUnit
@@ -29,6 +32,7 @@ FIXED_RATE_UNIT_DAY: FixedRateUnit
 TYPE_UNSPECIFIED: TriggerAutomationSpecType
 TYPE_NONE: TriggerAutomationSpecType
 TYPE_SCHEDULE: TriggerAutomationSpecType
+TYPE_ARTIFACT: TriggerAutomationSpecType
 
 class NamedParameter(_message.Message):
     __slots__ = ["name", "parameter"]
@@ -68,13 +72,43 @@ class Schedule(_message.Message):
     kickoff_time_input_arg: str
     def __init__(self, rate: _Optional[_Union[FixedRate, _Mapping]] = ..., cron_expression: _Optional[str] = ..., cron: _Optional[_Union[Cron, _Mapping]] = ..., kickoff_time_input_arg: _Optional[str] = ...) -> None: ...
 
+class ArtifactTrigger(_message.Message):
+    __slots__ = ["artifact_name", "version", "input_arg", "partitions", "partition_input_args"]
+    class PartitionsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    class PartitionInputArgsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    ARTIFACT_NAME_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    INPUT_ARG_FIELD_NUMBER: _ClassVar[int]
+    PARTITIONS_FIELD_NUMBER: _ClassVar[int]
+    PARTITION_INPUT_ARGS_FIELD_NUMBER: _ClassVar[int]
+    artifact_name: str
+    version: str
+    input_arg: str
+    partitions: _containers.ScalarMap[str, str]
+    partition_input_args: _containers.ScalarMap[str, str]
+    def __init__(self, artifact_name: _Optional[str] = ..., version: _Optional[str] = ..., input_arg: _Optional[str] = ..., partitions: _Optional[_Mapping[str, str]] = ..., partition_input_args: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
 class TriggerAutomationSpec(_message.Message):
-    __slots__ = ["type", "schedule"]
+    __slots__ = ["type", "schedule", "artifact"]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     SCHEDULE_FIELD_NUMBER: _ClassVar[int]
+    ARTIFACT_FIELD_NUMBER: _ClassVar[int]
     type: TriggerAutomationSpecType
     schedule: Schedule
-    def __init__(self, type: _Optional[_Union[TriggerAutomationSpecType, str]] = ..., schedule: _Optional[_Union[Schedule, _Mapping]] = ...) -> None: ...
+    artifact: ArtifactTrigger
+    def __init__(self, type: _Optional[_Union[TriggerAutomationSpecType, str]] = ..., schedule: _Optional[_Union[Schedule, _Mapping]] = ..., artifact: _Optional[_Union[ArtifactTrigger, _Mapping]] = ...) -> None: ...
 
 class NamedLiteral(_message.Message):
     __slots__ = ["name", "value"]
@@ -100,8 +134,30 @@ class Inputs(_message.Message):
     context: _containers.RepeatedCompositeFieldContainer[_literals_pb2.KeyValuePair]
     def __init__(self, literals: _Optional[_Iterable[_Union[NamedLiteral, _Mapping]]] = ..., context: _Optional[_Iterable[_Union[_literals_pb2.KeyValuePair, _Mapping]]] = ...) -> None: ...
 
+class ProducedArtifact(_message.Message):
+    __slots__ = ["output", "name", "version", "info", "type", "parent_artifacts", "partitions", "time_partition"]
+    OUTPUT_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    INFO_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
+    PARENT_ARTIFACTS_FIELD_NUMBER: _ClassVar[int]
+    PARTITIONS_FIELD_NUMBER: _ClassVar[int]
+    TIME_PARTITION_FIELD_NUMBER: _ClassVar[int]
+    output: str
+    name: str
+    version: str
+    info: _artifact_id_pb2.ArtifactInfo
+    type: _types_pb2.LiteralType
+    parent_artifacts: _containers.RepeatedCompositeFieldContainer[_artifact_id_pb2.ArtifactVersionId]
+    partitions: _artifact_id_pb2.Partitions
+    time_partition: _artifact_id_pb2.TimePartition
+    def __init__(self, output: _Optional[str] = ..., name: _Optional[str] = ..., version: _Optional[str] = ..., info: _Optional[_Union[_artifact_id_pb2.ArtifactInfo, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., parent_artifacts: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactVersionId, _Mapping]]] = ..., partitions: _Optional[_Union[_artifact_id_pb2.Partitions, _Mapping]] = ..., time_partition: _Optional[_Union[_artifact_id_pb2.TimePartition, _Mapping]] = ...) -> None: ...
+
 class Outputs(_message.Message):
-    __slots__ = ["literals"]
+    __slots__ = ["literals", "produced_artifacts"]
     LITERALS_FIELD_NUMBER: _ClassVar[int]
+    PRODUCED_ARTIFACTS_FIELD_NUMBER: _ClassVar[int]
     literals: _containers.RepeatedCompositeFieldContainer[NamedLiteral]
-    def __init__(self, literals: _Optional[_Iterable[_Union[NamedLiteral, _Mapping]]] = ...) -> None: ...
+    produced_artifacts: _containers.RepeatedCompositeFieldContainer[ProducedArtifact]
+    def __init__(self, literals: _Optional[_Iterable[_Union[NamedLiteral, _Mapping]]] = ..., produced_artifacts: _Optional[_Iterable[_Union[ProducedArtifact, _Mapping]]] = ...) -> None: ...

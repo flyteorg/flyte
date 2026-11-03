@@ -1,0 +1,31 @@
+{{- if .Values.rbac.enabled }}
+{{- if $.Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
+apiVersion: rbac.authorization.k8s.io/v1
+{{- else }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- end }}
+kind: ClusterRole
+metadata:
+  name: {{ template "flyte.namespace" . -}}-{{- template "flyteconnector.name" . }}
+  labels: {{ include "flyteconnector.labels" . | nindent 4 }}
+rules:
+  {{- toYaml .Values.rbac.rules | nindent 2 }}
+---
+{{- if $.Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
+apiVersion: rbac.authorization.k8s.io/v1
+{{- else }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- end }}
+kind: ClusterRoleBinding
+metadata:
+  name: {{ template "flyte.namespace" . -}}-{{- template "flyteconnector.name" . }}
+  labels: {{ include "flyteconnector.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ template "flyte.namespace" . -}}-{{- template "flyteconnector.name" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ template "flyteconnector.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+{{- end }}

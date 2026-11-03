@@ -167,15 +167,17 @@ class TaskTrigger(_message.Message):
     def __init__(self, name: _Optional[str] = ..., spec: _Optional[_Union[TaskTriggerSpec, _Mapping]] = ..., automation_spec: _Optional[_Union[_common_pb2.TriggerAutomationSpec, _Mapping]] = ...) -> None: ...
 
 class TaskTriggerSpec(_message.Message):
-    __slots__ = ["active", "inputs", "offloaded_input_data", "run_spec", "description"]
+    __slots__ = ["active", "inputs", "offloaded_input_data", "run_spec", "description", "task_version"]
     ACTIVE_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     OFFLOADED_INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     RUN_SPEC_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    TASK_VERSION_FIELD_NUMBER: _ClassVar[int]
     active: bool
     inputs: _common_pb2.Inputs
     offloaded_input_data: _run_pb2.OffloadedInputData
     run_spec: _run_pb2_1.RunSpec
     description: str
-    def __init__(self, active: bool = ..., inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., offloaded_input_data: _Optional[_Union[_run_pb2.OffloadedInputData, _Mapping]] = ..., run_spec: _Optional[_Union[_run_pb2_1.RunSpec, _Mapping]] = ..., description: _Optional[str] = ...) -> None: ...
+    task_version: str
+    def __init__(self, active: bool = ..., inputs: _Optional[_Union[_common_pb2.Inputs, _Mapping]] = ..., offloaded_input_data: _Optional[_Union[_run_pb2.OffloadedInputData, _Mapping]] = ..., run_spec: _Optional[_Union[_run_pb2_1.RunSpec, _Mapping]] = ..., description: _Optional[str] = ..., task_version: _Optional[str] = ...) -> None: ...

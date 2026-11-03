@@ -141,3 +141,6 @@ func NewGCPSecretManagerInjector(cfg config.GCPSecretManagerConfig) GCPSecretMan
 		cfg: cfg,
 	}
 }
+
+// InvalidateCache is a no-op: this injector resolves secrets on every Inject and caches nothing.
+func (i GCPSecretManagerInjector) InvalidateCache(_ context.Context, _, _, _, _ string) {}
