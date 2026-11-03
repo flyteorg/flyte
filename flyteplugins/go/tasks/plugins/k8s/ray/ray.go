@@ -1029,7 +1029,11 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 				taskErrorAbsent = !hasErr
 				if hasErr {
 					if execErr, readerErr := reader.ReadError(ctx); readerErr == nil && execErr.GetRecoverability() == core.ContainerError_RECOVERABLE {
-						phaseInfo = pluginsCore.PhaseInfoRetryableFailure(flyteerr.TaskFailedWithError, failInfo, info)
+						if execErr.GetKind() == core.ExecutionError_SYSTEM {
+							phaseInfo = pluginsCore.PhaseInfoSystemRetryableFailure(flyteerr.TaskFailedWithError, failInfo, info)
+						} else {
+							phaseInfo = pluginsCore.PhaseInfoRetryableFailure(flyteerr.TaskFailedWithError, failInfo, info)
+						}
 					}
 				}
 			}
