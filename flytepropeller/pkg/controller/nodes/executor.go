@@ -885,7 +885,7 @@ func (c *nodeExecutor) execute(ctx context.Context, h interfaces.NodeHandler, nC
 		currentAttempt, maxAttempts, isEligible := c.isEligibleForRetry(nCtx, nodeStatus, phase.GetErr())
 		if !isEligible {
 			return handler.PhaseInfoFailure(
-				core.ExecutionError_USER,
+				phase.GetErr().GetKind(),
 				fmt.Sprintf("RetriesExhausted|%s", phase.GetErr().GetCode()),
 				fmt.Sprintf("[%d/%d] currentAttempt done. Last Error: %s::%s", currentAttempt, maxAttempts, phase.GetErr().GetKind().String(), phase.GetErr().GetMessage()),
 				phase.GetInfo(),
@@ -1218,7 +1218,11 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 		}
 
 		if execErr.GetKind() == core.ExecutionError_SYSTEM {
-			nodeStatus.IncrementSystemFailures()
+			// Only failures that will be retried consume the system-failure retry budget. A permanent failure
+			// (including one whose retries are exhausted) must not push the counter past its configured maximum.
+			if np != v1alpha1.NodePhaseFailing {
+				nodeStatus.IncrementSystemFailures()
+			}
 			c.metrics.SystemErrorDuration.Observe(ctx, startTime, endTime)
 		} else if execErr.GetKind() == core.ExecutionError_USER {
 			c.metrics.UserErrorDuration.Observe(ctx, startTime, endTime)
@@ -1229,7 +1233,6 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 		// the entire workflow is failed.
 		if np == v1alpha1.NodePhaseFailing {
 			if execErr.GetKind() == core.ExecutionError_SYSTEM {
-				nodeStatus.IncrementSystemFailures()
 				c.metrics.PermanentSystemErrorDuration.Observe(ctx, startTime, endTime)
 			} else if execErr.GetKind() == core.ExecutionError_USER {
 				c.metrics.PermanentUserErrorDuration.Observe(ctx, startTime, endTime)

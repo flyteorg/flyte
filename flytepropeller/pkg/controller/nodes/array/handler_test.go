@@ -1112,6 +1112,17 @@ func TestHandleArrayNodePhaseExecutingSubNodeFailures(t *testing.T) {
 			expectedAttempts: 11,
 		},
 		{
+			// default MaxNodeRetriesOnSystemFailures; the bitarray holds at most 3, so exhausting retries
+			// must not push the stored system failure count past it
+			name:               "SystemFailureDefaultMaxSystemFailures",
+			defaultMaxAttempts: 1,
+			maxSystemFailures:  3,
+			ignoreRetryCause:   false,
+			transition: handler.DoTransition(handler.TransitionTypeEphemeral,
+				handler.PhaseInfoRetryableFailure(idlcore.ExecutionError_SYSTEM, "", "", &handler.ExecutionInfo{})),
+			expectedAttempts: 4,
+		},
+		{
 			name:               "UserFailureIgnoreRetryCause",
 			defaultMaxAttempts: 3,
 			maxSystemFailures:  10,

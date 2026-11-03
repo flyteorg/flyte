@@ -1582,6 +1582,54 @@ func Test_nodeExecutor_system_error(t *testing.T) {
 	assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.GetErr().GetKind())
 }
 
+func Test_nodeExecutor_retries_exhausted_preserves_error_kind(t *testing.T) {
+	tests := []struct {
+		name              string
+		kind              core.ExecutionError_ErrorKind
+		attempts          uint32
+		systemFailures    uint32
+		maxSystemFailures uint32
+	}{
+		{"user", core.ExecutionError_USER, 1, 0, 0},
+		{"system", core.ExecutionError_SYSTEM, 1, 1, 1},
+		{"unknown", core.ExecutionError_UNKNOWN, 1, 0, 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			phaseInfo := handler.PhaseInfoRetryableFailureErr(&core.ExecutionError{Code: "TestError", Message: "test", Kind: tt.kind}, nil)
+
+			ns := &mocks.ExecutableNodeStatus{}
+			ns.EXPECT().GetAttempts().Return(tt.attempts)
+			ns.EXPECT().GetSystemFailures().Return(tt.systemFailures)
+			ns.On("GetQueuedAt").Return(&v1.Time{Time: time.Now()})
+			ns.On("GetLastAttemptStartedAt").Return(&v1.Time{Time: time.Now()})
+			ns.On("ClearLastAttemptStartedAt").Return()
+
+			c := &nodeExecutor{maxNodeRetriesForSystemFailures: tt.maxSystemFailures}
+			h := &nodemocks.NodeHandler{}
+			h.On("Handle",
+				mock.MatchedBy(func(ctx context.Context) bool { return true }),
+				mock.MatchedBy(func(o interfaces.NodeExecutionContext) bool { return true }),
+			).Return(handler.DoTransition(handler.TransitionTypeEphemeral, phaseInfo), nil)
+
+			mockNode := &mocks.ExecutableNode{}
+			mockNode.On("GetID").Return("node")
+			mockNode.On("GetActiveDeadline").Return(nil)
+			mockNode.On("GetExecutionDeadline").Return(nil)
+			retries := 1
+			mockNode.EXPECT().GetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &retries})
+
+			nCtx := &nodeExecContext{node: mockNode, nsm: &nodeStateManager{nodeStatus: ns}}
+			result, err := c.execute(context.TODO(), h, nCtx, ns)
+			assert.NoError(t, err)
+			assert.Equal(t, handler.EPhaseFailed, result.GetPhase())
+			assert.Equal(t, tt.kind, result.GetErr().GetKind())
+			assert.Equal(t, "RetriesExhausted|TestError", result.GetErr().GetCode())
+		})
+	}
+}
+
 func Test_nodeExecutor_abort(t *testing.T) {
 	ctx := context.Background()
 	exec := nodeExecutor{}
