@@ -21,6 +21,7 @@ type DownloadOptions struct {
 	inputInterface      []byte
 	metadataFormat      string
 	downloadMode        string
+	concurrencyPerCPU   int
 	timeout             time.Duration
 }
 
@@ -70,7 +71,7 @@ func (d *DownloadOptions) Download(ctx context.Context) error {
 		if !ok {
 			return fmt.Errorf("incorrect input download mode specified, given [%s], possible values [%+v]", d.downloadMode, GetDownloadModeVals())
 		}
-		dl := data.NewDownloader(ctx, d.Store, core.DataLoadingConfig_LiteralMapFormat(f), core.IOStrategy_DownloadMode(m))
+		dl := data.NewDownloader(ctx, d.Store, core.DataLoadingConfig_LiteralMapFormat(f), core.IOStrategy_DownloadMode(m), d.concurrencyPerCPU)
 		childCtx := ctx
 		cancelFn := func() {}
 		if d.timeout > 0 {
@@ -115,6 +116,7 @@ func NewDownloadCommand(opts *RootOptions) *cobra.Command {
 	downloadCmd.Flags().StringVarP(&downloadOpts.localDirectoryPath, "to-local-dir", "o", "", "The local directory on disk where data should be downloaded.")
 	downloadCmd.Flags().StringVarP(&downloadOpts.metadataFormat, "format", "m", core.DataLoadingConfig_JSON.String(), fmt.Sprintf("What should be the output format for the primitive and structured types. Options [%v]", GetFormatVals()))
 	downloadCmd.Flags().StringVarP(&downloadOpts.downloadMode, "download-mode", "d", core.IOStrategy_DOWNLOAD_EAGER.String(), fmt.Sprintf("Download mode to use. Options [%v]", GetDownloadModeVals()))
+	downloadCmd.Flags().IntVar(&downloadOpts.concurrencyPerCPU, "concurrency-per-cpu", data.DefaultConcurrencyPerCPU, "Concurrency multiplier used to cap concurrent download workers. Effective concurrency is CPU*concurrency-per-cpu.")
 	downloadCmd.Flags().DurationVarP(&downloadOpts.timeout, "timeout", "t", time.Hour*1, "Max time to allow for downloads to complete, default is 1H")
 	downloadCmd.Flags().BytesBase64VarP(&downloadOpts.inputInterface, "input-interface", "i", nil, "Input interface proto message - core.VariableMap, base64 encoced string")
 	return downloadCmd
