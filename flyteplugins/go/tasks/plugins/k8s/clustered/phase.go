@@ -7,6 +7,7 @@ import (
 	"time"
 
 	v1 "k8s.io/api/core/v1"
+	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -172,9 +173,23 @@ func afterStart(
 			logger.Warnf(ctx, "failed to read the Kueue Workload of JobSet %s/%s; ending the attempt: %v",
 				jobSet.Namespace, jobSet.Name, err)
 		}
-		if resumeAfterPreemption && awaitsReadmission(wl) {
-			// Phases never move backwards within an attempt, so the wait is reported as Running.
-			return runningPhaseInfo(taskInfo, classifyEviction(wl).Summary()+"; waiting for re-admission")
+		// Phases never move backwards within an attempt, so a wait is reported as Running.
+		suspendedAt := suspendedSince(jobSet)
+		switch classifySuspension(wl, suspendedAt) {
+		case suspensionUnexplained:
+			if suspendedAt.IsZero() || taskInfo.OccurredAt.Sub(suspendedAt) <= evictionReasonGracePeriod {
+				return runningPhaseInfo(taskInfo, classifyEviction(wl).Summary()+"; waiting for kueue to report why")
+			}
+			logger.Infof(ctx, "JobSet %s/%s: kueue gave no eviction reason within %v; ending the attempt",
+				jobSet.Namespace, jobSet.Name, evictionReasonGracePeriod)
+		case suspensionReadmitted:
+			if resumeAfterPreemption {
+				return runningPhaseInfo(taskInfo, "gang readmitted by kueue; waiting for the JobSet to resume")
+			}
+		case suspensionPreempted:
+			if resumeAfterPreemption {
+				return runningPhaseInfo(taskInfo, classifyEviction(wl).Summary()+"; waiting for re-admission")
+			}
 		}
 		return evictedPhaseInfo(pluginContext, wl, taskInfo)
 	}
@@ -285,6 +300,24 @@ func isSuspended(jobSet *jobsetv1alpha2.JobSet, condition *metav1.Condition) boo
 		return true
 	}
 	return conditionType(condition) == jobsetv1alpha2.JobSetSuspended
+}
+
+// evictionReasonGracePeriod bounds how long a started gang that Kueue suspended waits for
+// the Workload's Evicted condition. Kueue writes the condition before it suspends the
+// JobSet, so the wait only covers a Workload read that lags behind the JobSet. A JobSet
+// suspended for another reason, such as Kueue replacing a deleted Workload, never gets
+// one, and its attempt ends once the period is over.
+const evictionReasonGracePeriod = time.Minute
+
+// suspendedSince is when the JobSet's Suspended condition last became True, or zero when the
+// JobSet controller has not written it yet. It is looked up by type rather than taken from
+// the current condition, since another True condition can carry a later or equal timestamp.
+func suspendedSince(jobSet *jobsetv1alpha2.JobSet) time.Time {
+	c := apimeta.FindStatusCondition(jobSet.Status.Conditions, string(jobsetv1alpha2.JobSetSuspended))
+	if c == nil || c.Status != metav1.ConditionTrue {
+		return time.Time{}
+	}
+	return c.LastTransitionTime.Time
 }
 
 func conditionType(condition *metav1.Condition) jobsetv1alpha2.JobSetConditionType {
