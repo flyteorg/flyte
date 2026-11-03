@@ -32,6 +32,9 @@ class DataProxyService(Protocol):
     def tail_logs(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest, ctx: RequestContext) -> AsyncIterator[flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse]:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def get_cloud_credentials(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
 
 class DataProxyServiceASGIApplication(ConnectASGIApplication[DataProxyService]):
     def __init__(self, service: DataProxyService | AsyncGenerator[DataProxyService], *, interceptors: Iterable[Interceptor]=(), read_max_bytes: int | None = None, compressions: Iterable[Compression] | None = None) -> None:
@@ -87,6 +90,16 @@ class DataProxyServiceASGIApplication(ConnectASGIApplication[DataProxyService]):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.tail_logs,
+                ),
+                "/flyteidl2.dataproxy.DataProxyService/GetCloudCredentials": Endpoint.unary(
+                    method=MethodInfo(
+                        name="GetCloudCredentials",
+                        service_name="flyteidl2.dataproxy.DataProxyService",
+                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsRequest,
+                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.get_cloud_credentials,
                 ),
             },
             interceptors=interceptors,
@@ -203,6 +216,26 @@ class DataProxyServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    async def get_cloud_credentials(
+        self,
+        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetCloudCredentials",
+                service_name="flyteidl2.dataproxy.DataProxyService",
+                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsRequest,
+                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
 
 class DataProxyServiceSync(Protocol):
     def create_upload_location(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateUploadLocationResponse:
@@ -214,6 +247,8 @@ class DataProxyServiceSync(Protocol):
     def get_action_data(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetActionDataResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def tail_logs(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest, ctx: RequestContext) -> Iterator[flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse]:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def get_cloud_credentials(self, request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsRequest, ctx: RequestContext) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
@@ -270,6 +305,16 @@ class DataProxyServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.tail_logs,
+                ),
+                "/flyteidl2.dataproxy.DataProxyService/GetCloudCredentials": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="GetCloudCredentials",
+                        service_name="flyteidl2.dataproxy.DataProxyService",
+                        input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsRequest,
+                        output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.get_cloud_credentials,
                 ),
             },
             interceptors=interceptors,
@@ -380,6 +425,26 @@ class DataProxyServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.dataproxy.DataProxyService",
                 input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest,
                 output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def get_cloud_credentials(
+        self,
+        request: flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="GetCloudCredentials",
+                service_name="flyteidl2.dataproxy.DataProxyService",
+                input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsRequest,
+                output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
             ),
             headers=headers,

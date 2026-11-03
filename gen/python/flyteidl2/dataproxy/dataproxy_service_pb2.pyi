@@ -21,9 +21,93 @@ class ArtifactType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     ARTIFACT_TYPE_UNSPECIFIED: _ClassVar[ArtifactType]
     ARTIFACT_TYPE_REPORT: _ClassVar[ArtifactType]
     ARTIFACT_TYPE_CODE_BUNDLE: _ClassVar[ArtifactType]
+
+class CredentialAccess(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    CREDENTIAL_ACCESS_UNSPECIFIED: _ClassVar[CredentialAccess]
+    CREDENTIAL_ACCESS_READ: _ClassVar[CredentialAccess]
+    CREDENTIAL_ACCESS_READ_WRITE: _ClassVar[CredentialAccess]
+
+class CredentialKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    CREDENTIAL_KIND_UNSPECIFIED: _ClassVar[CredentialKind]
+    CREDENTIAL_KIND_AWS_SIGV4: _ClassVar[CredentialKind]
+    CREDENTIAL_KIND_GCP_ACCESS_TOKEN: _ClassVar[CredentialKind]
+    CREDENTIAL_KIND_AZURE_SAS: _ClassVar[CredentialKind]
 ARTIFACT_TYPE_UNSPECIFIED: ArtifactType
 ARTIFACT_TYPE_REPORT: ArtifactType
 ARTIFACT_TYPE_CODE_BUNDLE: ArtifactType
+CREDENTIAL_ACCESS_UNSPECIFIED: CredentialAccess
+CREDENTIAL_ACCESS_READ: CredentialAccess
+CREDENTIAL_ACCESS_READ_WRITE: CredentialAccess
+CREDENTIAL_KIND_UNSPECIFIED: CredentialKind
+CREDENTIAL_KIND_AWS_SIGV4: CredentialKind
+CREDENTIAL_KIND_GCP_ACCESS_TOKEN: CredentialKind
+CREDENTIAL_KIND_AZURE_SAS: CredentialKind
+
+class ProjectDataArea(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class VolumeData(_message.Message):
+    __slots__ = ["action_output", "artifact_version"]
+    ACTION_OUTPUT_FIELD_NUMBER: _ClassVar[int]
+    ARTIFACT_VERSION_FIELD_NUMBER: _ClassVar[int]
+    action_output: ActionOutput
+    artifact_version: ArtifactVersion
+    def __init__(self, action_output: _Optional[_Union[ActionOutput, _Mapping]] = ..., artifact_version: _Optional[_Union[ArtifactVersion, _Mapping]] = ...) -> None: ...
+
+class ActionOutput(_message.Message):
+    __slots__ = ["run_name", "action_name", "output_name"]
+    RUN_NAME_FIELD_NUMBER: _ClassVar[int]
+    ACTION_NAME_FIELD_NUMBER: _ClassVar[int]
+    OUTPUT_NAME_FIELD_NUMBER: _ClassVar[int]
+    run_name: str
+    action_name: str
+    output_name: str
+    def __init__(self, run_name: _Optional[str] = ..., action_name: _Optional[str] = ..., output_name: _Optional[str] = ...) -> None: ...
+
+class ArtifactVersion(_message.Message):
+    __slots__ = ["name", "version"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    version: str
+    def __init__(self, name: _Optional[str] = ..., version: _Optional[str] = ...) -> None: ...
+
+class GetCloudCredentialsRequest(_message.Message):
+    __slots__ = ["scope", "project_data", "volume", "access", "subpaths", "duration"]
+    SCOPE_FIELD_NUMBER: _ClassVar[int]
+    PROJECT_DATA_FIELD_NUMBER: _ClassVar[int]
+    VOLUME_FIELD_NUMBER: _ClassVar[int]
+    ACCESS_FIELD_NUMBER: _ClassVar[int]
+    SUBPATHS_FIELD_NUMBER: _ClassVar[int]
+    DURATION_FIELD_NUMBER: _ClassVar[int]
+    scope: _identifier_pb2.ProjectIdentifier
+    project_data: ProjectDataArea
+    volume: VolumeData
+    access: CredentialAccess
+    subpaths: _containers.RepeatedScalarFieldContainer[str]
+    duration: _duration_pb2.Duration
+    def __init__(self, scope: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., project_data: _Optional[_Union[ProjectDataArea, _Mapping]] = ..., volume: _Optional[_Union[VolumeData, _Mapping]] = ..., access: _Optional[_Union[CredentialAccess, str]] = ..., subpaths: _Optional[_Iterable[str]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+
+class GetCloudCredentialsResponse(_message.Message):
+    __slots__ = ["kind", "access_key_id", "secret_access_key", "session_token", "expiration", "bucket_uri", "granted_prefixes"]
+    KIND_FIELD_NUMBER: _ClassVar[int]
+    ACCESS_KEY_ID_FIELD_NUMBER: _ClassVar[int]
+    SECRET_ACCESS_KEY_FIELD_NUMBER: _ClassVar[int]
+    SESSION_TOKEN_FIELD_NUMBER: _ClassVar[int]
+    EXPIRATION_FIELD_NUMBER: _ClassVar[int]
+    BUCKET_URI_FIELD_NUMBER: _ClassVar[int]
+    GRANTED_PREFIXES_FIELD_NUMBER: _ClassVar[int]
+    kind: CredentialKind
+    access_key_id: str
+    secret_access_key: str
+    session_token: str
+    expiration: _timestamp_pb2.Timestamp
+    bucket_uri: str
+    granted_prefixes: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, kind: _Optional[_Union[CredentialKind, str]] = ..., access_key_id: _Optional[str] = ..., secret_access_key: _Optional[str] = ..., session_token: _Optional[str] = ..., expiration: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., bucket_uri: _Optional[str] = ..., granted_prefixes: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class CreateUploadLocationRequest(_message.Message):
     __slots__ = ["project", "domain", "filename", "expires_in", "content_md5", "filename_root", "add_content_md5_metadata", "org", "content_length", "queue"]
