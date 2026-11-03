@@ -237,6 +237,68 @@ func (_c *ActionRepo_ClearAbortRequest_Call) RunAndReturn(run func(ctx context.C
 	return _c
 }
 
+// CountActiveActionsByPhase provides a mock function for the type ActionRepo
+func (_mock *ActionRepo) CountActiveActionsByPhase(ctx context.Context) (map[interfaces.PhaseKey]int64, error) {
+	ret := _mock.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CountActiveActionsByPhase")
+	}
+
+	var r0 map[interfaces.PhaseKey]int64
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context) (map[interfaces.PhaseKey]int64, error)); ok {
+		return returnFunc(ctx)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context) map[interfaces.PhaseKey]int64); ok {
+		r0 = returnFunc(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(map[interfaces.PhaseKey]int64)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = returnFunc(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// ActionRepo_CountActiveActionsByPhase_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CountActiveActionsByPhase'
+type ActionRepo_CountActiveActionsByPhase_Call struct {
+	*mock.Call
+}
+
+// CountActiveActionsByPhase is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *ActionRepo_Expecter) CountActiveActionsByPhase(ctx interface{}) *ActionRepo_CountActiveActionsByPhase_Call {
+	return &ActionRepo_CountActiveActionsByPhase_Call{Call: _e.mock.On("CountActiveActionsByPhase", ctx)}
+}
+
+func (_c *ActionRepo_CountActiveActionsByPhase_Call) Run(run func(ctx context.Context)) *ActionRepo_CountActiveActionsByPhase_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *ActionRepo_CountActiveActionsByPhase_Call) Return(counts map[interfaces.PhaseKey]int64, err error) *ActionRepo_CountActiveActionsByPhase_Call {
+	_c.Call.Return(counts, err)
+	return _c
+}
+
+func (_c *ActionRepo_CountActiveActionsByPhase_Call) RunAndReturn(run func(ctx context.Context) (map[interfaces.PhaseKey]int64, error)) *ActionRepo_CountActiveActionsByPhase_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateAction provides a mock function for the type ActionRepo
 func (_mock *ActionRepo) CreateAction(ctx context.Context, action *models.Action, updateTriggeredAt bool) (*models.Action, error) {
 	ret := _mock.Called(ctx, action, updateTriggeredAt)

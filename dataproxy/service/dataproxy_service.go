@@ -279,8 +279,8 @@ func (s *Service) UploadInputs(
 	// When base_dir is set it is a full path used verbatim, bucket and all, so it becomes
 	// the base reference directly (enabling cross-bucket writes); otherwise inputs go
 	// under the configured Upload.StoragePrefix within the operator's base container.
-	// A request without base_dir takes run_base_dir from org/project/domain settings
-	// instead, the same middle tier CreateRun applies, and uses it the same way.
+	// middle tier. CreateRun already does, so until this matches, a settings-provided
+	// base applies to run metadata but not to offloaded inputs.
 	base := strings.TrimRight(req.Msg.GetBaseDir(), "/")
 	if base == "" {
 		base, err = s.runBaseDirFromSettings(ctx, org, domain, project)
@@ -288,7 +288,6 @@ func (s *Service) UploadInputs(
 			return nil, err
 		}
 	}
-
 	var baseRef storage.DataReference
 	var pathComponents []string
 	if base != "" {

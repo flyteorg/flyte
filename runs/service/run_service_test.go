@@ -2104,6 +2104,392 @@ func TestGetActionLogContext(t *testing.T) {
 	})
 }
 
+func TestActionModelToDetails(t *testing.T) {
+	svc := &RunService{}
+	now := time.Now().UTC().Truncate(time.Millisecond)
+	end := now.Add(5 * time.Second)
+
+	tests := []struct {
+		name     string
+		action   *models.Action
+		actionID *common.ActionIdentifier
+		verify   func(t *testing.T, result *workflow.ActionDetails)
+	}{
+		{
+			name: "BasicStatusFields",
+			action: &models.Action{
+				Phase:       int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+				CreatedAt:   now,
+				Attempts:    2,
+				CacheStatus: core.CatalogCacheStatus_CACHE_HIT,
+			},
+			actionID: testActionID,
+			verify: func(t *testing.T, result *workflow.ActionDetails) {
+				require.NotNil(t, result)
+				assert.Equal(t, testActionID, result.Id)
+				assert.Equal(t, common.ActionPhase_ACTION_PHASE_RUNNING, result.Status.Phase)
+				assert.Equal(t, now, result.Status.StartTime.AsTime())
+				assert.Equal(t, uint32(2), result.Status.Attempts)
+				assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT, result.Status.CacheStatus)
+				assert.Nil(t, result.Status.EndTime)
+				assert.Nil(t, result.Status.DurationMs)
+			},
+		},
+		{
+			name: "EndedAtSetsDurationFromTimestamps",
+			action: &models.Action{
+				Phase:     int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+				CreatedAt: now,
+				EndedAt:   sql.NullTime{Time: end, Valid: true},
+			},
+			actionID: testActionID,
+			verify: func(t *testing.T, result *workflow.ActionDetails) {
+				require.NotNil(t, result.Status.EndTime)
+				assert.Equal(t, end, result.Status.EndTime.AsTime())
+				require.NotNil(t, result.Status.DurationMs)
+				assert.Equal(t, uint64(5000), *result.Status.DurationMs)
+			},
+		},
+		{
+			name: "MetadataOptionalFields",
+			action: &models.Action{
+				Phase:            int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+				ActionType:       int32(workflow.ActionType_ACTION_TYPE_TASK),
+				FunctionName:     "my_func",
+				ParentActionName: sql.NullString{String: "parent-action", Valid: true},
+				ActionGroup:      sql.NullString{String: "group-1", Valid: true},
+				EnvironmentName:  sql.NullString{String: "prod", Valid: true},
+			},
+			actionID: testActionID,
+			verify: func(t *testing.T, result *workflow.ActionDetails) {
+				require.NotNil(t, result.Metadata)
+				assert.Equal(t, workflow.ActionType_ACTION_TYPE_TASK, result.Metadata.ActionType)
+				assert.Equal(t, "my_func", result.Metadata.FuntionName)
+				assert.Equal(t, "parent-action", result.Metadata.Parent)
+				assert.Equal(t, "group-1", result.Metadata.Group)
+				assert.Equal(t, "prod", result.Metadata.EnvironmentName)
+			},
+		},
+		{
+			name: "TaskMetadataWithFullID",
+			action: &models.Action{
+				Phase:         int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+				ActionType:    int32(workflow.ActionType_ACTION_TYPE_TASK),
+				TaskType:      "python",
+				TaskProject:   sql.NullString{String: "proj", Valid: true},
+				TaskDomain:    sql.NullString{String: "dev", Valid: true},
+				TaskName:      sql.NullString{String: "my_task", Valid: true},
+				TaskVersion:   sql.NullString{String: "v1", Valid: true},
+				TaskShortName: sql.NullString{String: "short", Valid: true},
+			},
+			actionID: testActionID,
+			verify: func(t *testing.T, result *workflow.ActionDetails) {
+				taskMeta := result.Metadata.GetTask()
+				require.NotNil(t, taskMeta)
+				assert.Equal(t, "python", taskMeta.TaskType)
+				assert.Equal(t, "short", taskMeta.ShortName)
+				require.NotNil(t, taskMeta.Id)
+				assert.Equal(t, "proj", taskMeta.Id.Project)
+				assert.Equal(t, "dev", taskMeta.Id.Domain)
+				assert.Equal(t, "my_task", taskMeta.Id.Name)
+				assert.Equal(t, "v1", taskMeta.Id.Version)
+			},
+		},
+		{
+			name: "TraceMetadata",
+			action: &models.Action{
+				Phase:        int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+				ActionType:   int32(workflow.ActionType_ACTION_TYPE_TRACE),
+				FunctionName: "trace_func",
+			},
+			actionID: testActionID,
+			verify: func(t *testing.T, result *workflow.ActionDetails) {
+				traceMeta := result.Metadata.GetTrace()
+				require.NotNil(t, traceMeta)
+				assert.Equal(t, "trace_func", traceMeta.Name)
+				assert.Nil(t, result.Metadata.GetTask())
+			},
+		},
+		{
+			name: "NilActionID",
+			action: &models.Action{
+				Phase: int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+			},
+			actionID: nil,
+			verify: func(t *testing.T, result *workflow.ActionDetails) {
+				require.NotNil(t, result)
+				assert.Nil(t, result.Id)
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.verify(t, svc.actionModelToDetails(tc.action, tc.actionID))
+		})
+	}
+}
+
+func TestBuildRunDetails(t *testing.T) {
+	runID := &common.RunIdentifier{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "test-domain",
+		Name:    "test-run",
+	}
+	rootActionID := &common.ActionIdentifier{Run: runID, Name: runID.Name}
+
+	// persistRunModel stores ActionSpec with proto.Marshal, so the fixture must too.
+	actionSpecBytes, err := proto.Marshal(&workflow.ActionSpec{
+		RunSpec: &task.RunSpec{
+			Labels: &task.Labels{Values: map[string]string{"env": "prod"}},
+		},
+	})
+	require.NoError(t, err)
+	runSpecBytes, err := proto.Marshal(&task.RunSpec{
+		Labels: &task.Labels{Values: map[string]string{"env": "staging"}},
+	})
+	require.NoError(t, err)
+
+	tests := []struct {
+		name   string
+		run    *models.Run
+		verify func(t *testing.T, result *workflow.RunDetails)
+	}{
+		{
+			name: "EmptyActionSpecNilRunSpec",
+			run:  &models.Run{Name: runID.Name, Phase: int32(common.ActionPhase_ACTION_PHASE_RUNNING)},
+			verify: func(t *testing.T, result *workflow.RunDetails) {
+				assert.Nil(t, result.RunSpec)
+			},
+		},
+		{
+			name: "ProtoActionSpecExtractsRunSpec",
+			run: &models.Run{
+				Name:       runID.Name,
+				Phase:      int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+				ActionSpec: actionSpecBytes,
+			},
+			verify: func(t *testing.T, result *workflow.RunDetails) {
+				require.NotNil(t, result.RunSpec)
+				assert.Equal(t, "prod", result.RunSpec.GetLabels().GetValues()["env"])
+			},
+		},
+		{
+			name: "RunSpecColumnPreferredOverActionSpec",
+			run: &models.Run{
+				Name:       runID.Name,
+				Phase:      int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+				ActionSpec: actionSpecBytes,
+				RunSpec:    runSpecBytes,
+			},
+			verify: func(t *testing.T, result *workflow.RunDetails) {
+				require.NotNil(t, result.RunSpec)
+				assert.Equal(t, "staging", result.RunSpec.GetLabels().GetValues()["env"])
+			},
+		},
+		{
+			name: "MalformedActionSpecNilRunSpec",
+			run: &models.Run{
+				Name:       runID.Name,
+				Phase:      int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+				ActionSpec: []byte("not-valid-proto{{"),
+			},
+			verify: func(t *testing.T, result *workflow.RunDetails) {
+				assert.Nil(t, result.RunSpec)
+			},
+		},
+		{
+			name: "RootActionIDPropagated",
+			run:  &models.Run{Name: runID.Name, Phase: int32(common.ActionPhase_ACTION_PHASE_QUEUED)},
+			verify: func(t *testing.T, result *workflow.RunDetails) {
+				require.NotNil(t, result.Action)
+				assert.True(t, proto.Equal(rootActionID, result.Action.Id))
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			actionRepo, _, svc := newTestService(t)
+			actionRepo.On("ListEvents", mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil)
+
+			result, err := svc.buildRunDetails(context.Background(), tc.run, runID)
+			require.NoError(t, err)
+			require.NotNil(t, result)
+			tc.verify(t, result)
+		})
+	}
+}
+
+func TestWatchRunDetails(t *testing.T) {
+	runID := &common.RunIdentifier{
+		Org:     "test-org",
+		Project: "test-project",
+		Domain:  "test-domain",
+		Name:    "rtest-watch-1",
+	}
+	rootActionID := &common.ActionIdentifier{Run: runID, Name: runID.Name}
+
+	actionSpecBytes, err := proto.Marshal(&workflow.ActionSpec{
+		RunSpec: &task.RunSpec{Labels: &task.Labels{Values: map[string]string{"env": "prod"}}},
+	})
+	require.NoError(t, err)
+
+	runModel := &models.Run{
+		Project:    runID.Project,
+		Domain:     runID.Domain,
+		Name:       runID.Name,
+		Phase:      int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+		Attempts:   1,
+		ActionSpec: actionSpecBytes,
+	}
+
+	// The terminal update: a FAILED run whose last attempt carries error info.
+	failedModel := &models.Run{
+		Project:    runID.Project,
+		Domain:     runID.Domain,
+		Name:       runID.Name,
+		Phase:      int32(common.ActionPhase_ACTION_PHASE_FAILED),
+		Attempts:   1,
+		ActionSpec: actionSpecBytes,
+	}
+	failedEventBytes, err := proto.Marshal(&workflow.ActionEvent{
+		Id:      rootActionID,
+		Attempt: 1,
+		Phase:   common.ActionPhase_ACTION_PHASE_FAILED,
+		ErrorInfo: &workflow.ErrorInfo{
+			Kind:    workflow.ErrorInfo_KIND_USER,
+			Message: "boom",
+		},
+	})
+	require.NoError(t, err)
+	failedEvents := []*models.ActionEvent{{Attempt: 1, Info: failedEventBytes}}
+
+	tests := []struct {
+		name       string
+		setupMocks func(actionRepo *repoMocks.ActionRepo)
+		test       func(t *testing.T, client workflowconnect.RunServiceClient)
+	}{
+		{
+			name: "GetRun_Error_Returns_NotFound",
+			setupMocks: func(actionRepo *repoMocks.ActionRepo) {
+				actionRepo.EXPECT().GetRun(mock.Anything, matchRunID(runID)).Return(nil, fmt.Errorf("run not found"))
+			},
+			test: func(t *testing.T, client workflowconnect.RunServiceClient) {
+				stream, err := client.WatchRunDetails(context.Background(), connect.NewRequest(&workflow.WatchRunDetailsRequest{
+					RunId: runID,
+				}))
+				require.NoError(t, err)
+				assert.False(t, stream.Receive())
+				require.Error(t, stream.Err())
+				var connectErr *connect.Error
+				require.True(t, errors.As(stream.Err(), &connectErr))
+				assert.Equal(t, connect.CodeNotFound, connectErr.Code())
+			},
+		},
+		{
+			name: "Initial_State_Has_RunSpec_And_Attempts",
+			setupMocks: func(actionRepo *repoMocks.ActionRepo) {
+				actionRepo.EXPECT().GetRun(mock.Anything, matchRunID(runID)).Return(runModel, nil)
+				actionRepo.EXPECT().ListEvents(mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil)
+				actionRepo.EXPECT().WatchRunUpdates(mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
+					RunAndReturn(func(ctx context.Context, _ *common.RunIdentifier, _ chan<- *models.Run, _ chan<- error) {
+						<-ctx.Done()
+					}).Call.Maybe()
+			},
+			test: func(t *testing.T, client workflowconnect.RunServiceClient) {
+				ctx, cancel := context.WithCancel(context.Background())
+				defer cancel()
+
+				stream, err := client.WatchRunDetails(ctx, connect.NewRequest(&workflow.WatchRunDetailsRequest{
+					RunId: runID,
+				}))
+				require.NoError(t, err)
+
+				require.True(t, stream.Receive())
+				details := stream.Msg().Details
+				require.NotNil(t, details)
+				assert.Equal(t, "prod", details.GetRunSpec().GetLabels().GetValues()["env"])
+				assert.True(t, proto.Equal(rootActionID, details.GetAction().GetId()))
+				assert.Equal(t, common.ActionPhase_ACTION_PHASE_RUNNING, details.GetAction().GetStatus().GetPhase())
+
+				cancel()
+				assert.False(t, stream.Receive())
+			},
+		},
+		{
+			name: "Watch_Error_Returns_Internal_Error",
+			setupMocks: func(actionRepo *repoMocks.ActionRepo) {
+				actionRepo.EXPECT().GetRun(mock.Anything, matchRunID(runID)).Return(runModel, nil)
+				actionRepo.EXPECT().ListEvents(mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil)
+				actionRepo.EXPECT().WatchRunUpdates(mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
+					RunAndReturn(func(_ context.Context, _ *common.RunIdentifier, _ chan<- *models.Run, errs chan<- error) {
+						errs <- fmt.Errorf("db watch failed")
+					})
+			},
+			test: func(t *testing.T, client workflowconnect.RunServiceClient) {
+				stream, err := client.WatchRunDetails(context.Background(), connect.NewRequest(&workflow.WatchRunDetailsRequest{
+					RunId: runID,
+				}))
+				require.NoError(t, err)
+
+				assert.True(t, stream.Receive())
+				assert.False(t, stream.Receive())
+				require.Error(t, stream.Err())
+				var connectErr *connect.Error
+				require.True(t, errors.As(stream.Err(), &connectErr))
+				assert.Equal(t, connect.CodeInternal, connectErr.Code())
+			},
+		},
+		{
+			name: "Run_Update_Streams_Attempts_And_ErrorInfo",
+			setupMocks: func(actionRepo *repoMocks.ActionRepo) {
+				actionRepo.EXPECT().GetRun(mock.Anything, matchRunID(runID)).Return(runModel, nil)
+				actionRepo.EXPECT().ListEvents(mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil).Once()
+				actionRepo.EXPECT().ListEvents(mock.Anything, matchActionID(rootActionID), 500).Return(failedEvents, nil).Once()
+				actionRepo.EXPECT().WatchRunUpdates(mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
+					RunAndReturn(func(ctx context.Context, _ *common.RunIdentifier, updates chan<- *models.Run, _ chan<- error) {
+						updates <- failedModel
+						<-ctx.Done()
+					})
+			},
+			test: func(t *testing.T, client workflowconnect.RunServiceClient) {
+				ctx, cancel := context.WithCancel(context.Background())
+				defer cancel()
+
+				stream, err := client.WatchRunDetails(ctx, connect.NewRequest(&workflow.WatchRunDetailsRequest{
+					RunId: runID,
+				}))
+				require.NoError(t, err)
+
+				require.True(t, stream.Receive())
+				require.True(t, stream.Receive())
+				details := stream.Msg().Details
+				require.NotNil(t, details)
+				assert.Equal(t, "prod", details.GetRunSpec().GetLabels().GetValues()["env"])
+				action := details.GetAction()
+				assert.Equal(t, common.ActionPhase_ACTION_PHASE_FAILED, action.GetStatus().GetPhase())
+				require.Len(t, action.GetAttempts(), 1)
+				assert.Equal(t, workflow.ErrorInfo_KIND_USER, action.GetErrorInfo().GetKind())
+				assert.Equal(t, "boom", action.GetErrorInfo().GetMessage())
+
+				cancel()
+				assert.False(t, stream.Receive())
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			actionRepo, _, svc := newTestService(t)
+			tc.setupMocks(actionRepo)
+			client := newRunServiceTestClient(t, svc)
+			tc.test(t, client)
+		})
+	}
+}
+
 // The console decides an action is a signalable condition from metadata.spec
 // alone. The watch stream builds its own metadata rather than reusing
 // actionMetadataFromModel, so the condition arm has to be kept in step: without
@@ -2149,4 +2535,99 @@ func TestConvertNodeUpdateToEnrichedProto_ConditionMetadata(t *testing.T) {
 	// The declared type drives which input the console renders, and the payload
 	// type check before signaling.
 	assert.Equal(t, core.SimpleType_STRING, condMeta.GetType().GetSimple())
+}
+
+func TestWatchRuns_RelistsOnResync(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+	client := newRunServiceTestClient(t, svc)
+
+	run := func(phase common.ActionPhase) *models.Run {
+		return &models.Run{Project: "p", Domain: "d", RunName: "r1", Name: "a0", Phase: int32(phase)}
+	}
+	actionRepo.On("WatchAllRunUpdates", mock.Anything, mock.Anything, mock.Anything).
+		Run(func(args mock.Arguments) {
+			args.Get(1).(chan<- *models.Run) <- nil
+			<-args.Get(0).(context.Context).Done()
+		}).Once()
+	actionRepo.On("ListActions", mock.Anything, mock.Anything).
+		Return([]*models.Run{run(common.ActionPhase_ACTION_PHASE_RUNNING)}, nil).Once()
+	actionRepo.On("ListActions", mock.Anything, mock.Anything).
+		Return([]*models.Run{run(common.ActionPhase_ACTION_PHASE_SUCCEEDED)}, nil).Once()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	stream, err := client.WatchRuns(ctx, connect.NewRequest(&workflow.WatchRunsRequest{}))
+	require.NoError(t, err)
+
+	require.True(t, stream.Receive())
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_RUNNING, stream.Msg().GetRuns()[0].GetAction().GetStatus().GetPhase())
+	require.True(t, stream.Receive())
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, stream.Msg().GetRuns()[0].GetAction().GetStatus().GetPhase())
+}
+
+func TestWatchActions_RelistsOnResync(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+	client := newRunServiceTestClient(t, svc)
+
+	runID := &common.RunIdentifier{Project: "p", Domain: "d", Name: "r1"}
+	root := func(phase common.ActionPhase, updatedAt time.Time) *models.Action {
+		return &models.Action{Project: "p", Domain: "d", RunName: "r1", Name: "a0", Phase: int32(phase), UpdatedAt: updatedAt}
+	}
+	child := &models.Action{
+		Project: "p", Domain: "d", RunName: "r1", Name: "a1",
+		ParentActionName: sql.NullString{String: "a0", Valid: true},
+		Phase:            int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+		UpdatedAt:        time.Unix(100, 0),
+	}
+	actionRepo.On("WatchAllActionUpdates", mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
+		Run(func(args mock.Arguments) {
+			args.Get(2).(chan<- *models.Action) <- nil
+			<-args.Get(0).(context.Context).Done()
+		}).Once()
+	actionRepo.On("ListActions", mock.Anything, mock.Anything).
+		Return([]*models.Action{root(common.ActionPhase_ACTION_PHASE_RUNNING, time.Unix(100, 0)), child}, nil).Once()
+	actionRepo.On("ListActions", mock.Anything, mock.Anything).
+		Return([]*models.Action{root(common.ActionPhase_ACTION_PHASE_SUCCEEDED, time.Unix(200, 0)), child}, nil).Once()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	stream, err := client.WatchActions(ctx, connect.NewRequest(&workflow.WatchActionsRequest{RunId: runID}))
+	require.NoError(t, err)
+
+	require.True(t, stream.Receive())
+	assert.Len(t, stream.Msg().GetEnrichedActions(), 2)
+	require.True(t, stream.Receive())
+	resent := stream.Msg().GetEnrichedActions()
+	require.Len(t, resent, 1, "the unchanged child must not be sent again")
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, resent[0].GetAction().GetStatus().GetPhase())
+}
+
+func TestWatchActions_KeepsStreamOnResyncListError(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+	client := newRunServiceTestClient(t, svc)
+
+	runID := &common.RunIdentifier{Project: "p", Domain: "d", Name: "r1"}
+	root := func(phase common.ActionPhase, updatedAt time.Time) *models.Action {
+		return &models.Action{Project: "p", Domain: "d", RunName: "r1", Name: "a0", Phase: int32(phase), UpdatedAt: updatedAt}
+	}
+	actionRepo.On("WatchAllActionUpdates", mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
+		Run(func(args mock.Arguments) {
+			updates := args.Get(2).(chan<- *models.Action)
+			updates <- nil
+			updates <- root(common.ActionPhase_ACTION_PHASE_SUCCEEDED, time.Unix(200, 0))
+			<-args.Get(0).(context.Context).Done()
+		}).Once()
+	actionRepo.On("ListActions", mock.Anything, mock.Anything).
+		Return([]*models.Action{root(common.ActionPhase_ACTION_PHASE_RUNNING, time.Unix(100, 0))}, nil).Once()
+	actionRepo.On("ListActions", mock.Anything, mock.Anything).
+		Return(nil, errors.New("db down")).Once()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	stream, err := client.WatchActions(ctx, connect.NewRequest(&workflow.WatchActionsRequest{RunId: runID}))
+	require.NoError(t, err)
+
+	require.True(t, stream.Receive())
+	require.True(t, stream.Receive(), "a failed re-list must not end the stream: %v", stream.Err())
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, stream.Msg().GetEnrichedActions()[0].GetAction().GetStatus().GetPhase())
 }
