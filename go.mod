@@ -9,7 +9,7 @@ require (
 	connectrpc.com/otelconnect v0.12.0
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.3
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.15.0
-	github.com/Azure/azure-sdk-for-go/sdk/security/keyvault/azsecrets v1.5.0
+	github.com/Azure/azure-sdk-for-go/sdk/security/keyvault/azsecrets v1.5.1
 	github.com/Masterminds/semver/v3 v3.5.0
 	github.com/XSAM/otelsql v0.44.0
 	github.com/alicebob/miniredis/v2 v2.40.0
