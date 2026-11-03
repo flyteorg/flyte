@@ -47,6 +47,11 @@ message SelectClusterRequest {
     // server answers with its own endpoint and serves these from control-plane storage.
     OPERATION_TRACKED_RUN_DATA = 11;
     OPERATION_GET_CLUSTER_CONFIG = 12;
+    // Reads findings a dataplane component records about a project's runs (for example,
+    // repeated failures grouped by cause), and records people's feedback on them. Both are
+    // served by the dataplane that holds the findings; with zero trust off the control plane
+    // relays the request and stores nothing.
+    OPERATION_PROJECT_INSIGHTS = 13;
   }
 
   Operation operation = 8 [(buf.validate.field).enum = {
