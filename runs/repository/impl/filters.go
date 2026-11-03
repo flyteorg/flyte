@@ -2,6 +2,7 @@ package impl
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/lib/pq"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -50,6 +51,7 @@ func (f *basicFilter) QueryExpression(table string) (interfaces.QueryExpr, error
 		column = table + "." + f.field
 	}
 
+	arg := f.value
 	switch f.expression {
 	case interfaces.FilterExpressionEqual:
 		query = fmt.Sprintf("%s = ?", column)
@@ -65,27 +67,36 @@ func (f *basicFilter) QueryExpression(table string) (interfaces.QueryExpr, error
 		query = fmt.Sprintf("%s <= ?", column)
 	case interfaces.FilterExpressionContains:
 		query = fmt.Sprintf("%s LIKE ?", column)
-		f.value = fmt.Sprintf("%%%v%%", f.value)
+		arg = "%" + escapeLikePattern(f.value) + "%"
 	case interfaces.FilterExpressionValueIn:
 		query = fmt.Sprintf("%s = ANY(?)", column)
-		f.value = pq.Array(f.value)
+		arg = pq.Array(f.value)
 	case interfaces.FilterExpressionEndsWith:
 		query = fmt.Sprintf("%s LIKE ?", column)
-		f.value = fmt.Sprintf("%%%v", f.value)
+		arg = "%" + escapeLikePattern(f.value)
 	case interfaces.FilterExpressionNotEndsWith:
 		query = fmt.Sprintf("%s NOT LIKE ?", column)
-		f.value = fmt.Sprintf("%%%v", f.value)
+		arg = "%" + escapeLikePattern(f.value)
 	case interfaces.FilterExpressionContainsCaseInsensitive:
 		query = fmt.Sprintf("LOWER(%s) LIKE LOWER(?)", column)
-		f.value = fmt.Sprintf("%%%v%%", f.value)
+		arg = "%" + escapeLikePattern(f.value) + "%"
 	default:
 		return interfaces.QueryExpr{}, fmt.Errorf("unsupported filter expression: %d", f.expression)
 	}
 
 	return interfaces.QueryExpr{
 		Query: query,
-		Args:  []interface{}{f.value},
+		Args:  []interface{}{arg},
 	}, nil
+}
+
+// likePatternEscaper escapes the LIKE wildcards % and _ and the escape character itself, so
+// a user-supplied filter value matches literally. Backslash is the default LIKE escape
+// character in PostgreSQL.
+var likePatternEscaper = strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
+
+func escapeLikePattern(value interface{}) string {
+	return likePatternEscaper.Replace(fmt.Sprintf("%v", value))
 }
 
 func (f *basicFilter) And(filter interfaces.Filter) interfaces.Filter {
