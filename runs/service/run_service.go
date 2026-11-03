@@ -571,20 +571,10 @@ func (s *RunService) GetRunDetails(
 		return nil, connect.NewError(connect.CodeNotFound, err)
 	}
 
-	rootActionID := &common.ActionIdentifier{
-		Run:  req.Msg.RunId,
-		Name: run.Name,
-	}
-
-	actionDetails, err := s.buildActionDetails(ctx, run, rootActionID)
+	details, err := s.buildRunDetails(ctx, run, req.Msg.RunId)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to build run action details: %v", err)
 		return nil, err
-	}
-
-	details := &workflow.RunDetails{
-		RunSpec: extractRunSpecFromActionModel(ctx, run),
-		Action:  actionDetails,
 	}
 
 	logger.Infof(ctx, "Retrieved run details for: %s", run.Name)
@@ -1216,26 +1206,21 @@ func (s *RunService) WatchRunDetails(
 ) error {
 	logger.Infof(ctx, "Received WatchRunDetails request")
 
-	// For now, just send initial state and close
-	// TODO: Implement actual streaming with polling or database triggers
 	run, err := s.repo.ActionRepo().GetRun(ctx, req.Msg.RunId)
 	if err != nil {
 		return connect.NewError(connect.CodeNotFound, err)
 	}
 
-	resp := &workflow.WatchRunDetailsResponse{
-		Details: &workflow.RunDetails{
-			// Would populate from run model
-		},
+	details, err := s.buildRunDetails(ctx, run, req.Msg.RunId)
+	if err != nil {
+		return connect.NewError(connect.CodeInternal, err)
 	}
-
-	if err := stream.Send(resp); err != nil {
+	if err := stream.Send(&workflow.WatchRunDetailsResponse{Details: details}); err != nil {
 		return err
 	}
 
 	logger.Infof(ctx, "Sent initial run details for: %s", run.Name)
 
-	// Keep connection open and send updates (simplified)
 	updates := make(chan *models.Run, 50)
 	errs := make(chan error, 1)
 
@@ -1248,17 +1233,34 @@ func (s *RunService) WatchRunDetails(
 		case err := <-errs:
 			return connect.NewError(connect.CodeInternal, err)
 		case run := <-updates:
-			resp := &workflow.WatchRunDetailsResponse{
-				Details: &workflow.RunDetails{
-					// Would populate from run
-				},
+			details, err := s.buildRunDetails(ctx, run, req.Msg.RunId)
+			if err != nil {
+				if ctx.Err() != nil {
+					return nil
+				}
+				return connect.NewError(connect.CodeInternal, err)
 			}
-			if err := stream.Send(resp); err != nil {
+			if err := stream.Send(&workflow.WatchRunDetailsResponse{Details: details}); err != nil {
 				return err
 			}
 			logger.Infof(ctx, "Sent run update for: %s", run.Name)
 		}
 	}
+}
+
+// buildRunDetails assembles RunDetails for a run model the same way GetRunDetails
+// does: the root action via buildActionDetails (spec, attempts, result) and the
+// RunSpec from the dedicated column with an ActionSpec fallback.
+func (s *RunService) buildRunDetails(ctx context.Context, run *models.Run, runID *common.RunIdentifier) (*workflow.RunDetails, error) {
+	rootActionID := &common.ActionIdentifier{Run: runID, Name: run.Name}
+	action, err := s.buildActionDetails(ctx, run, rootActionID)
+	if err != nil {
+		return nil, err
+	}
+	return &workflow.RunDetails{
+		RunSpec: extractRunSpecFromActionModel(ctx, run),
+		Action:  action,
+	}, nil
 }
 
 // WatchActionDetails streams action details updates from the DB.
@@ -1659,6 +1661,8 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 	}
 	if action.EndedAt.Valid {
 		status.EndTime = timestamppb.New(action.EndedAt.Time)
+		durationMs := uint64(status.EndTime.AsTime().Sub(status.StartTime.AsTime()).Milliseconds())
+		status.DurationMs = &durationMs
 	}
 	if action.DurationMs.Valid {
 		durationMs := uint64(action.DurationMs.Int64)
