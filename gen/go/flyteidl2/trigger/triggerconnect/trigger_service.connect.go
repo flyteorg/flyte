@@ -54,6 +54,9 @@ const (
 	// TriggerServiceDeleteTriggersProcedure is the fully-qualified name of the TriggerService's
 	// DeleteTriggers RPC.
 	TriggerServiceDeleteTriggersProcedure = "/flyteidl2.trigger.TriggerService/DeleteTriggers"
+	// TriggerServicePromoteTriggerProcedure is the fully-qualified name of the TriggerService's
+	// PromoteTrigger RPC.
+	TriggerServicePromoteTriggerProcedure = "/flyteidl2.trigger.TriggerService/PromoteTrigger"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
@@ -66,6 +69,7 @@ var (
 	triggerServiceGetTriggerRevisionHistoryMethodDescriptor = triggerServiceServiceDescriptor.Methods().ByName("GetTriggerRevisionHistory")
 	triggerServiceUpdateTriggersMethodDescriptor            = triggerServiceServiceDescriptor.Methods().ByName("UpdateTriggers")
 	triggerServiceDeleteTriggersMethodDescriptor            = triggerServiceServiceDescriptor.Methods().ByName("DeleteTriggers")
+	triggerServicePromoteTriggerMethodDescriptor            = triggerServiceServiceDescriptor.Methods().ByName("PromoteTrigger")
 )
 
 // TriggerServiceClient is a client for the flyteidl2.trigger.TriggerService service.
@@ -91,6 +95,10 @@ type TriggerServiceClient interface {
 	UpdateTriggers(context.Context, *connect.Request[trigger.UpdateTriggersRequest]) (*connect.Response[trigger.UpdateTriggersResponse], error)
 	// Soft-delete multiple triggers at once.
 	DeleteTriggers(context.Context, *connect.Request[trigger.DeleteTriggersRequest]) (*connect.Response[trigger.DeleteTriggersResponse], error)
+	// Point a trigger at a task version and pin it there. A pinned trigger keeps that version
+	// across later deploys of its task until it is promoted again, so deploying a task registers
+	// code without changing what the trigger runs.
+	PromoteTrigger(context.Context, *connect.Request[trigger.PromoteTriggerRequest]) (*connect.Response[trigger.PromoteTriggerResponse], error)
 }
 
 // NewTriggerServiceClient constructs a client for the flyteidl2.trigger.TriggerService service. By
@@ -149,6 +157,12 @@ func NewTriggerServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			connect.WithSchema(triggerServiceDeleteTriggersMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
+		promoteTrigger: connect.NewClient[trigger.PromoteTriggerRequest, trigger.PromoteTriggerResponse](
+			httpClient,
+			baseURL+TriggerServicePromoteTriggerProcedure,
+			connect.WithSchema(triggerServicePromoteTriggerMethodDescriptor),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -161,6 +175,7 @@ type triggerServiceClient struct {
 	getTriggerRevisionHistory *connect.Client[trigger.GetTriggerRevisionHistoryRequest, trigger.GetTriggerRevisionHistoryResponse]
 	updateTriggers            *connect.Client[trigger.UpdateTriggersRequest, trigger.UpdateTriggersResponse]
 	deleteTriggers            *connect.Client[trigger.DeleteTriggersRequest, trigger.DeleteTriggersResponse]
+	promoteTrigger            *connect.Client[trigger.PromoteTriggerRequest, trigger.PromoteTriggerResponse]
 }
 
 // DeployTrigger calls flyteidl2.trigger.TriggerService.DeployTrigger.
@@ -198,6 +213,11 @@ func (c *triggerServiceClient) DeleteTriggers(ctx context.Context, req *connect.
 	return c.deleteTriggers.CallUnary(ctx, req)
 }
 
+// PromoteTrigger calls flyteidl2.trigger.TriggerService.PromoteTrigger.
+func (c *triggerServiceClient) PromoteTrigger(ctx context.Context, req *connect.Request[trigger.PromoteTriggerRequest]) (*connect.Response[trigger.PromoteTriggerResponse], error) {
+	return c.promoteTrigger.CallUnary(ctx, req)
+}
+
 // TriggerServiceHandler is an implementation of the flyteidl2.trigger.TriggerService service.
 type TriggerServiceHandler interface {
 	// Create if trigger didn't exist previously.
@@ -221,6 +241,10 @@ type TriggerServiceHandler interface {
 	UpdateTriggers(context.Context, *connect.Request[trigger.UpdateTriggersRequest]) (*connect.Response[trigger.UpdateTriggersResponse], error)
 	// Soft-delete multiple triggers at once.
 	DeleteTriggers(context.Context, *connect.Request[trigger.DeleteTriggersRequest]) (*connect.Response[trigger.DeleteTriggersResponse], error)
+	// Point a trigger at a task version and pin it there. A pinned trigger keeps that version
+	// across later deploys of its task until it is promoted again, so deploying a task registers
+	// code without changing what the trigger runs.
+	PromoteTrigger(context.Context, *connect.Request[trigger.PromoteTriggerRequest]) (*connect.Response[trigger.PromoteTriggerResponse], error)
 }
 
 // NewTriggerServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -275,6 +299,12 @@ func NewTriggerServiceHandler(svc TriggerServiceHandler, opts ...connect.Handler
 		connect.WithSchema(triggerServiceDeleteTriggersMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
+	triggerServicePromoteTriggerHandler := connect.NewUnaryHandler(
+		TriggerServicePromoteTriggerProcedure,
+		svc.PromoteTrigger,
+		connect.WithSchema(triggerServicePromoteTriggerMethodDescriptor),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/flyteidl2.trigger.TriggerService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case TriggerServiceDeployTriggerProcedure:
@@ -291,6 +321,8 @@ func NewTriggerServiceHandler(svc TriggerServiceHandler, opts ...connect.Handler
 			triggerServiceUpdateTriggersHandler.ServeHTTP(w, r)
 		case TriggerServiceDeleteTriggersProcedure:
 			triggerServiceDeleteTriggersHandler.ServeHTTP(w, r)
+		case TriggerServicePromoteTriggerProcedure:
+			triggerServicePromoteTriggerHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -326,4 +358,8 @@ func (UnimplementedTriggerServiceHandler) UpdateTriggers(context.Context, *conne
 
 func (UnimplementedTriggerServiceHandler) DeleteTriggers(context.Context, *connect.Request[trigger.DeleteTriggersRequest]) (*connect.Response[trigger.DeleteTriggersResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.trigger.TriggerService.DeleteTriggers is not implemented"))
+}
+
+func (UnimplementedTriggerServiceHandler) PromoteTrigger(context.Context, *connect.Request[trigger.PromoteTriggerRequest]) (*connect.Response[trigger.PromoteTriggerResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.trigger.TriggerService.PromoteTrigger is not implemented"))
 }

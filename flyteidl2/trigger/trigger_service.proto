@@ -48,6 +48,11 @@ service TriggerService {
 
   // Soft-delete multiple triggers at once.
   rpc DeleteTriggers(DeleteTriggersRequest) returns (DeleteTriggersResponse) {}
+
+  // Point a trigger at a task version and pin it there. A pinned trigger keeps that version
+  // across later deploys of its task until it is promoted again, so deploying a task registers
+  // code without changing what the trigger runs.
+  rpc PromoteTrigger(PromoteTriggerRequest) returns (PromoteTriggerResponse) {}
 }
 
 // Request message for saving a trigger.
@@ -153,3 +158,22 @@ message DeleteTriggersRequest {
 
 // Response message for activating or deactivating multiple triggers.
 message DeleteTriggersResponse {}
+
+// Request message for pointing a trigger at a task version.
+message PromoteTriggerRequest {
+  common.TriggerName name = 1 [(buf.validate.field).required = true];
+
+  // Task version to run. It must already be deployed.
+  string task_version = 2 [
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 63
+  ];
+}
+
+// Response message for pointing a trigger at a task version.
+message PromoteTriggerResponse {
+  flyteidl2.trigger.TriggerDetails trigger = 1 [(buf.validate.field).required = true];
+
+  // Task version the trigger pointed at before this call.
+  string previous_task_version = 2;
+}

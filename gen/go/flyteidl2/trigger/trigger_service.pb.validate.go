@@ -2077,3 +2077,269 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeleteTriggersResponseValidationError{}
+
+// Validate checks the field values on PromoteTriggerRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PromoteTriggerRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PromoteTriggerRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PromoteTriggerRequestMultiError, or nil if none found.
+func (m *PromoteTriggerRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PromoteTriggerRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetName()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PromoteTriggerRequestValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PromoteTriggerRequestValidationError{
+					field:  "Name",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetName()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PromoteTriggerRequestValidationError{
+				field:  "Name",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for TaskVersion
+
+	if len(errors) > 0 {
+		return PromoteTriggerRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// PromoteTriggerRequestMultiError is an error wrapping multiple validation
+// errors returned by PromoteTriggerRequest.ValidateAll() if the designated
+// constraints aren't met.
+type PromoteTriggerRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PromoteTriggerRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PromoteTriggerRequestMultiError) AllErrors() []error { return m }
+
+// PromoteTriggerRequestValidationError is the validation error returned by
+// PromoteTriggerRequest.Validate if the designated constraints aren't met.
+type PromoteTriggerRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PromoteTriggerRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PromoteTriggerRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PromoteTriggerRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PromoteTriggerRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PromoteTriggerRequestValidationError) ErrorName() string {
+	return "PromoteTriggerRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PromoteTriggerRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPromoteTriggerRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PromoteTriggerRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PromoteTriggerRequestValidationError{}
+
+// Validate checks the field values on PromoteTriggerResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PromoteTriggerResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PromoteTriggerResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PromoteTriggerResponseMultiError, or nil if none found.
+func (m *PromoteTriggerResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PromoteTriggerResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetTrigger()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PromoteTriggerResponseValidationError{
+					field:  "Trigger",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PromoteTriggerResponseValidationError{
+					field:  "Trigger",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTrigger()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PromoteTriggerResponseValidationError{
+				field:  "Trigger",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for PreviousTaskVersion
+
+	if len(errors) > 0 {
+		return PromoteTriggerResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// PromoteTriggerResponseMultiError is an error wrapping multiple validation
+// errors returned by PromoteTriggerResponse.ValidateAll() if the designated
+// constraints aren't met.
+type PromoteTriggerResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PromoteTriggerResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PromoteTriggerResponseMultiError) AllErrors() []error { return m }
+
+// PromoteTriggerResponseValidationError is the validation error returned by
+// PromoteTriggerResponse.Validate if the designated constraints aren't met.
+type PromoteTriggerResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PromoteTriggerResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PromoteTriggerResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PromoteTriggerResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PromoteTriggerResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PromoteTriggerResponseValidationError) ErrorName() string {
+	return "PromoteTriggerResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PromoteTriggerResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPromoteTriggerResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PromoteTriggerResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PromoteTriggerResponseValidationError{}
