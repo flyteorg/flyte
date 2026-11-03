@@ -22,7 +22,9 @@ service ActionsService {
 
   // WatchForUpdates watches for updates to the state of actions.
   // This API guarantees at-least-once delivery semantics.
-  rpc WatchForUpdates(WatchForUpdatesRequest) returns (stream WatchForUpdatesResponse) {}
+  rpc WatchForUpdates(WatchForUpdatesRequest) returns (stream WatchForUpdatesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Update updates the status of an action and saves serialized NodeStatus.
   // This deprecates Put in the current StateService.

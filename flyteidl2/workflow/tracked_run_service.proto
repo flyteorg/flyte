@@ -42,7 +42,9 @@ service TrackedRunService {
 
   // Stream detailed information updates about a tracked run. The call will terminate when the run
   // reaches a terminal phase.
-  rpc WatchRunDetails(WatchRunDetailsRequest) returns (stream WatchRunDetailsResponse) {}
+  rpc WatchRunDetails(WatchRunDetailsRequest) returns (stream WatchRunDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Get detailed information about an action of a tracked run.
   rpc GetActionDetails(GetActionDetailsRequest) returns (GetActionDetailsResponse) {
@@ -51,7 +53,9 @@ service TrackedRunService {
 
   // Stream detailed information updates about an action of a tracked run. The call will terminate
   // when the action reaches a terminal phase.
-  rpc WatchActionDetails(WatchActionDetailsRequest) returns (stream WatchActionDetailsResponse) {}
+  rpc WatchActionDetails(WatchActionDetailsRequest) returns (stream WatchActionDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // List tracked runs based on the provided filter criteria.
   rpc ListRuns(ListRunsRequest) returns (ListRunsResponse) {
@@ -59,7 +63,9 @@ service TrackedRunService {
   }
 
   // Stream updates for tracked runs based on the provided filter criteria.
-  rpc WatchRuns(WatchRunsRequest) returns (stream WatchRunsResponse) {}
+  rpc WatchRuns(WatchRunsRequest) returns (stream WatchRunsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // List all actions for a given tracked run.
   rpc ListActions(ListActionsRequest) returns (ListActionsResponse) {
@@ -67,7 +73,9 @@ service TrackedRunService {
   }
 
   // Stream updates for actions of a given tracked run.
-  rpc WatchActions(WatchActionsRequest) returns (stream WatchActionsResponse) {}
+  rpc WatchActions(WatchActionsRequest) returns (stream WatchActionsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Abort a tracked run: mark the run and all of its non-terminal actions ABORTED on the server.
   // The platform cannot stop the client that owns the run; subsequent reports against aborted actions
