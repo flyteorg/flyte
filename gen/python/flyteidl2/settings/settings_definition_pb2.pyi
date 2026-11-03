@@ -129,10 +129,12 @@ class RunSettings(_message.Message):
     def __init__(self, default_queue: _Optional[_Union[StringSetting, _Mapping]] = ..., max_action_concurrency: _Optional[_Union[Int64Setting, _Mapping]] = ..., run_base_dir: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
 
 class SecuritySettings(_message.Message):
-    __slots__ = ["service_account"]
+    __slots__ = ["service_account", "kubernetes_namespace"]
     SERVICE_ACCOUNT_FIELD_NUMBER: _ClassVar[int]
+    KUBERNETES_NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     service_account: StringSetting
-    def __init__(self, service_account: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
+    kubernetes_namespace: StringSetting
+    def __init__(self, service_account: _Optional[_Union[StringSetting, _Mapping]] = ..., kubernetes_namespace: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
 
 class StorageSettings(_message.Message):
     __slots__ = ["raw_data_path"]
