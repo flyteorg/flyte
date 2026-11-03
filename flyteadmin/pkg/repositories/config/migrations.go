@@ -1298,6 +1298,37 @@ var ContinuedMigrations = []*gormigrate.Migration{
 			return tx.Migrator().DropIndex(&models.Execution{}, "idx_executions_phase")
 		},
 	},
+	{
+		ID: "2026-10-16-execution-retention-index",
+		Migrate: func(tx *gorm.DB) error {
+			if tx.Dialector.Name() != "postgres" {
+				return nil
+			}
+			for _, query := range []string{
+				`CREATE INDEX IF NOT EXISTS idx_executions_retention ON executions
+                    (execution_updated_at, execution_project, execution_domain, execution_name)
+                    WHERE phase IN ('SUCCEEDED','FAILED','ABORTED','TIMED_OUT')`,
+				`CREATE INDEX IF NOT EXISTS idx_executions_retention_source ON executions (source_execution_id)`,
+				`CREATE INDEX IF NOT EXISTS idx_executions_retention_parent ON executions (parent_node_execution_id)`,
+			} {
+				if err := tx.Exec(query).Error; err != nil {
+					return err
+				}
+			}
+			return nil
+		},
+		Rollback: func(tx *gorm.DB) error {
+			if tx.Dialector.Name() != "postgres" {
+				return nil
+			}
+			for _, index := range []string{"idx_executions_retention", "idx_executions_retention_source", "idx_executions_retention_parent"} {
+				if err := tx.Exec("DROP INDEX IF EXISTS " + index).Error; err != nil {
+					return err
+				}
+			}
+			return nil
+		},
+	},
 }
 
 var m = append(LegacyMigrations, NoopMigrations...)

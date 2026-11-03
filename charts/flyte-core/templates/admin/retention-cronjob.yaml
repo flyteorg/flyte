@@ -1,0 +1,91 @@
+{{- if and .Values.flyteadmin.enabled .Values.flyteadmin.retention.enabled }}
+{{- $admin := .Values.flyteadmin }}
+{{- $retention := $admin.retention }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ template "flyteadmin.name" . }}-retention
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+spec:
+  schedule: {{ $retention.schedule | quote }}
+  timeZone: {{ $retention.timeZone | quote }}
+  suspend: {{ $retention.suspend }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: {{ $retention.activeDeadlineSeconds }}
+      backoffLimit: {{ $retention.backoffLimit }}
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: flyteadmin-retention
+          {{- with $admin.podAnnotations }}
+          annotations: {{ tpl (toYaml .) $ | nindent 12 }}
+          {{- end }}
+        spec:
+          restartPolicy: Never
+          serviceAccountName: {{ template "flyteadmin.name" . }}
+          {{- with $admin.securityContext }}
+          securityContext: {{ tpl (toYaml .) $ | nindent 12 }}
+          {{- end }}
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets: {{ tpl (toYaml .) $ | nindent 12 }}
+          {{- end }}
+          {{- with $admin.nodeSelector }}
+          nodeSelector: {{ tpl (toYaml .) $ | nindent 12 }}
+          {{- end }}
+          {{- with $admin.affinity }}
+          affinity: {{ tpl (toYaml .) $ | nindent 12 }}
+          {{- end }}
+          {{- with $admin.tolerations }}
+          tolerations: {{ tpl (toYaml .) $ | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: retention
+              image: "{{ $admin.image.repository }}:{{ $admin.image.tag }}"
+              imagePullPolicy: {{ $admin.image.pullPolicy }}
+              command: [flyteadmin-retention]
+              args:
+                - --config
+                - {{ $admin.configPath | quote }}
+                - --retention-age={{ $retention.age }}
+                - --batch-size={{ $retention.batchSize }}
+                - --max-runtime={{ $retention.maxRuntime }}
+                - --dry-run={{ $retention.dryRun }}
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              resources: {{ toYaml $retention.resources | nindent 16 }}
+              {{- with $admin.env }}
+              env: {{ tpl (toYaml .) $ | nindent 16 }}
+              {{- end }}
+              {{- with $admin.envFrom }}
+              envFrom: {{ tpl (toYaml .) $ | nindent 16 }}
+              {{- end }}
+              volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 16 }}
+                - mountPath: /etc/flyte/config
+                  name: config
+                - mountPath: /etc/secrets/
+                  name: admin-secrets
+                {{- with $admin.additionalVolumeMounts }}
+                {{- tpl (toYaml .) $ | nindent 16 }}
+                {{- end }}
+          volumes: {{- include "databaseSecret.volume" . | nindent 12 }}
+            - name: config
+              projected:
+                sources:
+                  - configMap:
+                      name: flyte-admin-base-config
+                  {{- if .Values.storage.secretName }}
+                  - secret:
+                      name: {{ .Values.storage.secretName }}
+                  {{- end }}
+            - name: admin-secrets
+              secret:
+                secretName: flyte-admin-secrets
+            {{- with $admin.additionalVolumes }}
+            {{- tpl (toYaml .) $ | nindent 12 }}
+            {{- end }}
+{{- end }}

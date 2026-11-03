@@ -11,6 +11,19 @@
 
 flyteadmin:
   enabled: true
+  # Database-only retention; uses the flyteadmin image and configuration.
+  retention:
+    enabled: false
+    suspend: false
+    schedule: "0 3 * * *"
+    timeZone: "Etc/UTC"
+    age: 2160h
+    batchSize: 100
+    maxRuntime: 20m
+    dryRun: true
+    activeDeadlineSeconds: 1500
+    backoffLimit: 1
+    resources: {}
   # -- Replicas count for Flyteadmin deployment
   replicaCount: 1
   image:
