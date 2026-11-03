@@ -1748,14 +1748,6 @@ func TestActionModelToDetails(t *testing.T) {
 		verify   func(t *testing.T, result *workflow.ActionDetails)
 	}{
 		{
-			name:     "BothNilReturnsNil",
-			action:   nil,
-			actionID: nil,
-			verify: func(t *testing.T, result *workflow.ActionDetails) {
-				assert.Nil(t, result)
-			},
-		},
-		{
 			name: "BasicStatusFields",
 			action: &models.Action{
 				Phase:       int32(common.ActionPhase_ACTION_PHASE_RUNNING),
@@ -1870,136 +1862,96 @@ func TestActionModelToDetails(t *testing.T) {
 	}
 }
 
-func TestRunModelToDetails(t *testing.T) {
-	svc := &RunService{}
-
-	testRunID := &common.RunIdentifier{
+func TestBuildRunDetails(t *testing.T) {
+	runID := &common.RunIdentifier{
 		Org:     "test-org",
 		Project: "test-project",
 		Domain:  "test-domain",
 		Name:    "test-run",
 	}
+	rootActionID := &common.ActionIdentifier{Run: runID, Name: runID.Name}
 
-	validActionSpecBytes, err := json.Marshal(&workflow.ActionSpec{
+	// persistRunModel stores ActionSpec with proto.Marshal, so the fixture must too.
+	actionSpecBytes, err := proto.Marshal(&workflow.ActionSpec{
 		RunSpec: &task.RunSpec{
-			Labels: &task.Labels{
-				Values: map[string]string{"env": "prod"},
-			},
+			Labels: &task.Labels{Values: map[string]string{"env": "prod"}},
 		},
+	})
+	require.NoError(t, err)
+	runSpecBytes, err := proto.Marshal(&task.RunSpec{
+		Labels: &task.Labels{Values: map[string]string{"env": "staging"}},
 	})
 	require.NoError(t, err)
 
 	tests := []struct {
 		name   string
 		run    *models.Run
-		runID  *common.RunIdentifier
 		verify func(t *testing.T, result *workflow.RunDetails)
 	}{
 		{
-			name:  "BothNilReturnsNil",
-			run:   nil,
-			runID: nil,
-			verify: func(t *testing.T, result *workflow.RunDetails) {
-				assert.Nil(t, result)
-			},
-		},
-		{
 			name: "EmptyActionSpecNilRunSpec",
-			run: &models.Run{
-				Name:  "test-run",
-				Phase: int32(common.ActionPhase_ACTION_PHASE_RUNNING),
-			},
-			runID: testRunID,
+			run:  &models.Run{Name: runID.Name, Phase: int32(common.ActionPhase_ACTION_PHASE_RUNNING)},
 			verify: func(t *testing.T, result *workflow.RunDetails) {
-				require.NotNil(t, result)
 				assert.Nil(t, result.RunSpec)
 			},
 		},
 		{
-			name: "ValidActionSpecExtractsRunSpec",
+			name: "ProtoActionSpecExtractsRunSpec",
 			run: &models.Run{
-				Name:       "test-run",
+				Name:       runID.Name,
 				Phase:      int32(common.ActionPhase_ACTION_PHASE_RUNNING),
-				ActionSpec: validActionSpecBytes,
+				ActionSpec: actionSpecBytes,
 			},
-			runID: testRunID,
 			verify: func(t *testing.T, result *workflow.RunDetails) {
-				require.NotNil(t, result)
 				require.NotNil(t, result.RunSpec)
-				require.NotNil(t, result.RunSpec.Labels)
-				assert.Equal(t, "prod", result.RunSpec.Labels.Values["env"])
+				assert.Equal(t, "prod", result.RunSpec.GetLabels().GetValues()["env"])
+			},
+		},
+		{
+			name: "RunSpecColumnPreferredOverActionSpec",
+			run: &models.Run{
+				Name:       runID.Name,
+				Phase:      int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+				ActionSpec: actionSpecBytes,
+				RunSpec:    runSpecBytes,
+			},
+			verify: func(t *testing.T, result *workflow.RunDetails) {
+				require.NotNil(t, result.RunSpec)
+				assert.Equal(t, "staging", result.RunSpec.GetLabels().GetValues()["env"])
 			},
 		},
 		{
 			name: "MalformedActionSpecNilRunSpec",
 			run: &models.Run{
-				Name:       "test-run",
+				Name:       runID.Name,
 				Phase:      int32(common.ActionPhase_ACTION_PHASE_RUNNING),
-				ActionSpec: []byte("not-valid-json{{"),
+				ActionSpec: []byte("not-valid-proto{{"),
 			},
-			runID: testRunID,
 			verify: func(t *testing.T, result *workflow.RunDetails) {
-				require.NotNil(t, result)
 				assert.Nil(t, result.RunSpec)
 			},
 		},
 		{
-			name: "RunNamePropagatedToActionID",
-			run: &models.Run{
-				Name:  "my-run-name",
-				Phase: int32(common.ActionPhase_ACTION_PHASE_QUEUED),
-			},
-			runID: testRunID,
+			name: "RootActionIDPropagated",
+			run:  &models.Run{Name: runID.Name, Phase: int32(common.ActionPhase_ACTION_PHASE_QUEUED)},
 			verify: func(t *testing.T, result *workflow.RunDetails) {
-				require.NotNil(t, result)
 				require.NotNil(t, result.Action)
-				require.NotNil(t, result.Action.Id)
-				assert.Equal(t, "my-run-name", result.Action.Id.Name)
-			},
-		},
-		{
-			name: "RunIDPropagatedToActionID",
-			run: &models.Run{
-				Name:  testRunID.Name,
-				Phase: int32(common.ActionPhase_ACTION_PHASE_RUNNING),
-			},
-			runID: testRunID,
-			verify: func(t *testing.T, result *workflow.RunDetails) {
-				require.NotNil(t, result)
-				require.NotNil(t, result.Action)
-				require.NotNil(t, result.Action.Id)
-				assert.Equal(t, testRunID.Org, result.Action.Id.Run.Org)
-				assert.Equal(t, testRunID.Project, result.Action.Id.Run.Project)
-				assert.Equal(t, testRunID.Domain, result.Action.Id.Run.Domain)
-				assert.Equal(t, testRunID.Name, result.Action.Id.Run.Name)
+				assert.True(t, proto.Equal(rootActionID, result.Action.Id))
 			},
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.verify(t, svc.runModelToDetails(tc.run, tc.runID))
+			actionRepo, _, svc := newTestService(t)
+			actionRepo.On("ListEvents", mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil)
+
+			result, err := svc.buildRunDetails(context.Background(), tc.run, runID)
+			require.NoError(t, err)
+			require.NotNil(t, result)
+			tc.verify(t, result)
 		})
 	}
-}
-
-func newWatchRunDetailsTestClient(t *testing.T, actionRepo *repoMocks.ActionRepo) workflowconnect.RunServiceClient {
-	t.Helper()
-	taskRepo := &repoMocks.TaskRepo{}
-	repo := &repoMocks.Repository{}
-	repo.On("ActionRepo").Return(actionRepo)
-	repo.On("TaskRepo").Maybe().Return(taskRepo)
-
-	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
-	svc := &RunService{repo: repo, actionsClient: actionsClient}
-	path, handler := workflowconnect.NewRunServiceHandler(svc)
-
-	mux := http.NewServeMux()
-	mux.Handle(path, handler)
-	server := httptest.NewServer(mux)
-	t.Cleanup(server.Close)
-
-	return workflowconnect.NewRunServiceClient(http.DefaultClient, server.URL)
 }
 
 func TestWatchRunDetails(t *testing.T) {
@@ -2009,13 +1961,42 @@ func TestWatchRunDetails(t *testing.T) {
 		Domain:  "test-domain",
 		Name:    "rtest-watch-1",
 	}
+	rootActionID := &common.ActionIdentifier{Run: runID, Name: runID.Name}
+
+	actionSpecBytes, err := proto.Marshal(&workflow.ActionSpec{
+		RunSpec: &task.RunSpec{Labels: &task.Labels{Values: map[string]string{"env": "prod"}}},
+	})
+	require.NoError(t, err)
 
 	runModel := &models.Run{
-		Project: runID.Project,
-		Domain:  runID.Domain,
-		Name:    runID.Name,
-		Phase:   int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+		Project:    runID.Project,
+		Domain:     runID.Domain,
+		Name:       runID.Name,
+		Phase:      int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+		Attempts:   1,
+		ActionSpec: actionSpecBytes,
 	}
+
+	// The terminal update: a FAILED run whose last attempt carries error info.
+	failedModel := &models.Run{
+		Project:    runID.Project,
+		Domain:     runID.Domain,
+		Name:       runID.Name,
+		Phase:      int32(common.ActionPhase_ACTION_PHASE_FAILED),
+		Attempts:   1,
+		ActionSpec: actionSpecBytes,
+	}
+	failedEventBytes, err := proto.Marshal(&workflow.ActionEvent{
+		Id:      rootActionID,
+		Attempt: 1,
+		Phase:   common.ActionPhase_ACTION_PHASE_FAILED,
+		ErrorInfo: &workflow.ErrorInfo{
+			Kind:    workflow.ErrorInfo_KIND_USER,
+			Message: "boom",
+		},
+	})
+	require.NoError(t, err)
+	failedEvents := []*models.ActionEvent{{Attempt: 1, Info: failedEventBytes}}
 
 	tests := []struct {
 		name       string
@@ -2028,8 +2009,7 @@ func TestWatchRunDetails(t *testing.T) {
 				actionRepo.EXPECT().GetRun(mock.Anything, matchRunID(runID)).Return(nil, fmt.Errorf("run not found"))
 			},
 			test: func(t *testing.T, client workflowconnect.RunServiceClient) {
-				ctx := context.Background()
-				stream, err := client.WatchRunDetails(ctx, connect.NewRequest(&workflow.WatchRunDetailsRequest{
+				stream, err := client.WatchRunDetails(context.Background(), connect.NewRequest(&workflow.WatchRunDetailsRequest{
 					RunId: runID,
 				}))
 				require.NoError(t, err)
@@ -2041,9 +2021,10 @@ func TestWatchRunDetails(t *testing.T) {
 			},
 		},
 		{
-			name: "Initial_State_Sent_On_Success",
+			name: "Initial_State_Has_RunSpec_And_Attempts",
 			setupMocks: func(actionRepo *repoMocks.ActionRepo) {
 				actionRepo.EXPECT().GetRun(mock.Anything, matchRunID(runID)).Return(runModel, nil)
+				actionRepo.EXPECT().ListEvents(mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil)
 				actionRepo.EXPECT().WatchRunUpdates(mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
 					RunAndReturn(func(ctx context.Context, _ *common.RunIdentifier, _ chan<- *models.Run, _ chan<- error) {
 						<-ctx.Done()
@@ -2058,8 +2039,12 @@ func TestWatchRunDetails(t *testing.T) {
 				}))
 				require.NoError(t, err)
 
-				assert.True(t, stream.Receive())
-				require.NotNil(t, stream.Msg().Details)
+				require.True(t, stream.Receive())
+				details := stream.Msg().Details
+				require.NotNil(t, details)
+				assert.Equal(t, "prod", details.GetRunSpec().GetLabels().GetValues()["env"])
+				assert.True(t, proto.Equal(rootActionID, details.GetAction().GetId()))
+				assert.Equal(t, common.ActionPhase_ACTION_PHASE_RUNNING, details.GetAction().GetStatus().GetPhase())
 
 				cancel()
 				assert.False(t, stream.Receive())
@@ -2069,20 +2054,19 @@ func TestWatchRunDetails(t *testing.T) {
 			name: "Watch_Error_Returns_Internal_Error",
 			setupMocks: func(actionRepo *repoMocks.ActionRepo) {
 				actionRepo.EXPECT().GetRun(mock.Anything, matchRunID(runID)).Return(runModel, nil)
+				actionRepo.EXPECT().ListEvents(mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil)
 				actionRepo.EXPECT().WatchRunUpdates(mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
 					RunAndReturn(func(_ context.Context, _ *common.RunIdentifier, _ chan<- *models.Run, errs chan<- error) {
 						errs <- fmt.Errorf("db watch failed")
 					})
 			},
 			test: func(t *testing.T, client workflowconnect.RunServiceClient) {
-				ctx := context.Background()
-				stream, err := client.WatchRunDetails(ctx, connect.NewRequest(&workflow.WatchRunDetailsRequest{
+				stream, err := client.WatchRunDetails(context.Background(), connect.NewRequest(&workflow.WatchRunDetailsRequest{
 					RunId: runID,
 				}))
 				require.NoError(t, err)
 
 				assert.True(t, stream.Receive())
-
 				assert.False(t, stream.Receive())
 				require.Error(t, stream.Err())
 				var connectErr *connect.Error
@@ -2091,17 +2075,14 @@ func TestWatchRunDetails(t *testing.T) {
 			},
 		},
 		{
-			name: "Run_Update_Sends_New_Response",
+			name: "Run_Update_Streams_Attempts_And_ErrorInfo",
 			setupMocks: func(actionRepo *repoMocks.ActionRepo) {
 				actionRepo.EXPECT().GetRun(mock.Anything, matchRunID(runID)).Return(runModel, nil)
+				actionRepo.EXPECT().ListEvents(mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil).Once()
+				actionRepo.EXPECT().ListEvents(mock.Anything, matchActionID(rootActionID), 500).Return(failedEvents, nil).Once()
 				actionRepo.EXPECT().WatchRunUpdates(mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
 					RunAndReturn(func(ctx context.Context, _ *common.RunIdentifier, updates chan<- *models.Run, _ chan<- error) {
-						updates <- &models.Run{
-							Project: runID.Project,
-							Domain:  runID.Domain,
-							Name:    runID.Name,
-							Phase:   int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
-						}
+						updates <- failedModel
 						<-ctx.Done()
 					})
 			},
@@ -2114,9 +2095,16 @@ func TestWatchRunDetails(t *testing.T) {
 				}))
 				require.NoError(t, err)
 
-				assert.True(t, stream.Receive())
-				assert.True(t, stream.Receive())
-				assert.NotNil(t, stream.Msg().Details)
+				require.True(t, stream.Receive())
+				require.True(t, stream.Receive())
+				details := stream.Msg().Details
+				require.NotNil(t, details)
+				assert.Equal(t, "prod", details.GetRunSpec().GetLabels().GetValues()["env"])
+				action := details.GetAction()
+				assert.Equal(t, common.ActionPhase_ACTION_PHASE_FAILED, action.GetStatus().GetPhase())
+				require.Len(t, action.GetAttempts(), 1)
+				assert.Equal(t, workflow.ErrorInfo_KIND_USER, action.GetErrorInfo().GetKind())
+				assert.Equal(t, "boom", action.GetErrorInfo().GetMessage())
 
 				cancel()
 				assert.False(t, stream.Receive())
@@ -2126,11 +2114,10 @@ func TestWatchRunDetails(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			actionRepo := &repoMocks.ActionRepo{}
+			actionRepo, _, svc := newTestService(t)
 			tc.setupMocks(actionRepo)
-			client := newWatchRunDetailsTestClient(t, actionRepo)
+			client := newRunServiceTestClient(t, svc)
 			tc.test(t, client)
-			actionRepo.AssertExpectations(t)
 		})
 	}
 }
