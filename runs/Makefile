@@ -122,3 +122,8 @@ clean: clean-db ## Remove build artifacts and database
 	@echo "Cleaning build artifacts..."
 	@rm -rf bin/
 	@rm -f coverage.out coverage.html
+
+.PHONY: build-retention
+build-retention: ## Build the one-shot retention job
+	@mkdir -p $(BIN_DIR)
+	@go build -o $(BIN_DIR)/runs-retention ./cmd/retention
