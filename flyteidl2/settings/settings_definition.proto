@@ -167,6 +167,8 @@ message RunSettings {
 // SecuritySettings controls security-related configuration.
 message SecuritySettings {
   StringSetting service_account = 1 [(flyteidl2.settings.desc) = "Kubernetes service account for task pods"];
+  // A server may restrict which values are allowed, and who may set this.
+  StringSetting kubernetes_namespace = 2 [(flyteidl2.settings.desc) = "Kubernetes namespace that task pods and apps run in"];
 }
 
 // StorageSettings controls data storage configuration.
