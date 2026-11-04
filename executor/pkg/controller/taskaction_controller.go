@@ -585,13 +585,16 @@ func (r *TaskActionReconciler) recordAttemptStart(
 	return r.persistAttemptStartedAt(ctx, taskAction, startedAt)
 }
 
+// ensureAttemptQueuedAt stamps when the attempt was queued. The stamp lives on the TaskAction in memory and is saved
+// by the status write that ends the reconcile. A reconcile that fails before that write, such as one whose event
+// cannot be published, works out the time again from what is already saved: the action's creation, the retry's
+// launch time or the phase history. An outage of the event service therefore does not move the clock.
 func (r *TaskActionReconciler) ensureAttemptQueuedAt(
-	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
 	retryLaunchableAt *metav1.Time,
-) error {
+) {
 	if taskAction.Status.AttemptQueuedAt != nil || !isQueuedPluginPhase(taskAction.Status.PluginPhase) {
-		return nil
+		return
 	}
 	queuedAt, ok := getPhaseLastTransitionTime(taskAction, flyteorgv1.ConditionReasonQueued)
 	if retryLaunchableAt != nil {
@@ -604,40 +607,22 @@ func (r *TaskActionReconciler) ensureAttemptQueuedAt(
 			queuedAt = taskAction.CreationTimestamp.Time
 		}
 	}
-	return r.persistAttemptQueuedAt(ctx, taskAction, queuedAt)
+	stampedAt := metav1.NewTime(queuedAt)
+	taskAction.Status.AttemptQueuedAt = &stampedAt
 }
 
 func (r *TaskActionReconciler) recordAttemptQueuedFromPhase(
-	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
 	info pluginsCore.PhaseInfo,
-) error {
+) {
 	if taskAction.Status.AttemptQueuedAt != nil || !isQueuedPhase(info.Phase()) {
-		return nil
+		return
 	}
-	queuedAt := r.now()
+	queuedAt := metav1.NewTime(r.now())
 	if taskInfo := info.Info(); taskInfo != nil && taskInfo.OccurredAt != nil && !taskInfo.OccurredAt.IsZero() {
-		queuedAt = *taskInfo.OccurredAt
+		queuedAt = metav1.NewTime(*taskInfo.OccurredAt)
 	}
-	return r.persistAttemptQueuedAt(ctx, taskAction, queuedAt)
-}
-
-func (r *TaskActionReconciler) persistAttemptQueuedAt(
-	ctx context.Context,
-	taskAction *flyteorgv1.TaskAction,
-	queuedAt time.Time,
-) error {
-	finalQueuedAt := metav1.NewTime(queuedAt)
-	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
-		if latest.Status.AttemptQueuedAt == nil {
-			latest.Status.AttemptQueuedAt = &finalQueuedAt
-		}
-		finalQueuedAt = *latest.Status.AttemptQueuedAt
-	}); err != nil {
-		return err
-	}
-	taskAction.Status.AttemptQueuedAt = &finalQueuedAt
-	return nil
+	taskAction.Status.AttemptQueuedAt = &queuedAt
 }
 
 // recordAttemptInitialized anchors the first time the plugin reports the attempt initializing,
@@ -1169,9 +1154,7 @@ func (r *TaskActionReconciler) reconcileTask(
 		return r.timeoutAwareRequeue(taskAction, timeouts), nil
 	}
 
-	if err := r.ensureAttemptQueuedAt(ctx, taskAction, retryLaunchableAt); err != nil {
-		return ctrl.Result{}, err
-	}
+	r.ensureAttemptQueuedAt(taskAction, retryLaunchableAt)
 
 	// A recorded deadline means an earlier reconcile already committed to ending
 	// this attempt. Resume that cleanup rather than handling the plugin again.
@@ -1250,9 +1233,7 @@ func (r *TaskActionReconciler) reconcileTask(
 		transition.Info().Phase() == pluginsCore.PhaseQueued
 
 	if handleErr == nil {
-		if err := r.recordAttemptQueuedFromPhase(ctx, taskAction, transition.Info()); err != nil {
-			return ctrl.Result{}, err
-		}
+		r.recordAttemptQueuedFromPhase(taskAction, transition.Info())
 		if err := r.recordAttemptStart(ctx, taskAction, transition.Info(), alreadyRunning); err != nil {
 			return ctrl.Result{}, err
 		}
