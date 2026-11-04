@@ -40,7 +40,7 @@ message EnqueueActionRequest {
   string run_output_base = 7 [(buf.validate.field).string.min_len = 1];
 
   // group this action belongs to, if applicable.
-  string group = 8;
+  string group = 8 [(buf.validate.field).string.max_len = 255];
 
   // subject that created the run, if known.
   string subject = 9;

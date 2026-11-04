@@ -62,9 +62,9 @@ const primaryContainerAnnotation = "flyte.org/primary-container"
 
 // Gang admission: a JobSet held suspended by an external admission gate (Kueue's
 // JobSet integration flips spec.suspend) is reported as WaitingForResources until the
-// gate releases it, and as a GangEvicted system retry if the gate revokes a gang that
-// had already fully started. See phase.go. Build-time wiring (queue label and
-// spec.suspend on creation) is gated by plugin config.
+// gate releases it. If the gate revokes a gang that had already fully started, the
+// attempt ends with GangEvicted, or, for a preemption with the task's
+// failure_policy.resume_after_preemption set, waits for re-admission. See phase.go.
 
 var (
 	labelSanitizeRE = regexp.MustCompile(`[^a-zA-Z0-9._-]`)

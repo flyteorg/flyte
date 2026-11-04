@@ -119,6 +119,10 @@ func TestMain(m *testing.M) {
 		log.Printf("Failed to create manager: %v", err)
 		return
 	}
+	if err := actionsk8s.RegisterTaskActionIndexes(ctx, mgr.GetCache()); err != nil {
+		log.Printf("Failed to register TaskAction indexes: %v", err)
+		return
+	}
 	go func() {
 		if err := mgr.Start(ctx); err != nil {
 			log.Printf("Manager exited with error: %v", err)

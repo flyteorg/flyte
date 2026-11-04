@@ -22,6 +22,7 @@ import (
 	plugink8s "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	k8smocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	clusteredpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
 )
 
 const (
@@ -70,9 +71,24 @@ func readerWith(t *testing.T, objects ...client.Object) client.Reader {
 func kueuePluginCtx(
 	reader client.Reader, state plugink8s.PluginState, retryAttempt, maxAttempts uint32,
 ) *k8smocks.PluginContext {
+	return kueuePluginCtxFor(twoNodeSpec(), reader, state, retryAttempt, maxAttempts)
+}
+
+// resumingPluginCtx is kueuePluginCtx for a task that resumes after a preemption.
+func resumingPluginCtx(
+	reader client.Reader, state plugink8s.PluginState, retryAttempt, maxAttempts uint32,
+) *k8smocks.PluginContext {
+	spec := twoNodeSpecWithPolicy(&clusteredpb.ClusterFailurePolicy{ResumeAfterPreemption: true})
+	return kueuePluginCtxFor(spec, reader, state, retryAttempt, maxAttempts)
+}
+
+func kueuePluginCtxFor(
+	taskTemplate *core.TaskTemplate,
+	reader client.Reader, state plugink8s.PluginState, retryAttempt, maxAttempts uint32,
+) *k8smocks.PluginContext {
 	pCtx := &k8smocks.PluginContext{}
 	taskReader := &coreMocks.TaskReader{}
-	taskReader.EXPECT().Read(mock.Anything).Return(twoNodeSpec(), nil)
+	taskReader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
 	pCtx.EXPECT().TaskReader().Return(taskReader)
 	pCtx.EXPECT().K8sReader().Return(reader)
 
@@ -157,6 +173,15 @@ func TestGetTaskPhase_Evicted_ClassifiedByWorkloadReason(t *testing.T) {
 			wantInMsg:   []string{"(Deactivated): The workload is deactivated", "does not count against the task's retries"},
 		},
 		{
+			name: "deactivating it while a stale preemption reason is in place is a system retry",
+			workload: deactivated(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "True", evictedByPreemption, preemptedMessage),
+				workloadCond(workloadConditionPreempted, "True", "InClusterQueue", preemptedMessage)),
+			maxAttempts: 3,
+			wantKind:    core.ExecutionError_SYSTEM,
+			wantInMsg:   []string{"gang evicted by kueue (Deactivated); this does not count against the task's retries"},
+		},
+		{
 			name: "a stopped queue is a system retry",
 			workload: workload(testJobSetUID,
 				workloadCond(workloadConditionEvicted, "True", "ClusterQueueStopped", "The ClusterQueue is stopped")),
@@ -199,6 +224,176 @@ func TestGetTaskPhase_Evicted_ClassifiedByWorkloadReason(t *testing.T) {
 			}
 		})
 	}
+}
+
+// deactivated is a deactivated Workload (spec.active: false) with the given conditions.
+func deactivated(jobSetUID k8stypes.UID, conditions ...map[string]interface{}) *unstructured.Unstructured {
+	wl := workload(jobSetUID, conditions...)
+	wl.Object["spec"] = map[string]interface{}{"active": false}
+	return wl
+}
+
+func TestGetTaskPhase_Resume_WaitsForReadmission(t *testing.T) {
+	tests := []struct {
+		name       string
+		workload   *unstructured.Unstructured
+		wantReason string
+	}{
+		{
+			name: "preemption",
+			workload: workload(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "True", evictedByPreemption, preemptedMessage),
+				workloadCond(workloadConditionPreempted, "True", "InClusterQueue", preemptedMessage)),
+			wantReason: "gang evicted by kueue (Preempted, InClusterQueue): " + preemptedMessage +
+				"; waiting for re-admission",
+		},
+		{
+			name:       "no Evicted condition yet",
+			workload:   workload(testJobSetUID),
+			wantReason: "gang evicted by kueue; waiting for re-admission",
+		},
+		{
+			name: "Evicted condition from an earlier eviction not True yet",
+			workload: workload(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "False", "NodeFailures", "")),
+			wantReason: "gang evicted by kueue; waiting for re-admission",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Given
+			pCtx := resumingPluginCtx(readerWith(t, tt.workload), startedState, 0, 1)
+
+			// When
+			phase, err := clusteredResourceHandler{}.GetTaskPhase(context.Background(), pCtx, suspendedJobSet())
+
+			// Then
+			require.NoError(t, err)
+			assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+			assert.Equal(t, tt.wantReason, phase.Reason())
+			assert.Nil(t, phase.Err())
+			assert.False(t, phase.CleanupOnFailure())
+		})
+	}
+}
+
+func TestGetTaskPhase_Resume_EndsAttemptUnlessPreempted(t *testing.T) {
+	tests := []struct {
+		name      string
+		workload  *unstructured.Unstructured
+		wantKind  core.ExecutionError_ErrorKind
+		wantInMsg string
+	}{
+		{
+			name: "pods ready timeout",
+			workload: workload(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "True", "PodsReadyTimeout", "Exceeded the PodsReady timeout")),
+			wantKind:  core.ExecutionError_SYSTEM,
+			wantInMsg: "gang evicted by kueue (PodsReadyTimeout)",
+		},
+		{
+			name: "node failures",
+			workload: workload(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "True", "NodeFailures", "node lost")),
+			wantKind:  core.ExecutionError_SYSTEM,
+			wantInMsg: "gang evicted by kueue (NodeFailures)",
+		},
+		{
+			name: "a stopped queue",
+			workload: workload(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "True", "ClusterQueueStopped", "The ClusterQueue is stopped")),
+			wantKind:  core.ExecutionError_SYSTEM,
+			wantInMsg: "gang evicted by kueue (ClusterQueueStopped)",
+		},
+		{
+			name: "requeuing limit exceeded",
+			workload: deactivated(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "True", "DeactivatedDueToRequeuingLimitExceeded", "")),
+			wantKind: core.ExecutionError_SYSTEM,
+		},
+		{
+			name: "the user's maximum execution time",
+			workload: deactivated(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "True", evictedByMaximumExecutionTime, "")),
+			wantKind: core.ExecutionError_USER,
+		},
+		{
+			name: "deactivated while waiting after a preemption",
+			workload: deactivated(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "True", evictedByPreemption, preemptedMessage),
+				workloadCond(workloadConditionPreempted, "True", "InClusterQueue", preemptedMessage)),
+			wantKind:  core.ExecutionError_SYSTEM,
+			wantInMsg: "gang evicted by kueue (Deactivated); this does not count against the task's retries",
+		},
+		{
+			name: "deactivated by an operator",
+			workload: workload(testJobSetUID,
+				workloadCond(workloadConditionEvicted, "True", "Deactivated", "The workload is deactivated")),
+			wantKind: core.ExecutionError_SYSTEM,
+		},
+		{
+			name:     "deactivated before Kueue wrote the condition",
+			workload: deactivated(testJobSetUID),
+			wantKind: core.ExecutionError_SYSTEM,
+		},
+		{
+			name:     "no Workload for this JobSet",
+			workload: workload("another-jobset"),
+			wantKind: core.ExecutionError_SYSTEM,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Given
+			pCtx := resumingPluginCtx(readerWith(t, tt.workload), startedState, 0, 3)
+
+			// When
+			phase, err := clusteredResourceHandler{}.GetTaskPhase(context.Background(), pCtx, suspendedJobSet())
+
+			// Then
+			require.NoError(t, err)
+			assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
+			require.NotNil(t, phase.Err())
+			assert.Equal(t, gang.CodeGangEvicted, phase.Err().GetCode())
+			assert.Equal(t, tt.wantKind, phase.Err().GetKind())
+			assert.True(t, phase.CleanupOnFailure())
+			assert.Contains(t, phase.Err().GetMessage(), tt.wantInMsg)
+		})
+	}
+}
+
+func TestGetTaskPhase_Resume_EvictionWhileRunningBumpsVersion(t *testing.T) {
+	// Given a running gang that Kueue preempts
+	wl := workload(testJobSetUID, workloadCond(workloadConditionEvicted, "True", evictedByPreemption, ""))
+	running := plugink8s.PluginState{Phase: pluginsCore.PhaseRunning, PhaseVersion: 4, Reason: "running (restart attempt 0)"}
+	pCtx := resumingPluginCtx(readerWith(t, wl), running, 0, 1)
+
+	// When
+	phase, err := clusteredResourceHandler{}.GetTaskPhase(context.Background(), pCtx, suspendedJobSet())
+
+	// Then the new reason is not dropped as a duplicate of the last Running event
+	require.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+	assert.Equal(t, uint32(5), phase.Version())
+}
+
+func TestGetTaskPhase_Resume_ReadmittedGangRunsAgain(t *testing.T) {
+	// Given a gang waiting for re-admission that Kueue has resumed
+	waiting := plugink8s.PluginState{
+		Phase: pluginsCore.PhaseRunning, PhaseVersion: 5,
+		Reason: "gang evicted by kueue (Preempted); waiting for re-admission",
+	}
+	pCtx := resumingPluginCtx(readerWith(t), waiting, 0, 1)
+	js := makeJobSet("", "", false)
+
+	// When
+	phase, err := clusteredResourceHandler{}.GetTaskPhase(context.Background(), pCtx, js)
+
+	// Then
+	require.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+	assert.Equal(t, "running (restart attempt 0)", phase.Reason())
+	assert.Equal(t, uint32(6), phase.Version())
 }
 
 func TestGetTaskPhase_Held_MissingLocalQueue_FailsAsUserError(t *testing.T) {

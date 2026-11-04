@@ -797,7 +797,7 @@ func (pm *PluginManager) classifyExternalTermination(
 
 	switch phaseInfo.Err().GetCode() {
 	case codeUnexpectedObjectDeletion:
-		c := flytek8s.GetTerminationTarget(pod.Status)
+		c := flytek8s.GetTerminationTarget(pod.Status, flytek8s.GetPrimaryContainerName(pod))
 		if c == nil {
 			return phaseInfo
 		}
