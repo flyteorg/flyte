@@ -91,6 +91,13 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 			sentryutils.Flush()
 			return nil
 		})
+
+		activeRunsReporter := service.NewActiveRunsReporter(func(ctx context.Context) (int64, error) {
+			return impl.CountRunningRuns(ctx, sc.DB)
+		}, 60*time.Second)
+		sc.AddWorker("active-runs-reporter", func(ctx context.Context) error {
+			return activeRunsReporter.Run(ctx)
+		})
 	}
 
 	repo, err := repository.NewRepository(
