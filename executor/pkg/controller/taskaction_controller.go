@@ -1260,18 +1260,18 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		return ctrl.Result{}, nil
 	}
+
+	p, err := r.PluginRegistry.ResolvePlugin(taskAction.Spec.TaskType)
+	if err != nil {
+		logger.Info("Cannot resolve plugin for abort/finalize, removing finalizer", "error", err)
+		return r.removeFinalizer(ctx, taskAction)
+	}
 	terminal := isTerminal(taskAction)
 	if terminal {
 		result, err := r.reconcileTerminalCleanup(ctx, taskAction)
 		if err != nil || result.RequeueAfter > 0 {
 			return result, err
 		}
-	}
-
-	p, err := r.PluginRegistry.ResolvePlugin(taskAction.Spec.TaskType)
-	if err != nil {
-		logger.Info("Cannot resolve plugin for abort/finalize, removing finalizer", "error", err)
-		return r.removeFinalizer(ctx, taskAction)
 	}
 
 	stateMgr := plugin.NewPluginStateManager(

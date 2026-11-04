@@ -2414,6 +2414,39 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(recorded.RecordedEvents()[0].GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_FAILED))
 		})
 
+		It("removes the finalizer after a restart without the cleanup plugin", func() {
+			nn := createTaskAction("cleanup-missing-plugin")
+			now := time.Now()
+			fake := failingWith(pluginsCore.PhaseInfoFailureWithCleanup(
+				"ContainerCannotRun", "container cannot run", &pluginsCore.TaskInfo{OccurredAt: &now}))
+			fake.abortErrors = []error{stderrors.New("cleanup temporarily unavailable")}
+			recorded := &recordingEventsClient{}
+			request := reconcile.Request{NamespacedName: nn}
+			_, err := newReconciler(fake, recorded).Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+
+			persisted := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(meta.IsStatusConditionTrue(persisted.Status.Conditions,
+				string(flyteorgv1.ConditionTypeCleanupPending))).To(BeTrue())
+			Expect(k8sClient.Delete(ctx, persisted)).To(Succeed())
+
+			restarted := newReconciler(fake, recorded)
+			restarted.PluginRegistry = executorplugin.NewRegistry(nil, emptyPluginRegistry{})
+			Expect(restarted.PluginRegistry.Initialize(ctx)).To(Succeed())
+			result, err := restarted.Reconcile(ctx, request)
+			deleted := errors.IsNotFound(k8sClient.Get(ctx, nn, &flyteorgv1.TaskAction{}))
+			GinkgoWriter.Printf("missing_plugin cleanup_pending=true reconcile_error=%v action_deleted=%t\n", err, deleted)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(result).To(BeZero())
+			Expect(deleted).To(BeTrue())
+			Expect(fake.handleCalls).To(Equal(1))
+			Expect(fake.abortCalls).To(Equal(1))
+			Expect(recorded.RecordedEvents()).To(HaveLen(1))
+			Expect(recorded.RecordedEvents()[0].GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_FAILED))
+		})
+
 		DescribeTable("retries failed terminal cleanup after a restart",
 			func(deleting bool) {
 				nn := createTaskAction(fmt.Sprintf("cleanup-recovery-%t", deleting))
