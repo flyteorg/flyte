@@ -71,7 +71,7 @@ class ProjectServiceASGIApplication(ConnectASGIApplication[ProjectService]):
                         service_name="flyteidl2.project.ProjectService",
                         input=flyteidl2_dot_project_dot_project__service__pb2.ListProjectsRequest,
                         output=flyteidl2_dot_project_dot_project__service__pb2.ListProjectsResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.list_projects,
                 ),
@@ -156,6 +156,7 @@ class ProjectServiceClient(ConnectClient):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_project_dot_project__service__pb2.ListProjectsResponse:
         return await self.execute_unary(
             request=request,
@@ -164,10 +165,11 @@ class ProjectServiceClient(ConnectClient):
                 service_name="flyteidl2.project.ProjectService",
                 input=flyteidl2_dot_project_dot_project__service__pb2.ListProjectsRequest,
                 output=flyteidl2_dot_project_dot_project__service__pb2.ListProjectsResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
 
@@ -222,7 +224,7 @@ class ProjectServiceWSGIApplication(ConnectWSGIApplication):
                         service_name="flyteidl2.project.ProjectService",
                         input=flyteidl2_dot_project_dot_project__service__pb2.ListProjectsRequest,
                         output=flyteidl2_dot_project_dot_project__service__pb2.ListProjectsResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.list_projects,
                 ),
@@ -307,6 +309,7 @@ class ProjectServiceClientSync(ConnectClientSync):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_project_dot_project__service__pb2.ListProjectsResponse:
         return self.execute_unary(
             request=request,
@@ -315,8 +318,9 @@ class ProjectServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.project.ProjectService",
                 input=flyteidl2_dot_project_dot_project__service__pb2.ListProjectsRequest,
                 output=flyteidl2_dot_project_dot_project__service__pb2.ListProjectsResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
