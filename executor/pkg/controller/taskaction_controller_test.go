@@ -2447,6 +2447,58 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(recorded.RecordedEvents()[0].GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_FAILED))
 		})
 
+		DescribeTable("allows garbage collection when terminal cleanup cannot build its context",
+			func(deleting bool) {
+				nn := createTaskAction(fmt.Sprintf("cleanup-context-%t", deleting))
+				now := time.Now()
+				fake := failingWith(pluginsCore.PhaseInfoFailureWithCleanup(
+					"ContainerCannotRun", "container cannot run", &pluginsCore.TaskInfo{OccurredAt: &now}))
+				fake.abortErrors = []error{stderrors.New("cleanup temporarily unavailable")}
+				recorded := &recordingEventsClient{}
+				request := reconcile.Request{NamespacedName: nn}
+				_, err := newReconciler(fake, recorded).Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+
+				persisted := &flyteorgv1.TaskAction{}
+				Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+				Expect(meta.IsStatusConditionTrue(persisted.Status.Conditions,
+					string(flyteorgv1.ConditionTypeCleanupPending))).To(BeTrue())
+				failure := persisted.Status.ErrorState.DeepCopy()
+				persisted.Spec.RunOutputBase = "://"
+				Expect(k8sClient.Update(ctx, persisted)).To(Succeed())
+				if deleting {
+					Expect(k8sClient.Delete(ctx, persisted)).To(Succeed())
+				}
+
+				restarted := newReconciler(fake, recorded)
+				result, err := restarted.Reconcile(ctx, request)
+				getErr := k8sClient.Get(ctx, nn, persisted)
+				deleted := errors.IsNotFound(getErr)
+				labeled := persisted.Labels[LabelTerminationStatus] == LabelValueTerminated
+				GinkgoWriter.Printf("cleanup_context deleting=%t reconcile_error=%v action_deleted=%t gc_labeled=%t\n",
+					deleting, err, deleted, labeled)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(result).To(BeZero())
+				if deleting {
+					Expect(deleted).To(BeTrue())
+					Expect(restarted.Recorder.(*events.FakeRecorder).Events).To(
+						Receive(ContainSubstring("Underlying resources may need manual cleanup")))
+				} else {
+					Expect(getErr).NotTo(HaveOccurred())
+					Expect(labeled).To(BeTrue())
+					Expect(persisted.Status.ErrorState).To(Equal(failure))
+					Expect(meta.IsStatusConditionTrue(persisted.Status.Conditions,
+						string(flyteorgv1.ConditionTypeCleanupPending))).To(BeTrue())
+				}
+				Expect(fake.handleCalls).To(Equal(1))
+				Expect(fake.abortCalls).To(Equal(1))
+				Expect(fake.finalizeCalls).To(BeZero())
+				Expect(recorded.RecordedEvents()).To(HaveLen(1))
+			},
+			Entry("before deletion", false),
+			Entry("during finalization", true),
+		)
+
 		DescribeTable("retries failed terminal cleanup after a restart",
 			func(deleting bool) {
 				nn := createTaskAction(fmt.Sprintf("cleanup-recovery-%t", deleting))

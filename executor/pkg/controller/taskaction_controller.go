@@ -1238,7 +1238,8 @@ func (r *TaskActionReconciler) reconcileTerminalCleanup(
 		taskAction, r.DataStore, stateMgr, r.SecretManager, r.ResourceManager, r.CatalogClient,
 	)
 	if err != nil {
-		return ctrl.Result{}, err
+		log.FromContext(ctx).Error(err, "failed to build terminal cleanup context; resources may need manual cleanup")
+		return ctrl.Result{}, nil
 	}
 	if err := p.Abort(ctx, tCtx); err != nil {
 		log.FromContext(ctx).Error(err, "plugin cleanup failed, will retry")
