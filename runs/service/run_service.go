@@ -295,6 +295,9 @@ func (s *RunService) CreateRun(
 	if err := validatePodTemplateName(runSpec.GetDefaultSettings().GetPodTemplateName()); err != nil {
 		return nil, err
 	}
+	if err := impl.ValidateLabels(runSpec.GetLabels().GetValues()); err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
 
 	// Stamp the run start time, but only for SDKs that understand it (>= 2.3.6) — older task
 	// templates have no {{.runStartTime}} placeholder, so leaving it unset keeps the executor from
@@ -466,6 +469,15 @@ func (s *RunService) persistRunModel(
 		}
 	}
 
+	// An empty object rather than NULL, which marks runs from before the labels column.
+	labels := []byte("{}")
+	if values := runSpec.GetLabels().GetValues(); len(values) > 0 {
+		labels, err = json.Marshal(values)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal run labels: %w", err)
+		}
+	}
+
 	nullStr := func(s string) sql.NullString {
 		return sql.NullString{String: s, Valid: s != ""}
 	}
@@ -503,6 +515,7 @@ func (s *RunService) persistRunModel(
 		ActionDetails:    []byte("{}"),
 		DetailedInfo:     detailedInfo,
 		RunSpec:          runSpecBytes,
+		Labels:           labels,
 		Attempts:         1,
 		RunSource:        source.String(),
 		CreatedBy:        createdByBytes,
@@ -937,17 +950,25 @@ func (s *RunService) ListRuns(
 	}
 
 	// The console's run search box arrives as a filter on the synthetic "search" field
-	// (run name OR task name). Resolve it here and AND it onto the scope filter: the
-	// generic parser below validates fields against the action column allow-list and
-	// would reject it.
+	// (run name OR task name), and run label filters on "labels.<key>". Resolve them here
+	// and AND them onto the scope filter: the generic parser below validates fields
+	// against the action column allow-list and would reject them.
 	listReq := req.Msg.Request
 	searchFilter, remainingFilters, err := impl.SplitSearchFilters(listReq.GetFilters())
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
-	if searchFilter != nil {
-		scopeFilter = scopeFilter.And(searchFilter)
-		// Clone so the caller's request is not mutated when the search filter is stripped.
+	labelFilter, remainingFilters, err := impl.SplitLabelFilters(remainingFilters)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+	for _, f := range []interfaces.Filter{searchFilter, labelFilter} {
+		if f != nil {
+			scopeFilter = scopeFilter.And(f)
+		}
+	}
+	if len(remainingFilters) != len(listReq.GetFilters()) {
+		// Clone so the caller's request is not mutated when the filters are stripped.
 		listReq = proto.Clone(listReq).(*common.ListRequest)
 		listReq.Filters = remainingFilters
 	}
@@ -1922,7 +1943,25 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 
 	return &workflow.Run{
 		Action: action,
+		Labels: runLabels(run),
 	}
+}
+
+// runLabels returns a run's labels. Runs created before the labels column existed have
+// them only in their run spec.
+func runLabels(run *models.Run) map[string]string {
+	if run.Labels == nil {
+		var spec task.RunSpec
+		if err := proto.Unmarshal(run.RunSpec, &spec); err != nil {
+			logger.Warningf(context.Background(), "failed to unmarshal run spec for run %s: %v", run.RunName, err)
+		}
+		return spec.GetLabels().GetValues()
+	}
+	var labels map[string]string
+	if err := json.Unmarshal(run.Labels, &labels); err != nil {
+		logger.Warningf(context.Background(), "failed to unmarshal labels for run %s: %v", run.RunName, err)
+	}
+	return labels
 }
 
 // convertActionToEnrichedProto converts a repository Action to an EnrichedAction proto

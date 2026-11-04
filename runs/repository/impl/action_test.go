@@ -672,6 +672,56 @@ func TestListRuns_SearchFilter(t *testing.T) {
 		"a term matching neither column returns nothing")
 }
 
+// TestListRuns_LabelFilter runs the run label predicates against a real database.
+func TestListRuns_LabelFilter(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	for _, a := range []*models.Action{
+		{Project: "proj1", Domain: "domain1", RunName: "run-a", Name: rootActionName,
+			Labels: []byte(`{"example.com/job-id":"j-1","team":"a"}`)},
+		{Project: "proj1", Domain: "domain1", RunName: "run-b", Name: rootActionName,
+			Labels: []byte(`{"example.com/job-id":"j-2","team":"a"}`)},
+		{Project: "proj1", Domain: "domain1", RunName: "run-unlabeled", Name: rootActionName},
+	} {
+		_, err := actionRepo.CreateAction(ctx, a, false)
+		require.NoError(t, err)
+	}
+
+	list := func(t *testing.T, filters ...*common.Filter) []string {
+		t.Helper()
+		filter, _, err := SplitLabelFilters(filters)
+		require.NoError(t, err)
+		runs, err := actionRepo.ListActions(ctx, interfaces.ListResourceInput{
+			Filter: NewIsRootActionFilter().And(filter),
+			Limit:  50,
+		})
+		require.NoError(t, err)
+		names := make([]string, 0, len(runs))
+		for _, r := range runs {
+			names = append(names, r.RunName)
+		}
+		return names
+	}
+
+	assert.ElementsMatch(t, []string{"run-a"},
+		list(t, &common.Filter{Function: common.Filter_EQUAL, Field: "labels.example.com/job-id", Values: []string{"j-1"}}),
+		"EQUAL matches the label's value")
+	assert.ElementsMatch(t, []string{"run-a", "run-b"},
+		list(t, &common.Filter{Function: common.Filter_EXISTS, Field: "labels.example.com/job-id"}),
+		"EXISTS matches any value and skips runs without the label")
+	assert.ElementsMatch(t, []string{"run-b"}, list(t,
+		&common.Filter{Function: common.Filter_EQUAL, Field: "labels.team", Values: []string{"a"}},
+		&common.Filter{Function: common.Filter_EQUAL, Field: "labels.example.com/job-id", Values: []string{"j-2"}},
+	), "several label filters AND together")
+	assert.Empty(t,
+		list(t, &common.Filter{Function: common.Filter_EQUAL, Field: "labels.team", Values: []string{"b"}}),
+		"a value no run carries matches nothing")
+}
+
 // TestListActions_KeysetPagination covers the O(n) keyset paging used by the
 // WatchActions snapshot: pages continue after the previous page's (created_at, name)
 // instead of by OFFSET. It forces tied created_at (the bulk-created map-task case) so
