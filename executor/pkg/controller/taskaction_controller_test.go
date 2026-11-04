@@ -30,6 +30,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/events"
@@ -2394,6 +2395,10 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
 			Expect(isTerminal(persisted)).To(BeTrue())
 			failure := persisted.Status.ErrorState
+			GinkgoWriter.Printf("after_crash phase=%s cleanup_pending=%t abort_calls=%d\n",
+				persisted.Status.PluginPhase,
+				meta.IsStatusConditionTrue(persisted.Status.Conditions, string(flyteorgv1.ConditionTypeCleanupPending)),
+				fake.abortCalls)
 
 			_, err := newReconciler(fake, recorded).Reconcile(ctx, request)
 			Expect(err).NotTo(HaveOccurred())
@@ -2401,6 +2406,10 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(fake.handleCalls).To(Equal(1))
 			Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
 			Expect(persisted.Status.ErrorState).To(Equal(failure))
+			GinkgoWriter.Printf("after_restart phase=%s cleanup_pending=%t abort_calls=%d error_code=%s\n",
+				persisted.Status.PluginPhase,
+				meta.IsStatusConditionTrue(persisted.Status.Conditions, string(flyteorgv1.ConditionTypeCleanupPending)),
+				fake.abortCalls, persisted.Status.ErrorState.Code)
 			Expect(recorded.RecordedEvents()).To(HaveLen(1))
 			Expect(recorded.RecordedEvents()[0].GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_FAILED))
 		})
@@ -2421,6 +2430,10 @@ var _ = Describe("TaskAction Controller", func() {
 				Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
 				Expect(isTerminal(persisted)).To(BeTrue())
 				failure := persisted.Status.ErrorState
+				GinkgoWriter.Printf("abort_error deleting=%t phase=%s cleanup_pending=%t abort_calls=%d requeue_after=%s\n",
+					deleting, persisted.Status.PluginPhase,
+					meta.IsStatusConditionTrue(persisted.Status.Conditions, string(flyteorgv1.ConditionTypeCleanupPending)),
+					fake.abortCalls, result.RequeueAfter)
 				if deleting {
 					Expect(k8sClient.Delete(ctx, persisted)).To(Succeed())
 				}
@@ -2433,9 +2446,15 @@ var _ = Describe("TaskAction Controller", func() {
 				if deleting {
 					Expect(errors.IsNotFound(k8sClient.Get(ctx, nn, persisted))).To(BeTrue())
 					Expect(fake.finalizeCalls).To(Equal(1))
+					GinkgoWriter.Printf("finalized action_deleted=true abort_calls=%d finalize_calls=%d\n",
+						fake.abortCalls, fake.finalizeCalls)
 				} else {
 					Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
 					Expect(persisted.Status.ErrorState).To(Equal(failure))
+					GinkgoWriter.Printf("after_retry phase=%s cleanup_pending=%t abort_calls=%d error_code=%s\n",
+						persisted.Status.PluginPhase,
+						meta.IsStatusConditionTrue(persisted.Status.Conditions, string(flyteorgv1.ConditionTypeCleanupPending)),
+						fake.abortCalls, persisted.Status.ErrorState.Code)
 					_, err = newReconciler(fake, recorded).Reconcile(ctx, request)
 					Expect(err).NotTo(HaveOccurred())
 					Expect(fake.abortCalls).To(Equal(2))
