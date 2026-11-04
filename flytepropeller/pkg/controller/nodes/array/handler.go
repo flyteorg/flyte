@@ -418,7 +418,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 					arrayNodeState.SubNodeDeltaTimestamps.SetItem(index, 0)
 				} else if startedAt != nil && arrayNodeState.SubNodeDeltaTimestamps.GetItem(index) == 0 {
 					// otherwise if `SubNodeDeltaTimestamps` is unset, we compute the delta and set it
-					deltaDuration := uint64(subNodeStartedAt.Time.Sub(startedAt.Time).Seconds())
+					deltaDuration := deltaTimestampSeconds(startedAt.Time, subNodeStartedAt.Time, arrayNodeState.SubNodeDeltaTimestamps.ItemSize)
 					arrayNodeState.SubNodeDeltaTimestamps.SetItem(index, deltaDuration)
 				}
 			}
@@ -824,4 +824,23 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	arrayNodeExecutor := a.nodeExecutor.WithNodeExecutionContextBuilder(arrayNodeExecutionContextBuilder)
 
 	return arrayNodeExecutor, arrayExecutionContext, &arrayNodeLookup, &arrayNodeLookup, &subNodeSpec, subNodeStatus, nil
+}
+
+// deltaTimestampSeconds returns the whole seconds between the ArrayNode and subNode start times,
+// clamped to the range an itemSize-bit CompactArray item can hold. A subNode may start more than
+// MaxDeltaTimestamp after the ArrayNode (large fan-out with low parallelism), and a retried or
+// recovered ArrayNode may have a later start time than its subNodes. Storing either value as is
+// panics in SetItem on every evaluation, so we trade timestamp precision for progress.
+func deltaTimestampSeconds(startedAt, subNodeStartedAt time.Time, itemSize uint) uint64 {
+	delta := subNodeStartedAt.Sub(startedAt)
+	if delta <= 0 {
+		return 0
+	}
+
+	seconds := uint64(delta / time.Second) // #nosec G115
+	if maxValue := (uint64(1) << itemSize) - 1; seconds > maxValue {
+		return maxValue
+	}
+
+	return seconds
 }
