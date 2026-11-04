@@ -1094,6 +1094,10 @@ var _ = Describe("TaskAction Controller", func() {
 				Expect(persisted.Status.ErrorState.Message).To(ContainSubstring("queued timeout"))
 				Expect(persisted.Status.Attempts).To(Equal(uint32(2)))
 				Expect(fake.handleCalls).To(Equal(handled))
+				GinkgoWriter.Printf("late_retry cache_unavailable=%t phase=%s error=%q"+
+					" attempts=%d handle_before=%d handle_after=%d\n",
+					cacheUnavailable, persisted.Status.PluginPhase, persisted.Status.ErrorState.Message,
+					persisted.Status.Attempts, handled, fake.handleCalls)
 			},
 			Entry("before a direct-running launch", false),
 			Entry("while the cache keeps failing", true),
