@@ -46,9 +46,10 @@ const (
 	// This is a terminal condition. Once True, the TaskAction will not be reconciled further.
 	ConditionTypeSucceeded TaskActionConditionType = "Succeeded"
 
-	// ConditionTypeFailed indicates whether the TaskAction has failed.
-	// This is a terminal condition. Once True, the TaskAction will not be reconciled further.
+	// ConditionTypeFailed is terminal; pending cleanup does not change the failure.
 	ConditionTypeFailed TaskActionConditionType = "Failed"
+
+	ConditionTypeCleanupPending TaskActionConditionType = "CleanupPending"
 )
 
 // Condition reason constants

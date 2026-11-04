@@ -19,6 +19,7 @@ package controller
 import (
 	"context"
 	stderrors "errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -152,6 +153,7 @@ func systemRetryEvents(events []*workflow.ActionEvent) []*workflow.ActionEvent {
 type failingStatusClient struct {
 	client.Client
 	failUpdates bool
+	afterUpdate func()
 }
 
 func (f *failingStatusClient) Status() client.SubResourceWriter {
@@ -174,7 +176,13 @@ func (f *failingStatusWriter) Update(
 	if f.client.failUpdates {
 		return stderrors.New("status unavailable")
 	}
-	return f.SubResourceWriter.Update(ctx, obj, opts...)
+	if err := f.SubResourceWriter.Update(ctx, obj, opts...); err != nil {
+		return err
+	}
+	if f.client.afterUpdate != nil {
+		f.client.afterUpdate()
+	}
+	return nil
 }
 
 // recordingEventsClient captures all recorded ActionEvents for assertion in tests.
@@ -2364,6 +2372,80 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(isTerminal(persisted)).To(BeTrue())
 			Expect(fake.abortCalls).To(Equal(1))
 		})
+
+		It("resumes cleanup after a crash following terminal persistence", func() {
+			nn := createTaskAction("cleanup-crash-persist")
+			now := time.Now()
+			fake := failingWith(pluginsCore.PhaseInfoFailureWithCleanup(
+				"ContainerCannotRun", "container cannot run", &pluginsCore.TaskInfo{OccurredAt: &now}))
+			recorded := &recordingEventsClient{}
+			r := newReconciler(fake, recorded)
+			crash := stderrors.New("controller stopped after status persistence")
+			r.Client = &failingStatusClient{
+				Client: k8sClient,
+				afterUpdate: func() {
+					panic(crash)
+				},
+			}
+			request := reconcile.Request{NamespacedName: nn}
+			Expect(func() { _, _ = r.Reconcile(ctx, request) }).To(PanicWith(crash))
+			Expect(fake.abortCalls).To(BeZero())
+			persisted := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+			Expect(isTerminal(persisted)).To(BeTrue())
+			failure := persisted.Status.ErrorState
+
+			_, err := newReconciler(fake, recorded).Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(fake.abortCalls).To(Equal(1))
+			Expect(fake.handleCalls).To(Equal(1))
+			Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+			Expect(persisted.Status.ErrorState).To(Equal(failure))
+			Expect(recorded.RecordedEvents()).To(HaveLen(1))
+			Expect(recorded.RecordedEvents()[0].GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_FAILED))
+		})
+
+		DescribeTable("retries failed terminal cleanup after a restart",
+			func(deleting bool) {
+				nn := createTaskAction(fmt.Sprintf("cleanup-recovery-%t", deleting))
+				now := time.Now()
+				fake := failingWith(pluginsCore.PhaseInfoFailureWithCleanup(
+					"ContainerCannotRun", "container cannot run", &pluginsCore.TaskInfo{OccurredAt: &now}))
+				fake.abortErrors = []error{stderrors.New("cleanup temporarily unavailable")}
+				recorded := &recordingEventsClient{}
+				request := reconcile.Request{NamespacedName: nn}
+				result, err := newReconciler(fake, recorded).Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(result.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
+				persisted := &flyteorgv1.TaskAction{}
+				Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+				Expect(isTerminal(persisted)).To(BeTrue())
+				failure := persisted.Status.ErrorState
+				if deleting {
+					Expect(k8sClient.Delete(ctx, persisted)).To(Succeed())
+				}
+
+				result, err = newReconciler(fake, recorded).Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(result.RequeueAfter).To(BeZero())
+				Expect(fake.abortCalls).To(Equal(2))
+				Expect(fake.handleCalls).To(Equal(1))
+				if deleting {
+					Expect(errors.IsNotFound(k8sClient.Get(ctx, nn, persisted))).To(BeTrue())
+					Expect(fake.finalizeCalls).To(Equal(1))
+				} else {
+					Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+					Expect(persisted.Status.ErrorState).To(Equal(failure))
+					_, err = newReconciler(fake, recorded).Reconcile(ctx, request)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(fake.abortCalls).To(Equal(2))
+				}
+				Expect(recorded.RecordedEvents()).To(HaveLen(1))
+				Expect(recorded.RecordedEvents()[0].GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_FAILED))
+			},
+			Entry("while the action remains available", false),
+			Entry("during finalization", true),
+		)
 	})
 
 	Context("resetPluginResource", func() {

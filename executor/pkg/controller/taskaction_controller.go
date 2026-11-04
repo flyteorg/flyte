@@ -909,6 +909,10 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	// Check terminal conditions -- short-circuit
 	if isTerminal(taskAction) {
+		result, err := r.reconcileTerminalCleanup(ctx, taskAction)
+		if err != nil || result.RequeueAfter > 0 {
+			return result, err
+		}
 		if err := r.ensureTerminalLabels(ctx, taskAction); err != nil {
 			return ctrl.Result{}, err
 		}
@@ -1140,6 +1144,10 @@ func (r *TaskActionReconciler) reconcileTask(
 	// Delete the resource after the failure is recorded when the plugin requests cleanup.
 	abortAfterFailure := !cacheShortCircuited && cleanupOnFailure && phaseInfo.Phase() == pluginsCore.PhasePermanentFailure
 	mapPhaseToConditions(taskAction, phaseInfo)
+	if abortAfterFailure {
+		setCondition(taskAction, flyteorgv1.ConditionTypeCleanupPending, metav1.ConditionTrue,
+			flyteorgv1.ConditionReasonPermanentFailure, "Plugin cleanup is pending.")
+	}
 
 	// Update StateJSON for observability
 	actionSpec, _ := taskAction.Spec.GetActionSpec()
@@ -1172,11 +1180,10 @@ func (r *TaskActionReconciler) reconcileTask(
 		return ctrl.Result{}, err
 	}
 
-	// Only after the failure is persisted: a reconcile that found the resource gone before then
-	// would take it for a system failure and relaunch the task.
 	if abortAfterFailure {
-		if abortErr := p.Abort(ctx, tCtx); abortErr != nil {
-			logger.Error(abortErr, "failed to abort plugin resource after terminal failure")
+		result, err := r.reconcileTerminalCleanup(ctx, taskAction)
+		if err != nil || result.RequeueAfter > 0 {
+			return result, err
 		}
 	}
 
@@ -1215,6 +1222,37 @@ func (r *TaskActionReconciler) ensureTerminalLabels(ctx context.Context, taskAct
 	return nil
 }
 
+func (r *TaskActionReconciler) reconcileTerminalCleanup(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+) (ctrl.Result, error) {
+	if !meta.IsStatusConditionTrue(taskAction.Status.Conditions, string(flyteorgv1.ConditionTypeCleanupPending)) {
+		return ctrl.Result{}, nil
+	}
+	p, err := r.PluginRegistry.ResolvePlugin(taskAction.Spec.TaskType)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	stateMgr := plugin.NewPluginStateManager(taskAction.Status.PluginState, taskAction.Status.PluginStateVersion)
+	tCtx, err := plugin.NewTaskExecutionContext(
+		taskAction, r.DataStore, stateMgr, r.SecretManager, r.ResourceManager, r.CatalogClient,
+	)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	if err := p.Abort(ctx, tCtx); err != nil {
+		log.FromContext(ctx).Error(err, "plugin cleanup failed, will retry")
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+	}
+	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
+		meta.RemoveStatusCondition(&latest.Status.Conditions, string(flyteorgv1.ConditionTypeCleanupPending))
+	}); err != nil {
+		return ctrl.Result{}, err
+	}
+	meta.RemoveStatusCondition(&taskAction.Status.Conditions, string(flyteorgv1.ConditionTypeCleanupPending))
+	return ctrl.Result{}, nil
+}
+
 // handleAbortAndFinalize handles the deletion of a TaskAction by aborting and finalizing the plugin.
 func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskAction *flyteorgv1.TaskAction) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
@@ -1223,6 +1261,12 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 		return ctrl.Result{}, nil
 	}
 	terminal := isTerminal(taskAction)
+	if terminal {
+		result, err := r.reconcileTerminalCleanup(ctx, taskAction)
+		if err != nil || result.RequeueAfter > 0 {
+			return result, err
+		}
+	}
 
 	p, err := r.PluginRegistry.ResolvePlugin(taskAction.Spec.TaskType)
 	if err != nil {
@@ -1365,6 +1409,9 @@ func (r *TaskActionReconciler) persistStatusWithRetry(
 		start = time.Now()
 		updErr := r.Status().Update(ctx, latest)
 		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
+		if updErr == nil {
+			taskAction.ResourceVersion = latest.ResourceVersion
+		}
 		return updErr
 	})
 }
