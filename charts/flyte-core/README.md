@@ -481,6 +481,7 @@ Distributed Flyte 2 core services
 | configuration.runs.identityHeaders.emailHeader | string | `""` |  |
 | configuration.runs.identityHeaders.subjectHeader | string | `"X-Amzn-Oidc-Identity"` |  |
 | configuration.runs.notificationBufferLimit | int | `65000` |  |
+| configuration.runs.notifyBatchSize | int | `100` |  |
 | configuration.runs.notifyRetryMaxBackoff | string | `"5s"` |  |
 | configuration.runs.notifyRetryMinBackoff | string | `"50ms"` |  |
 | configuration.runs.seedProjects[0] | string | `"flytesnacks"` |  |

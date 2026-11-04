@@ -68,6 +68,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "notificationBufferLimit"), defaultConfig.NotificationBufferLimit, "Maximum pending entries in each notification queue")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "notifyRetryMinBackoff"), defaultConfig.NotifyRetryMinBackoff.String(), "Initial notification retry delay")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "notifyRetryMaxBackoff"), defaultConfig.NotifyRetryMaxBackoff.String(), "Maximum notification retry delay")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "notifyBatchSize"), defaultConfig.NotifyBatchSize, "Maximum notifications sent per pg_notify statement")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "actionsService.url"), defaultConfig.ActionsService.URL, "Actions service base URL")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "actionsService.auth.type"), string(defaultConfig.ActionsService.Auth.Type), "Actions service authentication type")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "actionsService.auth.issuerUrl"), defaultConfig.ActionsService.Auth.IssuerURL, "Actions service OAuth 2.0 issuer URL")
