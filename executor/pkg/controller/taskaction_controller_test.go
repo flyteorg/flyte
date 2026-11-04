@@ -26,6 +26,7 @@ import (
 	"connectrpc.com/connect"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
@@ -42,9 +43,13 @@ import (
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	executorplugin "github.com/flyteorg/flyte/v2/executor/pkg/plugin"
 	pluginserrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
 	k8sPlugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi"
+	webapiMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
+	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -338,12 +343,12 @@ func withRetryBackoff(template []byte, backoff *core.Backoff) []byte {
 }
 
 type fakeCorePluginRegistry struct {
-	plugin *fakePlugin
+	plugin pluginsCore.Plugin
 }
 
 func (f fakeCorePluginRegistry) GetCorePlugins() []pluginsCore.PluginEntry {
 	return []pluginsCore.PluginEntry{{
-		ID:                  f.plugin.id,
+		ID:                  f.plugin.GetID(),
 		RegisteredTaskTypes: []pluginsCore.TaskType{"timeout-test"},
 		LoadPlugin: func(context.Context, pluginsCore.SetupContext) (pluginsCore.Plugin, error) {
 			return f.plugin, nil
@@ -355,7 +360,7 @@ func (fakeCorePluginRegistry) GetK8sPlugins() []k8sPlugin.PluginEntry {
 	return nil
 }
 
-func newFakePluginRegistry(fake *fakePlugin) *executorplugin.Registry {
+func newFakePluginRegistry(fake pluginsCore.Plugin) *executorplugin.Registry {
 	registry := executorplugin.NewRegistry(nil, fakeCorePluginRegistry{plugin: fake})
 	Expect(registry.Initialize(context.Background())).To(Succeed())
 	return registry
@@ -860,6 +865,157 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(fake.abortCalls).To(Equal(1))
 			Expect(fake.finalizeCalls).To(Equal(1))
 		})
+
+		It("keeps plugin progress without reporting an unobserved phase", func() {
+			nn := createTaskAction("unknown-phase-state", buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
+			fakeClock := testingclock.NewFakeClock(getTaskAction(nn).CreationTimestamp.Time)
+			fake := &fakePlugin{id: "timeout-plugin"}
+			fake.handleFunc = launchThenPoll(fakeClock.Now, func() pluginsCore.Transition {
+				return pluginsCore.UnknownTransition
+			})
+			recorded := &recordingEventsClient{}
+			r := newReconciler(fake, fakeClock, recorded, nil)
+			request := reconcile.Request{NamespacedName: nn}
+			_, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			submitted := getTaskAction(nn)
+
+			fake.handleFunc = func(_ context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+				err := tCtx.PluginStateWriter().Put(2, &fakeLaunchState{Launched: true, Waiting: true})
+				return pluginsCore.UnknownTransition, err
+			}
+			fakeClock.Step(time.Minute)
+			result, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.PluginStateVersion).To(Equal(uint8(2)))
+			state := fakeLaunchState{}
+			reader := executorplugin.NewPluginStateManager(persisted.Status.PluginState, persisted.Status.PluginStateVersion)
+			_, err = reader.Get(&state)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(state).To(Equal(fakeLaunchState{Launched: true, Waiting: true}))
+			Expect(persisted.Status.PluginPhase).To(Equal(submitted.Status.PluginPhase))
+			Expect(persisted.Status.AttemptQueuedAt).To(Equal(submitted.Status.AttemptQueuedAt))
+			Expect(result.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
+			Expect(recorded.RecordedEvents()).To(HaveLen(1))
+			GinkgoWriter.Printf("unobserved_phase plugin_state_version=%d phase=%s event_count=%d requeue_after=%s\n",
+				persisted.Status.PluginStateVersion, persisted.Status.PluginPhase,
+				len(recorded.RecordedEvents()), result.RequeueAfter)
+		})
+
+		DescribeTable("waits for the WebAPI cache after a restart",
+			func(remotePhase pluginsCore.Phase, deadlineExpired bool) {
+				template := &core.TaskTemplate{}
+				Expect(proto.Unmarshal(buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0), template)).To(Succeed())
+				name := "webapi-" + strings.ToLower(remotePhase.String())
+				if deadlineExpired {
+					template.Metadata.Timeouts.Deadline = durationpb.New(30 * time.Second)
+					name += "-deadline"
+				}
+				data, err := proto.Marshal(template)
+				Expect(err).NotTo(HaveOccurred())
+				nn := createTaskAction(name, data)
+				base := getTaskAction(nn).CreationTimestamp.Time
+				fakeClock := testingclock.NewFakeClock(base)
+				ready := make(chan struct{})
+				remoteInfo := pluginsCore.PhaseInfoQueued(base.Add(time.Second), pluginsCore.DefaultPhaseVersion, "queued")
+				if remotePhase == pluginsCore.PhaseRunning {
+					remoteInfo = runningTransition(base.Add(time.Second)).Info()
+				}
+				remote := webapiMocks.NewAsyncPlugin(GinkgoT())
+				remote.EXPECT().GetConfig().Return(webapi.DefaultPluginConfig)
+				remote.EXPECT().Create(mock.Anything, mock.Anything).Return("remote-job", nil, nil).Once()
+				remote.EXPECT().Get(mock.Anything, mock.Anything).RunAndReturn(
+					func(ctx context.Context, _ webapi.GetContext) (webapi.Resource, error) {
+						select {
+						case <-ready:
+							return remoteInfo, nil
+						case <-ctx.Done():
+							return nil, ctx.Err()
+						}
+					}).Maybe()
+				remote.EXPECT().Status(mock.Anything, mock.Anything).RunAndReturn(
+					func(_ context.Context, status webapi.StatusContext) (pluginsCore.PhaseInfo, error) {
+						return status.Resource().(pluginsCore.PhaseInfo), nil
+					}).Maybe()
+				deleted := 0
+				remote.EXPECT().Delete(mock.Anything, mock.Anything).Run(
+					func(context.Context, webapi.DeleteContext) { deleted++ }).Return(nil).Maybe()
+				entry := pluginmachinery.CreateRemotePlugin(webapi.PluginEntry{
+					ID: "webapi-cache-test", SupportedTaskTypes: []pluginsCore.TaskType{"timeout-test"},
+					PluginLoader: func(context.Context, webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+						return remote, nil
+					},
+				})
+				loadPlugin := func() (pluginsCore.Plugin, context.CancelFunc) {
+					pluginCtx, cancel := context.WithCancel(ctx)
+					DeferCleanup(cancel)
+					loaded, err := entry.LoadPlugin(pluginCtx, executorplugin.NewSetupContext(
+						nil, nil, nil, nil, nil, "TaskAction", promutils.NewTestScope()))
+					Expect(err).NotTo(HaveOccurred())
+					return loaded, cancel
+				}
+				initial, stop := loadPlugin()
+				recorded := &recordingEventsClient{}
+				r := newReconciler(&fakePlugin{id: "timeout-plugin"}, fakeClock, recorded, nil)
+				r.PluginRegistry = newFakePluginRegistry(initial)
+				request := reconcile.Request{NamespacedName: nn}
+				_, err = r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				submitted := getTaskAction(nn)
+				Expect(submitted.Status.PluginState).NotTo(BeEmpty())
+				Expect(submitted.Status.PluginPhase).To(Equal(pluginsCore.PhaseQueued.String()))
+				stop()
+
+				restarted, _ := loadPlugin()
+				r.PluginRegistry = newFakePluginRegistry(restarted)
+				fakeClock.Step(time.Minute)
+				if deadlineExpired {
+					_, err = r.Reconcile(ctx, request)
+					Expect(err).NotTo(HaveOccurred())
+					persisted := getTaskAction(nn)
+					Expect(isTerminal(persisted)).To(BeTrue())
+					Expect(persisted.Status.ErrorState.Code).To(Equal(TaskDeadlineExceededCode))
+					GinkgoWriter.Printf("webapi_cache cold=true deadline_expired=true error_code=%s delete_calls=%d\n",
+						persisted.Status.ErrorState.Code, deleted)
+					return
+				}
+				for poll := 1; poll <= 3; poll++ {
+					result, err := r.Reconcile(ctx, request)
+					Expect(err).NotTo(HaveOccurred())
+					persisted := getTaskAction(nn)
+					GinkgoWriter.Printf("webapi_cache remote_phase=%s cold_poll=%d action_phase=%s delete_calls=%d requeue_after=%s\n",
+						remotePhase, poll, persisted.Status.PluginPhase, deleted, result.RequeueAfter)
+					Expect(isTerminal(persisted)).To(BeFalse())
+					Expect(persisted.Status.PluginPhase).To(Equal(submitted.Status.PluginPhase))
+					Expect(persisted.Status.PluginState).To(Equal(submitted.Status.PluginState))
+					Expect(persisted.Status.AttemptQueuedAt).To(Equal(submitted.Status.AttemptQueuedAt))
+					Expect(persisted.Status.SystemFailures).To(BeZero())
+					Expect(persisted.ResourceVersion).To(Equal(submitted.ResourceVersion))
+					Expect(result.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
+				}
+				close(ready)
+				Eventually(func(g Gomega) {
+					_, err := r.Reconcile(ctx, request)
+					g.Expect(err).NotTo(HaveOccurred())
+					persisted := getTaskAction(nn)
+					if remotePhase == pluginsCore.PhaseRunning {
+						g.Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseRunning.String()))
+						g.Expect(persisted.Status.TimeoutAt).To(BeNil())
+						g.Expect(deleted).To(BeZero())
+					} else {
+						g.Expect(isTerminal(persisted)).To(BeTrue())
+						g.Expect(persisted.Status.ErrorState.Code).To(Equal(TaskExecutionTimedOutCode))
+						g.Expect(deleted).To(Equal(1))
+					}
+				}).WithTimeout(10 * time.Second).WithPolling(10 * time.Millisecond).Should(Succeed())
+				GinkgoWriter.Printf("webapi_cache remote_phase=%s cold=false action_phase=%s delete_calls=%d\n",
+					remotePhase, getTaskAction(nn).Status.PluginPhase, deleted)
+			},
+			Entry("preserves remote work that already started", pluginsCore.PhaseRunning, false),
+			Entry("expires work only after observing that it is still queued", pluginsCore.PhaseQueued, false),
+			Entry("enforces the action deadline while the cache is cold", pluginsCore.PhaseRunning, true),
+		)
 
 		DescribeTable("gives a system relaunch its own queued timeout",
 			func(initialPhase pluginsCore.Phase) {

@@ -1293,6 +1293,21 @@ func (r *TaskActionReconciler) reconcileTask(
 		}
 	}
 
+	if handleErr == nil && transition.Info().Phase() == pluginsCore.PhaseUndefined {
+		// A cold cache has not observed the resource's phase yet.
+		timeouts.queued = 0
+		if newBytes, newVersion, written := stateMgr.GetNewState(); written &&
+			(newVersion != taskAction.Status.PluginStateVersion || !bytes.Equal(newBytes, taskAction.Status.PluginState)) {
+			if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
+				latest.Status.PluginState = newBytes
+				latest.Status.PluginStateVersion = newVersion
+			}); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+		return r.timeoutAwareRequeue(taskAction, timeouts), nil
+	}
+
 	if deadline, ok := taskAttemptQueuedDeadline(taskAction, timeouts.queued); ok && handleErr == nil {
 		// A persisted queued phase can lag behind the resource after downtime
 		// or a failed event publication. Check the plugin before ending the attempt.
