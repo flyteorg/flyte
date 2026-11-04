@@ -309,20 +309,16 @@ func (s *RunService) CreateRun(
 	}
 
 	// Compute storage URIs before DB insert so they're persisted in the ActionSpec.
-	// runSpec.RunBaseDir overrides the configured storagePrefix when set; it must
-	// resolve to the same base UploadInputs used (UploadInputsRequest.base_dir) so the
-	// run reads offloaded inputs from where they were written.
-	// TODO: consult org/project/domain settings (StorageSettings.run_base_dir) here as
-	// the middle tier once settings lookup lands; it must be applied in UploadInputs too.
+	// runSpec.RunBaseDir overrides the configured storagePrefix when set, either by the
+	// request or from settings above; it must resolve to the same base UploadInputs used
+	// (UploadInputsRequest.base_dir) so the run reads offloaded inputs from where they
+	// were written.
 	runBase := s.storagePrefix
 	if rb := runSpec.GetRunBaseDir(); rb != "" {
 		runBase = rb
 	}
 	inputPrefix := buildInputPrefix(runBase, runId.GetProject(), runId.GetDomain(), runId.GetName())
 	runOutputBase := buildRunOutputBase(runBase, runId.GetProject(), runId.GetDomain(), runId.GetName())
-	if runSpec.GetRawDataStorage() == nil || runSpec.GetRawDataStorage().GetRawDataPrefix() == "" {
-		runSpec.RawDataStorage = &task.RawDataStorage{RawDataPrefix: s.storagePrefix}
-	}
 
 	cacheKey := ""
 	switch iw := request.GetInputWrapper().(type) {
@@ -573,20 +569,10 @@ func (s *RunService) GetRunDetails(
 		return nil, connect.NewError(connect.CodeNotFound, err)
 	}
 
-	rootActionID := &common.ActionIdentifier{
-		Run:  req.Msg.RunId,
-		Name: run.Name,
-	}
-
-	actionDetails, err := s.buildActionDetails(ctx, run, rootActionID)
+	details, err := s.buildRunDetails(ctx, run, req.Msg.RunId)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to build run action details: %v", err)
 		return nil, err
-	}
-
-	details := &workflow.RunDetails{
-		RunSpec: extractRunSpecFromActionModel(ctx, run),
-		Action:  actionDetails,
 	}
 
 	logger.Infof(ctx, "Retrieved run details for: %s", run.Name)
@@ -1218,26 +1204,21 @@ func (s *RunService) WatchRunDetails(
 ) error {
 	logger.Infof(ctx, "Received WatchRunDetails request")
 
-	// For now, just send initial state and close
-	// TODO: Implement actual streaming with polling or database triggers
 	run, err := s.repo.ActionRepo().GetRun(ctx, req.Msg.RunId)
 	if err != nil {
 		return connect.NewError(connect.CodeNotFound, err)
 	}
 
-	resp := &workflow.WatchRunDetailsResponse{
-		Details: &workflow.RunDetails{
-			// Would populate from run model
-		},
+	details, err := s.buildRunDetails(ctx, run, req.Msg.RunId)
+	if err != nil {
+		return connect.NewError(connect.CodeInternal, err)
 	}
-
-	if err := stream.Send(resp); err != nil {
+	if err := stream.Send(&workflow.WatchRunDetailsResponse{Details: details}); err != nil {
 		return err
 	}
 
 	logger.Infof(ctx, "Sent initial run details for: %s", run.Name)
 
-	// Keep connection open and send updates (simplified)
 	updates := make(chan *models.Run, 50)
 	errs := make(chan error, 1)
 
@@ -1250,17 +1231,34 @@ func (s *RunService) WatchRunDetails(
 		case err := <-errs:
 			return connect.NewError(connect.CodeInternal, err)
 		case run := <-updates:
-			resp := &workflow.WatchRunDetailsResponse{
-				Details: &workflow.RunDetails{
-					// Would populate from run
-				},
+			details, err := s.buildRunDetails(ctx, run, req.Msg.RunId)
+			if err != nil {
+				if ctx.Err() != nil {
+					return nil
+				}
+				return connect.NewError(connect.CodeInternal, err)
 			}
-			if err := stream.Send(resp); err != nil {
+			if err := stream.Send(&workflow.WatchRunDetailsResponse{Details: details}); err != nil {
 				return err
 			}
 			logger.Infof(ctx, "Sent run update for: %s", run.Name)
 		}
 	}
+}
+
+// buildRunDetails assembles RunDetails for a run model the same way GetRunDetails
+// does: the root action via buildActionDetails (spec, attempts, result) and the
+// RunSpec from the dedicated column with an ActionSpec fallback.
+func (s *RunService) buildRunDetails(ctx context.Context, run *models.Run, runID *common.RunIdentifier) (*workflow.RunDetails, error) {
+	rootActionID := &common.ActionIdentifier{Run: runID, Name: run.Name}
+	action, err := s.buildActionDetails(ctx, run, rootActionID)
+	if err != nil {
+		return nil, err
+	}
+	return &workflow.RunDetails{
+		RunSpec: extractRunSpecFromActionModel(ctx, run),
+		Action:  action,
+	}, nil
 }
 
 // WatchActionDetails streams action details updates from the DB.
@@ -1344,22 +1342,26 @@ func (s *RunService) WatchRuns(
 
 	// Step 2: Send existing runs that match filter
 	listInput := s.convertWatchRequestToListInput(req.Msg)
-
-	runs, err := s.repo.ActionRepo().ListActions(ctx, listInput)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to list runs: %v", err)
-		// Continue even if list fails - still watch for new updates
-	} else if len(runs) > 0 {
+	sendRuns := func() error {
+		runs, err := s.repo.ActionRepo().ListActions(ctx, listInput)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to list runs: %v", err)
+			// Continue even if list fails - still watch for new updates
+			return nil
+		}
+		if len(runs) == 0 {
+			return nil
+		}
 		protoRuns := make([]*workflow.Run, len(runs))
 		for i, run := range runs {
 			protoRuns[i] = s.convertRunToProto(run)
 		}
-
-		if err := stream.Send(&workflow.WatchRunsResponse{
+		return stream.Send(&workflow.WatchRunsResponse{
 			Runs: protoRuns,
-		}); err != nil {
-			return err
-		}
+		})
+	}
+	if err := sendRuns(); err != nil {
+		return err
 	}
 
 	for {
@@ -1370,6 +1372,13 @@ func (s *RunService) WatchRuns(
 			logger.Errorf(ctx, "Error watching runs: %v", err)
 			return err
 		case run := <-updatesCh:
+			if run == nil {
+				// Updates may have been lost; send the list again.
+				if err := sendRuns(); err != nil {
+					return err
+				}
+				continue
+			}
 			// Filter the run based on the watch request criteria
 			if !s.runMatchesFilter(run, req.Msg) {
 				continue
@@ -1420,6 +1429,16 @@ func (s *RunService) WatchActions(
 			if !ok {
 				return nil
 			}
+			if updated == nil {
+				// Updates may have been lost; re-list the run.
+				if err := s.listAndSendAllActions(ctx, runID, rsm, stream); err != nil {
+					if !errors.Is(err, errListActions) {
+						return err
+					}
+					logger.Errorf(ctx, "Failed to re-list actions: %v", err)
+				}
+				continue
+			}
 			updates, err := rsm.upsertActions(ctx, []*models.Action{updated})
 			if err != nil {
 				return err
@@ -1430,6 +1449,9 @@ func (s *RunService) WatchActions(
 		}
 	}
 }
+
+// errListActions marks a failed DB read in listAndSendAllActions, which a re-list can tolerate.
+var errListActions = errors.New("list actions")
 
 func (s *RunService) listAndSendAllActions(
 	ctx context.Context,
@@ -1463,7 +1485,7 @@ func (s *RunService) listAndSendAllActions(
 			},
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("%w: %w", errListActions, err)
 		}
 
 		// ListActions returns up to Limit+1 rows (the extra row is a has-more probe).
@@ -1474,7 +1496,15 @@ func (s *RunService) listAndSendAllActions(
 			batch = batch[:pageSize]
 		}
 
-		updates, err := rsm.upsertActions(ctx, batch)
+		// On a re-list, skip actions the stream already has: upserting an existing one marks it
+		// and its ancestors as changed even when nothing differs.
+		fresh := make([]*models.Action, 0, len(batch))
+		for _, action := range batch {
+			if known := rsm.GetActionTreeNodeByName(action.Name); known == nil || !known.Action.UpdatedAt.Equal(action.UpdatedAt) {
+				fresh = append(fresh, action)
+			}
+		}
+		updates, err := rsm.upsertActions(ctx, fresh)
 		if err != nil {
 			return err
 		}
@@ -1629,6 +1659,8 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 	}
 	if action.EndedAt.Valid {
 		status.EndTime = timestamppb.New(action.EndedAt.Time)
+		durationMs := uint64(status.EndTime.AsTime().Sub(status.StartTime.AsTime()).Milliseconds())
+		status.DurationMs = &durationMs
 	}
 	if action.DurationMs.Valid {
 		durationMs := uint64(action.DurationMs.Int64)

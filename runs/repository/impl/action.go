@@ -44,6 +44,26 @@ const (
 	defaultListenerMinReconnectInterval = 10 * time.Second
 )
 
+// terminalPhases are the phases an action ends in. FAILED and TIMED_OUT can
+// still move on when the action is retried (see UpdateActionPhase).
+var terminalPhases = []int32{
+	int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+	int32(common.ActionPhase_ACTION_PHASE_FAILED),
+	int32(common.ActionPhase_ACTION_PHASE_ABORTED),
+	int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
+	int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
+}
+
+// activePhases is every ActionPhase not in terminalPhases.
+var activePhases = []int32{
+	int32(common.ActionPhase_ACTION_PHASE_UNSPECIFIED),
+	int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+	int32(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES),
+	int32(common.ActionPhase_ACTION_PHASE_INITIALIZING),
+	int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+	int32(common.ActionPhase_ACTION_PHASE_PAUSED),
+}
+
 type notificationBuffer string
 
 // NotificationConfig configures the pending notification queues and delivery retries.
@@ -124,8 +144,8 @@ type actionRepo struct {
 	listenerMinReconnectInterval time.Duration
 
 	// Subscriber management for LISTEN/NOTIFY
-	runSubscribers    map[chan string]bool
-	actionSubscribers map[chan string]bool
+	runSubscribers    map[*subscription]struct{}
+	actionSubscribers map[*subscription]struct{}
 	mu                sync.RWMutex
 
 	notifyMu            sync.Mutex
@@ -158,8 +178,8 @@ func NewActionRepo(
 	repo := &actionRepo{
 		db:                  db,
 		dsn:                 dsn,
-		runSubscribers:      make(map[chan string]bool),
-		actionSubscribers:   make(map[chan string]bool),
+		runSubscribers:      make(map[*subscription]struct{}),
+		actionSubscribers:   make(map[*subscription]struct{}),
 		notificationConfig:  notificationConfig,
 		notificationMetrics: notificationMetrics,
 	}
@@ -337,7 +357,8 @@ func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *comm
 	return &event, nil
 }
 
-// CreateAction inserts an Action model into the database.
+// CreateAction inserts an Action model and promotes its parent to RUNNING in the
+// same transaction only from QUEUED, INITIALIZING, or WAITING_FOR_RESOURCES.
 // When updateTriggeredAt is true and the action has a TriggerName set, triggered_at on the
 // corresponding trigger row is updated to now() in the same transaction.
 func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, updateTriggeredAt bool) (*models.Action, error) {
@@ -376,6 +397,32 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, up
 		}
 	}
 
+	// Creating a child proves its parent started executing. Check and update
+	// the parent in one statement so a concurrent terminal update cannot be
+	// overwritten by this inferred RUNNING status.
+	var parentUpdated bool
+	if rowsAffected > 0 && action.ParentActionName.Valid && action.ParentActionName.String != "" {
+		result, err := tx.ExecContext(ctx,
+			`UPDATE actions SET phase = $5, updated_at = NOW()
+			 WHERE project = $1 AND domain = $2 AND run_name = $3 AND name = $4
+			 AND phase = ANY($6)`,
+			action.Project, action.Domain, action.RunName, action.ParentActionName.String,
+			int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+			pq.Array([]int32{
+				int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+				int32(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES),
+				int32(common.ActionPhase_ACTION_PHASE_INITIALIZING),
+			}))
+		if err != nil {
+			return nil, fmt.Errorf("failed to promote parent action: %w", err)
+		}
+		updated, err := result.RowsAffected()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get parent update count: %w", err)
+		}
+		parentUpdated = updated > 0
+	}
+
 	if err := tx.Commit(); err != nil {
 		return nil, fmt.Errorf("failed to commit tx: %w", err)
 	}
@@ -387,6 +434,12 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, up
 			Domain:  action.Domain,
 			Name:    action.RunName,
 		},
+	}
+
+	if parentUpdated {
+		r.notifyActionUpdate(ctx, &common.ActionIdentifier{
+			Run: actionID.Run, Name: action.ParentActionName.String,
+		})
 	}
 
 	// If no rows were affected, the action already exists — fetch and return it.
@@ -555,13 +608,6 @@ func (r *actionRepo) UpdateActionPhase(
 	retryablePhases := []int32{
 		int32(common.ActionPhase_ACTION_PHASE_FAILED),
 		int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
-	}
-	terminalPhases := []int32{
-		int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
-		int32(common.ActionPhase_ACTION_PHASE_FAILED),
-		int32(common.ActionPhase_ACTION_PHASE_ABORTED),
-		int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
-		int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
 	}
 
 	var queryBuilder strings.Builder
@@ -780,66 +826,88 @@ func (r *actionRepo) WatchStateUpdates(ctx context.Context, updates chan<- *comm
 	<-ctx.Done()
 }
 
+// subscription is one Watch* subscriber.
+type subscription struct {
+	notify chan string
+	// resync asks the subscriber to re-read its state from the DB after the listener reconnects.
+	resync chan struct{}
+}
+
+// requestResync never blocks, and repeated requests coalesce into one re-read.
+func (s *subscription) requestResync() {
+	select {
+	case s.resync <- struct{}{}:
+	default:
+	}
+}
+
+func (r *actionRepo) subscribe(subs map[*subscription]struct{}) *subscription {
+	sub := &subscription{
+		notify: make(chan string, r.notificationConfig.watchBufferSize),
+		resync: make(chan struct{}, 1),
+	}
+	r.mu.Lock()
+	subs[sub] = struct{}{}
+	r.mu.Unlock()
+	return sub
+}
+
+func (r *actionRepo) unsubscribe(subs map[*subscription]struct{}, sub *subscription) {
+	r.mu.Lock()
+	delete(subs, sub)
+	close(sub.notify)
+	r.mu.Unlock()
+}
+
 // WatchRunUpdates watches for run updates via LISTEN/NOTIFY
 func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Run, errs chan<- error) {
 	runKey := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
-	notifCh := make(chan string, r.notificationConfig.watchBufferSize)
-
-	r.mu.Lock()
-	r.runSubscribers[notifCh] = true
-	r.mu.Unlock()
-
-	defer func() {
-		r.mu.Lock()
-		delete(r.runSubscribers, notifCh)
-		close(notifCh)
-		r.mu.Unlock()
-	}()
+	sub := r.subscribe(r.runSubscribers)
+	defer r.unsubscribe(r.runSubscribers, sub)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case notifPayload := <-notifCh:
-			if notifPayload == runKey {
-				run, err := r.GetRun(ctx, runID)
-				if err != nil {
-					if ctx.Err() != nil {
-						return
-					}
-					errs <- err
-					return
-				}
-				select {
-				case updates <- run:
-				case <-ctx.Done():
-					return
-				}
+		case <-sub.resync:
+		case notifPayload := <-sub.notify:
+			if notifPayload != runKey {
+				continue
 			}
+		}
+
+		run, err := r.GetRun(ctx, runID)
+		if err != nil {
+			if ctx.Err() != nil {
+				return
+			}
+			errs <- err
+			return
+		}
+		select {
+		case updates <- run:
+		case <-ctx.Done():
+			return
 		}
 	}
 }
 
 // WatchAllRunUpdates watches for all run updates via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error) {
-	notifCh := make(chan string, r.notificationConfig.watchBufferSize)
-
-	r.mu.Lock()
-	r.runSubscribers[notifCh] = true
-	r.mu.Unlock()
-
-	defer func() {
-		r.mu.Lock()
-		delete(r.runSubscribers, notifCh)
-		close(notifCh)
-		r.mu.Unlock()
-	}()
+	sub := r.subscribe(r.runSubscribers)
+	defer r.unsubscribe(r.runSubscribers, sub)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case notifPayload := <-notifCh:
+		case <-sub.resync:
+			select {
+			case updates <- nil:
+			case <-ctx.Done():
+				return
+			}
+		case notifPayload := <-sub.notify:
 			parts := strings.Split(notifPayload, "/")
 			if len(parts) != 3 {
 				logger.Warnf(ctx, "Invalid run notification payload: %s", notifPayload)
@@ -875,24 +943,20 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 // WatchAllActionUpdates watches for all action updates for a run via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	runPrefix := fmt.Sprintf("%s/%s/%s/", runID.Project, runID.Domain, runID.Name)
-	notifCh := make(chan string, r.notificationConfig.watchBufferSize)
-
-	r.mu.Lock()
-	r.actionSubscribers[notifCh] = true
-	r.mu.Unlock()
-
-	defer func() {
-		r.mu.Lock()
-		delete(r.actionSubscribers, notifCh)
-		close(notifCh)
-		r.mu.Unlock()
-	}()
+	sub := r.subscribe(r.actionSubscribers)
+	defer r.unsubscribe(r.actionSubscribers, sub)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case notifPayload := <-notifCh:
+		case <-sub.resync:
+			select {
+			case updates <- nil:
+			case <-ctx.Done():
+				return
+			}
+		case notifPayload := <-sub.notify:
 			// Collect this notification plus any others already queued,
 			// deduplicating by action name so we only query the DB once
 			// per action during a burst of updates.
@@ -904,7 +968,7 @@ func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.Ru
 		drain:
 			for {
 				select {
-				case extra := <-notifCh:
+				case extra := <-sub.notify:
 					if len(extra) > len(runPrefix) && extra[:len(runPrefix)] == runPrefix {
 						pending[extra[len(runPrefix):]] = true
 					}
@@ -943,24 +1007,15 @@ func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.Ru
 func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.ActionIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	targetPayload := fmt.Sprintf("%s/%s/%s/%s",
 		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
-	notifCh := make(chan string, r.notificationConfig.watchBufferSize)
-
-	r.mu.Lock()
-	r.actionSubscribers[notifCh] = true
-	r.mu.Unlock()
-
-	defer func() {
-		r.mu.Lock()
-		delete(r.actionSubscribers, notifCh)
-		close(notifCh)
-		r.mu.Unlock()
-	}()
+	sub := r.subscribe(r.actionSubscribers)
+	defer r.unsubscribe(r.actionSubscribers, sub)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case notifPayload := <-notifCh:
+		case <-sub.resync:
+		case notifPayload := <-sub.notify:
 			if notifPayload != targetPayload {
 				continue
 			}
@@ -969,7 +1024,7 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.Ac
 			for {
 				// Prevent continuous update from the action
 				select {
-				case extra := <-notifCh:
+				case extra := <-sub.notify:
 					if extra != targetPayload {
 						continue
 					}
@@ -977,21 +1032,21 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.Ac
 					break drain
 				}
 			}
+		}
 
-			action, err := r.GetAction(ctx, actionID)
-			if err != nil {
-				if ctx.Err() != nil {
-					return
-				}
-				logger.Errorf(ctx, "Failed to get action from notification: %v", err)
-				continue
-			}
-
-			select {
-			case updates <- action:
-			case <-ctx.Done():
+		action, err := r.GetAction(ctx, actionID)
+		if err != nil {
+			if ctx.Err() != nil {
 				return
 			}
+			logger.Errorf(ctx, "Failed to get action from notification: %v", err)
+			continue
+		}
+
+		select {
+		case updates <- action:
+		case <-ctx.Done():
+			return
 		}
 	}
 }
@@ -1047,6 +1102,15 @@ func (r *actionRepo) processNotifications() {
 			}
 			if notif == nil {
 				// pq sends nil after it reconnects; notifications sent while it was down may be lost.
+				logger.Infof(context.Background(), "PostgreSQL listener reconnected, resyncing subscribers")
+				r.mu.RLock()
+				for sub := range r.runSubscribers {
+					sub.requestResync()
+				}
+				for sub := range r.actionSubscribers {
+					sub.requestResync()
+				}
+				r.mu.RUnlock()
 				continue
 			}
 
@@ -1054,9 +1118,9 @@ func (r *actionRepo) processNotifications() {
 			case "run_updates":
 				// Broadcast to all run subscribers
 				r.mu.RLock()
-				for ch := range r.runSubscribers {
+				for sub := range r.runSubscribers {
 					select {
-					case ch <- notif.Extra:
+					case sub.notify <- notif.Extra:
 					default:
 						// Channel full, skip this subscriber
 						logger.Warnf(context.Background(), "Run subscriber channel full, dropping notification")
@@ -1067,9 +1131,9 @@ func (r *actionRepo) processNotifications() {
 			case "action_updates":
 				// Broadcast to all action subscribers
 				r.mu.RLock()
-				for ch := range r.actionSubscribers {
+				for sub := range r.actionSubscribers {
 					select {
-					case ch <- notif.Extra:
+					case sub.notify <- notif.Extra:
 					default:
 						logger.Warnf(context.Background(), "Action subscriber channel full, dropping notification payload=%s", notif.Extra)
 					}
@@ -1222,6 +1286,28 @@ func (r *actionRepo) ListRootActions(ctx context.Context, project, domain string
 		return nil, fmt.Errorf("failed to list root actions: %w", err)
 	}
 	return actions, nil
+}
+
+// CountActiveActionsByPhase counts the actions in an active phase, split by phase
+// and by whether the action is a root (a run).
+func (r *actionRepo) CountActiveActionsByPhase(ctx context.Context) (map[interfaces.PhaseKey]int64, error) {
+	var rows []struct {
+		Phase  int32 `db:"phase"`
+		IsRoot bool  `db:"is_root"`
+		Count  int64 `db:"count"`
+	}
+	err := sqlx.SelectContext(ctx, r.db, &rows,
+		`SELECT phase, parent_action_name IS NULL AS is_root, COUNT(*) AS count
+		FROM actions WHERE phase = ANY($1) GROUP BY 1, 2`,
+		pq.Array(activePhases))
+	if err != nil {
+		return nil, fmt.Errorf("failed to count actions by phase: %w", err)
+	}
+	counts := make(map[interfaces.PhaseKey]int64, len(rows))
+	for _, row := range rows {
+		counts[interfaces.PhaseKey{Phase: row.Phase, IsRoot: row.IsRoot}] = row.Count
+	}
+	return counts, nil
 }
 
 // startNotifyLoop acquires a dedicated DB connection for NOTIFY commands and

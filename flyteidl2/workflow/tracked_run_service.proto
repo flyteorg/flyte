@@ -124,7 +124,7 @@ message TrackedActionUpdate {
   string parent_name = 2;
 
   // Group this action belongs to, if applicable. Only honored on the first report of an action.
-  string group = 3;
+  string group = 3 [(buf.validate.field).string.max_len = 255];
 
   // The action's spec. Should be provided on the first report of an action; ignored afterwards.
   oneof spec {

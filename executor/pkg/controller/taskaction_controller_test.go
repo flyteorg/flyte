@@ -526,7 +526,7 @@ var _ = Describe("TaskAction Controller", func() {
 			original := ta.DeepCopy()
 			startingAttempts := ta.Status.Attempts
 
-			res, err := r.recordSystemError(ctx, ta, original, "pod", errFakeWebhookDenied, 0)
+			res, err := r.recordSystemError(ctx, ta, original, "pod", errFakeWebhookDenied, taskTimeouts{})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(res.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
 			Expect(ta.Status.SystemFailures).To(Equal(uint32(1)))
@@ -553,7 +553,7 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(k8sClient.Get(ctx, nn, ta)).To(Succeed())
 			original := ta.DeepCopy()
 
-			res, err := r.recordSystemError(ctx, ta, original, "pod", errFakeWebhookDenied, 0)
+			res, err := r.recordSystemError(ctx, ta, original, "pod", errFakeWebhookDenied, taskTimeouts{})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(res.RequeueAfter).To(BeZero(), "terminal — should not requeue")
 			Expect(ta.Status.SystemFailures).To(Equal(uint32(3)))
@@ -579,7 +579,7 @@ var _ = Describe("TaskAction Controller", func() {
 
 			handleErr := pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "invalid ray submission mode %q", "HttpMode")
 
-			res, err := r.recordSystemError(ctx, ta, original, "ray", handleErr, 0)
+			res, err := r.recordSystemError(ctx, ta, original, "ray", handleErr, taskTimeouts{})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(res.RequeueAfter).To(BeZero(), "terminal - should not requeue")
 			Expect(ta.Status.SystemFailures).To(BeZero(), "a deterministic failure must not consume system attempts")
@@ -607,7 +607,7 @@ var _ = Describe("TaskAction Controller", func() {
 			handleErr := pluginserrors.Errorf(pluginserrors.AppleSiliconNotAvailable,
 				"gpu='AppleSilicon' requires an Apple Silicon devbox; this backend has no Apple Silicon bridge.")
 
-			res, err := r.recordSystemError(ctx, ta, original, "container", handleErr, 0)
+			res, err := r.recordSystemError(ctx, ta, original, "container", handleErr, taskTimeouts{})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(res.RequeueAfter).To(BeZero(), "terminal - should not requeue")
 			Expect(ta.Status.SystemFailures).To(BeZero(), "retrying cannot conjure a bridge")
@@ -1957,6 +1957,294 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(isTerminal(getTaskAction(nn))).To(BeTrue())
 			Expect(fake.abortCalls).To(BeZero())
+		})
+
+		Context("action deadline", func() {
+			withDeadline := func(template []byte, deadline time.Duration) []byte {
+				tmpl := &core.TaskTemplate{}
+				Expect(proto.Unmarshal(template, tmpl)).To(Succeed())
+				tmpl.Metadata.Timeouts = &core.TimeoutStrategy{Deadline: durationpb.New(deadline)}
+				data, err := proto.Marshal(tmpl)
+				Expect(err).NotTo(HaveOccurred())
+				return data
+			}
+
+			// The deadline is anchored on CreationTimestamp, which the API server sets from
+			// the real clock, so each test starts its fake clock there.
+			createdAt := func(nn types.NamespacedName) time.Time {
+				return getTaskAction(nn).CreationTimestamp.Time
+			}
+
+			queuedTransition := func(at time.Time) pluginsCore.Transition {
+				return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(at, pluginsCore.DefaultPhaseVersion, "waiting"))
+			}
+
+			expectDeadlineExceeded := func(ta *flyteorgv1.TaskAction) {
+				Expect(isTerminal(ta)).To(BeTrue())
+				Expect(ta.Status.ErrorState).NotTo(BeNil())
+				Expect(ta.Status.ErrorState.Code).To(Equal(TaskDeadlineExceededCode))
+				Expect(ta.Status.ErrorState.Kind).To(Equal("USER"))
+				Expect(ta.Status.Conditions).To(ContainElement(And(
+					HaveField("Type", string(flyteorgv1.ConditionTypeFailed)),
+					HaveField("Status", metav1.ConditionTrue),
+					HaveField("Reason", string(flyteorgv1.ConditionReasonTimedOut)),
+				)))
+			}
+
+			It("counts queue time and times out an action that never started", func() {
+				const deadline = 30 * time.Second
+				fakeClock := testingclock.NewFakeClock(time.Now())
+				fake := &fakePlugin{id: "timeout-plugin"}
+				fake.handleFunc = func(context.Context, pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+					return queuedTransition(fakeClock.Now()), nil
+				}
+				recorded := &recordingEventsClient{}
+				r := newReconciler(fake, fakeClock, recorded, nil)
+				nn := createTaskAction(
+					"deadline-queued",
+					withDeadline(buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", 0, 2), deadline),
+				)
+				created := createdAt(nn)
+				request := reconcile.Request{NamespacedName: nn}
+
+				// Close to the deadline, the requeue is cut short so the deadline is not overshot.
+				fakeClock.SetTime(created.Add(25 * time.Second))
+				result, err := r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(result.RequeueAfter).To(Equal(5 * time.Second))
+				Expect(fake.handleCalls).To(Equal(1))
+
+				fakeClock.SetTime(created.Add(deadline))
+				_, err = r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				persisted := getTaskAction(nn)
+				expectDeadlineExceeded(persisted)
+				Expect(persisted.Status.Attempts).To(Equal(uint32(1)))
+				Expect(persisted.Status.AttemptStartedAt).To(BeNil())
+				Expect(fake.handleCalls).To(Equal(1))
+				Expect(fake.abortCalls).To(Equal(1))
+				Expect(fake.finalizeCalls).To(Equal(1))
+
+				events := recorded.RecordedEvents()
+				last := events[len(events)-1]
+				Expect(last.GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_TIMED_OUT))
+				Expect(last.GetUpdatedTime().AsTime()).To(BeTemporally("==", created.Add(deadline)))
+				Expect(last.GetErrorInfo().GetCode()).To(Equal(TaskDeadlineExceededCode))
+			})
+
+			It("spans attempts and is not reset by a user retry", func() {
+				const deadline = 30 * time.Second
+				fakeClock := testingclock.NewFakeClock(time.Now())
+				fake := &fakePlugin{id: "timeout-plugin"}
+				fake.handleFunc = func(_ context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+					if tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().GetRetryAttempt() == 0 {
+						return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("UserError", "task raised", nil)), nil
+					}
+					return runningTransition(fakeClock.Now()), nil
+				}
+				r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+				nn := createTaskAction(
+					"deadline-spans-attempts",
+					withDeadline(buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", 0, 3), deadline),
+				)
+				created := createdAt(nn)
+				request := reconcile.Request{NamespacedName: nn}
+
+				// Attempt 1 fails 10s in and is retried at once.
+				fakeClock.SetTime(created.Add(10 * time.Second))
+				_, err := r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(getTaskAction(nn).Status.Attempts).To(Equal(uint32(2)))
+
+				// Attempt 2 starts running; its requeue is bounded by what is left of the deadline.
+				fakeClock.SetTime(created.Add(20 * time.Second))
+				result, err := r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(result.RequeueAfter).To(Equal(10 * time.Second))
+				Expect(isTerminal(getTaskAction(nn))).To(BeFalse())
+
+				// Retries remain, but the deadline ends the action anyway.
+				fakeClock.SetTime(created.Add(deadline))
+				_, err = r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				persisted := getTaskAction(nn)
+				expectDeadlineExceeded(persisted)
+				Expect(persisted.Status.Attempts).To(Equal(uint32(2)))
+				Expect(persisted.Status.ErrorState.Message).To(ContainSubstring("deadline of 30s across all attempts (attempt 2)"))
+			})
+
+			It("cuts a retry backoff short and times out without relaunching", func() {
+				const deadline = 30 * time.Second
+				fakeClock := testingclock.NewFakeClock(time.Now())
+				failed := pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("UserError", "task raised", nil))
+				fake := &fakePlugin{id: "timeout-plugin", transitions: []pluginsCore.Transition{failed}}
+				r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+				backoff := &core.Backoff{Base: durationpb.New(time.Minute)}
+				nn := createTaskAction(
+					"deadline-backoff",
+					withDeadline(
+						withRetryBackoff(buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", 0, 2), backoff),
+						deadline,
+					),
+				)
+				created := createdAt(nn)
+				request := reconcile.Request{NamespacedName: nn}
+
+				fakeClock.SetTime(created)
+				result, err := r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(getTaskAction(nn).Status.NextAttemptAt.Time).To(BeTemporally("==", created.Add(time.Minute)))
+				Expect(result.RequeueAfter).To(Equal(deadline))
+
+				fakeClock.SetTime(created.Add(10 * time.Second))
+				result, err = r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(result.RequeueAfter).To(Equal(20 * time.Second))
+				Expect(fake.handleCalls).To(Equal(1))
+
+				fakeClock.SetTime(created.Add(deadline))
+				_, err = r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				persisted := getTaskAction(nn)
+				expectDeadlineExceeded(persisted)
+				Expect(persisted.Status.Attempts).To(Equal(uint32(2)))
+				Expect(persisted.Status.NextAttemptAt).To(BeNil())
+				Expect(fake.handleCalls).To(Equal(1))
+			})
+
+			It("keeps max-runtime retries until the deadline ends the action", func() {
+				const timeout = 5 * time.Second
+				const deadline = 12 * time.Second
+				fakeClock := testingclock.NewFakeClock(time.Now())
+				attemptStarts := map[uint32]time.Time{}
+				fake := &fakePlugin{id: "timeout-plugin"}
+				fake.handleFunc = func(_ context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+					attempt := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().GetRetryAttempt() + 1
+					startedAt, ok := attemptStarts[attempt]
+					if !ok {
+						startedAt = fakeClock.Now()
+						attemptStarts[attempt] = startedAt
+					}
+					return runningTransition(startedAt), nil
+				}
+				recorded := &recordingEventsClient{}
+				r := newReconciler(fake, fakeClock, recorded, nil)
+				nn := createTaskAction(
+					"deadline-after-max-runtime",
+					withDeadline(buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", timeout, 5), deadline),
+				)
+				created := createdAt(nn)
+				request := reconcile.Request{NamespacedName: nn}
+
+				fakeClock.SetTime(created)
+				for attempt := uint32(1); attempt <= 2; attempt++ {
+					_, err := r.Reconcile(ctx, request)
+					Expect(err).NotTo(HaveOccurred())
+					fakeClock.Step(timeout)
+					_, err = r.Reconcile(ctx, request)
+					Expect(err).NotTo(HaveOccurred())
+					persisted := getTaskAction(nn)
+					Expect(isTerminal(persisted)).To(BeFalse())
+					Expect(persisted.Status.Attempts).To(Equal(attempt + 1))
+				}
+
+				// Attempt 3 would run until created+15s, but the deadline at created+12s comes first.
+				result, err := r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(result.RequeueAfter).To(Equal(2 * time.Second))
+
+				fakeClock.Step(2 * time.Second)
+				_, err = r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				persisted := getTaskAction(nn)
+				expectDeadlineExceeded(persisted)
+				Expect(persisted.Status.Attempts).To(Equal(uint32(3)))
+
+				var timeoutCodes []string
+				for _, event := range recorded.RecordedEvents() {
+					if event.GetPhase() == common.ActionPhase_ACTION_PHASE_TIMED_OUT {
+						timeoutCodes = append(timeoutCodes, event.GetErrorInfo().GetCode())
+					}
+				}
+				Expect(timeoutCodes).To(Equal([]string{
+					TaskExecutionTimedOutCode,
+					TaskExecutionTimedOutCode,
+					TaskDeadlineExceededCode,
+				}))
+			})
+
+			It("lets a result that finished before the deadline win over a late reconcile", func() {
+				const deadline = 30 * time.Second
+				fakeClock := testingclock.NewFakeClock(time.Now())
+				var created time.Time
+				fake := &fakePlugin{id: "timeout-plugin"}
+				fake.handleFunc = func(_ context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+					Expect(tCtx.PluginStateWriter().Put(1, "launched")).To(Succeed())
+					if fake.handleCalls == 1 {
+						return runningTransition(fakeClock.Now()), nil
+					}
+					finishedAt := created.Add(20 * time.Second)
+					return pluginsCore.DoTransition(pluginsCore.PhaseInfoSuccess(&pluginsCore.TaskInfo{OccurredAt: &finishedAt})), nil
+				}
+				r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+				nn := createTaskAction(
+					"deadline-success-before",
+					withDeadline(buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", 0, 0), deadline),
+				)
+				created = createdAt(nn)
+				request := reconcile.Request{NamespacedName: nn}
+
+				fakeClock.SetTime(created)
+				_, err := r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(getTaskAction(nn).Status.PluginState).NotTo(BeEmpty())
+
+				// The controller only gets back to the action after the deadline.
+				fakeClock.SetTime(created.Add(time.Minute))
+				_, err = r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				persisted := getTaskAction(nn)
+				Expect(persisted.Status.ErrorState).To(BeNil())
+				Expect(persisted.Status.Conditions).To(ContainElement(And(
+					HaveField("Type", string(flyteorgv1.ConditionTypeSucceeded)),
+					HaveField("Status", metav1.ConditionTrue),
+				)))
+				Expect(fake.abortCalls).To(BeZero())
+			})
+
+			It("resumes deadline cleanup after an Abort failure", func() {
+				const deadline = 30 * time.Second
+				fakeClock := testingclock.NewFakeClock(time.Now())
+				fake := &fakePlugin{
+					id:          "timeout-plugin",
+					abortErrors: []error{stderrors.New("abort failed")},
+				}
+				fake.handleFunc = func(context.Context, pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+					return queuedTransition(fakeClock.Now()), nil
+				}
+				r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+				nn := createTaskAction(
+					"deadline-abort-failure",
+					withDeadline(buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", 0, 2), deadline),
+				)
+				created := createdAt(nn)
+				request := reconcile.Request{NamespacedName: nn}
+
+				fakeClock.SetTime(created.Add(deadline))
+				result, err := r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(result.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
+				pending := getTaskAction(nn)
+				Expect(isTerminal(pending)).To(BeFalse())
+				Expect(pending.Status.TimeoutAt.Time).To(BeTemporally("==", created.Add(deadline)))
+
+				fakeClock.Step(TaskActionDefaultRequeueDuration)
+				_, err = r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				expectDeadlineExceeded(getTaskAction(nn))
+				Expect(fake.abortCalls).To(Equal(2))
+				Expect(fake.handleCalls).To(BeZero())
+			})
 		})
 	})
 

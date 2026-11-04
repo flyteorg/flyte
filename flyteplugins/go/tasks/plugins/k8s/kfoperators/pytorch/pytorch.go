@@ -227,7 +227,7 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginCo
 	occurredAt := time.Now()
 	statusDetails, _ := utils.MarshalObjToStruct(app.Status) //nolint: staticcheck
 	podList := &v1.PodList{}
-	err = pluginContext.K8sReader().List(ctx, podList)
+	err = pluginContext.K8sReader().List(ctx, podList, client.MatchingLabels{kubeflowv1.JobNameLabel: app.Name})
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("failed to list pytorch execution pods. Error: %w", err)
 	}

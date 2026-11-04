@@ -3,6 +3,7 @@ package clustered
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -28,6 +29,10 @@ const (
 	// queue they chose, or ran past the maximum execution time they set on the job.
 	evictedByPreemption           = "Preempted"
 	evictedByMaximumExecutionTime = "DeactivatedDueToMaximumExecutionTimeExceeded"
+
+	// evictedByDeactivationPrefix starts every Evicted reason Kueue gives when it deactivates
+	// a Workload, e.g. "DeactivatedDueToRequeuingLimitExceeded".
+	evictedByDeactivationPrefix = "Deactivated"
 
 	quotaReservedInadmissible = "Inadmissible"
 )
@@ -94,7 +99,15 @@ func readWorkloadCondition(wl *unstructured.Unstructured, conditionType string) 
 func classifyEviction(wl *unstructured.Unstructured) gang.Eviction {
 	eviction := gang.Eviction{Source: evictionSource}
 	evicted, ok := readWorkloadCondition(wl, workloadConditionEvicted)
-	if !ok || evicted.status != "True" {
+	evictedNow := ok && evicted.status == "True"
+	// Deactivating a Workload that is already evicted, e.g. one waiting for re-admission
+	// after a preemption, can leave the earlier reason in place: the deactivation is the
+	// cause now.
+	if isInactive(wl) && !(evictedNow && strings.HasPrefix(evicted.reason, evictedByDeactivationPrefix)) {
+		eviction.Reason = evictedByDeactivationPrefix
+		return eviction
+	}
+	if !evictedNow {
 		return eviction
 	}
 	eviction.Reason = evicted.reason
@@ -109,6 +122,29 @@ func classifyEviction(wl *unstructured.Unstructured) gang.Eviction {
 		eviction.UserCaused = true
 	}
 	return eviction
+}
+
+// awaitsReadmission reports whether a gang Kueue took back was preempted, and so will be
+// readmitted once there is room again. Any other eviction, such as node failures or a
+// PodsReady timeout, may recur, so it is not worth waiting for; nor is a deactivated
+// Workload or a missing one. A JobSet can be suspended before Kueue has written the
+// Evicted condition, which is waited out until the condition says why.
+func awaitsReadmission(wl *unstructured.Unstructured) bool {
+	if wl == nil || isInactive(wl) {
+		return false
+	}
+	evicted, ok := readWorkloadCondition(wl, workloadConditionEvicted)
+	return !ok || evicted.status != "True" || evicted.reason == evictedByPreemption
+}
+
+// isInactive reports whether the Workload has been deactivated (spec.active: false), which
+// Kueue does on its own limits and an operator does by hand.
+func isInactive(wl *unstructured.Unstructured) bool {
+	if wl == nil {
+		return false
+	}
+	active, found, err := unstructured.NestedBool(wl.Object, "spec", "active")
+	return err == nil && found && !active
 }
 
 // missingLocalQueue reports the LocalQueue the JobSet names when Kueue cannot admit it because

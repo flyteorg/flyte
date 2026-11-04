@@ -34,7 +34,8 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/service"
 )
 
-const otelServiceName = "runs-service"
+// ServiceName identifies telemetry emitted by this service and its clients.
+const ServiceName = "runs-service"
 
 var sentryOperations = map[string]string{
 	workflowconnect.RunServiceCreateRunProcedure:        "create_run",
@@ -70,12 +71,12 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	otelCfg := otelutils.GetConfig()
-	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
+	if err := otelutils.RegisterProvidersWithContext(ctx, ServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
-	meterProvider := otelutils.GetMeterProvider(otelServiceName)
+	meterProvider := otelutils.GetMeterProvider(ServiceName)
 	otelInterceptor, err := otelconnect.NewInterceptor(
-		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
+		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(ServiceName)),
 		otelconnect.WithMeterProvider(meterProvider),
 	)
 	if err != nil {
@@ -83,7 +84,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	interceptors := []connect.Interceptor{otelInterceptor}
-	if sentryutils.Init(ctx, otelServiceName) {
+	if sentryutils.Init(ctx, ServiceName) {
 		interceptors = append(interceptors, sentryutils.Interceptor(sentryOperations), deployTriggerInterceptor())
 		sc.AddWorker("sentry-flush", func(ctx context.Context) error {
 			<-ctx.Done()

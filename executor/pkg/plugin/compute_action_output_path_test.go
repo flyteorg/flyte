@@ -7,6 +7,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 )
 
 func TestComputeActionOutputPath(t *testing.T) {
@@ -111,5 +115,59 @@ func TestComputeActionOutputPath(t *testing.T) {
 	t.Run("invalid RunOutputBase returns error", func(t *testing.T) {
 		_, err := ComputeActionOutputPath(ctx, "flyte", "my-action-abc", "://bad url", "action-0", 1)
 		assert.Error(t, err)
+	})
+}
+
+func TestComputeActionRawOutputPath(t *testing.T) {
+	ctx := context.Background()
+	newAction := func(rawPrefix string) *flyteorgv1.TaskAction {
+		return &flyteorgv1.TaskAction{
+			ObjectMeta: metav1.ObjectMeta{Namespace: "flyte", Name: "run123-action-0"},
+			Spec: flyteorgv1.TaskActionSpec{
+				Project: "proj", Domain: "dev", RunName: "run123", ActionName: "action-0",
+				RawDataPrefix: rawPrefix,
+			},
+		}
+	}
+	outputPrefix := storage.DataReference("s3://meta-bucket/ab/proj/dev/run123/action-0/1")
+
+	t.Run("empty prefix falls back to the output path", func(t *testing.T) {
+		got, err := ComputeActionRawOutputPath(ctx, newAction(""), 1, outputPrefix)
+		require.NoError(t, err)
+		assert.Equal(t, outputPrefix, got)
+	})
+
+	t.Run("prefix is laid out like the output path", func(t *testing.T) {
+		got, err := ComputeActionRawOutputPath(ctx, newAction("s3://raw-bucket/team"), 2, outputPrefix)
+		require.NoError(t, err)
+		want, err := ComputeActionOutputPath(ctx, "flyte", "run123-action-0", "s3://raw-bucket/team/proj/dev/run123/", "action-0", 2)
+		require.NoError(t, err)
+		assert.Equal(t, want, got)
+		assert.True(t, strings.HasPrefix(string(got), "s3://raw-bucket/"), got)
+		assert.True(t, strings.HasSuffix(string(got), "/team/proj/dev/run123/action-0/2"), got)
+	})
+
+	t.Run("trailing slash on prefix is ignored", func(t *testing.T) {
+		withSlash, err := ComputeActionRawOutputPath(ctx, newAction("s3://raw-bucket/team/"), 1, outputPrefix)
+		require.NoError(t, err)
+		withoutSlash, err := ComputeActionRawOutputPath(ctx, newAction("s3://raw-bucket/team"), 1, outputPrefix)
+		require.NoError(t, err)
+		assert.Equal(t, withoutSlash, withSlash)
+	})
+
+	t.Run("attempts get distinct paths", func(t *testing.T) {
+		a1, err := ComputeActionRawOutputPath(ctx, newAction("s3://raw-bucket"), 1, outputPrefix)
+		require.NoError(t, err)
+		a2, err := ComputeActionRawOutputPath(ctx, newAction("s3://raw-bucket"), 2, outputPrefix)
+		require.NoError(t, err)
+		assert.NotEqual(t, a1, a2)
+	})
+
+	t.Run("prefix equal to the metadata base yields the same path as before", func(t *testing.T) {
+		meta, err := ComputeActionOutputPath(ctx, "flyte", "run123-action-0", "s3://flyte-data/proj/dev/run123/", "action-0", 1)
+		require.NoError(t, err)
+		raw, err := ComputeActionRawOutputPath(ctx, newAction("s3://flyte-data"), 1, "unused")
+		require.NoError(t, err)
+		assert.Equal(t, meta, raw)
 	})
 }
