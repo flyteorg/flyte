@@ -184,6 +184,30 @@ func (f *failingStatusWriter) Update(
 	return f.SubResourceWriter.Update(ctx, obj, opts...)
 }
 
+// countingStatusClient counts the status updates that reach the API server.
+type countingStatusClient struct {
+	client.Client
+	updates int
+}
+
+func (c *countingStatusClient) Status() client.SubResourceWriter {
+	return &countingStatusWriter{SubResourceWriter: c.Client.Status(), client: c}
+}
+
+type countingStatusWriter struct {
+	client.SubResourceWriter
+	client *countingStatusClient
+}
+
+func (w *countingStatusWriter) Update(
+	ctx context.Context,
+	obj client.Object,
+	opts ...client.SubResourceUpdateOption,
+) error {
+	w.client.updates++
+	return w.SubResourceWriter.Update(ctx, obj, opts...)
+}
+
 // recordingEventsClient captures all recorded ActionEvents for assertion in tests.
 type recordingEventsClient struct {
 	mu     sync.Mutex
@@ -1017,6 +1041,62 @@ var _ = Describe("TaskAction Controller", func() {
 			persisted := getTaskAction(nn)
 			Expect(persisted.Status.AttemptQueuedAt).NotTo(BeNil())
 			Expect(persisted.Status.SystemFailures).To(Equal(uint32(1)))
+		})
+
+		It("keeps the queue clock of a retry whose relaunch cannot be reported", func() {
+			const budget = 2 * time.Second
+			nn := createTaskAction("qt-retry-events-down", buildTaskTemplateBytesWithQueuedTimeoutAndRetries(1))
+			base := getTaskAction(nn).CreationTimestamp.Time
+			fakeClock := testingclock.NewFakeClock(base)
+			failed := false
+			fake := &fakePlugin{id: "timeout-plugin"}
+			fake.handleFunc = launchThenPoll(fakeClock.Now, func() pluginsCore.Transition {
+				if !failed {
+					failed = true
+					return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("UserError", "task failed", nil))
+				}
+				return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(
+					fakeClock.Now(), pluginsCore.DefaultPhaseVersion, "scheduling"))
+			})
+			recorded := &failingEventsClient{}
+			r := newReconciler(fake, fakeClock, recorded, nil)
+			req := reconcile.Request{NamespacedName: nn}
+
+			_, err := r.Reconcile(ctx, req) // launches the first attempt
+			Expect(err).NotTo(HaveOccurred())
+			fakeClock.Step(time.Second)
+			_, err = r.Reconcile(ctx, req) // fails it, which queues the retry from now
+			Expect(err).NotTo(HaveOccurred())
+			retriedAt := fakeClock.Now()
+
+			recorded.failures = 1000 // the event service is away from the relaunch on
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).To(MatchError("events unavailable"))
+			fakeClock.Step(10 * time.Second)
+			_, err = r.Reconcile(ctx, req)
+			Expect(err).To(MatchError("events unavailable"), "the TIMED_OUT event cannot be published either")
+			Expect(getTaskAction(nn).Status.TimeoutAt.Time).To(BeTemporally("==", retriedAt.Add(budget)))
+		})
+
+		It("saves the queue stamp with the status write that ends the reconcile", func() {
+			nn := createTaskAction("qt-one-status-write", buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
+			base := getTaskAction(nn).CreationTimestamp.Time
+			fakeClock := testingclock.NewFakeClock(base)
+			fake := &fakePlugin{id: "timeout-plugin"}
+			fake.handleFunc = launchThenPoll(fakeClock.Now, func() pluginsCore.Transition {
+				return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(base, pluginsCore.DefaultPhaseVersion, "scheduling"))
+			})
+			counting := &countingStatusClient{Client: k8sClient}
+			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, counting)
+
+			_, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(counting.updates).To(Equal(1), "the stamp needs no write of its own")
+			persisted := getTaskAction(nn)
+			Expect(persisted.Status.AttemptQueuedAt).NotTo(BeNil())
+			Expect(persisted.Status.AttemptQueuedAt.Time).To(BeTemporally("==", base))
+			Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseQueued.String()))
 		})
 
 		It("starts the queue budget of a retry scheduled before upgrade when its backoff ends", func() {
