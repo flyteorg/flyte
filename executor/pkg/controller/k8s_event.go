@@ -31,7 +31,7 @@ const (
 
 // ParseEventLevel parses the executor's k8sEventLevel config value.
 func ParseEventLevel(s string) (EventLevel, error) {
-	switch s {
+	switch strings.ToLower(strings.TrimSpace(s)) {
 	case "off":
 		return EventLevelOff, nil
 	case "terminal":
