@@ -1330,14 +1330,26 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 }
 
 func (r *TaskActionReconciler) removeFinalizer(ctx context.Context, taskAction *flyteorgv1.TaskAction) (ctrl.Result, error) {
-	controllerutil.RemoveFinalizer(taskAction, taskActionFinalizer)
-	start := time.Now()
-	err := r.Update(ctx, taskAction)
-	r.metrics.recordK8sOp(ctx, opUpdate, start, err)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-	return ctrl.Result{}, nil
+	err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		latest := &flyteorgv1.TaskAction{}
+		start := time.Now()
+		getErr := r.Get(ctx, client.ObjectKeyFromObject(taskAction), latest)
+		r.metrics.recordK8sOp(ctx, opGet, start, getErr)
+		if getErr != nil {
+			return client.IgnoreNotFound(getErr)
+		}
+		if latest.UID != taskAction.UID {
+			return nil
+		}
+		if !controllerutil.RemoveFinalizer(latest, taskActionFinalizer) {
+			return nil
+		}
+		start = time.Now()
+		updErr := r.Update(ctx, latest)
+		r.metrics.recordK8sOp(ctx, opUpdate, start, updErr)
+		return updErr
+	})
+	return ctrl.Result{}, err
 }
 
 // updateTaskActionStatus updates the TaskAction status only when the status has changed,

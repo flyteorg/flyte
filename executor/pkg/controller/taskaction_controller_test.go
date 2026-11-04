@@ -36,6 +36,7 @@ import (
 	"k8s.io/client-go/tools/events"
 	testingclock "k8s.io/utils/clock/testing"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
@@ -2322,7 +2323,7 @@ var _ = Describe("TaskAction Controller", func() {
 				}
 				resource.Finalizers = nil
 				Expect(k8sClient.Update(ctx, resource)).To(Succeed())
-				Expect(k8sClient.Delete(ctx, resource)).To(Succeed())
+				Expect(client.IgnoreNotFound(k8sClient.Delete(ctx, resource))).To(Succeed())
 			}
 			created = nil
 		})
@@ -2446,6 +2447,117 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(recorded.RecordedEvents()).To(HaveLen(1))
 			Expect(recorded.RecordedEvents()[0].GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_FAILED))
 		})
+
+		It("keeps the finalizer of a replacement TaskAction", func() {
+			nn := createTaskAction("cleanup-replaced")
+			original := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, original)).To(Succeed())
+			Expect(k8sClient.Delete(ctx, original)).To(Succeed())
+			deleting := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, deleting)).To(Succeed())
+			deleting.Finalizers = nil
+			Expect(k8sClient.Update(ctx, deleting)).To(Succeed())
+			createTaskAction(nn.Name)
+			replacement := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, replacement)).To(Succeed())
+			Expect(replacement.UID).NotTo(Equal(original.UID))
+
+			r := &TaskActionReconciler{Client: k8sClient}
+			_, err := r.removeFinalizer(ctx, original)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(k8sClient.Get(ctx, nn, replacement)).To(Succeed())
+			GinkgoWriter.Printf("replacement_task old_uid=%s new_uid=%s finalizers=%v\n",
+				original.UID, replacement.UID, replacement.Finalizers)
+			Expect(replacement.Finalizers).To(ConsistOf(taskActionFinalizer))
+		})
+
+		DescribeTable("preserves concurrent metadata during terminal finalization",
+			func(conflict bool) {
+				nn := createTaskAction(fmt.Sprintf("cleanup-metadata-%t", conflict))
+				now := time.Now()
+				fake := failingWith(pluginsCore.PhaseInfoFailureWithCleanup(
+					"ContainerCannotRun", "container cannot run", &pluginsCore.TaskInfo{OccurredAt: &now}))
+				fake.abortErrors = []error{stderrors.New("cleanup temporarily unavailable")}
+				recorded := &recordingEventsClient{}
+				request := reconcile.Request{NamespacedName: nn}
+				_, err := newReconciler(fake, recorded).Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+
+				persisted := &flyteorgv1.TaskAction{}
+				Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+				Expect(meta.IsStatusConditionTrue(persisted.Status.Conditions,
+					string(flyteorgv1.ConditionTypeCleanupPending))).To(BeTrue())
+				failure := persisted.Status.ErrorState.DeepCopy()
+				persisted.Finalizers = append(persisted.Finalizers, "example.org/other-controller")
+				Expect(k8sClient.Update(ctx, persisted)).To(Succeed())
+				Expect(k8sClient.Delete(ctx, persisted)).To(Succeed())
+
+				apiClient, err := client.NewWithWatch(cfg, client.Options{Scheme: k8sClient.Scheme()})
+				Expect(err).NotTo(HaveOccurred())
+				metadataUpdated := false
+				finalizerWriteUpdated := false
+				conflicts := 0
+				restarted := newReconciler(fake, recorded)
+				restarted.Client = interceptor.NewClient(apiClient, interceptor.Funcs{
+					Get: func(
+						callCtx context.Context, c client.WithWatch, key client.ObjectKey,
+						obj client.Object, opts ...client.GetOption,
+					) error {
+						if err := c.Get(callCtx, key, obj, opts...); err != nil {
+							return err
+						}
+						if metadataUpdated || key != nn {
+							return nil
+						}
+						metadataUpdated = true
+						return c.Patch(callCtx, obj.(*flyteorgv1.TaskAction).DeepCopy(),
+							client.RawPatch(types.MergePatchType, []byte(`{"metadata":{
+								"annotations":{"example.org/cleanup-note":"kept"},
+								"labels":{"example.org/cleanup-owner":"other-controller"}
+							}}`)))
+					},
+					Update: func(
+						callCtx context.Context, c client.WithWatch, obj client.Object, opts ...client.UpdateOption,
+					) error {
+						if conflict && !finalizerWriteUpdated {
+							finalizerWriteUpdated = true
+							if err := c.Patch(callCtx, obj.(*flyteorgv1.TaskAction).DeepCopy(),
+								client.RawPatch(types.MergePatchType, []byte(`{"metadata":{
+									"annotations":{"example.org/finalizer-note":"kept"}
+								}}`))); err != nil {
+								return err
+							}
+						}
+						err := c.Update(callCtx, obj, opts...)
+						if errors.IsConflict(err) {
+							conflicts++
+						}
+						return err
+					},
+				})
+
+				result, err := restarted.Reconcile(ctx, request)
+				Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+				GinkgoWriter.Printf("cleanup_metadata race=%t error=%v note=%q owner=%q finalizers=%v conflicts=%d\n",
+					conflict, err, persisted.Annotations["example.org/cleanup-note"],
+					persisted.Labels["example.org/cleanup-owner"], persisted.Finalizers, conflicts)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(result).To(BeZero())
+				Expect(persisted.Annotations["example.org/cleanup-note"]).To(Equal("kept"))
+				Expect(persisted.Labels["example.org/cleanup-owner"]).To(Equal("other-controller"))
+				Expect(persisted.Finalizers).To(ConsistOf("example.org/other-controller"))
+				Expect(persisted.Status.ErrorState).To(Equal(failure))
+				Expect(meta.IsStatusConditionTrue(persisted.Status.Conditions,
+					string(flyteorgv1.ConditionTypeCleanupPending))).To(BeFalse())
+				if conflict {
+					Expect(persisted.Annotations["example.org/finalizer-note"]).To(Equal("kept"))
+					Expect(conflicts).To(Equal(1))
+				}
+				Expect(recorded.RecordedEvents()).To(HaveLen(1))
+			},
+			Entry("after the initial read", false),
+			Entry("during the finalizer write", true),
+		)
 
 		DescribeTable("allows garbage collection when terminal cleanup cannot build its context",
 			func(deleting bool) {
