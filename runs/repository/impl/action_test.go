@@ -1492,7 +1492,7 @@ func TestProcessNotifications_ResyncsSubscribersOnReconnect(t *testing.T) {
 		listenerPingInterval: time.Hour,
 		runSubscribers:       make(map[*subscription]struct{}),
 		actionSubscribers:    make(map[*subscription]struct{}),
-		notificationConfig:   NewNotificationConfig(testNotificationBufferLimit, notifyRetryMinBackoff, notifyRetryMaxBackoff, 1),
+		notificationConfig:   NewNotificationConfig(testNotificationBufferLimit, notifyRetryMinBackoff, notifyRetryMaxBackoff, 1, defaultNotifyBatchSize),
 	}
 	runSub := r.subscribe(r.runSubscribers)
 	actionSub := r.subscribe(r.actionSubscribers)
