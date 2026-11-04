@@ -3,9 +3,11 @@ package serviceclient
 import (
 	"context"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -19,6 +21,42 @@ func TestNewHTTPClientDisabledReturnsBaseClient(t *testing.T) {
 	actual, err := NewHTTPClient(context.Background(), base, ServiceConfig{URL: "http://service"})
 	require.NoError(t, err)
 	assert.Same(t, base, actual)
+}
+
+// Concurrent requests through the default base client must reuse their connections.
+func TestNewHTTPClientDefaultReusesConnections(t *testing.T) {
+	var opened atomic.Int32
+	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		time.Sleep(10 * time.Millisecond)
+	}))
+	server.Config.ConnState = func(_ net.Conn, state http.ConnState) {
+		if state == http.StateNew {
+			opened.Add(1)
+		}
+	}
+	server.Start()
+	t.Cleanup(server.Close)
+
+	client, err := NewHTTPClient(context.Background(), nil, ServiceConfig{URL: server.URL})
+	require.NoError(t, err)
+
+	burst := func() {
+		var wg sync.WaitGroup
+		for range 50 {
+			wg.Go(func() {
+				resp, err := client.Get(server.URL)
+				if assert.NoError(t, err) {
+					_, _ = io.Copy(io.Discard, resp.Body)
+					_ = resp.Body.Close()
+				}
+			})
+		}
+		wg.Wait()
+	}
+	burst()
+	first := opened.Load()
+	burst()
+	assert.Equal(t, first, opened.Load(), "second burst opened new connections")
 }
 
 func TestNewHTTPClientAuthenticatesAndReusesToken(t *testing.T) {

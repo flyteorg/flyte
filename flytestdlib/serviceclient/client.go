@@ -18,7 +18,19 @@ import (
 const (
 	oauthAuthorizationServerMetadataPath = "/.well-known/oauth-authorization-server"
 	defaultDiscoveryTimeout              = 10 * time.Second
+	// maxIdleConnsPerHost covers the executor's default 512 concurrent reconciles.
+	maxIdleConnsPerHost = 512
 )
+
+// pooledClient keeps an idle connection per concurrent caller, so bursts reuse connections.
+var pooledClient = &http.Client{Transport: newPooledTransport()}
+
+func newPooledTransport() *http.Transport {
+	t := http.DefaultTransport.(*http.Transport).Clone()
+	t.MaxIdleConns = 0
+	t.MaxIdleConnsPerHost = maxIdleConnsPerHost
+	return t
+}
 
 // ServiceConfig describes a downstream service and how to authenticate to it.
 type ServiceConfig struct {
@@ -55,7 +67,7 @@ func (c AuthConfig) hasSettings() bool {
 // NewHTTPClient returns an HTTP client configured for the service.
 func NewHTTPClient(ctx context.Context, base *http.Client, cfg ServiceConfig) (*http.Client, error) {
 	if base == nil {
-		base = http.DefaultClient
+		base = pooledClient
 	}
 	if cfg.URL == "" {
 		return nil, fmt.Errorf("service client: url is required")

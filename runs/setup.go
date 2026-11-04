@@ -115,7 +115,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if sc.BaseURL != "" {
 		actionsServiceCfg.URL = sc.BaseURL
 	}
-	actionsHTTPClient, err := serviceclient.NewHTTPClient(ctx, http.DefaultClient, actionsServiceCfg)
+	actionsHTTPClient, err := serviceclient.NewHTTPClient(ctx, nil, actionsServiceCfg)
 	if err != nil {
 		return fmt.Errorf("runs: configure actions service client: %w", err)
 	}
