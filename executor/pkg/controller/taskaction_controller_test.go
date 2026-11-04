@@ -19,6 +19,7 @@ package controller
 import (
 	"context"
 	stderrors "errors"
+	"strings"
 	"sync"
 	"time"
 
@@ -860,6 +861,60 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(fake.finalizeCalls).To(Equal(1))
 		})
 
+		DescribeTable("gives a system relaunch its own queued timeout",
+			func(initialPhase pluginsCore.Phase) {
+				nn := createTaskAction(
+					"relaunch-"+strings.ToLower(initialPhase.String()),
+					buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0),
+				)
+				base := getTaskAction(nn).CreationTimestamp.Time
+				retryAt := base.Add(time.Second)
+				initial := runningTransition(base)
+				if initialPhase == pluginsCore.PhaseInitializing {
+					initial = pluginsCore.DoTransition(pluginsCore.PhaseInfoInitializing(
+						base, pluginsCore.DefaultPhaseVersion, "initializing", &pluginsCore.TaskInfo{OccurredAt: &base}))
+				}
+				fakeClock := testingclock.NewFakeClock(base)
+				fake := &fakePlugin{id: "timeout-plugin", transitions: []pluginsCore.Transition{
+					initial,
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoSystemRetryableFailure(
+						"TransientSystemFailure", "retry", &pluginsCore.TaskInfo{OccurredAt: &retryAt})),
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(retryAt, pluginsCore.DefaultPhaseVersion, "queued")),
+				}}
+				r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+				request := reconcile.Request{NamespacedName: nn}
+				_, err := r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				fakeClock.Step(time.Second)
+				_, err = r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+
+				persisted := getTaskAction(nn)
+				Expect(persisted.Status.AttemptStartedAt).To(BeNil())
+				Expect(persisted.Status.AttemptInitializedAt).To(BeNil())
+				Expect(persisted.Status.AttemptQueuedAt.Time).To(BeTemporally("==", retryAt))
+				Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseNotReady.String()))
+				Expect(persisted.Status.Attempts).To(Equal(uint32(1)))
+				Expect(persisted.Status.SystemFailures).To(Equal(uint32(1)))
+
+				r = newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+				fakeClock.Step(time.Second)
+				result, err := r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(isTerminal(getTaskAction(nn))).To(BeFalse())
+				Expect(result.RequeueAfter).To(Equal(time.Second))
+				fakeClock.Step(time.Second)
+				_, err = r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				persisted = getTaskAction(nn)
+				Expect(isTerminal(persisted)).To(BeTrue())
+				Expect(persisted.Status.ErrorState.Message).To(ContainSubstring("queued timeout"))
+				Expect(persisted.Status.Attempts).To(Equal(uint32(1)))
+			},
+			Entry("after initializing", pluginsCore.PhaseInitializing),
+			Entry("after running", pluginsCore.PhaseRunning),
+		)
+
 		It("preserves a running attempt after its queued event fails to advance", func() {
 			nn := createTaskAction("queued-timeout-event-outage",
 				buildTaskTemplateBytesWithQueuedTimeoutAndRetries(0))
@@ -976,6 +1031,73 @@ var _ = Describe("TaskAction Controller", func() {
 				}
 			}
 		})
+
+		DescribeTable("expires an unlaunched retry after its queue budget",
+			func(cacheUnavailable bool) {
+				template := &core.TaskTemplate{}
+				Expect(proto.Unmarshal(buildSerializedCacheTemplateBytesWithQueuedTimeout(), template)).To(Succeed())
+				template.Metadata.Retries = &core.RetryStrategy{Retries: 1}
+				data, err := proto.Marshal(template)
+				Expect(err).NotTo(HaveOccurred())
+				nn := createTaskAction("qt-late-retry", data)
+				base := getTaskAction(nn).CreationTimestamp.Time
+				fakeClock := testingclock.NewFakeClock(base)
+				retrying := false
+				initialAttempt := launchThenPoll(fakeClock.Now, func() pluginsCore.Transition {
+					retrying = true
+					return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("UserError", "task failed", nil))
+				})
+				fake := &fakePlugin{id: "timeout-plugin"}
+				fake.handleFunc = func(
+					ctx context.Context, tCtx pluginsCore.TaskExecutionContext,
+				) (pluginsCore.Transition, error) {
+					if retrying {
+						return runningTransition(fakeClock.Now()), nil
+					}
+					return initialAttempt(ctx, tCtx)
+				}
+				r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
+				r.Catalog = &stubCatalogClient{
+					getFunc: func(context.Context, catalog.Key) (catalog.Entry, error) {
+						return catalog.Entry{}, grpcstatus.Error(codes.NotFound, "miss")
+					},
+					getOrExtendReservationFunc: func(
+						_ context.Context, _ catalog.Key, owner string, _ time.Duration,
+					) (*cacheservice.Reservation, error) {
+						if retrying && cacheUnavailable {
+							return nil, stderrors.New("cache service unavailable")
+						}
+						return &cacheservice.Reservation{OwnerId: owner}, nil
+					},
+					releaseReservationFunc: func(context.Context, catalog.Key, string) error { return nil },
+				}
+				req := reconcile.Request{NamespacedName: nn}
+
+				_, err = r.Reconcile(ctx, req)
+				Expect(err).NotTo(HaveOccurred())
+				fakeClock.Step(time.Second)
+				_, err = r.Reconcile(ctx, req)
+				Expect(err).NotTo(HaveOccurred())
+				persisted := getTaskAction(nn)
+				Expect(persisted.Status.Attempts).To(Equal(uint32(2)))
+				Expect(persisted.Status.PluginState).To(BeEmpty())
+				Expect(persisted.Status.AttemptInitializedAt).To(BeNil())
+				Expect(persisted.Status.AttemptStartedAt).To(BeNil())
+				retriedAt := persisted.Status.AttemptQueuedAt.Time
+				handled := fake.handleCalls
+
+				fakeClock.SetTime(retriedAt.Add(2 * time.Second))
+				_, err = r.Reconcile(ctx, req)
+				Expect(err).NotTo(HaveOccurred())
+				persisted = getTaskAction(nn)
+				Expect(isTerminal(persisted)).To(BeTrue())
+				Expect(persisted.Status.ErrorState.Message).To(ContainSubstring("queued timeout"))
+				Expect(persisted.Status.Attempts).To(Equal(uint32(2)))
+				Expect(fake.handleCalls).To(Equal(handled))
+			},
+			Entry("before a direct-running launch", false),
+			Entry("while the cache keeps failing", true),
+		)
 
 		DescribeTable("waits for current plugin state when queued timeout recovery encounters an outage",
 			func(outage string) {
@@ -1523,6 +1645,7 @@ var _ = Describe("TaskAction Controller", func() {
 			result, err := r.Reconcile(ctx, req) // the reservation fails before the first Handle call
 			Expect(err).NotTo(HaveOccurred())
 			Expect(isTerminal(getTaskAction(nn))).To(BeFalse())
+			Expect(getTaskAction(nn).Status.AttemptQueuedAt.Time).To(BeTemporally("==", base))
 			Expect(result).To(Equal(reconcile.Result{RequeueAfter: 2 * time.Second}),
 				"the requeue still follows the queue budget")
 
@@ -1597,6 +1720,7 @@ var _ = Describe("TaskAction Controller", func() {
 
 				_, err := r.Reconcile(ctx, req) // launches inside the budget, but its Queued event cannot be published
 				Expect(err).To(MatchError("events unavailable"))
+				Expect(getTaskAction(nn).Status.AttemptQueuedAt.Time).To(BeTemporally("==", base))
 
 				fakeClock.Step(10 * time.Second) // the budget runs out while the events service is still away
 				_, err = r.Reconcile(ctx, req)
@@ -2099,7 +2223,7 @@ var _ = Describe("TaskAction Controller", func() {
 					Expect(afterTimeout.Status.Attempts).To(Equal(attempt + 1))
 					Expect(afterTimeout.Status.AttemptStartedAt).To(BeNil())
 					Expect(afterTimeout.Status.TimeoutAt).To(BeNil())
-					Expect(afterTimeout.Status.PluginPhase).To(Equal(pluginsCore.PhaseQueued.String()))
+					Expect(afterTimeout.Status.PluginPhase).To(Equal(pluginsCore.PhaseNotReady.String()))
 				} else {
 					Expect(isTerminal(afterTimeout)).To(BeTrue())
 					Expect(afterTimeout.Status.Attempts).To(Equal(retries + 1))
@@ -2478,7 +2602,7 @@ var _ = Describe("TaskAction Controller", func() {
 		})
 
 		It("does not consume a user attempt for a system retry", func() {
-			const timeout = time.Hour
+			const timeout = 2 * time.Minute
 			base := time.Date(2026, time.August, 25, 0, 0, 0, 0, time.UTC)
 			fakeClock := testingclock.NewFakeClock(base)
 			systemFailureAt := base.Add(time.Minute)
@@ -2491,6 +2615,7 @@ var _ = Describe("TaskAction Controller", func() {
 						"transient failure",
 						&pluginsCore.TaskInfo{OccurredAt: &systemFailureAt},
 					)),
+					runningTransition(base.Add(2 * time.Minute)),
 				},
 			}
 			r := newReconciler(fake, fakeClock, &recordingEventsClient{}, nil)
@@ -2509,10 +2634,20 @@ var _ = Describe("TaskAction Controller", func() {
 			persisted := getTaskAction(nn)
 			Expect(persisted.Status.Attempts).To(Equal(uint32(1)))
 			Expect(persisted.Status.SystemFailures).To(Equal(uint32(1)))
-			Expect(persisted.Status.AttemptStartedAt.Time).To(BeTemporally("==", base))
+			Expect(persisted.Status.AttemptStartedAt).To(BeNil())
 			Expect(persisted.Status.TimeoutAt).To(BeNil())
 			Expect(isTerminal(persisted)).To(BeFalse())
 			Expect(fake.abortCalls).To(Equal(1))
+
+			fakeClock.Step(time.Minute)
+			_, err = r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(getTaskAction(nn).Status.AttemptStartedAt.Time).To(BeTemporally("==", base.Add(2*time.Minute)))
+			fakeClock.Step(time.Minute)
+			result, err := r.Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(isTerminal(getTaskAction(nn))).To(BeFalse())
+			Expect(result.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
 		})
 
 		It("reports the system failure before relaunching the attempt in place", func() {

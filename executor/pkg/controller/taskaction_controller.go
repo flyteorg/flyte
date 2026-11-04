@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"reflect"
@@ -625,6 +626,24 @@ func (r *TaskActionReconciler) recordAttemptQueuedFromPhase(
 	taskAction.Status.AttemptQueuedAt = &queuedAt
 }
 
+func (r *TaskActionReconciler) persistAttemptQueuedAt(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	queuedAt time.Time,
+) error {
+	finalQueuedAt := metav1.NewTime(queuedAt)
+	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
+		if latest.Status.AttemptQueuedAt == nil {
+			latest.Status.AttemptQueuedAt = &finalQueuedAt
+		}
+		finalQueuedAt = *latest.Status.AttemptQueuedAt
+	}); err != nil {
+		return err
+	}
+	taskAction.Status.AttemptQueuedAt = &finalQueuedAt
+	return nil
+}
+
 // recordAttemptInitialized anchors the first time the plugin reports the attempt initializing,
 // unless it shows that happened after the queue deadline, before that report's event is published.
 // When publishing fails the stored phase stays Queued, and without this anchor a later poll that
@@ -645,6 +664,10 @@ func (r *TaskActionReconciler) recordAttemptInitialized(
 	}
 	finalInitializedAt := metav1.NewTime(r.now())
 	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
+		if latest.Status.AttemptQueuedAt == nil {
+			latest.Status.AttemptQueuedAt = taskAction.Status.AttemptQueuedAt
+		}
+		taskAction.Status.AttemptQueuedAt = latest.Status.AttemptQueuedAt
 		if latest.Status.AttemptInitializedAt == nil {
 			latest.Status.AttemptInitializedAt = &finalInitializedAt
 		}
@@ -666,6 +689,10 @@ func (r *TaskActionReconciler) persistAttemptStartedAt(
 ) error {
 	finalStartedAt := metav1.NewTime(startedAt)
 	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
+		if latest.Status.AttemptQueuedAt == nil {
+			latest.Status.AttemptQueuedAt = taskAction.Status.AttemptQueuedAt
+		}
+		taskAction.Status.AttemptQueuedAt = latest.Status.AttemptQueuedAt
 		if latest.Status.AttemptStartedAt == nil {
 			latest.Status.AttemptStartedAt = &finalStartedAt
 		}
@@ -688,6 +715,9 @@ func (r *TaskActionReconciler) markTimeoutPending(
 ) error {
 	finalDeadline := metav1.NewTime(deadline)
 	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
+		if latest.Status.AttemptQueuedAt == nil {
+			latest.Status.AttemptQueuedAt = taskAction.Status.AttemptQueuedAt
+		}
 		if latest.Status.TimeoutAt == nil {
 			latest.Status.TimeoutAt = &finalDeadline
 		}
@@ -793,7 +823,7 @@ func (r *TaskActionReconciler) reconcileTimedOutAttempt(
 			return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 		}
 
-		phaseInfo := pluginsCore.PhaseInfoQueued(
+		phaseInfo := pluginsCore.PhaseInfoNotReady(
 			r.now(),
 			pluginsCore.DefaultPhaseVersion,
 			requeueReason,
@@ -853,8 +883,7 @@ func (r *TaskActionReconciler) applyTimeoutPhase(
 	return r.updateTaskActionStatus(ctx, original, taskAction, phaseInfo)
 }
 
-// resetPluginResource aborts any in-flight plugin resource and clears persisted
-// plugin state so the next reconcile starts fresh from PluginPhaseNotStarted.
+// resetPluginResource clears the resource and clocks for a system relaunch.
 func (r *TaskActionReconciler) resetPluginResource(
 	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
@@ -866,6 +895,17 @@ func (r *TaskActionReconciler) resetPluginResource(
 	}
 	taskAction.Status.PluginState = nil
 	taskAction.Status.PluginStateVersion = 0
+	queuedAt := metav1.NewTime(r.now())
+	taskAction.Status.AttemptQueuedAt = &queuedAt
+	taskAction.Status.AttemptInitializedAt = nil
+	taskAction.Status.AttemptStartedAt = nil
+	queued := pluginsCore.PhaseInfoNotReady(queuedAt.Time, pluginsCore.DefaultPhaseVersion, systemRetryReason)
+	mapPhaseToConditions(taskAction, queued)
+	taskAction.Status.PluginPhase = queued.Phase().String()
+	taskAction.Status.PluginPhaseVersion = queued.Version()
+	if actionSpec, _ := taskAction.Spec.GetActionSpec(); actionSpec != nil {
+		taskAction.Status.StateJSON = createStateJSON(actionSpec, queued.Phase().String())
+	}
 }
 
 // recordSystemRetry publishes the system failure an attempt is about to be retried
@@ -1184,14 +1224,18 @@ func (r *TaskActionReconciler) reconcileTask(
 	transition, cacheShortCircuited, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, alreadyRunning)
 	if err != nil {
 		logger.Error(err, "cache pre-execution handling failed")
+		if taskAction.Status.AttemptQueuedAt != nil {
+			if persistErr := r.persistAttemptQueuedAt(
+				ctx, taskAction, taskAction.Status.AttemptQueuedAt.Time); persistErr != nil {
+				return ctrl.Result{}, persistErr
+			}
+		}
 		// Yield to the deadline if there is one: a cache that keeps failing must
 		// not be able to hold an attempt open past its max runtime or deadline.
 		if hasDeadline && !r.now().Before(deadline) {
 			return r.setAttemptTimeout(ctx, taskAction, originalTaskActionInstance, p, tCtx, stateMgr, timeouts, deadline)
 		}
-		// A cache error cannot establish whether a resource that may already exist has left
-		// the queue, so it cannot expire the deadline. With no saved state and no launched phase
-		// nothing has run for the attempt, and a cache that keeps failing must not hold it in the queue.
+		// Queued can be an adoption report even when its plugin state was not saved.
 		if len(taskAction.Status.PluginState) > 0 || isLaunchedPluginPhase(taskAction.Status.PluginPhase) {
 			timeouts.queued = 0
 		} else if queuedDeadline, ok := taskAttemptQueuedDeadline(taskAction, timeouts.queued); ok && !r.now().Before(queuedDeadline) {
@@ -1217,8 +1261,6 @@ func (r *TaskActionReconciler) reconcileTask(
 	}
 	polledAt := r.now()
 	if !cacheShortCircuited {
-		// With no saved state and no launched phase nothing has run for the attempt, so no resource can
-		// have left the queue in time. A spent budget ends it here, before anything is launched for it.
 		queuedDeadline, ok := taskAttemptQueuedDeadline(taskAction, timeouts.queued)
 		if ok && !hasState && !isLaunchedPluginPhase(taskAction.Status.PluginPhase) && !polledAt.Before(queuedDeadline) {
 			return r.setAttemptTimeout(
@@ -1272,6 +1314,12 @@ func (r *TaskActionReconciler) reconcileTask(
 
 	if transition, err = r.finalizeCacheAfterExecution(ctx, taskAction, tCtx, transition, cacheShortCircuited); err != nil {
 		logger.Error(err, "cache post-execution handling failed")
+		if taskAction.Status.AttemptQueuedAt != nil {
+			if persistErr := r.persistAttemptQueuedAt(
+				ctx, taskAction, taskAction.Status.AttemptQueuedAt.Time); persistErr != nil {
+				return ctrl.Result{}, persistErr
+			}
+		}
 		return r.timeoutAwareRequeue(taskAction, timeouts), nil
 	}
 
@@ -1330,7 +1378,7 @@ func (r *TaskActionReconciler) reconcileTask(
 			r.scheduleNextAttempt(ctx, taskAction, currentAttempts)
 			logger.Info("restarting task in-place",
 				"attempt", currentAttempts+1, "maxAttempts", maxAttempts, "nextAttemptAt", taskAction.Status.NextAttemptAt)
-			// Override the transition to Queued so the TaskAction stays non-terminal.
+			// The retry has no submitted resource yet, but its public action phase remains Queued.
 			transition = pluginsCore.DoTransition(queuedForInPlaceRestart(phaseInfo, restartedAt))
 			phaseInfo = transition.Info()
 		} else {
@@ -1372,7 +1420,7 @@ func (r *TaskActionReconciler) reconcileTask(
 	}
 
 	// If an in-place restart was triggered, increment attempts and clear plugin state so the
-	// next reconcile starts fresh with PluginPhaseNotStarted and creates a new pod.
+	// next reconcile starts fresh with PhaseNotReady and creates a new pod.
 	if restartAttempts > 0 {
 		taskAction.Status.Attempts = restartAttempts
 		taskAction.Status.PluginState = nil
@@ -1515,8 +1563,17 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	ctx context.Context,
 	oldTaskAction, newTaskAction *flyteorgv1.TaskAction,
 	phaseInfo pluginsCore.PhaseInfo,
-) error {
+) (updateErr error) {
 	logger := log.FromContext(ctx)
+	defer func() {
+		if updateErr == nil || oldTaskAction.Status.AttemptQueuedAt != nil || newTaskAction.Status.AttemptQueuedAt == nil {
+			return
+		}
+		// An event or status outage must not restart the queue budget.
+		if err := r.persistAttemptQueuedAt(ctx, newTaskAction, newTaskAction.Status.AttemptQueuedAt.Time); err != nil {
+			updateErr = errors.Join(updateErr, fmt.Errorf("persist queued clock: %w", err))
+		}
+	}()
 
 	if !taskActionStatusChanged(oldTaskAction.Status, newTaskAction.Status) {
 		return nil
@@ -1570,8 +1627,15 @@ func (r *TaskActionReconciler) keepLaunchProgress(ctx context.Context, taskActio
 // SystemRetries past the ones it was reported for.
 func applyReconciledStatus(latest, reconciled *flyteorgv1.TaskAction) {
 	address := latest.Status.Address
+	queuedAt := latest.Status.AttemptQueuedAt
+	sameLaunch := observedAttempts(latest) == observedAttempts(reconciled) &&
+		latest.Status.SystemRetries == reconciled.Status.SystemRetries
 	latest.Status = reconciled.Status
 	latest.Status.Address = address
+	if sameLaunch && queuedAt != nil {
+		latest.Status.AttemptQueuedAt = queuedAt
+		reconciled.Status.AttemptQueuedAt = queuedAt
+	}
 }
 
 // persistStatusWithRetry re-fetches the TaskAction and applies the status
@@ -1761,11 +1825,12 @@ func isTaskExecutionTimedOut(info pluginsCore.PhaseInfo) bool {
 // The rest of the failed attempt's task info is deliberately left behind, since its logs
 // and custom info describe the pod that just went away rather than the one being queued.
 func queuedForInPlaceRestart(failed pluginsCore.PhaseInfo, at time.Time) pluginsCore.PhaseInfo {
-	info := &pluginsCore.TaskInfo{OccurredAt: &at}
+	// A retry has not submitted a resource; Queued is reserved for the plugin's launch report.
+	queued := pluginsCore.PhaseInfoNotReady(at, pluginsCore.DefaultPhaseVersion, "restarting task")
 	if failedInfo := failed.Info(); failedInfo != nil {
-		info.AdditionalReasons = failedInfo.AdditionalReasons
+		queued.Info().AdditionalReasons = failedInfo.AdditionalReasons
 	}
-	return pluginsCore.PhaseInfoQueuedWithTaskInfo(at, pluginsCore.DefaultPhaseVersion, "restarting task", info)
+	return queued
 }
 
 func toClusterEvents(phaseInfo pluginsCore.PhaseInfo, fallbackTime *timestamppb.Timestamp) []*workflow.ClusterEvent {
