@@ -673,6 +673,10 @@ func TestListRuns_SearchFilter(t *testing.T) {
 		"EQUAL selects exactly the named run")
 	assert.Empty(t, search(t, common.Filter_CONTAINS_CASE_INSENSITIVE, "nomatch"),
 		"a term matching neither column returns nothing")
+	assert.Empty(t, search(t, common.Filter_CONTAINS_CASE_INSENSITIVE, "%"),
+		"% matches literally, not as a wildcard")
+	assert.Empty(t, search(t, common.Filter_CONTAINS, "runone_abc"),
+		"_ matches literally, not as a single-character wildcard")
 }
 
 // TestListRuns_LabelFilter runs the run label predicates against a real database.
