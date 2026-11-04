@@ -23,8 +23,16 @@ service QueueService {
 
 // request message for queuing an action.
 message EnqueueActionRequest {
-  // the unique identifier for the action.
-  flyteidl2.common.ActionIdentifier action_id = 1 [(buf.validate.field).required = true];
+  // the unique identifier for the action. The name must not contain '/' or ':', which separate the
+  // parts of an action's key. Only checked here, so that existing actions stay readable.
+  flyteidl2.common.ActionIdentifier action_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "action_id.name.no_separators"
+      message: "Action name must not contain '/' or ':'"
+      expression: "!this.name.matches('[/:]')"
+    }
+  ];
 
   // an optional name for the parent action, if it exists. the remaining run metadata (ex. org,
   // project, domain) will be the same as the action_id defined above.

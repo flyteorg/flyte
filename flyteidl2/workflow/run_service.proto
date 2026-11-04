@@ -109,8 +109,13 @@ message CreateRunRequest {
   oneof id {
     option (buf.validate.oneof).required = true;
 
-    // The user provided run id.
-    common.RunIdentifier run_id = 1;
+    // The user provided run id. The name must not contain '/' or ':', which separate the parts
+    // of an action's key. Only checked here, so that existing runs stay readable.
+    common.RunIdentifier run_id = 1 [(buf.validate.field).cel = {
+      id: "run_id.name.no_separators"
+      message: "Run name must not contain '/' or ':'"
+      expression: "!this.name.matches('[/:]')"
+    }];
 
     // The project id for this run. Run name will be generated.
     common.ProjectIdentifier project_id = 6;
