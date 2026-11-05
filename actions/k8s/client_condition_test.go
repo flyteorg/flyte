@@ -227,7 +227,7 @@ func TestNotifyRunService_Condition(t *testing.T) {
 		return mockClient, &ActionsClient{
 			recordedFilter: testFilter(),
 			runClient:      mockClient,
-			subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+			subscribers:    make(map[string]map[chan *ActionUpdate]*subscription),
 		}
 	}
 

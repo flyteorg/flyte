@@ -68,7 +68,7 @@ func TestNotifyRunService_DeduplicateRecordAction(t *testing.T) {
 	c := &ActionsClient{
 		runClient:      mockClient,
 		recordedFilter: filter,
-		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+		subscribers:    make(map[string]map[chan *ActionUpdate]*subscription),
 	}
 
 	ta, update := newTestActionUpdate("action-1")
@@ -97,7 +97,7 @@ func TestNotifyRunService_FailedRecordAllowsRetry(t *testing.T) {
 	c := &ActionsClient{
 		runClient:      mockClient,
 		recordedFilter: filter,
-		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+		subscribers:    make(map[string]map[chan *ActionUpdate]*subscription),
 	}
 
 	ta, update := newTestActionUpdate("action-2")
@@ -129,7 +129,7 @@ func TestNotifyRunService_UpdateActionStatusIncludesAttemptsAndCacheStatus(t *te
 	c := &ActionsClient{
 		recordedFilter: testFilter(),
 		runClient:      mockClient,
-		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+		subscribers:    make(map[string]map[chan *ActionUpdate]*subscription),
 	}
 
 	ta, update := newTestActionUpdate("action-4")
@@ -177,7 +177,7 @@ func TestNotifyRunService_RejectedStatusUpdateSkipsTerminalLabel(t *testing.T) {
 	c := &ActionsClient{
 		runClient:      mockClient,
 		recordedFilter: testFilter(),
-		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+		subscribers:    make(map[string]map[chan *ActionUpdate]*subscription),
 		k8sClient: fake.NewClientBuilder().
 			WithScheme(scheme).
 			WithObjects(ta.DeepCopy()).
@@ -572,7 +572,7 @@ func TestNotifyRunService_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testi
 	c := &ActionsClient{
 		runClient:      mockClient,
 		recordedFilter: filter,
-		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+		subscribers:    make(map[string]map[chan *ActionUpdate]*subscription),
 	}
 
 	// Create a terminal TaskAction CRD (SUCCEEDED)
@@ -628,7 +628,7 @@ func TestNotifyRunService_ProcessesNonTerminalAddedEvents(t *testing.T) {
 	c := &ActionsClient{
 		runClient:      mockClient,
 		recordedFilter: filter,
-		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+		subscribers:    make(map[string]map[chan *ActionUpdate]*subscription),
 	}
 
 	// Create a non-terminal TaskAction CRD (QUEUED)
@@ -675,7 +675,7 @@ func TestNotifyRunService_DuplicateAddedSkipsRecordAction(t *testing.T) {
 	c := &ActionsClient{
 		runClient:      mockClient,
 		recordedFilter: filter,
-		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+		subscribers:    make(map[string]map[chan *ActionUpdate]*subscription),
 	}
 
 	ta, update := newTestActionUpdate("action-dup")
@@ -705,7 +705,7 @@ func TestNotifyRunService_TerminalDuplicateRepairsTimestamps(t *testing.T) {
 	c := &ActionsClient{
 		runClient:      mockClient,
 		recordedFilter: filter,
-		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+		subscribers:    make(map[string]map[chan *ActionUpdate]*subscription),
 	}
 
 	ta, update := newTestActionUpdate("action-terminal-dup")
@@ -733,7 +733,7 @@ func TestNotifyRunService_RootActionAddedDoesNotPromoteParent(t *testing.T) {
 	c := &ActionsClient{
 		recordedFilter: testFilter(),
 		runClient:      mockClient,
-		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+		subscribers:    make(map[string]map[chan *ActionUpdate]*subscription),
 	}
 
 	// Root action has no parent
@@ -845,7 +845,7 @@ func TestHandleWatchEvent_CoalescedReadsLatestPhase(t *testing.T) {
 	c := &ActionsClient{
 		runClient:         mockClient,
 		recordedFilter:    filter,
-		subscribers:       make(map[string]map[chan *ActionUpdate]struct{}),
+		subscribers:       make(map[string]map[chan *ActionUpdate]*subscription),
 		dispatchedActions: map[string]struct{}{"a3": {}}, // an event for a3 is already dispatched
 	}
 	// The executor advanced the CRD to SUCCEEDED before the worker ran.
@@ -882,7 +882,7 @@ func TestHandleWatchEvent_CreateThenDeleteStillRecords(t *testing.T) {
 	c := &ActionsClient{
 		runClient:         mockClient,
 		recordedFilter:    filter,
-		subscribers:       make(map[string]map[chan *ActionUpdate]struct{}),
+		subscribers:       make(map[string]map[chan *ActionUpdate]*subscription),
 		dispatchedActions: map[string]struct{}{"d1": {}},
 	}
 	// The CR was deleted before the worker reached the coalesced ADDED, so the cache
@@ -922,7 +922,7 @@ func TestHandleWatchEvent_DeleteAfterRecordDoesNotDoubleRecord(t *testing.T) {
 	c := &ActionsClient{
 		runClient:      mockClient,
 		recordedFilter: filter,
-		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+		subscribers:    make(map[string]map[chan *ActionUpdate]*subscription),
 	}
 	// Pre-mark the action as already recorded (normal ADDED/MODIFIED lifecycle).
 	c.recordedFilter.Add(ctx, []byte(buildTaskActionName(&common.ActionIdentifier{
