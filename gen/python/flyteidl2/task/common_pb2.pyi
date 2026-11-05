@@ -134,6 +134,36 @@ class Inputs(_message.Message):
     context: _containers.RepeatedCompositeFieldContainer[_literals_pb2.KeyValuePair]
     def __init__(self, literals: _Optional[_Iterable[_Union[NamedLiteral, _Mapping]]] = ..., context: _Optional[_Iterable[_Union[_literals_pb2.KeyValuePair, _Mapping]]] = ...) -> None: ...
 
+class ActionInputOverridesData(_message.Message):
+    __slots__ = ["input_uris", "code_bundles"]
+    class InputUrisEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    class CodeBundlesEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: ActionCodeBundle
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[ActionCodeBundle, _Mapping]] = ...) -> None: ...
+    INPUT_URIS_FIELD_NUMBER: _ClassVar[int]
+    CODE_BUNDLES_FIELD_NUMBER: _ClassVar[int]
+    input_uris: _containers.ScalarMap[str, str]
+    code_bundles: _containers.MessageMap[str, ActionCodeBundle]
+    def __init__(self, input_uris: _Optional[_Mapping[str, str]] = ..., code_bundles: _Optional[_Mapping[str, ActionCodeBundle]] = ...) -> None: ...
+
+class ActionCodeBundle(_message.Message):
+    __slots__ = ["tgz", "version"]
+    TGZ_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    tgz: str
+    version: str
+    def __init__(self, tgz: _Optional[str] = ..., version: _Optional[str] = ...) -> None: ...
+
 class ProducedArtifact(_message.Message):
     __slots__ = ["output", "name", "version", "info", "type", "parent_artifacts", "partitions", "time_partition"]
     OUTPUT_FIELD_NUMBER: _ClassVar[int]
