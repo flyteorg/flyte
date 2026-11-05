@@ -1,3 +1,13 @@
+> [!WARNING]
+> ## Flyte 1 reaches end of life on December 31, 2026
+>
+> Until then, Flyte 1 gets bug fixes and security fixes.
+> After that date there will be no further updates or releases of any kind, including security fixes.
+> This repository and [flyteorg/flytekit](https://github.com/flyteorg/flytekit) stay available, and you can fork them to keep maintaining Flyte 1 yourself.
+> For details, see the [Flyte 1 documentation](https://www.union.ai/docs/v1/flyte/community/).
+>
+> **To migrate your project, see [From Flyte 1 to 2](https://www.union.ai/docs/v2/flyte/user-guide/migration/flyte-2/).**
+
 > [!IMPORTANT]
 > ## Looking for Flyte 2?
 >
