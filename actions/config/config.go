@@ -25,7 +25,10 @@ var defaultConfig = &Config{
 	// Each entry includes a DeepCopy() of the TaskAction; tune carefully to avoid large memory spikes under backlog.
 	WatchBufferSize: 1000,
 	WatchWorkers:    100,
-	RunService:      serviceclient.ServiceConfig{URL: "http://localhost:8090"},
+	RunService: serviceclient.ServiceConfig{
+		URL:  "http://localhost:8090",
+		HTTP: serviceclient.HTTPConfig{MaxIdleConnsPerHost: 512},
+	},
 	// 8M slots × 8 bytes/pointer = 64 MB; can track ~8M unique actions.
 	RecordFilterSize: 1 << 23,
 }

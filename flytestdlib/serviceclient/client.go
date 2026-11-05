@@ -24,6 +24,14 @@ const (
 type ServiceConfig struct {
 	URL  string     `json:"url" pflag:",Service base URL"`
 	Auth AuthConfig `json:"auth" pflag:",Service authentication"`
+	HTTP HTTPConfig `json:"http" pflag:",Service HTTP client"`
+}
+
+// HTTPConfig tunes the transport NewHTTPClient sets when the base client has none.
+type HTTPConfig struct {
+	// MaxIdleConnsPerHost should cover the caller's request concurrency, or bursts
+	// open fresh connections and exhaust ephemeral ports in TIME_WAIT.
+	MaxIdleConnsPerHost int `json:"maxIdleConnsPerHost" pflag:",Idle connections kept per host; 0 uses Go's default of 2"`
 }
 
 // AuthType identifies the authentication mechanism used for service requests.
@@ -54,9 +62,14 @@ func (c AuthConfig) hasSettings() bool {
 
 // NewHTTPClient returns an HTTP client configured for the service.
 func NewHTTPClient(ctx context.Context, base *http.Client, cfg ServiceConfig) (*http.Client, error) {
-	if base == nil {
-		base = http.DefaultClient
+	client := http.Client{}
+	if base != nil {
+		client = *base
 	}
+	if client.Transport == nil {
+		client.Transport = newTransport(cfg.HTTP)
+	}
+	base = &client
 	if cfg.URL == "" {
 		return nil, fmt.Errorf("service client: url is required")
 	}
@@ -71,6 +84,15 @@ func NewHTTPClient(ctx context.Context, base *http.Client, cfg ServiceConfig) (*
 	default:
 		return nil, fmt.Errorf("service client auth: unsupported type %q", cfg.Auth.Type)
 	}
+}
+
+func newTransport(cfg HTTPConfig) *http.Transport {
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	if cfg.MaxIdleConnsPerHost > 0 {
+		transport.MaxIdleConns = 0
+		transport.MaxIdleConnsPerHost = cfg.MaxIdleConnsPerHost
+	}
+	return transport
 }
 
 func newOAuth2ClientCredentialsClient(ctx context.Context, base *http.Client, authCfg AuthConfig) (*http.Client, error) {

@@ -13,17 +13,24 @@ const configSectionKey = "executor"
 
 var (
 	defaultConfig = &Config{
-		MetricsBindAddress:      ":10254",
-		HealthProbeBindAddress:  ":8081",
-		LeaderElect:             false,
-		MetricsSecure:           true,
-		WebhookCertName:         "tls.crt",
-		WebhookCertKey:          "tls.key",
-		MetricsCertName:         "tls.crt",
-		MetricsCertKey:          "tls.key",
-		EnableHTTP2:             false,
-		EventsService:           serviceclient.ServiceConfig{URL: "http://localhost:8090"},
-		CacheService:            serviceclient.ServiceConfig{URL: "http://localhost:8094"},
+		MetricsBindAddress:     ":10254",
+		HealthProbeBindAddress: ":8081",
+		LeaderElect:            false,
+		MetricsSecure:          true,
+		WebhookCertName:        "tls.crt",
+		WebhookCertKey:         "tls.key",
+		MetricsCertName:        "tls.crt",
+		MetricsCertKey:         "tls.key",
+		EnableHTTP2:            false,
+		// An idle connection per concurrent reconcile (MaxConcurrentReconciles).
+		EventsService: serviceclient.ServiceConfig{
+			URL:  "http://localhost:8090",
+			HTTP: serviceclient.HTTPConfig{MaxIdleConnsPerHost: 512},
+		},
+		CacheService: serviceclient.ServiceConfig{
+			URL:  "http://localhost:8094",
+			HTTP: serviceclient.HTTPConfig{MaxIdleConnsPerHost: 512},
+		},
 		Cluster:                 "",
 		MaxSystemFailures:       3,
 		MaxConcurrentReconciles: 512,

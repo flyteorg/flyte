@@ -78,6 +78,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "actionsService.auth.clientSecretFile"), defaultConfig.ActionsService.Auth.ClientSecretFile, "File containing the actions service OAuth 2.0 client secret")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "actionsService.auth.scopes"), defaultConfig.ActionsService.Auth.Scopes, "Actions service OAuth 2.0 scopes")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "actionsService.auth.audience"), defaultConfig.ActionsService.Auth.Audience, "Actions service OAuth 2.0 token audience")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "actionsService.http.maxIdleConnsPerHost"), defaultConfig.ActionsService.HTTP.MaxIdleConnsPerHost, "Actions service idle connections kept per host; 0 uses Go's default of 2")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storagePrefix"), defaultConfig.StoragePrefix, "Base URI prefix for storing run inputs and outputs")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "seedProjects"), defaultConfig.SeedProjects, "Projects to create by default at startup")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "triggerScheduler.enabled"), defaultConfig.TriggerScheduler.Enabled, "Enable the trigger scheduler worker")

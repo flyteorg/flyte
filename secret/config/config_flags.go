@@ -61,6 +61,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "webhook.auth.clientSecretFile"), defaultConfig.Webhook.Auth.ClientSecretFile, "File containing the pod webhook OAuth 2.0 client secret")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "webhook.auth.scopes"), defaultConfig.Webhook.Auth.Scopes, "Pod webhook OAuth 2.0 scopes")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "webhook.auth.audience"), defaultConfig.Webhook.Auth.Audience, "Pod webhook OAuth 2.0 token audience")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "webhook.http.maxIdleConnsPerHost"), defaultConfig.Webhook.HTTP.MaxIdleConnsPerHost, "Pod webhook idle connections kept per host; 0 uses Go's default of 2")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.kubeconfig"), defaultConfig.Kubernetes.KubeConfig, "Path to kubeconfig file (optional)")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.namespace"), defaultConfig.Kubernetes.Namespace, "Kubernetes namespace")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "kubernetes.qps"), defaultConfig.Kubernetes.QPS, "Maximum queries per second to the Kubernetes API server")

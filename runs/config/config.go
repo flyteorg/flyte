@@ -23,7 +23,8 @@ var defaultConfig = &Config{
 	NotifyRetryMaxBackoff:   config.Duration{Duration: 5 * time.Second},
 	NotifyBatchSize:         100,
 	ActionsService: serviceclient.ServiceConfig{
-		URL: "http://localhost:8090",
+		URL:  "http://localhost:8090",
+		HTTP: serviceclient.HTTPConfig{MaxIdleConnsPerHost: 512},
 	},
 	StoragePrefix: "file:///tmp/flyte/data",
 	SeedProjects:  []string{"flytesnacks"},
