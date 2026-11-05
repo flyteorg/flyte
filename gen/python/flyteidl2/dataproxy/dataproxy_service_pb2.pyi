@@ -23,12 +23,10 @@ class ArtifactType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     ARTIFACT_TYPE_REPORT: _ClassVar[ArtifactType]
     ARTIFACT_TYPE_CODE_BUNDLE: _ClassVar[ArtifactType]
     ARTIFACT_TYPE_CARD: _ClassVar[ArtifactType]
-    ARTIFACT_TYPE_VALUE: _ClassVar[ArtifactType]
 ARTIFACT_TYPE_UNSPECIFIED: ArtifactType
 ARTIFACT_TYPE_REPORT: ArtifactType
 ARTIFACT_TYPE_CODE_BUNDLE: ArtifactType
 ARTIFACT_TYPE_CARD: ArtifactType
-ARTIFACT_TYPE_VALUE: ArtifactType
 
 class CreateUploadLocationRequest(_message.Message):
     __slots__ = ["project", "domain", "filename", "expires_in", "content_md5", "filename_root", "add_content_md5_metadata", "org", "content_length", "queue"]
@@ -124,12 +122,10 @@ class CreateDownloadLinkRequest(_message.Message):
     def __init__(self, artifact_type: _Optional[_Union[ArtifactType, str]] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., action_attempt_id: _Optional[_Union[_identifier_pb2.ActionAttemptIdentifier, _Mapping]] = ..., app_id: _Optional[_Union[_app_definition_pb2.Identifier, _Mapping]] = ..., task_id: _Optional[_Union[_task_definition_pb2.TaskIdentifier, _Mapping]] = ..., artifact_id: _Optional[_Union[_artifact_pb2.ArtifactIdentifier, _Mapping]] = ...) -> None: ...
 
 class CreateDownloadLinkResponse(_message.Message):
-    __slots__ = ["pre_signed_urls", "relative_paths"]
+    __slots__ = ["pre_signed_urls"]
     PRE_SIGNED_URLS_FIELD_NUMBER: _ClassVar[int]
-    RELATIVE_PATHS_FIELD_NUMBER: _ClassVar[int]
     pre_signed_urls: PreSignedURLs
-    relative_paths: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, pre_signed_urls: _Optional[_Union[PreSignedURLs, _Mapping]] = ..., relative_paths: _Optional[_Iterable[str]] = ...) -> None: ...
+    def __init__(self, pre_signed_urls: _Optional[_Union[PreSignedURLs, _Mapping]] = ...) -> None: ...
 
 class GetActionDataRequest(_message.Message):
     __slots__ = ["action_id", "run_source"]
