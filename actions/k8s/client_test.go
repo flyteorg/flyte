@@ -940,6 +940,40 @@ func TestHandleWatchEvent_DeleteAfterRecordDoesNotDoubleRecord(t *testing.T) {
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
 }
 
+// With several actions replicas, another replica can record the terminal status and
+// label the TaskAction before this one's worker reads it. Parents watching through
+// this replica must still get the update; only the run service is skipped.
+func TestHandleWatchEvent_LabelledLatestStillNotifiesSubscribers(t *testing.T) {
+	ctx := context.Background()
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+
+	c := &ActionsClient{
+		runClient:      mockClient,
+		recordedFilter: testFilter(),
+		bufferSize:     10,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+	parent := "a0"
+	c.getLatest = func(_ context.Context, name string) (*executorv1.TaskAction, bool, error) {
+		ta := succeededTaskAction(name)
+		ta.Spec.ParentActionName = &parent
+		ta.Labels = map[string]string{labelTerminalStatusRecorded: "true"}
+		return ta, true, nil
+	}
+	ch := c.Subscribe("run1", parent)
+
+	c.handleWatchEvent(ctx, watch.Event{Type: watch.Modified, Object: runningTaskAction("c1")})
+
+	select {
+	case got := <-ch:
+		assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, got.Phase)
+	default:
+		t.Fatal("subscriber did not receive the labelled terminal update")
+	}
+	mockClient.AssertNotCalled(t, "RecordAction")
+	mockClient.AssertNotCalled(t, "UpdateActionStatus")
+}
+
 func TestDispatchEvent_DifferentNamesCanLandOnDifferentShards(t *testing.T) {
 	c := newWorkerTestClient(4, 10)
 
