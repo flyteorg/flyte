@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -11,7 +13,8 @@ import (
 	"syscall"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"connectrpc.com/otelconnect"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -47,13 +50,13 @@ func main() {
 		},
 	}
 
-	otelInterceptor, err := otelconnect.NewInterceptor()
+	otelInterceptor, err := otelconnect.NewClientInterceptor()
 	if err != nil {
 		log.Fatalf("Failed to create otel interceptor: %v", err)
 	}
 
 	// Create service clients
-	runClient := workflowconnect.NewRunServiceClient(httpClient, runsServiceURL, connect.WithInterceptors(otelInterceptor))
+	runClient := workflowconnect.NewRunServiceClient(connect.NewClient(connecthttp.NewTransport(httpClient, runsServiceURL, connecthttp.WithReadMaxBytes(0)), otelInterceptor))
 
 	log.Println("🚀 Flyte Client Demo")
 	log.Println("===================")
@@ -116,7 +119,7 @@ func watchRuns(ctx context.Context, client workflowconnect.RunServiceClient) {
 		},
 	}
 
-	stream, err := client.WatchRuns(ctx, connect.NewRequest(req))
+	stream, err := client.WatchRuns(ctx, req)
 	if err != nil {
 		log.Printf("❌ Failed to start WatchRuns: %v", err)
 		return
@@ -125,8 +128,15 @@ func watchRuns(ctx context.Context, client workflowconnect.RunServiceClient) {
 
 	log.Println("✅ WatchRuns stream connected")
 
-	for stream.Receive() {
-		msg := stream.Msg()
+	for {
+		msg2, err := stream.Receive()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			log.Printf("❌ WatchRuns stream error: %v", err)
+		}
+		msg := msg2
 		for _, run := range msg.Runs {
 			if run.Action != nil && run.Action.Id != nil && run.Action.Id.Run != nil {
 				runID := run.Action.Id.Run
@@ -136,9 +146,6 @@ func watchRuns(ctx context.Context, client workflowconnect.RunServiceClient) {
 		}
 	}
 
-	if err := stream.Err(); err != nil {
-		log.Printf("❌ WatchRuns stream error: %v", err)
-	}
 }
 
 // watchActions watches for action updates and logs them
@@ -149,7 +156,7 @@ func watchActions(ctx context.Context, client workflowconnect.RunServiceClient, 
 		RunId: runID,
 	}
 
-	stream, err := client.WatchActions(ctx, connect.NewRequest(req))
+	stream, err := client.WatchActions(ctx, req)
 	if err != nil {
 		log.Printf("❌ Failed to start WatchActions: %v", err)
 		return
@@ -158,8 +165,15 @@ func watchActions(ctx context.Context, client workflowconnect.RunServiceClient, 
 
 	log.Println("✅ WatchActions stream connected")
 
-	for stream.Receive() {
-		msg := stream.Msg()
+	for {
+		msg2, err := stream.Receive()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			log.Printf("❌ WatchActions stream error: %v", err)
+		}
+		msg := msg2
 		for _, enrichedAction := range msg.EnrichedActions {
 			if enrichedAction.Action != nil && enrichedAction.Action.Id != nil {
 				var phase common.ActionPhase
@@ -173,9 +187,6 @@ func watchActions(ctx context.Context, client workflowconnect.RunServiceClient, 
 		}
 	}
 
-	if err := stream.Err(); err != nil {
-		log.Printf("❌ WatchActions stream error: %v", err)
-	}
 }
 
 // createRun creates a new workflow run
@@ -213,14 +224,14 @@ func createRun(ctx context.Context, client workflowconnect.RunServiceClient) *co
 		},
 	}
 
-	resp, err := client.CreateRun(ctx, connect.NewRequest(req))
+	resp, err := client.CreateRun(ctx, req)
 	if err != nil {
 		log.Printf("❌ Failed to create run: %v", err)
 		return nil
 	}
 
-	if resp.Msg.Run != nil && resp.Msg.Run.Action != nil && resp.Msg.Run.Action.Id != nil && resp.Msg.Run.Action.Id.Run != nil {
-		createdRunID := resp.Msg.Run.Action.Id.Run
+	if resp.Run != nil && resp.Run.Action != nil && resp.Run.Action.Id != nil && resp.Run.Action.Id.Run != nil {
+		createdRunID := resp.Run.Action.Id.Run
 		log.Printf("✅ Run created: %s", createdRunID.Name)
 		log.Printf("   Organization: %s", createdRunID.Org)
 		log.Printf("   Project: %s", createdRunID.Project)

@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"connectrpc.com/otelconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 
@@ -36,12 +37,19 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
-	otelInterceptor, err := otelconnect.NewInterceptor(
+	otelInterceptor, err := otelconnect.NewServerInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
 		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
 	)
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
+	}
+	otelClientInterceptor, err := otelconnect.NewClientInterceptor(
+		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
+		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
+	)
+	if err != nil {
+		return fmt.Errorf("creating otel client interceptor: %w", err)
 	}
 
 	runServiceCfg := cfg.RunService
@@ -52,11 +60,11 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err != nil {
 		return fmt.Errorf("dataproxy: configure runs service client: %w", err)
 	}
-	taskClient := taskconnect.NewTaskServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
-	triggerClient := triggerconnect.NewTriggerServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
-	runClient := workflowconnect.NewRunServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
-	projectClient := projectconnect.NewProjectServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
-	settingsClient := settingsconnect.NewSettingsServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
+	taskClient := taskconnect.NewTaskServiceClient(connect.NewClient(connecthttp.NewTransport(runHTTPClient, runServiceCfg.URL, connecthttp.WithReadMaxBytes(0)), otelClientInterceptor))
+	triggerClient := triggerconnect.NewTriggerServiceClient(connect.NewClient(connecthttp.NewTransport(runHTTPClient, runServiceCfg.URL, connecthttp.WithReadMaxBytes(0)), otelClientInterceptor))
+	runClient := workflowconnect.NewRunServiceClient(connect.NewClient(connecthttp.NewTransport(runHTTPClient, runServiceCfg.URL, connecthttp.WithReadMaxBytes(0)), otelClientInterceptor))
+	projectClient := projectconnect.NewProjectServiceClient(connect.NewClient(connecthttp.NewTransport(runHTTPClient, runServiceCfg.URL, connecthttp.WithReadMaxBytes(0)), otelClientInterceptor))
+	settingsClient := settingsconnect.NewSettingsServiceClient(connect.NewClient(connecthttp.NewTransport(runHTTPClient, runServiceCfg.URL, connecthttp.WithReadMaxBytes(0)), otelClientInterceptor))
 
 	var logStreamer logs.LogStreamer
 	if sc.K8sConfig != nil {
@@ -69,18 +77,24 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 	svc := service.NewService(*cfg, sc.DataStore, taskClient, triggerClient, runClient, projectClient, settingsClient, logStreamer)
 
-	path, handler := dataproxyconnect.NewDataProxyServiceHandler(svc, connect.WithInterceptors(otelInterceptor))
-	sc.Mux.Handle(path, handler)
+	handler := connect.NewServer(otelInterceptor)
+	dataproxyconnect.RegisterDataProxyServiceHandler(handler, svc)
+	connecthttp.Mount(sc.Mux, handler, connecthttp.WithReadMaxBytes(0))
+	path := "/" + dataproxyconnect.DataProxyServiceName + "/"
 	logger.Infof(ctx, "Mounted DataProxyService at %s", path)
 
 	clusterSvc := service.NewClusterService()
-	clusterPath, clusterHandler := clusterconnect.NewClusterServiceHandler(clusterSvc, connect.WithInterceptors(otelInterceptor))
-	sc.Mux.Handle(clusterPath, clusterHandler)
+	clusterHandler := connect.NewServer(otelInterceptor)
+	clusterconnect.RegisterClusterServiceHandler(clusterHandler, clusterSvc)
+	connecthttp.Mount(sc.Mux, clusterHandler, connecthttp.WithReadMaxBytes(0))
+	clusterPath := "/" + clusterconnect.ClusterServiceName + "/"
 	logger.Infof(ctx, "Mounted ClusterService at %s", clusterPath)
 
 	translatorSvc := NewTranslatorService(sc.DataStore, runClient, triggerClient)
-	translatorPath, translatorHandler := workflowconnect.NewTranslatorServiceHandler(translatorSvc, connect.WithInterceptors(otelInterceptor))
-	sc.Mux.Handle(translatorPath, translatorHandler)
+	translatorHandler := connect.NewServer(otelInterceptor)
+	workflowconnect.RegisterTranslatorServiceHandler(translatorHandler, translatorSvc)
+	connecthttp.Mount(sc.Mux, translatorHandler, connecthttp.WithReadMaxBytes(0))
+	translatorPath := "/" + workflowconnect.TranslatorServiceName + "/"
 	logger.Infof(ctx, "Mounted TranslatorService at %s", translatorPath)
 
 	sc.AddReadyCheck(func(r *http.Request) error {

@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/protobuf/proto"
@@ -55,9 +54,9 @@ func TestGetActionDetails_ActionNotFound(t *testing.T) {
 
 	actionRepo.On("GetAction", mock.Anything, testActionID).Return(nil, errors.New("action not found"))
 
-	_, err := svc.GetActionDetails(context.Background(), connect.NewRequest(&workflow.GetActionDetailsRequest{
+	_, err := svc.GetActionDetails(context.Background(), &workflow.GetActionDetailsRequest{
 		ActionId: testActionID,
-	}))
+	})
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "action not found")
 }
@@ -76,12 +75,12 @@ func TestGetActionDetails_NoDetailedInfo(t *testing.T) {
 	actionRepo.On("GetAction", mock.Anything, testActionID).Return(actionModel, nil)
 	actionRepo.On("ListEvents", mock.Anything, testActionID, 500).Return([]*models.ActionEvent{}, nil)
 
-	resp, err := svc.GetActionDetails(context.Background(), connect.NewRequest(&workflow.GetActionDetailsRequest{
+	resp, err := svc.GetActionDetails(context.Background(), &workflow.GetActionDetailsRequest{
 		ActionId: testActionID,
-	}))
+	})
 	assert.NoError(t, err)
-	assert.NotNil(t, resp.Msg.Details)
-	assert.Equal(t, common.ActionPhase_ACTION_PHASE_RUNNING, resp.Msg.Details.Status.Phase)
+	assert.NotNil(t, resp.Details)
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_RUNNING, resp.Details.Status.Phase)
 }
 
 func TestGetActionDetails_WithTaskSpec(t *testing.T) {
@@ -117,13 +116,13 @@ func TestGetActionDetails_WithTaskSpec(t *testing.T) {
 	}, nil)
 	actionRepo.On("ListEvents", mock.Anything, testActionID, 500).Return([]*models.ActionEvent{}, nil)
 
-	resp, err := svc.GetActionDetails(context.Background(), connect.NewRequest(&workflow.GetActionDetailsRequest{
+	resp, err := svc.GetActionDetails(context.Background(), &workflow.GetActionDetailsRequest{
 		ActionId: testActionID,
-	}))
+	})
 	assert.NoError(t, err)
-	assert.NotNil(t, resp.Msg.Details)
-	assert.NotNil(t, resp.Msg.Details.GetTask())
-	assert.Equal(t, "python", resp.Msg.Details.GetTask().GetTaskTemplate().GetType())
+	assert.NotNil(t, resp.Details)
+	assert.NotNil(t, resp.Details.GetTask())
+	assert.Equal(t, "python", resp.Details.GetTask().GetTaskTemplate().GetType())
 }
 
 func TestGetActionDetails_WithTraceSpec(t *testing.T) {
@@ -156,11 +155,11 @@ func TestGetActionDetails_WithTraceSpec(t *testing.T) {
 	}, nil)
 	actionRepo.On("ListEvents", mock.Anything, testActionID, 500).Return([]*models.ActionEvent{}, nil)
 
-	resp, err := svc.GetActionDetails(context.Background(), connect.NewRequest(&workflow.GetActionDetailsRequest{
+	resp, err := svc.GetActionDetails(context.Background(), &workflow.GetActionDetailsRequest{
 		ActionId: testActionID,
-	}))
+	})
 	assert.NoError(t, err)
-	assert.NotNil(t, resp.Msg.Details.GetTrace())
+	assert.NotNil(t, resp.Details.GetTrace())
 }
 
 func TestGetActionDetails_TaskSpecLookupFails(t *testing.T) {
@@ -183,9 +182,9 @@ func TestGetActionDetails_TaskSpecLookupFails(t *testing.T) {
 	taskRepo.On("GetTaskSpec", mock.Anything, "bad-digest").Return(nil, errors.New("not found"))
 	actionRepo.On("ListEvents", mock.Anything, testActionID, 500).Return([]*models.ActionEvent{}, nil)
 
-	_, err := svc.GetActionDetails(context.Background(), connect.NewRequest(&workflow.GetActionDetailsRequest{
+	_, err := svc.GetActionDetails(context.Background(), &workflow.GetActionDetailsRequest{
 		ActionId: testActionID,
-	}))
+	})
 	assert.Error(t, err)
 }
 
@@ -218,13 +217,13 @@ func TestGetActionDetails_FailedActionSetsErrorInfo(t *testing.T) {
 	actionRepo.On("GetAction", mock.Anything, testActionID).Return(actionModel, nil)
 	actionRepo.On("ListEvents", mock.Anything, testActionID, 500).Return([]*models.ActionEvent{failedEventModel}, nil)
 
-	resp, err := svc.GetActionDetails(context.Background(), connect.NewRequest(&workflow.GetActionDetailsRequest{
+	resp, err := svc.GetActionDetails(context.Background(), &workflow.GetActionDetailsRequest{
 		ActionId: testActionID,
-	}))
+	})
 	assert.NoError(t, err)
-	assert.Equal(t, common.ActionPhase_ACTION_PHASE_FAILED, resp.Msg.Details.Status.Phase)
-	assert.NotNil(t, resp.Msg.Details.GetErrorInfo())
-	assert.Equal(t, "task failed with OOM", resp.Msg.Details.GetErrorInfo().GetMessage())
+	assert.Equal(t, common.ActionPhase_ACTION_PHASE_FAILED, resp.Details.Status.Phase)
+	assert.NotNil(t, resp.Details.GetErrorInfo())
+	assert.Equal(t, "task failed with OOM", resp.Details.GetErrorInfo().GetMessage())
 }
 
 func TestGetActionDetails_WithAttempts(t *testing.T) {
@@ -285,12 +284,12 @@ func TestGetActionDetails_WithAttempts(t *testing.T) {
 	actionRepo.On("GetAction", mock.Anything, testActionID).Return(actionModel, nil)
 	actionRepo.On("ListEvents", mock.Anything, testActionID, 500).Return(eventModels, nil)
 
-	resp, err := svc.GetActionDetails(context.Background(), connect.NewRequest(&workflow.GetActionDetailsRequest{
+	resp, err := svc.GetActionDetails(context.Background(), &workflow.GetActionDetailsRequest{
 		ActionId: testActionID,
-	}))
+	})
 	assert.NoError(t, err)
 
-	attempts := resp.Msg.Details.Attempts
+	attempts := resp.Details.Attempts
 	assert.Equal(t, 2, len(attempts))
 	assert.Equal(t, uint32(0), attempts[0].Attempt)
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_FAILED, attempts[0].Phase)

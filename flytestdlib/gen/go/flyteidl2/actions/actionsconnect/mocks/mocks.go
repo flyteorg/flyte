@@ -7,8 +7,8 @@ package mocks
 import (
 	"context"
 
-	"connectrpc.com/connect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -18,10 +18,19 @@ func NewActionsServiceClient(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *ActionsServiceClient {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &ActionsServiceClient{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -40,27 +49,27 @@ func (_m *ActionsServiceClient) EXPECT() *ActionsServiceClient_Expecter {
 }
 
 // Abort provides a mock function for the type ActionsServiceClient
-func (_mock *ActionsServiceClient) Abort(context1 context.Context, request *connect.Request[actions.AbortRequest]) (*connect.Response[actions.AbortResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ActionsServiceClient) Abort(context1 context.Context, abortRequest *actions.AbortRequest) (*actions.AbortResponse, error) {
+	ret := _mock.Called(context1, abortRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Abort")
 	}
 
-	var r0 *connect.Response[actions.AbortResponse]
+	var r0 *actions.AbortResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.AbortRequest]) (*connect.Response[actions.AbortResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.AbortRequest) (*actions.AbortResponse, error)); ok {
+		return returnFunc(context1, abortRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.AbortRequest]) *connect.Response[actions.AbortResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.AbortRequest) *actions.AbortResponse); ok {
+		r0 = returnFunc(context1, abortRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[actions.AbortResponse])
+			r0 = ret.Get(0).(*actions.AbortResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[actions.AbortRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *actions.AbortRequest) error); ok {
+		r1 = returnFunc(context1, abortRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -74,20 +83,20 @@ type ActionsServiceClient_Abort_Call struct {
 
 // Abort is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[actions.AbortRequest]
-func (_e *ActionsServiceClient_Expecter) Abort(context1 interface{}, request interface{}) *ActionsServiceClient_Abort_Call {
-	return &ActionsServiceClient_Abort_Call{Call: _e.mock.On("Abort", context1, request)}
+//   - abortRequest *actions.AbortRequest
+func (_e *ActionsServiceClient_Expecter) Abort(context1 any, abortRequest any) *ActionsServiceClient_Abort_Call {
+	return &ActionsServiceClient_Abort_Call{Call: _e.mock.On("Abort", context1, abortRequest)}
 }
 
-func (_c *ActionsServiceClient_Abort_Call) Run(run func(context1 context.Context, request *connect.Request[actions.AbortRequest])) *ActionsServiceClient_Abort_Call {
+func (_c *ActionsServiceClient_Abort_Call) Run(run func(context1 context.Context, abortRequest *actions.AbortRequest)) *ActionsServiceClient_Abort_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[actions.AbortRequest]
+		var arg1 *actions.AbortRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[actions.AbortRequest])
+			arg1 = args[1].(*actions.AbortRequest)
 		}
 		run(
 			arg0,
@@ -97,38 +106,38 @@ func (_c *ActionsServiceClient_Abort_Call) Run(run func(context1 context.Context
 	return _c
 }
 
-func (_c *ActionsServiceClient_Abort_Call) Return(response *connect.Response[actions.AbortResponse], err error) *ActionsServiceClient_Abort_Call {
-	_c.Call.Return(response, err)
+func (_c *ActionsServiceClient_Abort_Call) Return(abortResponse *actions.AbortResponse, err error) *ActionsServiceClient_Abort_Call {
+	_c.Call.Return(abortResponse, err)
 	return _c
 }
 
-func (_c *ActionsServiceClient_Abort_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[actions.AbortRequest]) (*connect.Response[actions.AbortResponse], error)) *ActionsServiceClient_Abort_Call {
+func (_c *ActionsServiceClient_Abort_Call) RunAndReturn(run func(context1 context.Context, abortRequest *actions.AbortRequest) (*actions.AbortResponse, error)) *ActionsServiceClient_Abort_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Enqueue provides a mock function for the type ActionsServiceClient
-func (_mock *ActionsServiceClient) Enqueue(context1 context.Context, request *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ActionsServiceClient) Enqueue(context1 context.Context, enqueueRequest *actions.EnqueueRequest) (*actions.EnqueueResponse, error) {
+	ret := _mock.Called(context1, enqueueRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Enqueue")
 	}
 
-	var r0 *connect.Response[actions.EnqueueResponse]
+	var r0 *actions.EnqueueResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.EnqueueRequest) (*actions.EnqueueResponse, error)); ok {
+		return returnFunc(context1, enqueueRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.EnqueueRequest]) *connect.Response[actions.EnqueueResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.EnqueueRequest) *actions.EnqueueResponse); ok {
+		r0 = returnFunc(context1, enqueueRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[actions.EnqueueResponse])
+			r0 = ret.Get(0).(*actions.EnqueueResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[actions.EnqueueRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *actions.EnqueueRequest) error); ok {
+		r1 = returnFunc(context1, enqueueRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -142,20 +151,20 @@ type ActionsServiceClient_Enqueue_Call struct {
 
 // Enqueue is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[actions.EnqueueRequest]
-func (_e *ActionsServiceClient_Expecter) Enqueue(context1 interface{}, request interface{}) *ActionsServiceClient_Enqueue_Call {
-	return &ActionsServiceClient_Enqueue_Call{Call: _e.mock.On("Enqueue", context1, request)}
+//   - enqueueRequest *actions.EnqueueRequest
+func (_e *ActionsServiceClient_Expecter) Enqueue(context1 any, enqueueRequest any) *ActionsServiceClient_Enqueue_Call {
+	return &ActionsServiceClient_Enqueue_Call{Call: _e.mock.On("Enqueue", context1, enqueueRequest)}
 }
 
-func (_c *ActionsServiceClient_Enqueue_Call) Run(run func(context1 context.Context, request *connect.Request[actions.EnqueueRequest])) *ActionsServiceClient_Enqueue_Call {
+func (_c *ActionsServiceClient_Enqueue_Call) Run(run func(context1 context.Context, enqueueRequest *actions.EnqueueRequest)) *ActionsServiceClient_Enqueue_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[actions.EnqueueRequest]
+		var arg1 *actions.EnqueueRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[actions.EnqueueRequest])
+			arg1 = args[1].(*actions.EnqueueRequest)
 		}
 		run(
 			arg0,
@@ -165,38 +174,38 @@ func (_c *ActionsServiceClient_Enqueue_Call) Run(run func(context1 context.Conte
 	return _c
 }
 
-func (_c *ActionsServiceClient_Enqueue_Call) Return(response *connect.Response[actions.EnqueueResponse], err error) *ActionsServiceClient_Enqueue_Call {
-	_c.Call.Return(response, err)
+func (_c *ActionsServiceClient_Enqueue_Call) Return(enqueueResponse *actions.EnqueueResponse, err error) *ActionsServiceClient_Enqueue_Call {
+	_c.Call.Return(enqueueResponse, err)
 	return _c
 }
 
-func (_c *ActionsServiceClient_Enqueue_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error)) *ActionsServiceClient_Enqueue_Call {
+func (_c *ActionsServiceClient_Enqueue_Call) RunAndReturn(run func(context1 context.Context, enqueueRequest *actions.EnqueueRequest) (*actions.EnqueueResponse, error)) *ActionsServiceClient_Enqueue_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Signal provides a mock function for the type ActionsServiceClient
-func (_mock *ActionsServiceClient) Signal(context1 context.Context, request *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ActionsServiceClient) Signal(context1 context.Context, signalRequest *actions.SignalRequest) (*actions.SignalResponse, error) {
+	ret := _mock.Called(context1, signalRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Signal")
 	}
 
-	var r0 *connect.Response[actions.SignalResponse]
+	var r0 *actions.SignalResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.SignalRequest) (*actions.SignalResponse, error)); ok {
+		return returnFunc(context1, signalRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.SignalRequest]) *connect.Response[actions.SignalResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.SignalRequest) *actions.SignalResponse); ok {
+		r0 = returnFunc(context1, signalRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[actions.SignalResponse])
+			r0 = ret.Get(0).(*actions.SignalResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[actions.SignalRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *actions.SignalRequest) error); ok {
+		r1 = returnFunc(context1, signalRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -210,20 +219,20 @@ type ActionsServiceClient_Signal_Call struct {
 
 // Signal is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[actions.SignalRequest]
-func (_e *ActionsServiceClient_Expecter) Signal(context1 interface{}, request interface{}) *ActionsServiceClient_Signal_Call {
-	return &ActionsServiceClient_Signal_Call{Call: _e.mock.On("Signal", context1, request)}
+//   - signalRequest *actions.SignalRequest
+func (_e *ActionsServiceClient_Expecter) Signal(context1 any, signalRequest any) *ActionsServiceClient_Signal_Call {
+	return &ActionsServiceClient_Signal_Call{Call: _e.mock.On("Signal", context1, signalRequest)}
 }
 
-func (_c *ActionsServiceClient_Signal_Call) Run(run func(context1 context.Context, request *connect.Request[actions.SignalRequest])) *ActionsServiceClient_Signal_Call {
+func (_c *ActionsServiceClient_Signal_Call) Run(run func(context1 context.Context, signalRequest *actions.SignalRequest)) *ActionsServiceClient_Signal_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[actions.SignalRequest]
+		var arg1 *actions.SignalRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[actions.SignalRequest])
+			arg1 = args[1].(*actions.SignalRequest)
 		}
 		run(
 			arg0,
@@ -233,38 +242,38 @@ func (_c *ActionsServiceClient_Signal_Call) Run(run func(context1 context.Contex
 	return _c
 }
 
-func (_c *ActionsServiceClient_Signal_Call) Return(response *connect.Response[actions.SignalResponse], err error) *ActionsServiceClient_Signal_Call {
-	_c.Call.Return(response, err)
+func (_c *ActionsServiceClient_Signal_Call) Return(signalResponse *actions.SignalResponse, err error) *ActionsServiceClient_Signal_Call {
+	_c.Call.Return(signalResponse, err)
 	return _c
 }
 
-func (_c *ActionsServiceClient_Signal_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error)) *ActionsServiceClient_Signal_Call {
+func (_c *ActionsServiceClient_Signal_Call) RunAndReturn(run func(context1 context.Context, signalRequest *actions.SignalRequest) (*actions.SignalResponse, error)) *ActionsServiceClient_Signal_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Update provides a mock function for the type ActionsServiceClient
-func (_mock *ActionsServiceClient) Update(context1 context.Context, request *connect.Request[actions.UpdateRequest]) (*connect.Response[actions.UpdateResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ActionsServiceClient) Update(context1 context.Context, updateRequest *actions.UpdateRequest) (*actions.UpdateResponse, error) {
+	ret := _mock.Called(context1, updateRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Update")
 	}
 
-	var r0 *connect.Response[actions.UpdateResponse]
+	var r0 *actions.UpdateResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.UpdateRequest]) (*connect.Response[actions.UpdateResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.UpdateRequest) (*actions.UpdateResponse, error)); ok {
+		return returnFunc(context1, updateRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.UpdateRequest]) *connect.Response[actions.UpdateResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.UpdateRequest) *actions.UpdateResponse); ok {
+		r0 = returnFunc(context1, updateRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[actions.UpdateResponse])
+			r0 = ret.Get(0).(*actions.UpdateResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[actions.UpdateRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *actions.UpdateRequest) error); ok {
+		r1 = returnFunc(context1, updateRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -278,20 +287,20 @@ type ActionsServiceClient_Update_Call struct {
 
 // Update is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[actions.UpdateRequest]
-func (_e *ActionsServiceClient_Expecter) Update(context1 interface{}, request interface{}) *ActionsServiceClient_Update_Call {
-	return &ActionsServiceClient_Update_Call{Call: _e.mock.On("Update", context1, request)}
+//   - updateRequest *actions.UpdateRequest
+func (_e *ActionsServiceClient_Expecter) Update(context1 any, updateRequest any) *ActionsServiceClient_Update_Call {
+	return &ActionsServiceClient_Update_Call{Call: _e.mock.On("Update", context1, updateRequest)}
 }
 
-func (_c *ActionsServiceClient_Update_Call) Run(run func(context1 context.Context, request *connect.Request[actions.UpdateRequest])) *ActionsServiceClient_Update_Call {
+func (_c *ActionsServiceClient_Update_Call) Run(run func(context1 context.Context, updateRequest *actions.UpdateRequest)) *ActionsServiceClient_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[actions.UpdateRequest]
+		var arg1 *actions.UpdateRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[actions.UpdateRequest])
+			arg1 = args[1].(*actions.UpdateRequest)
 		}
 		run(
 			arg0,
@@ -301,38 +310,36 @@ func (_c *ActionsServiceClient_Update_Call) Run(run func(context1 context.Contex
 	return _c
 }
 
-func (_c *ActionsServiceClient_Update_Call) Return(response *connect.Response[actions.UpdateResponse], err error) *ActionsServiceClient_Update_Call {
-	_c.Call.Return(response, err)
+func (_c *ActionsServiceClient_Update_Call) Return(updateResponse *actions.UpdateResponse, err error) *ActionsServiceClient_Update_Call {
+	_c.Call.Return(updateResponse, err)
 	return _c
 }
 
-func (_c *ActionsServiceClient_Update_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[actions.UpdateRequest]) (*connect.Response[actions.UpdateResponse], error)) *ActionsServiceClient_Update_Call {
+func (_c *ActionsServiceClient_Update_Call) RunAndReturn(run func(context1 context.Context, updateRequest *actions.UpdateRequest) (*actions.UpdateResponse, error)) *ActionsServiceClient_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // WatchForUpdates provides a mock function for the type ActionsServiceClient
-func (_mock *ActionsServiceClient) WatchForUpdates(context1 context.Context, request *connect.Request[actions.WatchForUpdatesRequest]) (*connect.ServerStreamForClient[actions.WatchForUpdatesResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ActionsServiceClient) WatchForUpdates(context1 context.Context, watchForUpdatesRequest *actions.WatchForUpdatesRequest) (actionsconnect.ActionsServiceWatchForUpdatesClientStream, error) {
+	ret := _mock.Called(context1, watchForUpdatesRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for WatchForUpdates")
 	}
 
-	var r0 *connect.ServerStreamForClient[actions.WatchForUpdatesResponse]
+	var r0 actionsconnect.ActionsServiceWatchForUpdatesClientStream
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.WatchForUpdatesRequest]) (*connect.ServerStreamForClient[actions.WatchForUpdatesResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.WatchForUpdatesRequest) (actionsconnect.ActionsServiceWatchForUpdatesClientStream, error)); ok {
+		return returnFunc(context1, watchForUpdatesRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.WatchForUpdatesRequest]) *connect.ServerStreamForClient[actions.WatchForUpdatesResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.WatchForUpdatesRequest) actionsconnect.ActionsServiceWatchForUpdatesClientStream); ok {
+		r0 = returnFunc(context1, watchForUpdatesRequest)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.ServerStreamForClient[actions.WatchForUpdatesResponse])
-		}
+		r0 = ret.Get(0).(actionsconnect.ActionsServiceWatchForUpdatesClientStream)
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[actions.WatchForUpdatesRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *actions.WatchForUpdatesRequest) error); ok {
+		r1 = returnFunc(context1, watchForUpdatesRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -346,20 +353,20 @@ type ActionsServiceClient_WatchForUpdates_Call struct {
 
 // WatchForUpdates is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[actions.WatchForUpdatesRequest]
-func (_e *ActionsServiceClient_Expecter) WatchForUpdates(context1 interface{}, request interface{}) *ActionsServiceClient_WatchForUpdates_Call {
-	return &ActionsServiceClient_WatchForUpdates_Call{Call: _e.mock.On("WatchForUpdates", context1, request)}
+//   - watchForUpdatesRequest *actions.WatchForUpdatesRequest
+func (_e *ActionsServiceClient_Expecter) WatchForUpdates(context1 any, watchForUpdatesRequest any) *ActionsServiceClient_WatchForUpdates_Call {
+	return &ActionsServiceClient_WatchForUpdates_Call{Call: _e.mock.On("WatchForUpdates", context1, watchForUpdatesRequest)}
 }
 
-func (_c *ActionsServiceClient_WatchForUpdates_Call) Run(run func(context1 context.Context, request *connect.Request[actions.WatchForUpdatesRequest])) *ActionsServiceClient_WatchForUpdates_Call {
+func (_c *ActionsServiceClient_WatchForUpdates_Call) Run(run func(context1 context.Context, watchForUpdatesRequest *actions.WatchForUpdatesRequest)) *ActionsServiceClient_WatchForUpdates_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[actions.WatchForUpdatesRequest]
+		var arg1 *actions.WatchForUpdatesRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[actions.WatchForUpdatesRequest])
+			arg1 = args[1].(*actions.WatchForUpdatesRequest)
 		}
 		run(
 			arg0,
@@ -369,12 +376,12 @@ func (_c *ActionsServiceClient_WatchForUpdates_Call) Run(run func(context1 conte
 	return _c
 }
 
-func (_c *ActionsServiceClient_WatchForUpdates_Call) Return(serverStreamForClient *connect.ServerStreamForClient[actions.WatchForUpdatesResponse], err error) *ActionsServiceClient_WatchForUpdates_Call {
-	_c.Call.Return(serverStreamForClient, err)
+func (_c *ActionsServiceClient_WatchForUpdates_Call) Return(actionsServiceWatchForUpdatesClientStream actionsconnect.ActionsServiceWatchForUpdatesClientStream, err error) *ActionsServiceClient_WatchForUpdates_Call {
+	_c.Call.Return(actionsServiceWatchForUpdatesClientStream, err)
 	return _c
 }
 
-func (_c *ActionsServiceClient_WatchForUpdates_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[actions.WatchForUpdatesRequest]) (*connect.ServerStreamForClient[actions.WatchForUpdatesResponse], error)) *ActionsServiceClient_WatchForUpdates_Call {
+func (_c *ActionsServiceClient_WatchForUpdates_Call) RunAndReturn(run func(context1 context.Context, watchForUpdatesRequest *actions.WatchForUpdatesRequest) (actionsconnect.ActionsServiceWatchForUpdatesClientStream, error)) *ActionsServiceClient_WatchForUpdates_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -385,10 +392,19 @@ func NewActionsServiceHandler(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *ActionsServiceHandler {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &ActionsServiceHandler{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -407,27 +423,27 @@ func (_m *ActionsServiceHandler) EXPECT() *ActionsServiceHandler_Expecter {
 }
 
 // Abort provides a mock function for the type ActionsServiceHandler
-func (_mock *ActionsServiceHandler) Abort(context1 context.Context, request *connect.Request[actions.AbortRequest]) (*connect.Response[actions.AbortResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ActionsServiceHandler) Abort(context1 context.Context, abortRequest *actions.AbortRequest) (*actions.AbortResponse, error) {
+	ret := _mock.Called(context1, abortRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Abort")
 	}
 
-	var r0 *connect.Response[actions.AbortResponse]
+	var r0 *actions.AbortResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.AbortRequest]) (*connect.Response[actions.AbortResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.AbortRequest) (*actions.AbortResponse, error)); ok {
+		return returnFunc(context1, abortRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.AbortRequest]) *connect.Response[actions.AbortResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.AbortRequest) *actions.AbortResponse); ok {
+		r0 = returnFunc(context1, abortRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[actions.AbortResponse])
+			r0 = ret.Get(0).(*actions.AbortResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[actions.AbortRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *actions.AbortRequest) error); ok {
+		r1 = returnFunc(context1, abortRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -441,20 +457,20 @@ type ActionsServiceHandler_Abort_Call struct {
 
 // Abort is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[actions.AbortRequest]
-func (_e *ActionsServiceHandler_Expecter) Abort(context1 interface{}, request interface{}) *ActionsServiceHandler_Abort_Call {
-	return &ActionsServiceHandler_Abort_Call{Call: _e.mock.On("Abort", context1, request)}
+//   - abortRequest *actions.AbortRequest
+func (_e *ActionsServiceHandler_Expecter) Abort(context1 any, abortRequest any) *ActionsServiceHandler_Abort_Call {
+	return &ActionsServiceHandler_Abort_Call{Call: _e.mock.On("Abort", context1, abortRequest)}
 }
 
-func (_c *ActionsServiceHandler_Abort_Call) Run(run func(context1 context.Context, request *connect.Request[actions.AbortRequest])) *ActionsServiceHandler_Abort_Call {
+func (_c *ActionsServiceHandler_Abort_Call) Run(run func(context1 context.Context, abortRequest *actions.AbortRequest)) *ActionsServiceHandler_Abort_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[actions.AbortRequest]
+		var arg1 *actions.AbortRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[actions.AbortRequest])
+			arg1 = args[1].(*actions.AbortRequest)
 		}
 		run(
 			arg0,
@@ -464,38 +480,38 @@ func (_c *ActionsServiceHandler_Abort_Call) Run(run func(context1 context.Contex
 	return _c
 }
 
-func (_c *ActionsServiceHandler_Abort_Call) Return(response *connect.Response[actions.AbortResponse], err error) *ActionsServiceHandler_Abort_Call {
-	_c.Call.Return(response, err)
+func (_c *ActionsServiceHandler_Abort_Call) Return(abortResponse *actions.AbortResponse, err error) *ActionsServiceHandler_Abort_Call {
+	_c.Call.Return(abortResponse, err)
 	return _c
 }
 
-func (_c *ActionsServiceHandler_Abort_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[actions.AbortRequest]) (*connect.Response[actions.AbortResponse], error)) *ActionsServiceHandler_Abort_Call {
+func (_c *ActionsServiceHandler_Abort_Call) RunAndReturn(run func(context1 context.Context, abortRequest *actions.AbortRequest) (*actions.AbortResponse, error)) *ActionsServiceHandler_Abort_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Enqueue provides a mock function for the type ActionsServiceHandler
-func (_mock *ActionsServiceHandler) Enqueue(context1 context.Context, request *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ActionsServiceHandler) Enqueue(context1 context.Context, enqueueRequest *actions.EnqueueRequest) (*actions.EnqueueResponse, error) {
+	ret := _mock.Called(context1, enqueueRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Enqueue")
 	}
 
-	var r0 *connect.Response[actions.EnqueueResponse]
+	var r0 *actions.EnqueueResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.EnqueueRequest) (*actions.EnqueueResponse, error)); ok {
+		return returnFunc(context1, enqueueRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.EnqueueRequest]) *connect.Response[actions.EnqueueResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.EnqueueRequest) *actions.EnqueueResponse); ok {
+		r0 = returnFunc(context1, enqueueRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[actions.EnqueueResponse])
+			r0 = ret.Get(0).(*actions.EnqueueResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[actions.EnqueueRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *actions.EnqueueRequest) error); ok {
+		r1 = returnFunc(context1, enqueueRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -509,20 +525,20 @@ type ActionsServiceHandler_Enqueue_Call struct {
 
 // Enqueue is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[actions.EnqueueRequest]
-func (_e *ActionsServiceHandler_Expecter) Enqueue(context1 interface{}, request interface{}) *ActionsServiceHandler_Enqueue_Call {
-	return &ActionsServiceHandler_Enqueue_Call{Call: _e.mock.On("Enqueue", context1, request)}
+//   - enqueueRequest *actions.EnqueueRequest
+func (_e *ActionsServiceHandler_Expecter) Enqueue(context1 any, enqueueRequest any) *ActionsServiceHandler_Enqueue_Call {
+	return &ActionsServiceHandler_Enqueue_Call{Call: _e.mock.On("Enqueue", context1, enqueueRequest)}
 }
 
-func (_c *ActionsServiceHandler_Enqueue_Call) Run(run func(context1 context.Context, request *connect.Request[actions.EnqueueRequest])) *ActionsServiceHandler_Enqueue_Call {
+func (_c *ActionsServiceHandler_Enqueue_Call) Run(run func(context1 context.Context, enqueueRequest *actions.EnqueueRequest)) *ActionsServiceHandler_Enqueue_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[actions.EnqueueRequest]
+		var arg1 *actions.EnqueueRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[actions.EnqueueRequest])
+			arg1 = args[1].(*actions.EnqueueRequest)
 		}
 		run(
 			arg0,
@@ -532,38 +548,38 @@ func (_c *ActionsServiceHandler_Enqueue_Call) Run(run func(context1 context.Cont
 	return _c
 }
 
-func (_c *ActionsServiceHandler_Enqueue_Call) Return(response *connect.Response[actions.EnqueueResponse], err error) *ActionsServiceHandler_Enqueue_Call {
-	_c.Call.Return(response, err)
+func (_c *ActionsServiceHandler_Enqueue_Call) Return(enqueueResponse *actions.EnqueueResponse, err error) *ActionsServiceHandler_Enqueue_Call {
+	_c.Call.Return(enqueueResponse, err)
 	return _c
 }
 
-func (_c *ActionsServiceHandler_Enqueue_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error)) *ActionsServiceHandler_Enqueue_Call {
+func (_c *ActionsServiceHandler_Enqueue_Call) RunAndReturn(run func(context1 context.Context, enqueueRequest *actions.EnqueueRequest) (*actions.EnqueueResponse, error)) *ActionsServiceHandler_Enqueue_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Signal provides a mock function for the type ActionsServiceHandler
-func (_mock *ActionsServiceHandler) Signal(context1 context.Context, request *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ActionsServiceHandler) Signal(context1 context.Context, signalRequest *actions.SignalRequest) (*actions.SignalResponse, error) {
+	ret := _mock.Called(context1, signalRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Signal")
 	}
 
-	var r0 *connect.Response[actions.SignalResponse]
+	var r0 *actions.SignalResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.SignalRequest) (*actions.SignalResponse, error)); ok {
+		return returnFunc(context1, signalRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.SignalRequest]) *connect.Response[actions.SignalResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.SignalRequest) *actions.SignalResponse); ok {
+		r0 = returnFunc(context1, signalRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[actions.SignalResponse])
+			r0 = ret.Get(0).(*actions.SignalResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[actions.SignalRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *actions.SignalRequest) error); ok {
+		r1 = returnFunc(context1, signalRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -577,20 +593,20 @@ type ActionsServiceHandler_Signal_Call struct {
 
 // Signal is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[actions.SignalRequest]
-func (_e *ActionsServiceHandler_Expecter) Signal(context1 interface{}, request interface{}) *ActionsServiceHandler_Signal_Call {
-	return &ActionsServiceHandler_Signal_Call{Call: _e.mock.On("Signal", context1, request)}
+//   - signalRequest *actions.SignalRequest
+func (_e *ActionsServiceHandler_Expecter) Signal(context1 any, signalRequest any) *ActionsServiceHandler_Signal_Call {
+	return &ActionsServiceHandler_Signal_Call{Call: _e.mock.On("Signal", context1, signalRequest)}
 }
 
-func (_c *ActionsServiceHandler_Signal_Call) Run(run func(context1 context.Context, request *connect.Request[actions.SignalRequest])) *ActionsServiceHandler_Signal_Call {
+func (_c *ActionsServiceHandler_Signal_Call) Run(run func(context1 context.Context, signalRequest *actions.SignalRequest)) *ActionsServiceHandler_Signal_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[actions.SignalRequest]
+		var arg1 *actions.SignalRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[actions.SignalRequest])
+			arg1 = args[1].(*actions.SignalRequest)
 		}
 		run(
 			arg0,
@@ -600,38 +616,38 @@ func (_c *ActionsServiceHandler_Signal_Call) Run(run func(context1 context.Conte
 	return _c
 }
 
-func (_c *ActionsServiceHandler_Signal_Call) Return(response *connect.Response[actions.SignalResponse], err error) *ActionsServiceHandler_Signal_Call {
-	_c.Call.Return(response, err)
+func (_c *ActionsServiceHandler_Signal_Call) Return(signalResponse *actions.SignalResponse, err error) *ActionsServiceHandler_Signal_Call {
+	_c.Call.Return(signalResponse, err)
 	return _c
 }
 
-func (_c *ActionsServiceHandler_Signal_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[actions.SignalRequest]) (*connect.Response[actions.SignalResponse], error)) *ActionsServiceHandler_Signal_Call {
+func (_c *ActionsServiceHandler_Signal_Call) RunAndReturn(run func(context1 context.Context, signalRequest *actions.SignalRequest) (*actions.SignalResponse, error)) *ActionsServiceHandler_Signal_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Update provides a mock function for the type ActionsServiceHandler
-func (_mock *ActionsServiceHandler) Update(context1 context.Context, request *connect.Request[actions.UpdateRequest]) (*connect.Response[actions.UpdateResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *ActionsServiceHandler) Update(context1 context.Context, updateRequest *actions.UpdateRequest) (*actions.UpdateResponse, error) {
+	ret := _mock.Called(context1, updateRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Update")
 	}
 
-	var r0 *connect.Response[actions.UpdateResponse]
+	var r0 *actions.UpdateResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.UpdateRequest]) (*connect.Response[actions.UpdateResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.UpdateRequest) (*actions.UpdateResponse, error)); ok {
+		return returnFunc(context1, updateRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.UpdateRequest]) *connect.Response[actions.UpdateResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.UpdateRequest) *actions.UpdateResponse); ok {
+		r0 = returnFunc(context1, updateRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[actions.UpdateResponse])
+			r0 = ret.Get(0).(*actions.UpdateResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[actions.UpdateRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *actions.UpdateRequest) error); ok {
+		r1 = returnFunc(context1, updateRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -645,20 +661,20 @@ type ActionsServiceHandler_Update_Call struct {
 
 // Update is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[actions.UpdateRequest]
-func (_e *ActionsServiceHandler_Expecter) Update(context1 interface{}, request interface{}) *ActionsServiceHandler_Update_Call {
-	return &ActionsServiceHandler_Update_Call{Call: _e.mock.On("Update", context1, request)}
+//   - updateRequest *actions.UpdateRequest
+func (_e *ActionsServiceHandler_Expecter) Update(context1 any, updateRequest any) *ActionsServiceHandler_Update_Call {
+	return &ActionsServiceHandler_Update_Call{Call: _e.mock.On("Update", context1, updateRequest)}
 }
 
-func (_c *ActionsServiceHandler_Update_Call) Run(run func(context1 context.Context, request *connect.Request[actions.UpdateRequest])) *ActionsServiceHandler_Update_Call {
+func (_c *ActionsServiceHandler_Update_Call) Run(run func(context1 context.Context, updateRequest *actions.UpdateRequest)) *ActionsServiceHandler_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[actions.UpdateRequest]
+		var arg1 *actions.UpdateRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[actions.UpdateRequest])
+			arg1 = args[1].(*actions.UpdateRequest)
 		}
 		run(
 			arg0,
@@ -668,27 +684,27 @@ func (_c *ActionsServiceHandler_Update_Call) Run(run func(context1 context.Conte
 	return _c
 }
 
-func (_c *ActionsServiceHandler_Update_Call) Return(response *connect.Response[actions.UpdateResponse], err error) *ActionsServiceHandler_Update_Call {
-	_c.Call.Return(response, err)
+func (_c *ActionsServiceHandler_Update_Call) Return(updateResponse *actions.UpdateResponse, err error) *ActionsServiceHandler_Update_Call {
+	_c.Call.Return(updateResponse, err)
 	return _c
 }
 
-func (_c *ActionsServiceHandler_Update_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[actions.UpdateRequest]) (*connect.Response[actions.UpdateResponse], error)) *ActionsServiceHandler_Update_Call {
+func (_c *ActionsServiceHandler_Update_Call) RunAndReturn(run func(context1 context.Context, updateRequest *actions.UpdateRequest) (*actions.UpdateResponse, error)) *ActionsServiceHandler_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // WatchForUpdates provides a mock function for the type ActionsServiceHandler
-func (_mock *ActionsServiceHandler) WatchForUpdates(context1 context.Context, request *connect.Request[actions.WatchForUpdatesRequest], serverStream *connect.ServerStream[actions.WatchForUpdatesResponse]) error {
-	ret := _mock.Called(context1, request, serverStream)
+func (_mock *ActionsServiceHandler) WatchForUpdates(context1 context.Context, watchForUpdatesRequest *actions.WatchForUpdatesRequest, actionsServiceWatchForUpdatesServerStream actionsconnect.ActionsServiceWatchForUpdatesServerStream) error {
+	ret := _mock.Called(context1, watchForUpdatesRequest, actionsServiceWatchForUpdatesServerStream)
 
 	if len(ret) == 0 {
 		panic("no return value specified for WatchForUpdates")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[actions.WatchForUpdatesRequest], *connect.ServerStream[actions.WatchForUpdatesResponse]) error); ok {
-		r0 = returnFunc(context1, request, serverStream)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *actions.WatchForUpdatesRequest, actionsconnect.ActionsServiceWatchForUpdatesServerStream) error); ok {
+		r0 = returnFunc(context1, watchForUpdatesRequest, actionsServiceWatchForUpdatesServerStream)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -702,25 +718,25 @@ type ActionsServiceHandler_WatchForUpdates_Call struct {
 
 // WatchForUpdates is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[actions.WatchForUpdatesRequest]
-//   - serverStream *connect.ServerStream[actions.WatchForUpdatesResponse]
-func (_e *ActionsServiceHandler_Expecter) WatchForUpdates(context1 interface{}, request interface{}, serverStream interface{}) *ActionsServiceHandler_WatchForUpdates_Call {
-	return &ActionsServiceHandler_WatchForUpdates_Call{Call: _e.mock.On("WatchForUpdates", context1, request, serverStream)}
+//   - watchForUpdatesRequest *actions.WatchForUpdatesRequest
+//   - actionsServiceWatchForUpdatesServerStream actionsconnect.ActionsServiceWatchForUpdatesServerStream
+func (_e *ActionsServiceHandler_Expecter) WatchForUpdates(context1 any, watchForUpdatesRequest any, actionsServiceWatchForUpdatesServerStream any) *ActionsServiceHandler_WatchForUpdates_Call {
+	return &ActionsServiceHandler_WatchForUpdates_Call{Call: _e.mock.On("WatchForUpdates", context1, watchForUpdatesRequest, actionsServiceWatchForUpdatesServerStream)}
 }
 
-func (_c *ActionsServiceHandler_WatchForUpdates_Call) Run(run func(context1 context.Context, request *connect.Request[actions.WatchForUpdatesRequest], serverStream *connect.ServerStream[actions.WatchForUpdatesResponse])) *ActionsServiceHandler_WatchForUpdates_Call {
+func (_c *ActionsServiceHandler_WatchForUpdates_Call) Run(run func(context1 context.Context, watchForUpdatesRequest *actions.WatchForUpdatesRequest, actionsServiceWatchForUpdatesServerStream actionsconnect.ActionsServiceWatchForUpdatesServerStream)) *ActionsServiceHandler_WatchForUpdates_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[actions.WatchForUpdatesRequest]
+		var arg1 *actions.WatchForUpdatesRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[actions.WatchForUpdatesRequest])
+			arg1 = args[1].(*actions.WatchForUpdatesRequest)
 		}
-		var arg2 *connect.ServerStream[actions.WatchForUpdatesResponse]
+		var arg2 actionsconnect.ActionsServiceWatchForUpdatesServerStream
 		if args[2] != nil {
-			arg2 = args[2].(*connect.ServerStream[actions.WatchForUpdatesResponse])
+			arg2 = args[2].(actionsconnect.ActionsServiceWatchForUpdatesServerStream)
 		}
 		run(
 			arg0,
@@ -736,7 +752,7 @@ func (_c *ActionsServiceHandler_WatchForUpdates_Call) Return(err error) *Actions
 	return _c
 }
 
-func (_c *ActionsServiceHandler_WatchForUpdates_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[actions.WatchForUpdatesRequest], serverStream *connect.ServerStream[actions.WatchForUpdatesResponse]) error) *ActionsServiceHandler_WatchForUpdates_Call {
+func (_c *ActionsServiceHandler_WatchForUpdates_Call) RunAndReturn(run func(context1 context.Context, watchForUpdatesRequest *actions.WatchForUpdatesRequest, actionsServiceWatchForUpdatesServerStream actionsconnect.ActionsServiceWatchForUpdatesServerStream) error) *ActionsServiceHandler_WatchForUpdates_Call {
 	_c.Call.Return(run)
 	return _c
 }

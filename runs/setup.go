@@ -7,7 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"connectrpc.com/otelconnect"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
@@ -43,21 +44,39 @@ var sentryOperations = map[string]string{
 	triggerconnect.TriggerServiceDeployTriggerProcedure: "deploy_trigger",
 }
 
+// triggerCountingStream observes the decoded request without consuming it before
+// the generated handler receives it.
+type triggerCountingStream struct {
+	connect.ServerStream
+	triggers int
+}
+
+func (s *triggerCountingStream) Receive(msg any) error {
+	if err := s.ServerStream.Receive(msg); err != nil {
+		return err
+	}
+	if req, ok := msg.(*taskpb.DeployTaskRequest); ok {
+		s.triggers = len(req.Triggers)
+	}
+	return nil
+}
+
 // deployTriggerInterceptor counts the triggers that ride along inside a
 // DeployTask request. TriggerService.DeployTrigger only ever sees standalone
 // trigger deploys, so without this the deploy_trigger count misses every
 // trigger declared on a task.
-func deployTriggerInterceptor() connect.UnaryInterceptorFunc {
-	return func(next connect.UnaryFunc) connect.UnaryFunc {
-		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-			resp, err := next(ctx, req)
-			if err != nil || req.Spec().Procedure != taskconnect.TaskServiceDeployTaskProcedure {
-				return resp, err
+func deployTriggerInterceptor() connect.ServerInterceptor {
+	return func(next connect.ServerFunc) connect.ServerFunc {
+		return func(ctx context.Context, spec connect.Spec, stream connect.ServerStream) error {
+			if spec.Procedure != taskconnect.TaskServiceDeployTaskProcedure {
+				return next(ctx, spec, stream)
 			}
-			if deployReq, ok := req.Any().(*taskpb.DeployTaskRequest); ok && len(deployReq.Triggers) > 0 {
-				sentryutils.Count(ctx, "deploy_trigger", int64(len(deployReq.Triggers)))
+			observed := &triggerCountingStream{ServerStream: stream}
+			err := next(ctx, spec, observed)
+			if err == nil && observed.triggers > 0 {
+				sentryutils.Count(ctx, "deploy_trigger", int64(observed.triggers))
 			}
-			return resp, err
+			return err
 		}
 	}
 }
@@ -76,15 +95,22 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
 	meterProvider := otelutils.GetMeterProvider(ServiceName)
-	otelInterceptor, err := otelconnect.NewInterceptor(
+	otelInterceptor, err := otelconnect.NewServerInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(ServiceName)),
 		otelconnect.WithMeterProvider(meterProvider),
 	)
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
+	otelClientInterceptor, err := otelconnect.NewClientInterceptor(
+		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(ServiceName)),
+		otelconnect.WithMeterProvider(meterProvider),
+	)
+	if err != nil {
+		return fmt.Errorf("creating otel client interceptor: %w", err)
+	}
 
-	interceptors := []connect.Interceptor{otelInterceptor}
+	interceptors := []connect.ServerInterceptor{otelInterceptor}
 	if sentryutils.Init(ctx, ServiceName) {
 		interceptors = append(interceptors, sentryutils.Interceptor(sentryOperations), deployTriggerInterceptor())
 		sc.AddWorker("sentry-flush", func(ctx context.Context) error {
@@ -121,18 +147,20 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err != nil {
 		return fmt.Errorf("runs: configure actions service client: %w", err)
 	}
-	actionsClient := actionsconnect.NewActionsServiceClient(
+	actionsClient := actionsconnect.NewActionsServiceClient(connect.NewClient(connecthttp.NewTransport(
 		actionsHTTPClient,
 		actionsServiceCfg.URL,
-		connect.WithInterceptors(otelInterceptor),
-	)
+		connecthttp.WithReadMaxBytes(0),
+	), otelClientInterceptor,
+	))
 
 	runsServiceURL := fmt.Sprintf("http://localhost:%d", cfg.Server.Port)
-	projectClient := projectconnect.NewProjectServiceClient(
+	projectClient := projectconnect.NewProjectServiceClient(connect.NewClient(connecthttp.NewTransport(
 		http.DefaultClient,
 		runsServiceURL,
-		connect.WithInterceptors(otelInterceptor),
-	)
+		connecthttp.WithReadMaxBytes(0),
+	), otelClientInterceptor,
+	))
 	abortReconciler := service.NewAbortReconciler(repo, actionsClient, service.AbortReconcilerConfig{
 		Workers:      5,
 		MaxAttempts:  10,
@@ -147,26 +175,36 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	runsSvc := service.NewRunService(repo, settingsRepo, actionsClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
 	taskSvc := service.NewTaskService(repo, projectClient)
 
-	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc, connect.WithInterceptors(interceptors...))
-	sc.Mux.Handle(runsPath, runsHandler)
+	runsHandler := connect.NewServer(interceptors...)
+	workflowconnect.RegisterRunServiceHandler(runsHandler, runsSvc)
+	connecthttp.Mount(sc.Mux, runsHandler, connecthttp.WithReadMaxBytes(0))
+	runsPath := "/" + workflowconnect.RunServiceName + "/"
 	logger.Infof(ctx, "Mounted RunService at %s", runsPath)
 
-	internalRunsPath, internalRunsHandler := workflowconnect.NewInternalRunServiceHandler(runsSvc, connect.WithInterceptors(otelInterceptor))
-	sc.Mux.Handle(internalRunsPath, internalRunsHandler)
+	internalRunsHandler := connect.NewServer(otelInterceptor)
+	workflowconnect.RegisterInternalRunServiceHandler(internalRunsHandler, runsSvc)
+	connecthttp.Mount(sc.Mux, internalRunsHandler, connecthttp.WithReadMaxBytes(0))
+	internalRunsPath := "/" + workflowconnect.InternalRunServiceName + "/"
 	logger.Infof(ctx, "Mounted InternalRunService at %s", internalRunsPath)
 
-	taskPath, taskHandler := taskconnect.NewTaskServiceHandler(taskSvc, connect.WithInterceptors(interceptors...))
-	sc.Mux.Handle(taskPath, taskHandler)
+	taskHandler := connect.NewServer(interceptors...)
+	taskconnect.RegisterTaskServiceHandler(taskHandler, taskSvc)
+	connecthttp.Mount(sc.Mux, taskHandler, connecthttp.WithReadMaxBytes(0))
+	taskPath := "/" + taskconnect.TaskServiceName + "/"
 	logger.Infof(ctx, "Mounted TaskService at %s", taskPath)
 
 	identitySvc := service.NewIdentityService(cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
-	identityPath, identityHandler := authconnect.NewIdentityServiceHandler(identitySvc, connect.WithInterceptors(otelInterceptor))
-	sc.Mux.Handle(identityPath, identityHandler)
+	identityHandler := connect.NewServer(otelInterceptor)
+	authconnect.RegisterIdentityServiceHandler(identityHandler, identitySvc)
+	connecthttp.Mount(sc.Mux, identityHandler, connecthttp.WithReadMaxBytes(0))
+	identityPath := "/" + authconnect.IdentityServiceName + "/"
 	logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
 
 	authMetadataSvc := service.NewAuthMetadataService(sc.BaseURL, cfg.AuthMetadata)
-	authMetadataPath, authMetadataHandler := authconnect.NewAuthMetadataServiceHandler(authMetadataSvc, connect.WithInterceptors(otelInterceptor))
-	sc.Mux.Handle(authMetadataPath, authMetadataHandler)
+	authMetadataHandler := connect.NewServer(otelInterceptor)
+	authconnect.RegisterAuthMetadataServiceHandler(authMetadataHandler, authMetadataSvc)
+	connecthttp.Mount(sc.Mux, authMetadataHandler, connecthttp.WithReadMaxBytes(0))
+	authMetadataPath := "/" + authconnect.AuthMetadataServiceName + "/"
 	logger.Infof(ctx, "Mounted AuthMetadataService at %s", authMetadataPath)
 
 	// Serve OAuth2 authorization-server metadata at the RFC 8414 well-known path
@@ -177,8 +215,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	logger.Infof(ctx, "Mounted OAuth2 metadata at /.well-known/oauth-authorization-server")
 
 	triggerSvc := service.NewTriggerService(repo)
-	triggerPath, triggerHandler := triggerconnect.NewTriggerServiceHandler(triggerSvc, connect.WithInterceptors(interceptors...))
-	sc.Mux.Handle(triggerPath, triggerHandler)
+	triggerHandler := connect.NewServer(interceptors...)
+	triggerconnect.RegisterTriggerServiceHandler(triggerHandler, triggerSvc)
+	connecthttp.Mount(sc.Mux, triggerHandler, connecthttp.WithReadMaxBytes(0))
+	triggerPath := "/" + triggerconnect.TriggerServiceName + "/"
 	logger.Infof(ctx, "Mounted TriggerService at %s", triggerPath)
 
 	domains := make([]*projectpb.Domain, 0, len(cfg.Domains))
@@ -189,13 +229,17 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		})
 	}
 	projectSvc := service.NewProjectService(impl.NewProjectRepo(sc.DB), domains)
-	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(projectSvc, connect.WithInterceptors(otelInterceptor))
-	sc.Mux.Handle(projectPath, projectHandler)
+	projectHandler := connect.NewServer(otelInterceptor)
+	projectconnect.RegisterProjectServiceHandler(projectHandler, projectSvc)
+	connecthttp.Mount(sc.Mux, projectHandler, connecthttp.WithReadMaxBytes(0))
+	projectPath := "/" + projectconnect.ProjectServiceName + "/"
 	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
 
 	settingsSvc := service.NewSettingsService(settingsRepo)
-	settingsPath, settingsHandler := settingsconnect.NewSettingsServiceHandler(settingsSvc, connect.WithInterceptors(otelInterceptor))
-	sc.Mux.Handle(settingsPath, settingsHandler)
+	settingsHandler := connect.NewServer(otelInterceptor)
+	settingsconnect.RegisterSettingsServiceHandler(settingsHandler, settingsSvc)
+	connecthttp.Mount(sc.Mux, settingsHandler, connecthttp.WithReadMaxBytes(0))
+	settingsPath := "/" + settingsconnect.SettingsServiceName + "/"
 	logger.Infof(ctx, "Mounted SettingsService at %s", settingsPath)
 
 	if err := seedProjects(ctx, impl.NewProjectRepo(sc.DB), cfg.SeedProjects); err != nil {
@@ -203,7 +247,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	if cfg.TriggerScheduler.Enabled {
-		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, http.DefaultClient, runsServiceURL, connect.WithInterceptors(otelInterceptor))
+		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, http.DefaultClient, runsServiceURL, otelClientInterceptor)
 		sc.AddWorker("trigger-scheduler", worker)
 		logger.Infof(ctx, "Registered trigger-scheduler worker")
 	}

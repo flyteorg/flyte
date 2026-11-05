@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"connectrpc.com/otelconnect"
 	"github.com/flyteorg/flyte/v2/events/config"
 	"github.com/flyteorg/flyte/v2/events/service"
@@ -26,12 +27,19 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
-	otelInterceptor, err := otelconnect.NewInterceptor(
+	otelInterceptor, err := otelconnect.NewServerInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
 		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
 	)
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
+	}
+	otelClientInterceptor, err := otelconnect.NewClientInterceptor(
+		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
+		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
+	)
+	if err != nil {
+		return fmt.Errorf("creating otel client interceptor: %w", err)
 	}
 
 	runServiceCfg := cfg.RunService
@@ -42,12 +50,14 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err != nil {
 		return fmt.Errorf("events: configure run service client: %w", err)
 	}
-	runClient := workflowconnect.NewInternalRunServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
+	runClient := workflowconnect.NewInternalRunServiceClient(connect.NewClient(connecthttp.NewTransport(runHTTPClient, runServiceCfg.URL, connecthttp.WithReadMaxBytes(0)), otelClientInterceptor))
 
 	eventsSvc := service.NewEventsProxyService(runClient)
 
-	path, handler := workflowconnect.NewEventsProxyServiceHandler(eventsSvc, connect.WithInterceptors(otelInterceptor))
-	sc.Mux.Handle(path, handler)
+	handler := connect.NewServer(otelInterceptor)
+	workflowconnect.RegisterEventsProxyServiceHandler(handler, eventsSvc)
+	connecthttp.Mount(sc.Mux, handler, connecthttp.WithReadMaxBytes(0))
+	path := "/" + workflowconnect.EventsProxyServiceName + "/"
 	logger.Infof(ctx, "Mounted EventsProxyService at %s", path)
 
 	sc.AddProfilingServer("events", cfg.PprofPort)
