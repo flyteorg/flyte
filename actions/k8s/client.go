@@ -56,6 +56,7 @@ type ActionUpdate struct {
 
 const (
 	labelTerminalStatusRecorded = "flyte.org/terminal-status-recorded"
+	parentActionIndex           = "taskAction.parent"
 )
 
 // ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
@@ -420,38 +421,32 @@ func (c *ActionsClient) ListRunActions(ctx context.Context, runID *common.RunIde
 	return result, nil
 }
 
-// ListChildActions lists all TaskActions that are children of the given parent action
+// ListChildActions lists the parent and its direct children from the shared
+// informer cache. Cache reads wait for initial sync but may lag subsequent writes.
 func (c *ActionsClient) ListChildActions(ctx context.Context, parentActionID *common.ActionIdentifier) ([]*executorv1.TaskAction, error) {
-	// List all TaskActions in the same run
-	taskActionList := &executorv1.TaskActionList{}
-	listOpts := []client.ListOption{
-		client.InNamespace(c.namespace),
-		client.MatchingLabels{
-			"flyte.org/project": parentActionID.Run.Project,
-			"flyte.org/domain":  parentActionID.Run.Domain,
-			"flyte.org/run":     parentActionID.Run.Name,
-		},
+	items := &executorv1.TaskActionList{}
+	key := parentActionIndexKey(parentActionID.Run.Project, parentActionID.Run.Domain,
+		parentActionID.Run.Name, parentActionID.Name)
+	if err := c.sharedCache.List(ctx, items, client.InNamespace(c.namespace),
+		client.MatchingFields{parentActionIndex: key}); err != nil {
+		return nil, fmt.Errorf("failed to list cached child TaskActions: %w", err)
 	}
 
-	if err := c.k8sClient.List(ctx, taskActionList, listOpts...); err != nil {
-		return nil, fmt.Errorf("failed to list TaskActions: %w", err)
-	}
-
-	// Filter for the parent and its children
 	var result []*executorv1.TaskAction
-	for i := range taskActionList.Items {
-		action := &taskActionList.Items[i]
-		// Include the parent action itself
-		if action.Spec.ActionName == parentActionID.Name {
-			result = append(result, action)
-			continue
-		}
-		// Include direct children
-		if action.Spec.ParentActionName != nil && *action.Spec.ParentActionName == parentActionID.Name {
-			result = append(result, action)
+	parent := &executorv1.TaskAction{}
+	parentName := buildTaskActionName(parentActionID)
+	err := c.sharedCache.Get(ctx, client.ObjectKey{Namespace: c.namespace, Name: parentName}, parent)
+	if err != nil && !apierrors.IsNotFound(err) {
+		return nil, fmt.Errorf("failed to get cached parent TaskAction: %w", err)
+	}
+	if err == nil {
+		result = append(result, parent)
+	}
+	for i := range items.Items {
+		if items.Items[i].Name != parentName {
+			result = append(result, &items.Items[i])
 		}
 	}
-
 	return result, nil
 }
 
@@ -532,11 +527,29 @@ func (c *ActionsClient) StartWatching(ctx context.Context) error {
 
 	logger.Infof(ctx, "Starting TaskAction watcher for namespace: %s (workers: %d)", c.namespace, c.numWorkers)
 
-	if c.sharedCache == nil {
-		return fmt.Errorf("shared cache is required for TaskAction informer")
-	}
-
 	return c.setupInformer(ctx)
+}
+
+// parentActionIndexKey scopes action names, which are only unique within a run.
+func parentActionIndexKey(project, domain, run, parent string) string {
+	return strings.Join([]string{project, domain, run, parent}, "/")
+}
+
+func indexTaskActionParent(obj client.Object) []string {
+	ta := obj.(*executorv1.TaskAction)
+	if ta.Spec.ParentActionName == nil || *ta.Spec.ParentActionName == "" {
+		return nil
+	}
+	return []string{parentActionIndexKey(ta.Spec.Project, ta.Spec.Domain, ta.Spec.RunName, *ta.Spec.ParentActionName)}
+}
+
+// RegisterTaskActionIndexes must be called before starting the shared cache.
+// StartWatching may subsequently attach to an already-running informer.
+func RegisterTaskActionIndexes(ctx context.Context, indexer client.FieldIndexer) error {
+	if err := indexer.IndexField(ctx, &executorv1.TaskAction{}, parentActionIndex, indexTaskActionParent); err != nil {
+		return fmt.Errorf("failed to index TaskAction parents: %w", err)
+	}
+	return nil
 }
 
 func (c *ActionsClient) setupInformer(ctx context.Context) error {
@@ -654,9 +667,6 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 	if !found {
 		return // object already gone; a delete event (if any) handles the terminal state
 	}
-	if c.shouldSkipTaskAction(latest) {
-		return
-	}
 	c.handleTaskActionEvent(ctx, latest, event.Type)
 }
 
@@ -678,7 +688,11 @@ func (c *ActionsClient) handleTaskActionEvent(ctx context.Context, taskAction *e
 		return
 	}
 
+	// Notify before the skip: subscribers still need the update when another replica recorded it.
 	c.notifySubscribers(ctx, update)
+	if c.shouldSkipTaskAction(taskAction) {
+		return
+	}
 	c.notifyRunService(ctx, taskAction, update, eventType)
 }
 
@@ -1107,11 +1121,13 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 		taskAction.Spec.EnvVars = nil
 		taskAction.Spec.Interruptible = nil
 		taskAction.Spec.PodTemplateName = ""
+		taskAction.Spec.RawDataPrefix = ""
 		return
 	}
 
 	taskAction.Spec.EnvVars = keyValuePairsToMap(runSpec.GetEnvs().GetValues())
 	taskAction.Spec.PodTemplateName = runSpec.GetDefaultSettings().GetPodTemplateName()
+	taskAction.Spec.RawDataPrefix = runSpec.GetRawDataStorage().GetRawDataPrefix()
 	if runSpec.GetInterruptible() != nil {
 		value := runSpec.GetInterruptible().GetValue()
 		taskAction.Spec.Interruptible = &value
@@ -1141,6 +1157,7 @@ func inheritRunContextFromParentTaskAction(taskAction *executorv1.TaskAction, pa
 	}
 	taskAction.Spec.EnvVars = cloneStringMap(parentTaskAction.Spec.EnvVars)
 	taskAction.Spec.PodTemplateName = parentTaskAction.Spec.PodTemplateName
+	taskAction.Spec.RawDataPrefix = parentTaskAction.Spec.RawDataPrefix
 	if len(parentTaskAction.Annotations) > 0 {
 		if taskAction.Annotations == nil {
 			taskAction.Annotations = map[string]string{}

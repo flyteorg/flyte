@@ -134,5 +134,7 @@ service ProjectService {
     option idempotency_level = NO_SIDE_EFFECTS;
   }
 
-  rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {}
+  rpc ListProjects(ListProjectsRequest) returns (ListProjectsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }

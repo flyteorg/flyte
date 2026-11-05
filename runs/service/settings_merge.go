@@ -223,16 +223,19 @@ func mergeRunSettings(levels []*settings.RunSettings) *settings.RunSettings {
 // other group mergers it holds no rules of its own. Returns nil when nothing resolved.
 func mergeSecuritySettings(levels []*settings.SecuritySettings) *settings.SecuritySettings {
 	serviceAccount := make([]*settings.StringSetting, len(levels))
+	kubernetesNamespace := make([]*settings.StringSetting, len(levels))
 
 	for i, l := range levels {
 		serviceAccount[i] = l.GetServiceAccount()
+		kubernetesNamespace[i] = l.GetKubernetesNamespace()
 	}
 
 	out := &settings.SecuritySettings{
-		ServiceAccount: mergeStringSettings(serviceAccount),
+		ServiceAccount:      mergeStringSettings(serviceAccount),
+		KubernetesNamespace: mergeStringSettings(kubernetesNamespace),
 	}
 
-	if out.ServiceAccount == nil {
+	if out.ServiceAccount == nil && out.KubernetesNamespace == nil {
 		return nil
 	}
 	return out

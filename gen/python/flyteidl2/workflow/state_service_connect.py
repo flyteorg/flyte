@@ -48,7 +48,7 @@ class StateServiceASGIApplication(ConnectASGIApplication[StateService]):
                         service_name="flyteidl2.workflow.StateService",
                         input=flyteidl2_dot_workflow_dot_state__service__pb2.GetRequest,
                         output=flyteidl2_dot_workflow_dot_state__service__pb2.GetResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.get,
                 ),
@@ -58,7 +58,7 @@ class StateServiceASGIApplication(ConnectASGIApplication[StateService]):
                         service_name="flyteidl2.workflow.StateService",
                         input=flyteidl2_dot_workflow_dot_state__service__pb2.WatchRequest,
                         output=flyteidl2_dot_workflow_dot_state__service__pb2.WatchResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.watch,
                 ),
@@ -101,6 +101,7 @@ class StateServiceClient(ConnectClient):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_workflow_dot_state__service__pb2.GetResponse:
         return await self.execute_unary(
             request=request,
@@ -109,10 +110,11 @@ class StateServiceClient(ConnectClient):
                 service_name="flyteidl2.workflow.StateService",
                 input=flyteidl2_dot_workflow_dot_state__service__pb2.GetRequest,
                 output=flyteidl2_dot_workflow_dot_state__service__pb2.GetResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     def watch(
@@ -129,7 +131,7 @@ class StateServiceClient(ConnectClient):
                 service_name="flyteidl2.workflow.StateService",
                 input=flyteidl2_dot_workflow_dot_state__service__pb2.WatchRequest,
                 output=flyteidl2_dot_workflow_dot_state__service__pb2.WatchResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
@@ -165,7 +167,7 @@ class StateServiceWSGIApplication(ConnectWSGIApplication):
                         service_name="flyteidl2.workflow.StateService",
                         input=flyteidl2_dot_workflow_dot_state__service__pb2.GetRequest,
                         output=flyteidl2_dot_workflow_dot_state__service__pb2.GetResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.get,
                 ),
@@ -175,7 +177,7 @@ class StateServiceWSGIApplication(ConnectWSGIApplication):
                         service_name="flyteidl2.workflow.StateService",
                         input=flyteidl2_dot_workflow_dot_state__service__pb2.WatchRequest,
                         output=flyteidl2_dot_workflow_dot_state__service__pb2.WatchResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.watch,
                 ),
@@ -218,6 +220,7 @@ class StateServiceClientSync(ConnectClientSync):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_workflow_dot_state__service__pb2.GetResponse:
         return self.execute_unary(
             request=request,
@@ -226,10 +229,11 @@ class StateServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.workflow.StateService",
                 input=flyteidl2_dot_workflow_dot_state__service__pb2.GetRequest,
                 output=flyteidl2_dot_workflow_dot_state__service__pb2.GetResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     def watch(
@@ -246,7 +250,7 @@ class StateServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.workflow.StateService",
                 input=flyteidl2_dot_workflow_dot_state__service__pb2.WatchRequest,
                 output=flyteidl2_dot_workflow_dot_state__service__pb2.WatchResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,

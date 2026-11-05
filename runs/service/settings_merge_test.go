@@ -377,3 +377,20 @@ func TestMergeTaskResourceSettingsHandlesEveryField(t *testing.T) {
 			"TaskResourceSettings field %q is not handled by mergeTaskResourceSettings; add it there, then add it to this list", name)
 	}
 }
+
+func TestMergeSettings_KubernetesNamespace(t *testing.T) {
+	org := &settings.Settings{Security: &settings.SecuritySettings{KubernetesNamespace: str(stateValue, "org-ns")}}
+	domain := &settings.Settings{Security: &settings.SecuritySettings{ServiceAccount: str(stateValue, "runner")}}
+	project := &settings.Settings{Security: &settings.SecuritySettings{KubernetesNamespace: str(stateValue, "project-ns")}}
+
+	inherited := mergeSettings([]*settings.Settings{org, domain})
+	assert.Equal(t, "org-ns", inherited.GetSecurity().GetKubernetesNamespace().GetStringValue())
+	assert.Equal(t, "runner", inherited.GetSecurity().GetServiceAccount().GetStringValue(), "resolves beside the service account")
+
+	overridden := mergeSettings([]*settings.Settings{org, domain, project})
+	assert.Equal(t, "project-ns", overridden.GetSecurity().GetKubernetesNamespace().GetStringValue())
+	assert.Equal(t, levelProject, overridden.GetSecurity().GetKubernetesNamespace().GetScopeLevel())
+
+	onlyNamespace := mergeSettings([]*settings.Settings{org})
+	assert.NotNil(t, onlyNamespace.GetSecurity(), "a group holding only the namespace still resolves")
+}

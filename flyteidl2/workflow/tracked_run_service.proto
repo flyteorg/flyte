@@ -42,7 +42,9 @@ service TrackedRunService {
 
   // Stream detailed information updates about a tracked run. The call will terminate when the run
   // reaches a terminal phase.
-  rpc WatchRunDetails(WatchRunDetailsRequest) returns (stream WatchRunDetailsResponse) {}
+  rpc WatchRunDetails(WatchRunDetailsRequest) returns (stream WatchRunDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Get detailed information about an action of a tracked run.
   rpc GetActionDetails(GetActionDetailsRequest) returns (GetActionDetailsResponse) {
@@ -51,7 +53,9 @@ service TrackedRunService {
 
   // Stream detailed information updates about an action of a tracked run. The call will terminate
   // when the action reaches a terminal phase.
-  rpc WatchActionDetails(WatchActionDetailsRequest) returns (stream WatchActionDetailsResponse) {}
+  rpc WatchActionDetails(WatchActionDetailsRequest) returns (stream WatchActionDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // List tracked runs based on the provided filter criteria.
   rpc ListRuns(ListRunsRequest) returns (ListRunsResponse) {
@@ -59,7 +63,9 @@ service TrackedRunService {
   }
 
   // Stream updates for tracked runs based on the provided filter criteria.
-  rpc WatchRuns(WatchRunsRequest) returns (stream WatchRunsResponse) {}
+  rpc WatchRuns(WatchRunsRequest) returns (stream WatchRunsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // List all actions for a given tracked run.
   rpc ListActions(ListActionsRequest) returns (ListActionsResponse) {
@@ -67,7 +73,9 @@ service TrackedRunService {
   }
 
   // Stream updates for actions of a given tracked run.
-  rpc WatchActions(WatchActionsRequest) returns (stream WatchActionsResponse) {}
+  rpc WatchActions(WatchActionsRequest) returns (stream WatchActionsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Abort a tracked run: mark the run and all of its non-terminal actions ABORTED on the server.
   // The platform cannot stop the client that owns the run; subsequent reports against aborted actions
@@ -80,8 +88,13 @@ message CreateTrackedRunRequest {
   oneof id {
     option (buf.validate.oneof).required = true;
 
-    // The user provided run id.
-    common.RunIdentifier run_id = 1;
+    // The user provided run id. The name must not contain '/' or ':', which separate the parts
+    // of an action's key. Only checked here, so that existing runs stay readable.
+    common.RunIdentifier run_id = 1 [(buf.validate.field).cel = {
+      id: "run_id.name.no_separators"
+      message: "Run name must not contain '/' or ':'"
+      expression: "!this.name.matches('[/:]')"
+    }];
 
     // The project id for this run. Run name will be generated.
     common.ProjectIdentifier project_id = 2;
@@ -116,15 +129,23 @@ message CreateTrackedRunRequest {
 message TrackedActionUpdate {
   // The event describing this state transition. Carries the action id, attempt (starting at 1),
   // phase, monotonically increasing version, timestamps, error info and output references
-  // (output_uri / report_uri under the control plane's storage).
-  ActionEvent event = 1 [(buf.validate.field).required = true];
+  // (output_uri / report_uri under the control plane's storage). The action's name must not contain
+  // '/' or ':', which separate the parts of an action's key.
+  ActionEvent event = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "event.id.name.no_separators"
+      message: "Action name must not contain '/' or ':'"
+      expression: "!this.id.name.matches('[/:]')"
+    }
+  ];
 
   // Name of the parent action if this is a nested action. Empty for the root action. Only
   // honored on the first report of an action.
   string parent_name = 2;
 
   // Group this action belongs to, if applicable. Only honored on the first report of an action.
-  string group = 3;
+  string group = 3 [(buf.validate.field).string.max_len = 255];
 
   // The action's spec. Should be provided on the first report of an action; ignored afterwards.
   oneof spec {
