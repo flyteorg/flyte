@@ -36,7 +36,7 @@ storage:
 
   # Enable multi-container support
   # When true, allows accessing multiple buckets
-  enable-multicontainer: false
+  enable-multicontainer: true
 
   # Stow Configuration (recommended)
   # This is the modern way to configure storage backends

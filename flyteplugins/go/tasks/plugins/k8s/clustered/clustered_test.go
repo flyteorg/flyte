@@ -1499,6 +1499,29 @@ func TestGetTaskPhase_LogContext(t *testing.T) {
 		}
 	})
 
+	t.Run("pods of other JobSets are excluded", func(t *testing.T) {
+		js := makeRunningJobSet()
+		otherJobSet := mkPod("other-job-workers-0-0-qwert", corev1.PodRunning)
+		otherJobSet.Labels = map[string]string{
+			jobsetv1alpha2.JobSetNameKey:        "other-job",
+			jobsetv1alpha2.ReplicatedJobNameKey: workersReplicatedJobName,
+		}
+		fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).
+			WithObjects(mkPod(rank0, corev1.PodRunning), otherJobSet).Build()
+
+		spec := &clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1}
+		pCtx := dummyPluginCtx(buildTaskTemplate(spec), fakeClient)
+
+		handler := clusteredResourceHandler{}
+		phase, err := handler.GetTaskPhase(context.Background(), pCtx, js)
+		assert.NoError(t, err)
+
+		lc := phase.Info().LogContext
+		require.NotNil(t, lc)
+		require.Len(t, lc.Pods, 1)
+		assert.Equal(t, rank0, lc.Pods[0].GetPodName())
+	})
+
 	t.Run("primary falls back when rank-0 pod is pending", func(t *testing.T) {
 		js := makeRunningJobSet()
 		fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).

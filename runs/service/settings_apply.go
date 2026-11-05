@@ -34,4 +34,16 @@ func applyRunSettings(spec *task.RunSpec, resolved *settings.Settings) {
 		}
 		spec.DefaultSettings.PodTemplateName = podTemplate.GetStringValue()
 	}
+
+	// Base for run metadata; also raw outputs when raw_data_prefix is empty.
+	if baseDir := resolved.GetRun().GetRunBaseDir(); spec.GetRunBaseDir() == "" &&
+		baseDir.GetState() == settings.SettingState_SETTING_STATE_VALUE {
+		spec.RunBaseDir = baseDir.GetStringValue()
+	}
+
+	// RawDataStorage carries only this prefix, so replacing the message loses nothing.
+	if rawDataPath := resolved.GetStorage().GetRawDataPath(); spec.GetRawDataStorage().GetRawDataPrefix() == "" &&
+		rawDataPath.GetState() == settings.SettingState_SETTING_STATE_VALUE {
+		spec.RawDataStorage = &task.RawDataStorage{RawDataPrefix: rawDataPath.GetStringValue()}
+	}
 }

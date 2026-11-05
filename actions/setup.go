@@ -21,7 +21,8 @@ import (
 const otelServiceName = "actions-service"
 
 // Setup registers the ActionsService handler on the SetupContext mux.
-// Requires sc.K8sClient and sc.Namespace to be set.
+// Requires sc.K8sClient, sc.K8sCache and sc.Namespace to be set. Call before
+// starting the shared cache so TaskAction indexes can be registered.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
 
@@ -39,6 +40,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 	if err := actionsk8s.InitScheme(); err != nil {
 		return fmt.Errorf("actions: failed to initialize scheme: %w", err)
+	}
+
+	if err := actionsk8s.RegisterTaskActionIndexes(ctx, sc.K8sCache); err != nil {
+		return err
 	}
 
 	runServiceCfg := cfg.RunService

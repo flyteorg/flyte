@@ -25,8 +25,8 @@ func TestNewShardedDeterministicRawOutputPath(t *testing.T) {
 	})
 
 	t.Run("error", func(t *testing.T) {
-		ss := NewConstantShardSelector([]string{"s3:// abc"})
-		sd, err := NewShardedDeterministicRawOutputPath(ctx, ss, "s3://bucket", "m", storage.URLPathConstructor{})
+		ss := NewConstantShardSelector([]string{"x"})
+		sd, err := NewShardedDeterministicRawOutputPath(ctx, ss, "s3:// abc", "m", storage.URLPathConstructor{})
 		assert.Error(t, err, "%s", sd)
 	})
 }
@@ -47,8 +47,8 @@ func TestNewShardedRawOutputPath(t *testing.T) {
 	})
 
 	t.Run("error", func(t *testing.T) {
-		ss := NewConstantShardSelector([]string{"s3:// abc"})
-		sd, err := NewShardedRawOutputPath(ctx, ss, "s3://bucket", make([]string, 0), "m", storage.URLPathConstructor{})
+		ss := NewConstantShardSelector([]string{"x"})
+		sd, err := NewShardedRawOutputPath(ctx, ss, "s3:// abc", make([]string, 0), "m", storage.URLPathConstructor{})
 		assert.Error(t, err, "%s", sd)
 	})
 }

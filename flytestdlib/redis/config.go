@@ -41,7 +41,8 @@ func WithTracerProvider(provider trace.TracerProvider) Option {
 	return func(options *configOptions) { options.tracerProvider = provider }
 }
 
-// WithMeterProvider enables Redis OpenTelemetry metrics with the supplied provider.
+// WithMeterProvider initializes process-wide Redis metrics if not already initialized.
+// The first provider wins; initialize metrics at startup to select a shared provider.
 func WithMeterProvider(provider metric.MeterProvider) Option {
 	return func(options *configOptions) { options.meterProvider = provider }
 }
@@ -309,6 +310,9 @@ func (r Config) NewClient(ctx context.Context, opts ...Option) (redis.UniversalC
 	if err != nil {
 		return nil, err
 	}
+	if err := InitMetrics(runtimeOptions.meterProvider); err != nil {
+		return nil, errors.Wrap(err, "failed to initialize Redis metrics")
+	}
 	var client redis.UniversalClient
 	if r.MasterName == "" && !r.IsClusterMode && len(options.Addrs) <= 1 {
 		simple := options.Simple()
@@ -324,12 +328,6 @@ func (r Config) NewClient(ctx context.Context, opts ...Option) (redis.UniversalC
 		); err != nil {
 			_ = client.Close()
 			return nil, errors.Wrap(err, "failed to instrument Redis tracing")
-		}
-	}
-	if runtimeOptions.meterProvider != nil {
-		if err := redisotel.InstrumentMetrics(client, redisotel.WithMeterProvider(runtimeOptions.meterProvider)); err != nil {
-			_ = client.Close()
-			return nil, errors.Wrap(err, "failed to instrument Redis metrics")
 		}
 	}
 	return client, nil

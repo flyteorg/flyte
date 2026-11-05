@@ -2106,6 +2106,8 @@ func (m *TaskTriggerSpec) validate(all bool) error {
 
 	// no validation rules for Description
 
+	// no validation rules for TaskVersion
+
 	switch v := m.InputWrapper.(type) {
 	case *TaskTriggerSpec_Inputs:
 		if v == nil {

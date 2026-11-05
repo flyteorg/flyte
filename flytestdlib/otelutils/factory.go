@@ -36,8 +36,12 @@ var meterProviders = make(map[string]*sdkmetric.MeterProvider)
 var noopTracerProvider = noop.NewTracerProvider()
 var noopMeterProvider = metricnoop.NewMeterProvider()
 
-// RegisterProvidersWithContext registers a tracer & metric provider for the given service name.
+// RegisterProvidersWithContext registers tracer and metric providers for the service.
+// If already registered, the existing providers are reused.
 func RegisterProvidersWithContext(ctx context.Context, serviceName string, config *Config) error {
+	if tracerProviders[serviceName] != nil && meterProviders[serviceName] != nil {
+		return nil
+	}
 	if config == nil {
 		return nil
 	}

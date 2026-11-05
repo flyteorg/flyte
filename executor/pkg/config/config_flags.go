@@ -79,7 +79,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cacheService.auth.audience"), defaultConfig.CacheService.Auth.Audience, "Cache service OAuth 2.0 token audience")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cluster"), defaultConfig.Cluster, "Cluster identifier for action events")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "defaultK8sServiceAccount"), defaultConfig.DefaultK8sServiceAccount, "Default Kubernetes service account for task pods when the task does not set one")
-	cmdFlags.Int32(fmt.Sprintf("%v%v", prefix, "maxSystemFailures"), defaultConfig.MaxSystemFailures, "Max consecutive system-level failures before forcing permanent failure")
+	cmdFlags.Int32(fmt.Sprintf("%v%v", prefix, "maxSystemFailures"), defaultConfig.MaxSystemFailures, "Max system-level failures per attempt before forcing permanent failure")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "requeueDuration"), defaultConfig.RequeueDuration.String(), "How long to wait before reconciling a running TaskAction again. 0 means the default of 10s")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "gc.interval"), defaultConfig.GC.Interval.String(), "How often the garbage collector runs. 0 disables GC.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "gc.maxTTL"), defaultConfig.GC.MaxTTL.String(), "Time-to-live for terminal TaskActions before deletion. <= 0 deletes terminal TaskActions immediately.")

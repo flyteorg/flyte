@@ -588,6 +588,52 @@ func TestJSONValuesToLiterals(t *testing.T) {
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "values cannot be nil")
 	})
+
+	t.Run("fractional value for integer is rejected", func(t *testing.T) {
+		variableMap := makeVariableMap(map[string]*core.Variable{
+			"num": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
+		})
+
+		values, err := structpb.NewStruct(map[string]any{"num": 2.5})
+		require.NoError(t, err)
+
+		_, err = JSONValuesToLiterals(context.Background(), variableMap, values)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "not a whole number")
+	})
+
+	t.Run("int or float union keeps fractional value", func(t *testing.T) {
+		variableMap := makeVariableMap(map[string]*core.Variable{
+			"num": {Type: &core.LiteralType{Type: &core.LiteralType_UnionType{UnionType: &core.UnionType{
+				Variants: []*core.LiteralType{
+					{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
+					{Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT}},
+				},
+			}}}},
+		})
+
+		values, err := structpb.NewStruct(map[string]any{"num": 2.5})
+		require.NoError(t, err)
+
+		literals, err := JSONValuesToLiterals(context.Background(), variableMap, values)
+		require.NoError(t, err)
+		require.Len(t, literals, 1)
+		union := literals[0].GetValue().GetScalar().GetUnion()
+		require.NotNil(t, union)
+		assert.Equal(t, core.SimpleType_FLOAT, union.GetType().GetSimple())
+		assert.Equal(t, 2.5, union.GetValue().GetScalar().GetPrimitive().GetFloatValue())
+
+		values, err = structpb.NewStruct(map[string]any{"num": 3})
+		require.NoError(t, err)
+
+		literals, err = JSONValuesToLiterals(context.Background(), variableMap, values)
+		require.NoError(t, err)
+		require.Len(t, literals, 1)
+		union = literals[0].GetValue().GetScalar().GetUnion()
+		require.NotNil(t, union)
+		assert.Equal(t, core.SimpleType_INTEGER, union.GetType().GetSimple())
+		assert.Equal(t, int64(3), union.GetValue().GetScalar().GetPrimitive().GetInteger())
+	})
 }
 
 func createSimpleDataclassLiteralSingleType() ([]*task.NamedLiteral, *core.VariableMap) {
