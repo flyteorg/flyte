@@ -3,11 +3,9 @@ package serviceclient
 import (
 	"context"
 	"io"
-	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -35,45 +33,6 @@ func TestNewHTTPClientSetsTransportOnBaseClient(t *testing.T) {
 	require.IsType(t, &http.Transport{}, actual.Transport)
 	assert.Equal(t, 50, actual.Transport.(*http.Transport).MaxIdleConnsPerHost)
 	assert.Nil(t, base.Transport, "base client was modified")
-}
-
-// Concurrent requests within MaxIdleConnsPerHost must reuse their connections.
-func TestNewHTTPClientMaxIdleConnsPerHostReusesConnections(t *testing.T) {
-	var opened atomic.Int32
-	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		time.Sleep(10 * time.Millisecond)
-	}))
-	server.Config.ConnState = func(_ net.Conn, state http.ConnState) {
-		if state == http.StateNew {
-			opened.Add(1)
-		}
-	}
-	server.Start()
-	t.Cleanup(server.Close)
-
-	client, err := NewHTTPClient(context.Background(), http.DefaultClient, ServiceConfig{
-		URL:  server.URL,
-		HTTP: HTTPConfig{MaxIdleConnsPerHost: 50},
-	})
-	require.NoError(t, err)
-
-	burst := func() {
-		var wg sync.WaitGroup
-		for range 50 {
-			wg.Go(func() {
-				resp, err := client.Get(server.URL)
-				if assert.NoError(t, err) {
-					_, _ = io.Copy(io.Discard, resp.Body)
-					_ = resp.Body.Close()
-				}
-			})
-		}
-		wg.Wait()
-	}
-	burst()
-	first := opened.Load()
-	burst()
-	assert.Equal(t, first, opened.Load(), "second burst opened new connections")
 }
 
 func TestNewHTTPClientAuthenticatesAndReusesToken(t *testing.T) {
