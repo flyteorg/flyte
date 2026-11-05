@@ -26,6 +26,7 @@ import (
 	"connectrpc.com/connect"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	metricnoop "go.opentelemetry.io/otel/metric/noop"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -2415,38 +2416,67 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(recorded.RecordedEvents()[0].GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_FAILED))
 		})
 
-		It("removes the finalizer after a restart without the cleanup plugin", func() {
-			nn := createTaskAction("cleanup-missing-plugin")
-			now := time.Now()
-			fake := failingWith(pluginsCore.PhaseInfoFailureWithCleanup(
-				"ContainerCannotRun", "container cannot run", &pluginsCore.TaskInfo{OccurredAt: &now}))
-			fake.abortErrors = []error{stderrors.New("cleanup temporarily unavailable")}
-			recorded := &recordingEventsClient{}
-			request := reconcile.Request{NamespacedName: nn}
-			_, err := newReconciler(fake, recorded).Reconcile(ctx, request)
-			Expect(err).NotTo(HaveOccurred())
+		DescribeTable("allows garbage collection after a restart without the cleanup plugin",
+			func(deleting bool) {
+				nn := createTaskAction(fmt.Sprintf("cleanup-missing-plugin-%t", deleting))
+				now := time.Now()
+				fake := failingWith(pluginsCore.PhaseInfoFailureWithCleanup(
+					"ContainerCannotRun", "container cannot run", &pluginsCore.TaskInfo{OccurredAt: &now}))
+				fake.abortErrors = []error{stderrors.New("cleanup temporarily unavailable")}
+				recorded := &recordingEventsClient{}
+				request := reconcile.Request{NamespacedName: nn}
+				_, err := newReconciler(fake, recorded).Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
 
-			persisted := &flyteorgv1.TaskAction{}
-			Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
-			Expect(isTerminal(persisted)).To(BeTrue())
-			Expect(meta.IsStatusConditionTrue(persisted.Status.Conditions,
-				string(flyteorgv1.ConditionTypeCleanupPending))).To(BeTrue())
-			Expect(k8sClient.Delete(ctx, persisted)).To(Succeed())
+				persisted := &flyteorgv1.TaskAction{}
+				Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+				Expect(isTerminal(persisted)).To(BeTrue())
+				Expect(meta.IsStatusConditionTrue(persisted.Status.Conditions,
+					string(flyteorgv1.ConditionTypeCleanupPending))).To(BeTrue())
+				failure := persisted.Status.ErrorState.DeepCopy()
+				if deleting {
+					Expect(k8sClient.Delete(ctx, persisted)).To(Succeed())
+				}
 
-			restarted := newReconciler(fake, recorded)
-			restarted.PluginRegistry = executorplugin.NewRegistry(nil, emptyPluginRegistry{})
-			Expect(restarted.PluginRegistry.Initialize(ctx)).To(Succeed())
-			result, err := restarted.Reconcile(ctx, request)
-			deleted := errors.IsNotFound(k8sClient.Get(ctx, nn, &flyteorgv1.TaskAction{}))
-			GinkgoWriter.Printf("missing_plugin cleanup_pending=true reconcile_error=%v action_deleted=%t\n", err, deleted)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(result).To(BeZero())
-			Expect(deleted).To(BeTrue())
-			Expect(fake.handleCalls).To(Equal(1))
-			Expect(fake.abortCalls).To(Equal(1))
-			Expect(recorded.RecordedEvents()).To(HaveLen(1))
-			Expect(recorded.RecordedEvents()[0].GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_FAILED))
-		})
+				restarted := newReconciler(fake, recorded)
+				restarted.PluginRegistry = executorplugin.NewRegistry(nil, emptyPluginRegistry{})
+				Expect(restarted.PluginRegistry.Initialize(ctx)).To(Succeed())
+				result, err := restarted.Reconcile(ctx, request)
+				getErr := k8sClient.Get(ctx, nn, persisted)
+				deleted := errors.IsNotFound(getErr)
+				labeled := persisted.Labels[LabelTerminationStatus] == LabelValueTerminated
+				GinkgoWriter.Printf("missing_plugin deleting=%t cleanup_pending=true reconcile_error=%v "+
+					"action_deleted=%t gc_labeled=%t\n",
+					deleting, err, deleted, labeled)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(result).To(BeZero())
+				if deleting {
+					Expect(deleted).To(BeTrue())
+				} else {
+					Expect(getErr).NotTo(HaveOccurred())
+					Expect(labeled).To(BeTrue())
+					Expect(persisted.Status.ErrorState).To(Equal(failure))
+					Expect(meta.IsStatusConditionTrue(persisted.Status.Conditions,
+						string(flyteorgv1.ConditionTypeCleanupPending))).To(BeTrue())
+					gc := NewGarbageCollector(k8sClient, k8sClient, time.Minute, 0, metricnoop.NewMeterProvider())
+					Expect(gc.collect(ctx)).To(Succeed())
+					Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+					deletionRequested := !persisted.DeletionTimestamp.IsZero()
+					Expect(deletionRequested).To(BeTrue())
+					_, err = restarted.Reconcile(ctx, request)
+					Expect(err).NotTo(HaveOccurred())
+					deleted = errors.IsNotFound(k8sClient.Get(ctx, nn, persisted))
+					GinkgoWriter.Printf("missing_plugin_gc deletion_requested=%t action_deleted=%t\n", deletionRequested, deleted)
+					Expect(deleted).To(BeTrue())
+				}
+				Expect(fake.handleCalls).To(Equal(1))
+				Expect(fake.abortCalls).To(Equal(1))
+				Expect(recorded.RecordedEvents()).To(HaveLen(1))
+				Expect(recorded.RecordedEvents()[0].GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_FAILED))
+			},
+			Entry("before deletion", false),
+			Entry("during deletion", true),
+		)
 
 		It("keeps the finalizer of a replacement TaskAction", func() {
 			nn := createTaskAction("cleanup-replaced")

@@ -1231,7 +1231,8 @@ func (r *TaskActionReconciler) reconcileTerminalCleanup(
 	}
 	p, err := r.PluginRegistry.ResolvePlugin(taskAction.Spec.TaskType)
 	if err != nil {
-		return ctrl.Result{}, err
+		log.FromContext(ctx).Error(err, "cannot resolve terminal cleanup plugin; resources may need manual cleanup")
+		return ctrl.Result{}, nil
 	}
 	stateMgr := plugin.NewPluginStateManager(taskAction.Status.PluginState, taskAction.Status.PluginStateVersion)
 	tCtx, err := plugin.NewTaskExecutionContext(
