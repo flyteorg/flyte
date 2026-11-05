@@ -1494,6 +1494,76 @@ func TestCreateRun_RejectsInvalidPodTemplateName(t *testing.T) {
 	assert.ErrorContains(t, err, "pod template name")
 }
 
+func TestCreateRun_RejectsInvalidMetadata(t *testing.T) {
+	tests := []struct {
+		name     string
+		resolved *settings.Settings
+		runSpec  *task.RunSpec
+		wantErr  string
+	}{
+		{
+			name:     "invalid label in the request",
+			resolved: &settings.Settings{},
+			runSpec:  &task.RunSpec{Labels: &task.Labels{Values: map[string]string{"my team": "ml"}}},
+			wantErr:  "invalid label",
+		},
+		{
+			// Settings are validated on write, but a row stored before that check
+			// existed can still carry a bad label, so the merged spec is checked too.
+			name: "invalid label from settings",
+			resolved: &settings.Settings{
+				Labels: mapSetting(stateValue, map[string]string{"team": "ml/infra"}),
+			},
+			wantErr: "invalid label",
+		},
+		{
+			name:     "invalid annotation in the request",
+			resolved: &settings.Settings{},
+			runSpec:  &task.RunSpec{Annotations: &task.Annotations{Values: map[string]string{"my note": "x"}}},
+			wantErr:  "invalid annotations",
+		},
+		{
+			name: "invalid annotation from settings",
+			resolved: &settings.Settings{
+				Annotations: mapSetting(stateValue, map[string]string{"my note": "x"}),
+			},
+			wantErr: "invalid annotations",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// As in TestCreateRun_RejectsInvalidPodTemplateName, everything after the check
+			// stays nil, so a missing check panics instead of passing.
+			svc := &RunService{
+				settingsRepo:  settingsRepoWith(t, tt.resolved),
+				projectClient: newMockProjectClientAlwaysOK(t),
+			}
+
+			req := &workflow.CreateRunRequest{
+				Id: &workflow.CreateRunRequest_RunId{
+					RunId: &common.RunIdentifier{
+						Org:     "org",
+						Project: "proj",
+						Domain:  "dev",
+						Name:    "rq-123",
+					},
+				},
+				InputWrapper: &workflow.CreateRunRequest_Inputs{Inputs: &task.Inputs{}},
+				Task: &workflow.CreateRunRequest_TaskSpec{
+					TaskSpec: &task.TaskSpec{},
+				},
+				RunSpec: tt.runSpec,
+			}
+
+			_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+			require.Error(t, err)
+			assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+			assert.ErrorContains(t, err, tt.wantErr)
+		})
+	}
+}
+
 func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}

@@ -14,7 +14,9 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	apivalidation "k8s.io/apimachinery/pkg/api/validation"
 	"k8s.io/apimachinery/pkg/util/validation"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -158,6 +160,36 @@ func validatePodTemplateName(name string) error {
 		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid pod template name %q: %s", name, strings.Join(errs, "; ")))
 	}
 
+	return nil
+}
+
+// reservedLabelPrefix is the namespace of labels the system sets and reads on
+// TaskActions; a user value there can break status tracking and GC.
+const reservedLabelPrefix = "flyte.org/"
+
+// validateLabels checks that labels are valid Kubernetes labels outside the reserved
+// prefix, so a bad one fails the request instead of the TaskAction CR creation.
+func validateLabels(labels map[string]string) error {
+	for key, value := range labels {
+		if strings.HasPrefix(key, reservedLabelPrefix) {
+			return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid label key %q: the %q prefix is reserved", key, reservedLabelPrefix))
+		}
+		if errs := validation.IsQualifiedName(key); len(errs) > 0 {
+			return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid label key %q: %s", key, strings.Join(errs, "; ")))
+		}
+		if errs := validation.IsValidLabelValue(value); len(errs) > 0 {
+			return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid label value %q for key %q: %s", value, key, strings.Join(errs, "; ")))
+		}
+	}
+	return nil
+}
+
+// validateAnnotations applies the Kubernetes annotation rules (key format and total
+// size), which the TaskAction CR creation would otherwise enforce.
+func validateAnnotations(annotations map[string]string) error {
+	if errs := apivalidation.ValidateAnnotations(annotations, field.NewPath("annotations")); len(errs) > 0 {
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid annotations: %s", errs.ToAggregate()))
+	}
 	return nil
 }
 

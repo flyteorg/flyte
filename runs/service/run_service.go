@@ -295,6 +295,12 @@ func (s *RunService) CreateRun(
 	if err := validatePodTemplateName(runSpec.GetDefaultSettings().GetPodTemplateName()); err != nil {
 		return nil, err
 	}
+	if err := validateLabels(runSpec.GetLabels().GetValues()); err != nil {
+		return nil, err
+	}
+	if err := validateAnnotations(runSpec.GetAnnotations().GetValues()); err != nil {
+		return nil, err
+	}
 
 	// Stamp the run start time, but only for SDKs that understand it (>= 2.3.6) — older task
 	// templates have no {{.runStartTime}} placeholder, so leaving it unset keeps the executor from

@@ -529,6 +529,12 @@ func TestValidateSettings(t *testing.T) {
 		assert.NoError(t, validateSettings(&settings.Settings{}))
 	})
 
+	t.Run("labels outside VALUE state are not checked", func(t *testing.T) {
+		assert.NoError(t, validateSettings(&settings.Settings{
+			Labels: mapSetting(stateUnset, map[string]string{"my team": "ml"}),
+		}))
+	})
+
 	t.Run("valid settings pass", func(t *testing.T) {
 		assert.NoError(t, validateSettings(&settings.Settings{
 			Run: &settings.RunSettings{MaxActionConcurrency: concurrency(stateValue, 64)},
@@ -571,6 +577,20 @@ func TestValidateSettings(t *testing.T) {
 				MaxActionConcurrency: concurrency(stateValue, 1),
 			}},
 			wantPath: "max_action_concurrency",
+		},
+		{
+			name: "invalid label key is reported",
+			input: &settings.Settings{
+				Labels: mapSetting(stateValue, map[string]string{"my team": "ml"}),
+			},
+			wantPath: "label",
+		},
+		{
+			name: "invalid annotation key is reported",
+			input: &settings.Settings{
+				Annotations: mapSetting(stateValue, map[string]string{"my note": "x"}),
+			},
+			wantPath: "annotations",
 		},
 	}
 

@@ -306,6 +306,64 @@ func TestGenerateCacheKeyForTask(t *testing.T) {
 	})
 }
 
+func TestValidateLabels(t *testing.T) {
+	tests := []struct {
+		name    string
+		labels  map[string]string
+		wantErr string
+	}{
+		{name: "nil labels", labels: nil},
+		{name: "valid key and value", labels: map[string]string{"team": "ml"}},
+		{name: "prefixed key and empty value", labels: map[string]string{"example.com/team": ""}},
+		{name: "key with a space", labels: map[string]string{"my team": "ml"}, wantErr: "invalid label key"},
+		{name: "key over 63 characters", labels: map[string]string{strings.Repeat("a", 64): "ml"}, wantErr: "invalid label key"},
+		{name: "value with a slash", labels: map[string]string{"team": "ml/infra"}, wantErr: "invalid label value"},
+		{name: "value over 63 characters", labels: map[string]string{"team": strings.Repeat("a", 64)}, wantErr: "invalid label value"},
+		{name: "reserved flyte.org prefix", labels: map[string]string{"flyte.org/terminal-status-recorded": "true"}, wantErr: "reserved"},
+		{name: "other prefixes are allowed", labels: map[string]string{"sub.flyte.org/team": "ml"}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateLabels(tt.labels)
+			if tt.wantErr == "" {
+				assert.NoError(t, err)
+				return
+			}
+			require.Error(t, err)
+			assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+			assert.ErrorContains(t, err, tt.wantErr)
+		})
+	}
+}
+
+func TestValidateAnnotations(t *testing.T) {
+	tests := []struct {
+		name        string
+		annotations map[string]string
+		wantErr     bool
+	}{
+		{name: "nil annotations", annotations: nil},
+		{name: "prefixed key with free-form value", annotations: map[string]string{"example.com/note": "any value / with spaces"}},
+		{name: "uppercase key is allowed", annotations: map[string]string{"Owner": "alice"}},
+		{name: "key with a space", annotations: map[string]string{"my note": "x"}, wantErr: true},
+		{name: "over the total size limit", annotations: map[string]string{"note": strings.Repeat("a", 256*1024)}, wantErr: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateAnnotations(tt.annotations)
+			if !tt.wantErr {
+				assert.NoError(t, err)
+				return
+			}
+			require.Error(t, err)
+			assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+			assert.ErrorContains(t, err, "invalid annotations")
+		})
+	}
+}
+
 func TestValidatePodTemplateName(t *testing.T) {
 	tests := []struct {
 		name    string

@@ -273,7 +273,13 @@ func validateSettings(s *settings.Settings) error {
 	if err := validateTaskResourceDefaults("task_resource.max", s.GetTaskResource().GetMax()); err != nil {
 		return err
 	}
-	return validateDefaultAccelerator(s.GetTaskResource().GetDefaultAccelerator())
+	if err := validateDefaultAccelerator(s.GetTaskResource().GetDefaultAccelerator()); err != nil {
+		return err
+	}
+	if err := validateLabels(valueEntries(s.GetLabels())); err != nil {
+		return err
+	}
+	return validateAnnotations(valueEntries(s.GetAnnotations()))
 }
 
 var _ settingsconnect.SettingsServiceHandler = (*SettingsService)(nil)
