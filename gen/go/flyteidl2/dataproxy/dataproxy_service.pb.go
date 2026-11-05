@@ -719,8 +719,8 @@ type CreateDownloadLinkRequest_TaskId struct {
 }
 
 type CreateDownloadLinkRequest_ArtifactId struct {
-	// ArtifactId identifies the artifact whose card (ARTIFACT_TYPE_CARD) is to be downloaded. The card's location
-	// is resolved by the server from the artifact record. An empty version resolves to the latest version.
+	// ArtifactId identifies the artifact version whose card (ARTIFACT_TYPE_CARD) is to be downloaded. The card's
+	// location is resolved by the server from the artifact record.
 	ArtifactId *artifact.ArtifactIdentifier `protobuf:"bytes,6,opt,name=artifact_id,json=artifactId,proto3,oneof"`
 }
 

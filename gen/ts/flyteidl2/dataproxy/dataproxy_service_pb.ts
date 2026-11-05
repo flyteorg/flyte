@@ -366,8 +366,8 @@ export type CreateDownloadLinkRequest = Message<"flyteidl2.dataproxy.CreateDownl
     case: "taskId";
   } | {
     /**
-     * ArtifactId identifies the artifact whose card (ARTIFACT_TYPE_CARD) is to be downloaded. The card's location
-     * is resolved by the server from the artifact record. An empty version resolves to the latest version.
+     * ArtifactId identifies the artifact version whose card (ARTIFACT_TYPE_CARD) is to be downloaded. The card's
+     * location is resolved by the server from the artifact record.
      *
      * @generated from field: flyteidl2.artifact.ArtifactIdentifier artifact_id = 6;
      */

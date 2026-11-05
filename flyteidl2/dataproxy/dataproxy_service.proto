@@ -192,8 +192,8 @@ message CreateDownloadLinkRequest {
     common.ActionAttemptIdentifier action_attempt_id = 3;
     flyteidl2.app.Identifier app_id = 4;
     flyteidl2.task.TaskIdentifier task_id = 5;
-    // ArtifactId identifies the artifact whose card (ARTIFACT_TYPE_CARD) is to be downloaded. The card's location
-    // is resolved by the server from the artifact record. An empty version resolves to the latest version.
+    // ArtifactId identifies the artifact version whose card (ARTIFACT_TYPE_CARD) is to be downloaded. The card's
+    // location is resolved by the server from the artifact record.
     flyteidl2.artifact.ArtifactIdentifier artifact_id = 6;
   }
 }
