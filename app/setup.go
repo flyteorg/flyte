@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
@@ -63,7 +64,7 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	if sc.BaseURL != "" {
 		internalAppServiceCfg.URL = sc.BaseURL
 	}
-	internalHTTPClient, err := serviceclient.NewHTTPClient(ctx, nil, internalAppServiceCfg)
+	internalHTTPClient, err := serviceclient.NewHTTPClient(ctx, http.DefaultClient, internalAppServiceCfg)
 	if err != nil {
 		return fmt.Errorf("app: configure internal app service client: %w", err)
 	}

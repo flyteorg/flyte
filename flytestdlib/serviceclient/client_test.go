@@ -51,7 +51,7 @@ func TestNewHTTPClientMaxIdleConnsPerHostReusesConnections(t *testing.T) {
 	server.Start()
 	t.Cleanup(server.Close)
 
-	client, err := NewHTTPClient(context.Background(), nil, ServiceConfig{
+	client, err := NewHTTPClient(context.Background(), http.DefaultClient, ServiceConfig{
 		URL:  server.URL,
 		HTTP: HTTPConfig{MaxIdleConnsPerHost: 50},
 	})

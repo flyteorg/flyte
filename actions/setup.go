@@ -3,6 +3,7 @@ package actions
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
@@ -49,7 +50,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if sc.BaseURL != "" {
 		runServiceCfg.URL = sc.BaseURL
 	}
-	runHTTPClient, err := serviceclient.NewHTTPClient(ctx, nil, runServiceCfg)
+	runHTTPClient, err := serviceclient.NewHTTPClient(ctx, http.DefaultClient, runServiceCfg)
 	if err != nil {
 		return fmt.Errorf("actions: configure run service client: %w", err)
 	}

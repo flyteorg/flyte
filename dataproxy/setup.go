@@ -47,7 +47,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if sc.BaseURL != "" {
 		runServiceCfg.URL = sc.BaseURL
 	}
-	runHTTPClient, err := serviceclient.NewHTTPClient(ctx, nil, runServiceCfg)
+	runHTTPClient, err := serviceclient.NewHTTPClient(ctx, http.DefaultClient, runServiceCfg)
 	if err != nil {
 		return fmt.Errorf("dataproxy: configure runs service client: %w", err)
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
@@ -228,11 +229,11 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		cacheServiceCfg.URL = sc.BaseURL
 	}
 
-	eventsHTTPClient, err := serviceclient.NewHTTPClient(ctx, nil, eventsServiceCfg)
+	eventsHTTPClient, err := serviceclient.NewHTTPClient(ctx, http.DefaultClient, eventsServiceCfg)
 	if err != nil {
 		return fmt.Errorf("executor: configure events service client: %w", err)
 	}
-	cacheHTTPClient, err := serviceclient.NewHTTPClient(ctx, nil, cacheServiceCfg)
+	cacheHTTPClient, err := serviceclient.NewHTTPClient(ctx, http.DefaultClient, cacheServiceCfg)
 	if err != nil {
 		return fmt.Errorf("executor: configure cache service client: %w", err)
 	}
