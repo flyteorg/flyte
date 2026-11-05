@@ -1624,6 +1624,76 @@ func TestCreateRun_AppliesSettingsQueue(t *testing.T) {
 	require.NoError(t, err)
 }
 
+// TestCreateRun_AppliesSettingsMaps mirrors the #8314 acceptance flow at the service
+// boundary: project settings carry an env var and a label, the request sets the same
+// env key, and the RunSpec handed to the actions service (and stored on the run)
+// carries the settings label and the request's env value.
+func TestCreateRun_AppliesSettingsMaps(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	dataStore := &storage.DataStore{ComposedProtobufStore: store}
+
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(taskRepo)
+
+	svc := &RunService{
+		repo: repo,
+		settingsRepo: settingsRepoWith(t, &settings.Settings{
+			Labels:               mapSetting(stateValue, map[string]string{"team": "ml"}),
+			EnvironmentVariables: mapSetting(stateValue, map[string]string{"LOG_LEVEL": "info", "REGION": "us-east-1"}),
+		}),
+		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
+		storagePrefix: "s3://flyte-data",
+		dataStore:     dataStore,
+	}
+
+	req := &workflow.CreateRunRequest{
+		Id: &workflow.CreateRunRequest_RunId{
+			RunId: &common.RunIdentifier{
+				Org:     "org",
+				Project: "proj",
+				Domain:  "dev",
+				Name:    "rq-123",
+			},
+		},
+		InputWrapper: &workflow.CreateRunRequest_Inputs{Inputs: &task.Inputs{}},
+		Task: &workflow.CreateRunRequest_TaskSpec{
+			TaskSpec: &task.TaskSpec{},
+		},
+		RunSpec: &task.RunSpec{Envs: envs("LOG_LEVEL", "debug")},
+	}
+
+	wantLabels := map[string]string{"team": "ml"}
+	wantEnvs := envs("LOG_LEVEL", "debug", "REGION", "us-east-1")
+	matches := func(rs *task.RunSpec) bool {
+		return assert.ObjectsAreEqual(wantLabels, rs.GetLabels().GetValues()) && proto.Equal(wantEnvs, rs.GetEnvs())
+	}
+
+	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+
+	actionRepo.On("CreateAction", mock.Anything, mock.MatchedBy(func(m *models.Run) bool {
+		var rs task.RunSpec
+		_ = proto.Unmarshal(m.RunSpec, &rs)
+		return matches(&rs)
+	}), mock.Anything).Return(&models.Run{
+		Project: "proj",
+		Domain:  "dev",
+		Name:    "rq-123",
+	}, nil).Once()
+
+	actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(req *connect.Request[actions.EnqueueRequest]) bool {
+		return matches(req.Msg.GetRunSpec())
+	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
+
+	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	require.NoError(t, err)
+}
+
 func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
