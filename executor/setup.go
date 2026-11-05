@@ -144,6 +144,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	mgr, err := ctrl.NewManager(sc.K8sConfig, ctrl.Options{
 		Scheme:                 scheme,
 		Metrics:                metricsServerOptions,
+		PprofBindAddress:       cfg.PprofBindAddress,
 		Cache:                  cacheOptions,
 		WebhookServer:          webhook.NewServer(webhookServerOptions),
 		HealthProbeBindAddress: cfg.HealthProbeBindAddress,

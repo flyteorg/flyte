@@ -124,6 +124,11 @@ spec:
             - name: metrics
               containerPort: {{ $.Values.configuration.executor.metricsPort }}
               protocol: TCP
+            {{- if $.Values.configuration.executor.pprofPort }}
+            - name: pprof
+              containerPort: {{ $.Values.configuration.executor.pprofPort }}
+              protocol: TCP
+            {{- end }}
             - name: health
               containerPort: {{ $.Values.configuration.executor.healthProbePort }}
               protocol: TCP

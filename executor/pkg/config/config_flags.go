@@ -51,6 +51,7 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "metricsBindAddress"), defaultConfig.MetricsBindAddress, "Address the metrics endpoint binds to")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "pprofBindAddress"), defaultConfig.PprofBindAddress, "Address the pprof endpoint binds to; empty or 0 disables profiling")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "healthProbeBindAddress"), defaultConfig.HealthProbeBindAddress, "Address the probe endpoint binds to")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "leaderElect"), defaultConfig.LeaderElect, "Enable leader election for controller manager")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "metricsSecure"), defaultConfig.MetricsSecure, "Serve metrics endpoint via HTTPS")

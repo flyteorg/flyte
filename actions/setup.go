@@ -25,6 +25,7 @@ const otelServiceName = "actions-service"
 // starting the shared cache so TaskAction indexes can be registered.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
+	sc.AddProfilingServer("actions", cfg.PprofPort)
 
 	otelCfg := otelutils.GetConfig()
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
