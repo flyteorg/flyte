@@ -65,5 +65,6 @@ func (cfg DataProxyConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.clientSecretFile"), defaultConfig.RunService.Auth.ClientSecretFile, "File containing the Runs service OAuth 2.0 client secret")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "runService.auth.scopes"), defaultConfig.RunService.Auth.Scopes, "Runs service OAuth 2.0 scopes")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.audience"), defaultConfig.RunService.Auth.Audience, "Runs service OAuth 2.0 token audience")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "runService.http.maxIdleConnsPerHost"), defaultConfig.RunService.HTTP.MaxIdleConnsPerHost, "Runs service idle connections kept per host; 0 uses Go's default of 2")
 	return cmdFlags
 }

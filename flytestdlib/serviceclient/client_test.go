@@ -23,8 +23,8 @@ func TestNewHTTPClientDisabledReturnsBaseClient(t *testing.T) {
 	assert.Same(t, base, actual)
 }
 
-// Concurrent requests through the default base client must reuse their connections.
-func TestNewHTTPClientDefaultReusesConnections(t *testing.T) {
+// Concurrent requests within MaxIdleConnsPerHost must reuse their connections.
+func TestNewHTTPClientMaxIdleConnsPerHostReusesConnections(t *testing.T) {
 	var opened atomic.Int32
 	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		time.Sleep(10 * time.Millisecond)
@@ -37,7 +37,10 @@ func TestNewHTTPClientDefaultReusesConnections(t *testing.T) {
 	server.Start()
 	t.Cleanup(server.Close)
 
-	client, err := NewHTTPClient(context.Background(), nil, ServiceConfig{URL: server.URL})
+	client, err := NewHTTPClient(context.Background(), nil, ServiceConfig{
+		URL:  server.URL,
+		HTTP: HTTPConfig{MaxIdleConnsPerHost: 50},
+	})
 	require.NoError(t, err)
 
 	burst := func() {

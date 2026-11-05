@@ -18,24 +18,20 @@ import (
 const (
 	oauthAuthorizationServerMetadataPath = "/.well-known/oauth-authorization-server"
 	defaultDiscoveryTimeout              = 10 * time.Second
-	// maxIdleConnsPerHost covers the executor's default 512 concurrent reconciles.
-	maxIdleConnsPerHost = 512
 )
-
-// pooledClient keeps an idle connection per concurrent caller, so bursts reuse connections.
-var pooledClient = &http.Client{Transport: newPooledTransport()}
-
-func newPooledTransport() *http.Transport {
-	t := http.DefaultTransport.(*http.Transport).Clone()
-	t.MaxIdleConns = 0
-	t.MaxIdleConnsPerHost = maxIdleConnsPerHost
-	return t
-}
 
 // ServiceConfig describes a downstream service and how to authenticate to it.
 type ServiceConfig struct {
 	URL  string     `json:"url" pflag:",Service base URL"`
 	Auth AuthConfig `json:"auth" pflag:",Service authentication"`
+	HTTP HTTPConfig `json:"http" pflag:",Service HTTP client"`
+}
+
+// HTTPConfig tunes the HTTP client built when NewHTTPClient is given no base client.
+type HTTPConfig struct {
+	// MaxIdleConnsPerHost should cover the caller's request concurrency, or bursts
+	// open fresh connections and exhaust ephemeral ports in TIME_WAIT.
+	MaxIdleConnsPerHost int `json:"maxIdleConnsPerHost" pflag:",Idle connections kept per host; 0 uses Go's default of 2"`
 }
 
 // AuthType identifies the authentication mechanism used for service requests.
@@ -64,10 +60,11 @@ func (c AuthConfig) hasSettings() bool {
 		c.ClientSecretFile != "" || len(c.Scopes) > 0 || c.Audience != ""
 }
 
-// NewHTTPClient returns an HTTP client configured for the service.
+// NewHTTPClient returns an HTTP client configured for the service. A nil base
+// gets a new client built from cfg.HTTP.
 func NewHTTPClient(ctx context.Context, base *http.Client, cfg ServiceConfig) (*http.Client, error) {
 	if base == nil {
-		base = pooledClient
+		base = newBaseClient(cfg.HTTP)
 	}
 	if cfg.URL == "" {
 		return nil, fmt.Errorf("service client: url is required")
@@ -83,6 +80,15 @@ func NewHTTPClient(ctx context.Context, base *http.Client, cfg ServiceConfig) (*
 	default:
 		return nil, fmt.Errorf("service client auth: unsupported type %q", cfg.Auth.Type)
 	}
+}
+
+func newBaseClient(cfg HTTPConfig) *http.Client {
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	if cfg.MaxIdleConnsPerHost > 0 {
+		transport.MaxIdleConns = 0
+		transport.MaxIdleConnsPerHost = cfg.MaxIdleConnsPerHost
+	}
+	return &http.Client{Transport: transport}
 }
 
 func newOAuth2ClientCredentialsClient(ctx context.Context, base *http.Client, authCfg AuthConfig) (*http.Client, error) {
