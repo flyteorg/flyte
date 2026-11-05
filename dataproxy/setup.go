@@ -30,6 +30,7 @@ const otelServiceName = "dataproxy-service"
 // Requires sc.DataStore to be set.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
+	sc.AddProfilingServer("dataproxy", cfg.PprofPort)
 
 	otelCfg := otelutils.GetConfig()
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {

@@ -66,6 +66,7 @@ func deployTriggerInterceptor() connect.UnaryInterceptorFunc {
 // Requires sc.DB and sc.DataStore to be set.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
+	sc.AddProfilingServer("runs", cfg.PprofPort)
 	if err := migrations.RunMigrations(ctx, sc.DB); err != nil {
 		return fmt.Errorf("runs: failed to run migrations: %w", err)
 	}

@@ -50,5 +50,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted EventsProxyService at %s", path)
 
+	sc.AddProfilingServer("events", cfg.PprofPort)
+
 	return nil
 }

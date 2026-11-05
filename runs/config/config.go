@@ -59,6 +59,9 @@ type Config struct {
 	// HTTP server configuration
 	Server ServerConfig `json:"server"`
 
+	// PprofPort is the port the pprof endpoint binds to. 0 disables profiling.
+	PprofPort int `json:"pprofPort" pflag:",Port the pprof endpoint binds to; 0 disables profiling"`
+
 	// Database configuration
 	Database database.DbConfig `json:"database"`
 

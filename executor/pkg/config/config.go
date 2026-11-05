@@ -43,6 +43,9 @@ type Config struct {
 	// Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable.
 	MetricsBindAddress string `json:"metricsBindAddress" pflag:",Address the metrics endpoint binds to"`
 
+	// PprofBindAddress is the address the pprof endpoint binds to. Empty or "0" disables profiling.
+	PprofBindAddress string `json:"pprofBindAddress" pflag:",Address the pprof endpoint binds to; empty or 0 disables profiling"`
+
 	// HealthProbeBindAddress is the address the probe endpoint binds to.
 	HealthProbeBindAddress string `json:"healthProbeBindAddress" pflag:",Address the probe endpoint binds to"`
 

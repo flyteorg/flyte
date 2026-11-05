@@ -37,6 +37,7 @@ func SetupInternal(ctx context.Context, sc *stdlibapp.SetupContext) error {
 // cfg.InternalAppService points at the data plane host.
 func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	cfg := appconfig.GetAppConfig()
+	sc.AddProfilingServer("app", cfg.PprofPort)
 
 	otelCfg := otelutils.GetConfig()
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {

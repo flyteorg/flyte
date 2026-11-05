@@ -24,6 +24,9 @@ type Config struct {
 	// HTTP server configuration.
 	Server ServerConfig `json:"server"`
 
+	// PprofPort is the port the pprof endpoint binds to. 0 disables profiling.
+	PprofPort int `json:"pprofPort" pflag:",Port the pprof endpoint binds to; 0 disables profiling"`
+
 	// RunService configures the internal run service client.
 	RunService serviceclient.ServiceConfig `json:"runService" pflag:",Internal run service client configuration"`
 }

@@ -37,6 +37,9 @@ type Config struct {
 	// HTTP server configuration
 	Server ServerConfig `json:"server"`
 
+	// PprofPort is the port the pprof endpoint binds to. 0 disables profiling.
+	PprofPort int `json:"pprofPort" pflag:",Port the pprof endpoint binds to; 0 disables profiling"`
+
 	// Kubernetes configuration (namespace where TaskAction CRs live; the unified
 	// binary shares the manager's client, this is read by the standalone cmd).
 	Kubernetes app.K8sConfig `json:"kubernetes"`
