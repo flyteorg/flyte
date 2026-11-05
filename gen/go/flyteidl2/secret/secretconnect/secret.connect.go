@@ -94,6 +94,7 @@ func NewSecretServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			httpClient,
 			baseURL+SecretServiceGetSecretProcedure,
 			connect.WithSchema(secretServiceGetSecretMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		deleteSecret: connect.NewClient[secret.DeleteSecretRequest, secret.DeleteSecretResponse](
@@ -177,6 +178,7 @@ func NewSecretServiceHandler(svc SecretServiceHandler, opts ...connect.HandlerOp
 		SecretServiceGetSecretProcedure,
 		svc.GetSecret,
 		connect.WithSchema(secretServiceGetSecretMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	secretServiceDeleteSecretHandler := connect.NewUnaryHandler(
