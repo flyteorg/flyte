@@ -85,7 +85,7 @@ func NewSecretServiceWithConfig(ctx context.Context, k8sClient client.Client, we
 	if webhookCfg.URL == "" {
 		return NewSecretService(k8sClient, ""), nil
 	}
-	httpClient, err := serviceclient.NewHTTPClient(ctx, nil, webhookCfg)
+	httpClient, err := serviceclient.NewHTTPClient(ctx, &http.Client{Timeout: cacheInvalidationTimeout}, webhookCfg)
 	if err != nil {
 		return nil, err
 	}

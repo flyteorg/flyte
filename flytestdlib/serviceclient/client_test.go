@@ -17,10 +17,24 @@ import (
 )
 
 func TestNewHTTPClientDisabledReturnsBaseClient(t *testing.T) {
-	base := &http.Client{Timeout: time.Second}
+	base := &http.Client{Timeout: time.Second, Transport: http.DefaultTransport}
 	actual, err := NewHTTPClient(context.Background(), base, ServiceConfig{URL: "http://service"})
 	require.NoError(t, err)
-	assert.Same(t, base, actual)
+	assert.Equal(t, base, actual)
+}
+
+// A base client without a transport keeps its timeout and gets one built from cfg.HTTP.
+func TestNewHTTPClientSetsTransportOnBaseClient(t *testing.T) {
+	base := &http.Client{Timeout: time.Second}
+	actual, err := NewHTTPClient(context.Background(), base, ServiceConfig{
+		URL:  "http://service",
+		HTTP: HTTPConfig{MaxIdleConnsPerHost: 50},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, time.Second, actual.Timeout)
+	require.IsType(t, &http.Transport{}, actual.Transport)
+	assert.Equal(t, 50, actual.Transport.(*http.Transport).MaxIdleConnsPerHost)
+	assert.Nil(t, base.Transport, "base client was modified")
 }
 
 // Concurrent requests within MaxIdleConnsPerHost must reuse their connections.

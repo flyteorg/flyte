@@ -27,7 +27,7 @@ type ServiceConfig struct {
 	HTTP HTTPConfig `json:"http" pflag:",Service HTTP client"`
 }
 
-// HTTPConfig tunes the HTTP client built when NewHTTPClient is given no base client.
+// HTTPConfig tunes the transport NewHTTPClient sets when the base client has none.
 type HTTPConfig struct {
 	// MaxIdleConnsPerHost should cover the caller's request concurrency, or bursts
 	// open fresh connections and exhaust ephemeral ports in TIME_WAIT.
@@ -62,9 +62,14 @@ func (c AuthConfig) hasSettings() bool {
 
 // NewHTTPClient returns an HTTP client configured for the service.
 func NewHTTPClient(ctx context.Context, base *http.Client, cfg ServiceConfig) (*http.Client, error) {
-	if base == nil {
-		base = newBaseClient(cfg.HTTP)
+	client := http.Client{}
+	if base != nil {
+		client = *base
 	}
+	if client.Transport == nil {
+		client.Transport = newTransport(cfg.HTTP)
+	}
+	base = &client
 	if cfg.URL == "" {
 		return nil, fmt.Errorf("service client: url is required")
 	}
@@ -81,13 +86,13 @@ func NewHTTPClient(ctx context.Context, base *http.Client, cfg ServiceConfig) (*
 	}
 }
 
-func newBaseClient(cfg HTTPConfig) *http.Client {
+func newTransport(cfg HTTPConfig) *http.Transport {
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	if cfg.MaxIdleConnsPerHost > 0 {
 		transport.MaxIdleConns = 0
 		transport.MaxIdleConnsPerHost = cfg.MaxIdleConnsPerHost
 	}
-	return &http.Client{Transport: transport}
+	return transport
 }
 
 func newOAuth2ClientCredentialsClient(ctx context.Context, base *http.Client, authCfg AuthConfig) (*http.Client, error) {
