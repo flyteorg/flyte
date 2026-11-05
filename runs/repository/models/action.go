@@ -107,6 +107,11 @@ type Action struct {
 	// interruptible, cluster, etc.) for this action's run.
 	RunSpec []byte `db:"run_spec"`
 
+	// Labels is the run's labels (RunSpec.labels) as a JSON object, stored on the root
+	// action only, so runs can be filtered by label. NULL on child actions and on runs
+	// created before the column existed.
+	Labels []byte `db:"labels"`
+
 	// Abort tracking — set when a user requests abort; cleared once the pod is confirmed terminated.
 	AbortRequestedAt  *time.Time `db:"abort_requested_at"`
 	AbortAttemptCount int        `db:"abort_attempt_count"`
@@ -142,6 +147,11 @@ func (a *Action) Clone() *Action {
 		actionDetails := make([]byte, len(a.ActionDetails))
 		copy(actionDetails, a.ActionDetails)
 		cloned.ActionDetails = actionDetails
+	}
+	if a.Labels != nil {
+		labels := make([]byte, len(a.Labels))
+		copy(labels, a.Labels)
+		cloned.Labels = labels
 	}
 
 	return &cloned

@@ -18,14 +18,24 @@ func podTemplateSettings(name *settings.StringSetting) *settings.Settings {
 	return &settings.Settings{PodTemplateName: name}
 }
 
+func runBaseDirSettings(baseDir *settings.StringSetting) *settings.Settings {
+	return &settings.Settings{Run: &settings.RunSettings{RunBaseDir: baseDir}}
+}
+
+func rawDataSettings(rawDataPath *settings.StringSetting) *settings.Settings {
+	return &settings.Settings{Storage: &settings.StorageSettings{RawDataPath: rawDataPath}}
+}
+
 func TestApplyRunSettings(t *testing.T) {
 	tests := []struct {
-		name            string
-		spec            *task.RunSpec
-		resolved        *settings.Settings
-		wantQueue       string
-		wantConcurrency uint32
-		wantPodTemplate string
+		name              string
+		spec              *task.RunSpec
+		resolved          *settings.Settings
+		wantQueue         string
+		wantConcurrency   uint32
+		wantPodTemplate   string
+		wantRunBaseDir    string
+		wantRawDataPrefix string
 	}{
 		{
 			name:      "empty queue takes the settings value",
@@ -91,6 +101,50 @@ func TestApplyRunSettings(t *testing.T) {
 			resolved:        podTemplateSettings(&settings.StringSetting{State: stateInherit, StringValue: "gpu-template"}),
 			wantPodTemplate: "",
 		},
+		{
+			name:           "empty run base dir takes the settings value",
+			spec:           &task.RunSpec{},
+			resolved:       runBaseDirSettings(&settings.StringSetting{State: stateValue, StringValue: "s3://settings-base"}),
+			wantRunBaseDir: "s3://settings-base",
+		},
+		{
+			name:           "an explicit run base dir wins over settings",
+			spec:           &task.RunSpec{RunBaseDir: "s3://user-base"},
+			resolved:       runBaseDirSettings(&settings.StringSetting{State: stateValue, StringValue: "s3://settings-base"}),
+			wantRunBaseDir: "s3://user-base",
+		},
+		{
+			name:           "a run base dir in INHERIT contributes nothing",
+			spec:           &task.RunSpec{},
+			resolved:       runBaseDirSettings(&settings.StringSetting{State: stateInherit, StringValue: "s3://settings-base"}),
+			wantRunBaseDir: "",
+		},
+		{
+			name:              "empty raw data prefix takes the settings value",
+			spec:              &task.RunSpec{},
+			resolved:          rawDataSettings(&settings.StringSetting{State: stateValue, StringValue: "s3://settings-raw"}),
+			wantRawDataPrefix: "s3://settings-raw",
+		},
+		{
+			name:              "an explicit raw data prefix wins over settings",
+			spec:              &task.RunSpec{RawDataStorage: &task.RawDataStorage{RawDataPrefix: "s3://user-raw"}},
+			resolved:          rawDataSettings(&settings.StringSetting{State: stateValue, StringValue: "s3://settings-raw"}),
+			wantRawDataPrefix: "s3://user-raw",
+		},
+		{
+			name:              "a raw data path in UNSET contributes nothing",
+			spec:              &task.RunSpec{},
+			resolved:          rawDataSettings(&settings.StringSetting{State: stateUnset, StringValue: "s3://settings-raw"}),
+			wantRawDataPrefix: "",
+		},
+		{
+			// Present but empty still counts as no request value. Guarding on a nil
+			// RawDataStorage instead would skip this row and leave the prefix empty.
+			name:              "a raw data storage message with no prefix takes the settings value",
+			spec:              &task.RunSpec{RawDataStorage: &task.RawDataStorage{}},
+			resolved:          rawDataSettings(&settings.StringSetting{State: stateValue, StringValue: "s3://settings-raw"}),
+			wantRawDataPrefix: "s3://settings-raw",
+		},
 	}
 
 	for _, tt := range tests {
@@ -99,6 +153,8 @@ func TestApplyRunSettings(t *testing.T) {
 			assert.Equal(t, tt.wantQueue, tt.spec.GetQueue())
 			assert.Equal(t, tt.wantConcurrency, tt.spec.GetMaxActionConcurrency())
 			assert.Equal(t, tt.wantPodTemplate, tt.spec.GetDefaultSettings().GetPodTemplateName())
+			assert.Equal(t, tt.wantRunBaseDir, tt.spec.GetRunBaseDir())
+			assert.Equal(t, tt.wantRawDataPrefix, tt.spec.GetRawDataStorage().GetRawDataPrefix())
 		})
 	}
 }

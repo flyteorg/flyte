@@ -112,6 +112,7 @@ func NewDataProxyServiceClient(httpClient connect.HTTPClient, baseURL string, op
 			httpClient,
 			baseURL+DataProxyServiceTailLogsProcedure,
 			connect.WithSchema(dataProxyServiceTailLogsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -199,6 +200,7 @@ func NewDataProxyServiceHandler(svc DataProxyServiceHandler, opts ...connect.Han
 		DataProxyServiceTailLogsProcedure,
 		svc.TailLogs,
 		connect.WithSchema(dataProxyServiceTailLogsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/flyteidl2.dataproxy.DataProxyService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

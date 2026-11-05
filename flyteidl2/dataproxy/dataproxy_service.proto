@@ -40,7 +40,9 @@ service DataProxyService {
   }
 
   // Stream logs for an action attempt.
-  rpc TailLogs(TailLogsRequest) returns (stream TailLogsResponse) {}
+  rpc TailLogs(TailLogsRequest) returns (stream TailLogsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 // CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.

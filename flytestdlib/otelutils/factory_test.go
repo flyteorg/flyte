@@ -43,3 +43,30 @@ func TestNewSpan(t *testing.T) {
 	_, span := NewSpan(ctx, "bar", "baz/bat")
 	span.End()
 }
+
+func TestRegisterProvidersWithContextReusesProviders(t *testing.T) {
+	ctx := context.Background()
+	const serviceName = "ensure-providers-test"
+	cfg := Config{
+		ExporterType:  FileExporter,
+		FileConfig:    FileConfig{Filename: t.TempDir() + "/telemetry.json"},
+		SamplerConfig: SamplerConfig{ParentSampler: AlwaysSample},
+	}
+	t.Cleanup(func() {
+		if tp := tracerProviders[serviceName]; tp != nil {
+			assert.NoError(t, tp.Shutdown(ctx))
+		}
+		if mp := meterProviders[serviceName]; mp != nil {
+			assert.NoError(t, mp.Shutdown(ctx))
+		}
+		delete(tracerProviders, serviceName)
+		delete(meterProviders, serviceName)
+	})
+	if !assert.NoError(t, RegisterProvidersWithContext(ctx, serviceName, &cfg)) {
+		return
+	}
+	tp, mp := GetTracerProvider(serviceName), GetMeterProvider(serviceName)
+	assert.NoError(t, RegisterProvidersWithContext(ctx, serviceName, &cfg))
+	assert.Same(t, tp, GetTracerProvider(serviceName))
+	assert.Same(t, mp, GetMeterProvider(serviceName))
+}

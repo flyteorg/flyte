@@ -17,7 +17,7 @@ from flyteidl2.task import run_pb2 as flyteidl2_dot_task_dot_run__pb2
 from flyteidl2.workflow import run_definition_pb2 as flyteidl2_dot_workflow_dot_run__definition__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n&flyteidl2/workflow/queue_service.proto\x12\x12\x66lyteidl2.workflow\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x18\x66lyteidl2/task/run.proto\x1a\'flyteidl2/workflow/run_definition.proto\"\xa7\x04\n\x14\x45nqueueActionRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x31\n\x12parent_action_name\x18\x02 \x01(\tH\x01R\x10parentActionName\x88\x01\x01\x12\x32\n\x08run_spec\x18\x03 \x01(\x0b\x32\x17.flyteidl2.task.RunSpecR\x07runSpec\x12$\n\tinput_uri\x18\x06 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x08inputUri\x12/\n\x0frun_output_base\x18\x07 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\rrunOutputBase\x12\x14\n\x05group\x18\x08 \x01(\tR\x05group\x12\x18\n\x07subject\x18\t \x01(\tR\x07subject\x12\x34\n\x04task\x18\n \x01(\x0b\x32\x1e.flyteidl2.workflow.TaskActionH\x00R\x04task\x12\x37\n\x05trace\x18\x0b \x01(\x0b\x32\x1f.flyteidl2.workflow.TraceActionH\x00R\x05trace\x12\x43\n\tcondition\x18\x0c \x01(\x0b\x32#.flyteidl2.workflow.ConditionActionH\x00R\tconditionB\r\n\x04spec\x12\x05\xbaH\x02\x08\x01\x42\x15\n\x13_parent_action_name\"\x17\n\x15\x45nqueueActionResponse\"\x7f\n\x15\x41\x62ortQueuedRunRequest\x12>\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05runId\x12\x1b\n\x06reason\x18\x02 \x01(\tH\x00R\x06reason\x88\x01\x01\x42\t\n\x07_reason\"\x18\n\x16\x41\x62ortQueuedRunResponse\"\x8b\x01\n\x18\x41\x62ortQueuedActionRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x1b\n\x06reason\x18\x02 \x01(\tH\x00R\x06reason\x88\x01\x01\x42\t\n\x07_reason\"\x1b\n\x19\x41\x62ortQueuedActionResponse2\xd5\x02\n\x0cQueueService\x12\x66\n\rEnqueueAction\x12(.flyteidl2.workflow.EnqueueActionRequest\x1a).flyteidl2.workflow.EnqueueActionResponse\"\x00\x12i\n\x0e\x41\x62ortQueuedRun\x12).flyteidl2.workflow.AbortQueuedRunRequest\x1a*.flyteidl2.workflow.AbortQueuedRunResponse\"\x00\x12r\n\x11\x41\x62ortQueuedAction\x12,.flyteidl2.workflow.AbortQueuedActionRequest\x1a-.flyteidl2.workflow.AbortQueuedActionResponse\"\x00\x42\xce\x01\n\x16\x63om.flyteidl2.workflowB\x11QueueServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n&flyteidl2/workflow/queue_service.proto\x12\x12\x66lyteidl2.workflow\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x18\x66lyteidl2/task/run.proto\x1a\'flyteidl2/workflow/run_definition.proto\"\x98\x05\n\x14\x45nqueueActionRequest\x12\xad\x01\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierBl\xbaHi\xba\x01\x63\n\x1c\x61\x63tion_id.name.no_separators\x12\'Action name must not contain \'/\' or \':\'\x1a\x1a!this.name.matches(\'[/:]\')\xc8\x01\x01R\x08\x61\x63tionId\x12\x31\n\x12parent_action_name\x18\x02 \x01(\tH\x01R\x10parentActionName\x88\x01\x01\x12\x32\n\x08run_spec\x18\x03 \x01(\x0b\x32\x17.flyteidl2.task.RunSpecR\x07runSpec\x12$\n\tinput_uri\x18\x06 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\x08inputUri\x12/\n\x0frun_output_base\x18\x07 \x01(\tB\x07\xbaH\x04r\x02\x10\x01R\rrunOutputBase\x12\x1e\n\x05group\x18\x08 \x01(\tB\x08\xbaH\x05r\x03\x18\xff\x01R\x05group\x12\x18\n\x07subject\x18\t \x01(\tR\x07subject\x12\x34\n\x04task\x18\n \x01(\x0b\x32\x1e.flyteidl2.workflow.TaskActionH\x00R\x04task\x12\x37\n\x05trace\x18\x0b \x01(\x0b\x32\x1f.flyteidl2.workflow.TraceActionH\x00R\x05trace\x12\x43\n\tcondition\x18\x0c \x01(\x0b\x32#.flyteidl2.workflow.ConditionActionH\x00R\tconditionB\r\n\x04spec\x12\x05\xbaH\x02\x08\x01\x42\x15\n\x13_parent_action_name\"\x17\n\x15\x45nqueueActionResponse\"\x7f\n\x15\x41\x62ortQueuedRunRequest\x12>\n\x06run_id\x18\x01 \x01(\x0b\x32\x1f.flyteidl2.common.RunIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x05runId\x12\x1b\n\x06reason\x18\x02 \x01(\tH\x00R\x06reason\x88\x01\x01\x42\t\n\x07_reason\"\x18\n\x16\x41\x62ortQueuedRunResponse\"\x8b\x01\n\x18\x41\x62ortQueuedActionRequest\x12G\n\taction_id\x18\x01 \x01(\x0b\x32\".flyteidl2.common.ActionIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x08\x61\x63tionId\x12\x1b\n\x06reason\x18\x02 \x01(\tH\x00R\x06reason\x88\x01\x01\x42\t\n\x07_reason\"\x1b\n\x19\x41\x62ortQueuedActionResponse2\xd5\x02\n\x0cQueueService\x12\x66\n\rEnqueueAction\x12(.flyteidl2.workflow.EnqueueActionRequest\x1a).flyteidl2.workflow.EnqueueActionResponse\"\x00\x12i\n\x0e\x41\x62ortQueuedRun\x12).flyteidl2.workflow.AbortQueuedRunRequest\x1a*.flyteidl2.workflow.AbortQueuedRunResponse\"\x00\x12r\n\x11\x41\x62ortQueuedAction\x12,.flyteidl2.workflow.AbortQueuedActionRequest\x1a-.flyteidl2.workflow.AbortQueuedActionResponse\"\x00\x42\xce\x01\n\x16\x63om.flyteidl2.workflowB\x11QueueServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -28,27 +28,29 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _ENQUEUEACTIONREQUEST.oneofs_by_name['spec']._options = None
   _ENQUEUEACTIONREQUEST.oneofs_by_name['spec']._serialized_options = b'\272H\002\010\001'
   _ENQUEUEACTIONREQUEST.fields_by_name['action_id']._options = None
-  _ENQUEUEACTIONREQUEST.fields_by_name['action_id']._serialized_options = b'\272H\003\310\001\001'
+  _ENQUEUEACTIONREQUEST.fields_by_name['action_id']._serialized_options = b'\272Hi\272\001c\n\034action_id.name.no_separators\022\'Action name must not contain \'/\' or \':\'\032\032!this.name.matches(\'[/:]\')\310\001\001'
   _ENQUEUEACTIONREQUEST.fields_by_name['input_uri']._options = None
   _ENQUEUEACTIONREQUEST.fields_by_name['input_uri']._serialized_options = b'\272H\004r\002\020\001'
   _ENQUEUEACTIONREQUEST.fields_by_name['run_output_base']._options = None
   _ENQUEUEACTIONREQUEST.fields_by_name['run_output_base']._serialized_options = b'\272H\004r\002\020\001'
+  _ENQUEUEACTIONREQUEST.fields_by_name['group']._options = None
+  _ENQUEUEACTIONREQUEST.fields_by_name['group']._serialized_options = b'\272H\005r\003\030\377\001'
   _ABORTQUEUEDRUNREQUEST.fields_by_name['run_id']._options = None
   _ABORTQUEUEDRUNREQUEST.fields_by_name['run_id']._serialized_options = b'\272H\003\310\001\001'
   _ABORTQUEUEDACTIONREQUEST.fields_by_name['action_id']._options = None
   _ABORTQUEUEDACTIONREQUEST.fields_by_name['action_id']._serialized_options = b'\272H\003\310\001\001'
   _globals['_ENQUEUEACTIONREQUEST']._serialized_start=194
-  _globals['_ENQUEUEACTIONREQUEST']._serialized_end=745
-  _globals['_ENQUEUEACTIONRESPONSE']._serialized_start=747
-  _globals['_ENQUEUEACTIONRESPONSE']._serialized_end=770
-  _globals['_ABORTQUEUEDRUNREQUEST']._serialized_start=772
-  _globals['_ABORTQUEUEDRUNREQUEST']._serialized_end=899
-  _globals['_ABORTQUEUEDRUNRESPONSE']._serialized_start=901
-  _globals['_ABORTQUEUEDRUNRESPONSE']._serialized_end=925
-  _globals['_ABORTQUEUEDACTIONREQUEST']._serialized_start=928
-  _globals['_ABORTQUEUEDACTIONREQUEST']._serialized_end=1067
-  _globals['_ABORTQUEUEDACTIONRESPONSE']._serialized_start=1069
-  _globals['_ABORTQUEUEDACTIONRESPONSE']._serialized_end=1096
-  _globals['_QUEUESERVICE']._serialized_start=1099
-  _globals['_QUEUESERVICE']._serialized_end=1440
+  _globals['_ENQUEUEACTIONREQUEST']._serialized_end=858
+  _globals['_ENQUEUEACTIONRESPONSE']._serialized_start=860
+  _globals['_ENQUEUEACTIONRESPONSE']._serialized_end=883
+  _globals['_ABORTQUEUEDRUNREQUEST']._serialized_start=885
+  _globals['_ABORTQUEUEDRUNREQUEST']._serialized_end=1012
+  _globals['_ABORTQUEUEDRUNRESPONSE']._serialized_start=1014
+  _globals['_ABORTQUEUEDRUNRESPONSE']._serialized_end=1038
+  _globals['_ABORTQUEUEDACTIONREQUEST']._serialized_start=1041
+  _globals['_ABORTQUEUEDACTIONREQUEST']._serialized_end=1180
+  _globals['_ABORTQUEUEDACTIONRESPONSE']._serialized_start=1182
+  _globals['_ABORTQUEUEDACTIONRESPONSE']._serialized_end=1209
+  _globals['_QUEUESERVICE']._serialized_start=1212
+  _globals['_QUEUESERVICE']._serialized_end=1553
 # @@protoc_insertion_point(module_scope)

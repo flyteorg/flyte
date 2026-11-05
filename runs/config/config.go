@@ -21,6 +21,7 @@ var defaultConfig = &Config{
 	NotificationBufferLimit: 65_000,
 	NotifyRetryMinBackoff:   config.Duration{Duration: 50 * time.Millisecond},
 	NotifyRetryMaxBackoff:   config.Duration{Duration: 5 * time.Second},
+	NotifyBatchSize:         100,
 	ActionsService: serviceclient.ServiceConfig{
 		URL: "http://localhost:8090",
 	},
@@ -73,6 +74,10 @@ type Config struct {
 
 	// NotifyRetryMaxBackoff caps the notification retry delay.
 	NotifyRetryMaxBackoff config.Duration `json:"notifyRetryMaxBackoff" pflag:",Maximum notification retry delay"`
+
+	// NotifyBatchSize is the maximum number of notifications sent in one pg_notify statement.
+	// Values <= 0 fall back to 100; values above 10000 are capped at 10000.
+	NotifyBatchSize int `json:"notifyBatchSize" pflag:",Maximum notifications sent per pg_notify statement"`
 
 	// ActionsService configures the actions service client.
 	ActionsService serviceclient.ServiceConfig `json:"actionsService" pflag:",Actions service client configuration"`
