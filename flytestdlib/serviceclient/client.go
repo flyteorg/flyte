@@ -60,8 +60,7 @@ func (c AuthConfig) hasSettings() bool {
 		c.ClientSecretFile != "" || len(c.Scopes) > 0 || c.Audience != ""
 }
 
-// NewHTTPClient returns an HTTP client configured for the service. A nil base
-// gets a new client built from cfg.HTTP.
+// NewHTTPClient returns an HTTP client configured for the service.
 func NewHTTPClient(ctx context.Context, base *http.Client, cfg ServiceConfig) (*http.Client, error) {
 	if base == nil {
 		base = newBaseClient(cfg.HTTP)
