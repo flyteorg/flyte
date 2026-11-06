@@ -151,6 +151,7 @@ APPLE_SILICON_DIR := $(HOME)/.flyte/apple-silicon
 APPLE_SILICON_PORT_ENV = --env FLYTE_DEVBOX_APPLE_SILICON_PORT=$(APPLE_SILICON_PORT)
 APPLE_SILICON_SECRET_ENV = --env FLYTE_DEVBOX_APPLE_SILICON_TOKEN_SECRET=$$(cat $(APPLE_SILICON_DIR)/secret)
 APPLE_SILICON_ENABLED = $(filter true,$(shell echo '$(APPLE_SILICON)' | tr '[:upper:]' '[:lower:]'))
+APPLE_SILICON_PUBLISH_IP = $(if $(APPLE_SILICON_ENABLED),127.0.0.1:)
 
 if_mlx_bridge_healthy = curl -fs -o /dev/null http://127.0.0.1:$(APPLE_SILICON_PORT)/healthz
 
@@ -229,13 +230,13 @@ start:
 			$(if $(APPLE_SILICON_ENABLED),$(APPLE_SILICON_SECRET_ENV)) \
 			--volume $(PWD)/.kube:/.kube \
 				--volume flyte-devbox:/var/lib/flyte/storage \
-			--publish "6443":"6443" \
-			--publish "30000:30000" \
-			--publish "30001:5432" \
-			--publish "30002:30002" \
-			--publish "30080:30080" \
-			--publish "30081:30081" \
-			--publish "30300:30300" \
+			--publish "$(APPLE_SILICON_PUBLISH_IP)6443:6443" \
+			--publish "$(APPLE_SILICON_PUBLISH_IP)30000:30000" \
+			--publish "$(APPLE_SILICON_PUBLISH_IP)30001:5432" \
+			--publish "$(APPLE_SILICON_PUBLISH_IP)30002:30002" \
+			--publish "$(APPLE_SILICON_PUBLISH_IP)30080:30080" \
+			--publish "$(APPLE_SILICON_PUBLISH_IP)30081:30081" \
+			--publish "$(APPLE_SILICON_PUBLISH_IP)30300:30300" \
 			$(FLYTE_DEVBOX_IMAGE); \
 	fi
 	@echo "Waiting for kubeconfig..."
