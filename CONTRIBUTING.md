@@ -66,7 +66,11 @@ make devbox-stop
 
 `FLYTE_DEV=True` is required when you intend to run the manager locally — it disables the in-cluster manager so your local process can take over. The value is case-insensitive. `make devbox-run` writes a kubeconfig pointing at the devbox cluster in global kubeconfig, so `kubectl` will target it automatically.
 
-`APPLE_SILICON=True` activates the Apple MLX bridge (requires an M-series Mac).
+`APPLE_SILICON=True` activates the Apple MLX bridge (requires an M-series Mac):
+
+```bash
+make devbox-run FLYTE_DEV=True APPLE_SILICON=True
+```
 
 ### Build and Run the Manager
 
@@ -83,6 +87,12 @@ make run
 cd manager
 make build
 ./bin/flyte-manager --config config.yaml
+```
+
+If the devbox was started with `APPLE_SILICON=True`, run the manager with it too (`make run` and `make run-dev` both accept it):
+
+```bash
+make -C manager run APPLE_SILICON=True
 ```
 
 The manager will:
