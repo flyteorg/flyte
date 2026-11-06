@@ -2389,6 +2389,94 @@ func TestToK8sPodDeviceClass(t *testing.T) {
 	})
 }
 
+func TestDemystifyPending_ResourceCapacity(t *testing.T) {
+	original := *config.GetK8sPluginConfig()
+	t.Cleanup(func() { assert.NoError(t, config.SetK8sPluginConfig(&original)) })
+	for _, test := range []struct {
+		name      string
+		message   string
+		waited    time.Duration
+		timeout   time.Duration
+		wantPhase pluginsCore.Phase
+	}{
+		{
+			name:      "temporarily busy nodes remain queued",
+			message:   "0/2 nodes are available: 2 Insufficient memory.",
+			waited:    time.Minute,
+			wantPhase: pluginsCore.PhaseQueued,
+		},
+		{
+			name:      "no eligible node fits and no deadline remains queued after a day",
+			message:   "0/2 nodes are available: 2 Insufficient memory.",
+			waited:    24 * time.Hour,
+			wantPhase: pluginsCore.PhaseQueued,
+		},
+		{
+			name:      "insufficient CPU without a deadline remains queued",
+			message:   "0/2 nodes are available: 2 Insufficient cpu.",
+			waited:    24 * time.Hour,
+			wantPhase: pluginsCore.PhaseQueued,
+		},
+		{
+			name:      "insufficient GPU without a deadline remains queued",
+			message:   "0/2 nodes are available: 2 Insufficient nvidia.com/gpu.",
+			waited:    24 * time.Hour,
+			wantPhase: pluginsCore.PhaseQueued,
+		},
+		{
+			name:      "within configured deadline remains queued",
+			message:   "0/2 nodes are available: 2 Insufficient memory.",
+			waited:    time.Minute,
+			timeout:   time.Hour,
+			wantPhase: pluginsCore.PhaseQueued,
+		},
+		{
+			name:      "negative deadline disables scheduling timeout",
+			message:   "0/2 nodes are available: 2 Insufficient memory.",
+			waited:    24 * time.Hour,
+			timeout:   -time.Minute,
+			wantPhase: pluginsCore.PhaseQueued,
+		},
+		{
+			name:      "exceeded scheduling deadline is system retryable",
+			message:   "0/2 nodes are available: 2 Insufficient memory.",
+			waited:    2 * time.Hour,
+			timeout:   time.Hour,
+			wantPhase: pluginsCore.PhaseRetryableFailure,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			cfg := original
+			cfg.PodPendingTimeout.Duration = test.timeout
+			assert.NoError(t, config.SetK8sPluginConfig(&cfg))
+			status := v1.PodStatus{
+				Phase: v1.PodPending,
+				Conditions: []v1.PodCondition{{
+					Type:               v1.PodScheduled,
+					Status:             v1.ConditionFalse,
+					Reason:             v1.PodReasonUnschedulable,
+					Message:            test.message,
+					LastTransitionTime: metav1.NewTime(time.Now().Add(-test.waited)),
+				}},
+			}
+
+			phase, err := DemystifyPending(status, pluginsCore.TaskInfo{})
+			assert.NoError(t, err)
+			assert.Equal(t, test.wantPhase, phase.Phase())
+			if test.wantPhase.IsFailure() {
+				if assert.NotNil(t, phase.Err()) {
+					assert.Equal(t, "PodPendingTimeout", phase.Err().GetCode())
+					assert.Equal(t, core.ExecutionError_SYSTEM, phase.Err().GetKind())
+					assert.Contains(t, phase.Err().GetMessage(), test.message)
+				}
+			} else {
+				assert.Nil(t, phase.Err())
+				assert.Contains(t, phase.Reason(), test.message)
+			}
+		})
+	}
+}
+
 func TestDemystifyPending(t *testing.T) {
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		CreateContainerErrorGracePeriod: config1.Duration{
