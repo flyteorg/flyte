@@ -157,11 +157,21 @@ func GetLiteralOffloadingEnvVars() []v1.EnvVar {
 }
 
 func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, envFroms []v1.EnvFromSource, taskEnvironmentVariables map[string]string, id pluginsCore.TaskExecutionID, consoleURL string) ([]v1.EnvVar, []v1.EnvFromSource) {
-	envVars = append(envVars, GetContextEnvVars(ctx)...)
-	envVars = append(envVars, GetExecutionEnvVars(id, consoleURL)...)
-	envVars = append(envVars, GetLiteralOffloadingEnvVars()...)
+	systemEnvVars := GetContextEnvVars(ctx)
+	systemEnvVars = append(systemEnvVars, GetExecutionEnvVars(id, consoleURL)...)
+	systemEnvVars = append(systemEnvVars, GetLiteralOffloadingEnvVars()...)
+	envVars = append(envVars, systemEnvVars...)
 
+	// Execution metadata env vars come from the run spec, which users and settings control, so
+	// they cannot replace a value the system sets for this execution.
+	systemNames := make(map[string]struct{}, len(systemEnvVars))
+	for _, ev := range systemEnvVars {
+		systemNames[ev.Name] = struct{}{}
+	}
 	for k, v := range taskEnvironmentVariables {
+		if _, ok := systemNames[k]; ok {
+			continue
+		}
 		envVars = append(envVars, v1.EnvVar{Name: k, Value: v})
 	}
 	for k, v := range config.GetK8sPluginConfig().DefaultEnvVars {
