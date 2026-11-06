@@ -40,6 +40,33 @@ flyte-core-components:
       storagePrefix: "uploads"
     download:
       maxExpiresIn: 1h
+    # logs Task log backend used once the Kubernetes pod is gone.
+    logs:
+      persisted:
+        # type "" (disabled) or "loki".
+        type: ""
+        loki:
+          url: ""
+          # tenantId Sent as X-Scope-OrgID.
+          tenantId: ""
+          # queryTemplate LogQL selector (fields .Namespace, .PodName, .ContainerName).
+          # Empty uses the binary default (Promtail/Alloy labels). Rendered through
+          # tpl, so escape braces: '{k8s_pod_name="{{ "{{" }} .PodName {{ "}}" }}"}'
+          queryTemplate: ""
+          # basicAuth / bearerToken are rendered into the configuration Secret.
+          basicAuth:
+            username: ""
+            password: ""
+          bearerToken: ""
+          timeout: 30s
+          # pageSize Keep at or below Loki's max_entries_limit_per_query.
+          pageSize: 1000
+          # maxLines 0 for unlimited.
+          maxLines: 0
+          # timePadding Widens the query window around the recorded container start/end.
+          timePadding: 1m
+          # lookback Window queried when no container start time was recorded.
+          lookback: 168h
 
   # Flyte-native secrets (flyte create secret): the secret service writes Kubernetes
   # Secrets into this namespace, and the pod webhook's embedded secret manager reads

@@ -204,4 +204,172 @@ func TestDataProxyConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_logs.persisted.type", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.persisted.type", testValue)
+			if vString, err := cmdFlags.GetString("logs.persisted.type"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.Logs.Persisted.Type)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.persisted.loki.url", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.persisted.loki.url", testValue)
+			if vString, err := cmdFlags.GetString("logs.persisted.loki.url"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.Logs.Persisted.Loki.URL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.persisted.loki.queryTemplate", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.persisted.loki.queryTemplate", testValue)
+			if vString, err := cmdFlags.GetString("logs.persisted.loki.queryTemplate"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.Logs.Persisted.Loki.QueryTemplate)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.persisted.loki.tenantId", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.persisted.loki.tenantId", testValue)
+			if vString, err := cmdFlags.GetString("logs.persisted.loki.tenantId"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.Logs.Persisted.Loki.TenantID)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.persisted.loki.basicAuth.username", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.persisted.loki.basicAuth.username", testValue)
+			if vString, err := cmdFlags.GetString("logs.persisted.loki.basicAuth.username"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.Logs.Persisted.Loki.BasicAuth.Username)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.persisted.loki.basicAuth.password", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.persisted.loki.basicAuth.password", testValue)
+			if vString, err := cmdFlags.GetString("logs.persisted.loki.basicAuth.password"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.Logs.Persisted.Loki.BasicAuth.Password)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.persisted.loki.bearerToken", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.persisted.loki.bearerToken", testValue)
+			if vString, err := cmdFlags.GetString("logs.persisted.loki.bearerToken"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.Logs.Persisted.Loki.BearerToken)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.persisted.loki.timeout", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.Logs.Persisted.Loki.Timeout.String()
+
+			cmdFlags.Set("logs.persisted.loki.timeout", testValue)
+			if vString, err := cmdFlags.GetString("logs.persisted.loki.timeout"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.Logs.Persisted.Loki.Timeout)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.persisted.loki.pageSize", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.persisted.loki.pageSize", testValue)
+			if vInt, err := cmdFlags.GetInt("logs.persisted.loki.pageSize"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vInt), &actual.Logs.Persisted.Loki.PageSize)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.persisted.loki.maxLines", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.persisted.loki.maxLines", testValue)
+			if vInt, err := cmdFlags.GetInt("logs.persisted.loki.maxLines"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vInt), &actual.Logs.Persisted.Loki.MaxLines)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.persisted.loki.timePadding", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.Logs.Persisted.Loki.TimePadding.String()
+
+			cmdFlags.Set("logs.persisted.loki.timePadding", testValue)
+			if vString, err := cmdFlags.GetString("logs.persisted.loki.timePadding"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.Logs.Persisted.Loki.TimePadding)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.persisted.loki.lookback", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.Logs.Persisted.Loki.Lookback.String()
+
+			cmdFlags.Set("logs.persisted.loki.lookback", testValue)
+			if vString, err := cmdFlags.GetString("logs.persisted.loki.lookback"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.Logs.Persisted.Loki.Lookback)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

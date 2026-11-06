@@ -81,6 +81,9 @@ func (s *K8sLogStreamer) TailLogs(ctx context.Context, logContext *core.LogConte
 
 	logStream, err := s.clientset.CoreV1().Pods(pod.GetNamespace()).GetLogs(pod.GetPodName(), opts).Stream(streamCtx)
 	if err != nil {
+		if k8serrors.IsNotFound(err) {
+			return connect.NewError(connect.CodeNotFound, fmt.Errorf("logs for pod %s not found in namespace %s: %w", pod.GetPodName(), pod.GetNamespace(), err))
+		}
 		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to stream pod logs: %w", err))
 	}
 	defer logStream.Close() //nolint:errcheck

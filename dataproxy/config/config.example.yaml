@@ -25,6 +25,21 @@ dataproxy:
     # Maximum expiration time for download URLs (1 hour)
     maxExpiresIn: 1h
 
+  logs:
+    # Backend consulted once the task pod has been deleted: "" (disabled) or "loki".
+    persisted:
+      type: ""
+      loki:
+        url: "http://loki-gateway.monitoring.svc:80"
+        # Adapt the label names to your collector.
+        queryTemplate: '{namespace="{{ .Namespace }}", pod="{{ .PodName }}", container="{{ .ContainerName }}"}'
+        tenantId: ""
+        timeout: 30s
+        pageSize: 1000
+        maxLines: 0
+        timePadding: 1m
+        lookback: 168h
+
 # Storage Configuration
 storage:
   # Type of storage backend (options: s3, minio, local, mem, stow)
