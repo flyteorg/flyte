@@ -95,6 +95,8 @@ func (m *Run) validate(all bool) error {
 
 	// no validation rules for Labels
 
+	// no validation rules for Annotations
+
 	if len(errors) > 0 {
 		return RunMultiError(errors)
 	}
