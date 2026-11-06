@@ -13,6 +13,8 @@ LOCALBIN ?= $(shell pwd)/bin
 APPLE_SILICON_PORT ?= 30090
 APPLE_SILICON_DIR := $(HOME)/.flyte/apple-silicon
 APPLE_SILICON_CONFIG := $(APPLE_SILICON_DIR)/$(SERVICE_NAME)-config.yaml
+# Non-empty when APPLE_SILICON is "true", matched case-insensitively like FLYTE_DEV.
+APPLE_SILICON_ENABLED = $(filter true,$(shell echo '$(APPLE_SILICON)' | tr '[:upper:]' '[:lower:]'))
 
 # ANSI color codes for prettier output
 COLOR_RESET   := \033[0m
@@ -121,7 +123,7 @@ bench: ## Run benchmarks
 .PHONY: run
 run: build-fast ## Build and run the service
 	@echo "$(COLOR_GREEN)Running $(SERVICE_NAME)...$(COLOR_RESET)"
-	@if [ "$(APPLE_SILICON)" != True ]; then \
+	@if [ -z "$(APPLE_SILICON_ENABLED)" ]; then \
 		./$(BIN_DIR)/$(BIN_NAME) $(RUN_ARGS); \
 	else \
 		$(MAKE) --no-print-directory apple-silicon-config && \
@@ -131,7 +133,7 @@ run: build-fast ## Build and run the service
 .PHONY: run-dev
 run-dev: ## Run service directly with go run (no build)
 	@echo "$(COLOR_GREEN)Running $(SERVICE_NAME) (dev mode)...$(COLOR_RESET)"
-	@if [ "$(APPLE_SILICON)" != True ]; then \
+	@if [ -z "$(APPLE_SILICON_ENABLED)" ]; then \
 		go run $(CMD_PATH) $(RUN_ARGS); \
 	else \
 		$(MAKE) --no-print-directory apple-silicon-config && \

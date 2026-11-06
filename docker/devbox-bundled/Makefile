@@ -150,6 +150,7 @@ FLYTE_PYTHON ?= uv run --isolated --no-project --with flyte python
 APPLE_SILICON_DIR := $(HOME)/.flyte/apple-silicon
 APPLE_SILICON_PORT_ENV = --env FLYTE_DEVBOX_APPLE_SILICON_PORT=$(APPLE_SILICON_PORT)
 APPLE_SILICON_SECRET_ENV = --env FLYTE_DEVBOX_APPLE_SILICON_TOKEN_SECRET=$$(cat $(APPLE_SILICON_DIR)/secret)
+APPLE_SILICON_ENABLED = $(filter true,$(shell echo '$(APPLE_SILICON)' | tr '[:upper:]' '[:lower:]'))
 
 if_mlx_bridge_healthy = curl -fs -o /dev/null http://127.0.0.1:$(APPLE_SILICON_PORT)/healthz
 
@@ -215,7 +216,8 @@ start:
 	[ -n "$(shell docker volume ls --filter name=^flyte-devbox$$ --format {{.Name}})" ] || \
 		docker volume create flyte-devbox
 	@if [ -z "$(shell docker ps --filter name=^flyte-devbox$$ --format {{.Names}})" ]; then \
-		if [ "$(APPLE_SILICON)" = True ]; then \
+		if [ -n "$(APPLE_SILICON_ENABLED)" ]; then \
+			echo "Starting MLX bridge"; \
 			$(MAKE) --no-print-directory start-mlx-bridge || exit 1; \
 		fi; \
 		rm -f $(PWD)/.kube/kubeconfig; \
@@ -223,8 +225,8 @@ start:
 			--add-host "host.docker.internal:host-gateway" \
 			--env FLYTE_DEV=$(FLYTE_DEV) \
 			--env K3S_KUBECONFIG_OUTPUT=/.kube/kubeconfig \
-			$(if $(filter True,$(APPLE_SILICON)),$(APPLE_SILICON_PORT_ENV)) \
-			$(if $(filter True,$(APPLE_SILICON)),$(APPLE_SILICON_SECRET_ENV)) \
+			$(if $(APPLE_SILICON_ENABLED),$(APPLE_SILICON_PORT_ENV)) \
+			$(if $(APPLE_SILICON_ENABLED),$(APPLE_SILICON_SECRET_ENV)) \
 			--volume $(PWD)/.kube:/.kube \
 				--volume flyte-devbox:/var/lib/flyte/storage \
 			--publish "6443":"6443" \
