@@ -292,8 +292,6 @@ pub mod app_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
-    /** AppService defines the service for managing apps.
-*/
     #[derive(Debug, Clone)]
     pub struct AppServiceClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -374,8 +372,6 @@ pub mod app_service_client {
             self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
-        /** Create creates a new app.
-*/
         pub async fn create(
             &mut self,
             request: impl tonic::IntoRequest<super::CreateRequest>,
@@ -584,8 +580,6 @@ pub mod app_service_server {
     /// Generated trait containing gRPC methods that should be implemented for use with AppServiceServer.
     #[async_trait]
     pub trait AppService: Send + Sync + 'static {
-        /** Create creates a new app.
-*/
         async fn create(
             &self,
             request: tonic::Request<super::CreateRequest>,
@@ -648,8 +642,6 @@ pub mod app_service_server {
             request: tonic::Request<super::LeaseRequest>,
         ) -> std::result::Result<tonic::Response<Self::LeaseStream>, tonic::Status>;
     }
-    /** AppService defines the service for managing apps.
-*/
     #[derive(Debug)]
     pub struct AppServiceServer<T: AppService> {
         inner: Arc<T>,

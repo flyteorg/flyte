@@ -14,12 +14,13 @@ _sym_db = _symbol_database.Default()
 from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
 from flyteidl2.common import identifier_pb2 as flyteidl2_dot_common_dot_identifier__pb2
 from flyteidl2.common import list_pb2 as flyteidl2_dot_common_dot_list__pb2
+from flyteidl2.common import rpc_options_pb2 as flyteidl2_dot_common_dot_rpc__options__pb2
 from flyteidl2.task import common_pb2 as flyteidl2_dot_task_dot_common__pb2
 from flyteidl2.task import task_definition_pb2 as flyteidl2_dot_task_dot_task__definition__pb2
 from flyteidl2.trigger import trigger_definition_pb2 as flyteidl2_dot_trigger_dot_trigger__definition__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\'flyteidl2/trigger/trigger_service.proto\x12\x11\x66lyteidl2.trigger\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1b\x66lyteidl2/common/list.proto\x1a\x1b\x66lyteidl2/task/common.proto\x1a$flyteidl2/task/task_definition.proto\x1a*flyteidl2/trigger/trigger_definition.proto\"\xff\x01\n\x14\x44\x65ployTriggerRequest\x12\x39\n\x04name\x18\x04 \x01(\x0b\x32\x1d.flyteidl2.common.TriggerNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12\x1a\n\x08revision\x18\x05 \x01(\x04R\x08revision\x12:\n\x04spec\x18\x02 \x01(\x0b\x32\x1e.flyteidl2.trigger.TriggerSpecB\x06\xbaH\x03\xc8\x01\x01R\x04spec\x12N\n\x0f\x61utomation_spec\x18\x03 \x01(\x0b\x32%.flyteidl2.task.TriggerAutomationSpecR\x0e\x61utomationSpecJ\x04\x08\x01\x10\x02\"\\\n\x15\x44\x65ployTriggerResponse\x12\x43\n\x07trigger\x18\x01 \x01(\x0b\x32!.flyteidl2.trigger.TriggerDetailsB\x06\xbaH\x03\xc8\x01\x01R\x07trigger\"U\n\x18GetTriggerDetailsRequest\x12\x39\n\x04name\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.TriggerNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\"`\n\x19GetTriggerDetailsResponse\x12\x43\n\x07trigger\x18\x01 \x01(\x0b\x32!.flyteidl2.trigger.TriggerDetailsB\x06\xbaH\x03\xc8\x01\x01R\x07trigger\"_\n GetTriggerRevisionDetailsRequest\x12;\n\x02id\x18\x01 \x01(\x0b\x32#.flyteidl2.common.TriggerIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x02id\"h\n!GetTriggerRevisionDetailsResponse\x12\x43\n\x07trigger\x18\x01 \x01(\x0b\x32!.flyteidl2.trigger.TriggerDetailsB\x06\xbaH\x03\xc8\x01\x01R\x07trigger\"\xb8\x02\n\x13ListTriggersRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12\x1b\n\x03org\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x00R\x03org\x12\x44\n\nproject_id\x18\x03 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\tprojectId\x12\x39\n\x07task_id\x18\x04 \x01(\x0b\x32\x1e.flyteidl2.task.TaskIdentifierH\x00R\x06taskId\x12\x37\n\ttask_name\x18\x05 \x01(\x0b\x32\x18.flyteidl2.task.TaskNameH\x00R\x08taskNameB\x11\n\x08scope_by\x12\x05\xbaH\x02\x08\x01\"d\n\x14ListTriggersResponse\x12\x36\n\x08triggers\x18\x01 \x03(\x0b\x32\x1a.flyteidl2.trigger.TriggerR\x08triggers\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\"\x96\x01\n GetTriggerRevisionHistoryRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12\x39\n\x04name\x18\x02 \x01(\x0b\x32\x1d.flyteidl2.common.TriggerNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\"y\n!GetTriggerRevisionHistoryResponse\x12>\n\x08triggers\x18\x01 \x03(\x0b\x32\".flyteidl2.trigger.TriggerRevisionR\x08triggers\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\"n\n\x15UpdateTriggersRequest\x12=\n\x05names\x18\x01 \x03(\x0b\x32\x1d.flyteidl2.common.TriggerNameB\x08\xbaH\x05\x92\x01\x02\x08\x01R\x05names\x12\x16\n\x06\x61\x63tive\x18\x02 \x01(\x08R\x06\x61\x63tive\"\x18\n\x16UpdateTriggersResponse\"V\n\x15\x44\x65leteTriggersRequest\x12=\n\x05names\x18\x01 \x03(\x0b\x32\x1d.flyteidl2.common.TriggerNameB\x08\xbaH\x05\x92\x01\x02\x08\x01R\x05names\"\x18\n\x16\x44\x65leteTriggersResponse2\xbf\x06\n\x0eTriggerService\x12\x64\n\rDeployTrigger\x12\'.flyteidl2.trigger.DeployTriggerRequest\x1a(.flyteidl2.trigger.DeployTriggerResponse\"\x00\x12s\n\x11GetTriggerDetails\x12+.flyteidl2.trigger.GetTriggerDetailsRequest\x1a,.flyteidl2.trigger.GetTriggerDetailsResponse\"\x03\x90\x02\x01\x12\x8b\x01\n\x19GetTriggerRevisionDetails\x12\x33.flyteidl2.trigger.GetTriggerRevisionDetailsRequest\x1a\x34.flyteidl2.trigger.GetTriggerRevisionDetailsResponse\"\x03\x90\x02\x01\x12\x64\n\x0cListTriggers\x12&.flyteidl2.trigger.ListTriggersRequest\x1a\'.flyteidl2.trigger.ListTriggersResponse\"\x03\x90\x02\x01\x12\x8b\x01\n\x19GetTriggerRevisionHistory\x12\x33.flyteidl2.trigger.GetTriggerRevisionHistoryRequest\x1a\x34.flyteidl2.trigger.GetTriggerRevisionHistoryResponse\"\x03\x90\x02\x01\x12g\n\x0eUpdateTriggers\x12(.flyteidl2.trigger.UpdateTriggersRequest\x1a).flyteidl2.trigger.UpdateTriggersResponse\"\x00\x12g\n\x0e\x44\x65leteTriggers\x12(.flyteidl2.trigger.DeleteTriggersRequest\x1a).flyteidl2.trigger.DeleteTriggersResponse\"\x00\x42\xca\x01\n\x15\x63om.flyteidl2.triggerB\x13TriggerServiceProtoH\x02P\x01Z5github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger\xa2\x02\x03\x46TX\xaa\x02\x11\x46lyteidl2.Trigger\xca\x02\x11\x46lyteidl2\\Trigger\xe2\x02\x1d\x46lyteidl2\\Trigger\\GPBMetadata\xea\x02\x12\x46lyteidl2::Triggerb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\'flyteidl2/trigger/trigger_service.proto\x12\x11\x66lyteidl2.trigger\x1a\x1b\x62uf/validate/validate.proto\x1a!flyteidl2/common/identifier.proto\x1a\x1b\x66lyteidl2/common/list.proto\x1a\"flyteidl2/common/rpc_options.proto\x1a\x1b\x66lyteidl2/task/common.proto\x1a$flyteidl2/task/task_definition.proto\x1a*flyteidl2/trigger/trigger_definition.proto\"\xff\x01\n\x14\x44\x65ployTriggerRequest\x12\x39\n\x04name\x18\x04 \x01(\x0b\x32\x1d.flyteidl2.common.TriggerNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\x12\x1a\n\x08revision\x18\x05 \x01(\x04R\x08revision\x12:\n\x04spec\x18\x02 \x01(\x0b\x32\x1e.flyteidl2.trigger.TriggerSpecB\x06\xbaH\x03\xc8\x01\x01R\x04spec\x12N\n\x0f\x61utomation_spec\x18\x03 \x01(\x0b\x32%.flyteidl2.task.TriggerAutomationSpecR\x0e\x61utomationSpecJ\x04\x08\x01\x10\x02\"\\\n\x15\x44\x65ployTriggerResponse\x12\x43\n\x07trigger\x18\x01 \x01(\x0b\x32!.flyteidl2.trigger.TriggerDetailsB\x06\xbaH\x03\xc8\x01\x01R\x07trigger\"U\n\x18GetTriggerDetailsRequest\x12\x39\n\x04name\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.TriggerNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\"`\n\x19GetTriggerDetailsResponse\x12\x43\n\x07trigger\x18\x01 \x01(\x0b\x32!.flyteidl2.trigger.TriggerDetailsB\x06\xbaH\x03\xc8\x01\x01R\x07trigger\"_\n GetTriggerRevisionDetailsRequest\x12;\n\x02id\x18\x01 \x01(\x0b\x32#.flyteidl2.common.TriggerIdentifierB\x06\xbaH\x03\xc8\x01\x01R\x02id\"h\n!GetTriggerRevisionDetailsResponse\x12\x43\n\x07trigger\x18\x01 \x01(\x0b\x32!.flyteidl2.trigger.TriggerDetailsB\x06\xbaH\x03\xc8\x01\x01R\x07trigger\"\xb8\x02\n\x13ListTriggersRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12\x1b\n\x03org\x18\x02 \x01(\tB\x07\xbaH\x04r\x02\x10\x01H\x00R\x03org\x12\x44\n\nproject_id\x18\x03 \x01(\x0b\x32#.flyteidl2.common.ProjectIdentifierH\x00R\tprojectId\x12\x39\n\x07task_id\x18\x04 \x01(\x0b\x32\x1e.flyteidl2.task.TaskIdentifierH\x00R\x06taskId\x12\x37\n\ttask_name\x18\x05 \x01(\x0b\x32\x18.flyteidl2.task.TaskNameH\x00R\x08taskNameB\x11\n\x08scope_by\x12\x05\xbaH\x02\x08\x01\"d\n\x14ListTriggersResponse\x12\x36\n\x08triggers\x18\x01 \x03(\x0b\x32\x1a.flyteidl2.trigger.TriggerR\x08triggers\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\"\x96\x01\n GetTriggerRevisionHistoryRequest\x12\x37\n\x07request\x18\x01 \x01(\x0b\x32\x1d.flyteidl2.common.ListRequestR\x07request\x12\x39\n\x04name\x18\x02 \x01(\x0b\x32\x1d.flyteidl2.common.TriggerNameB\x06\xbaH\x03\xc8\x01\x01R\x04name\"y\n!GetTriggerRevisionHistoryResponse\x12>\n\x08triggers\x18\x01 \x03(\x0b\x32\".flyteidl2.trigger.TriggerRevisionR\x08triggers\x12\x14\n\x05token\x18\x02 \x01(\tR\x05token\"n\n\x15UpdateTriggersRequest\x12=\n\x05names\x18\x01 \x03(\x0b\x32\x1d.flyteidl2.common.TriggerNameB\x08\xbaH\x05\x92\x01\x02\x08\x01R\x05names\x12\x16\n\x06\x61\x63tive\x18\x02 \x01(\x08R\x06\x61\x63tive\"\x18\n\x16UpdateTriggersResponse\"V\n\x15\x44\x65leteTriggersRequest\x12=\n\x05names\x18\x01 \x03(\x0b\x32\x1d.flyteidl2.common.TriggerNameB\x08\xbaH\x05\x92\x01\x02\x08\x01R\x05names\"\x18\n\x16\x44\x65leteTriggersResponse2\xc3\x06\n\x0eTriggerService\x12\x64\n\rDeployTrigger\x12\'.flyteidl2.trigger.DeployTriggerRequest\x1a(.flyteidl2.trigger.DeployTriggerResponse\"\x00\x12s\n\x11GetTriggerDetails\x12+.flyteidl2.trigger.GetTriggerDetailsRequest\x1a,.flyteidl2.trigger.GetTriggerDetailsResponse\"\x03\x90\x02\x01\x12\x8b\x01\n\x19GetTriggerRevisionDetails\x12\x33.flyteidl2.trigger.GetTriggerRevisionDetailsRequest\x1a\x34.flyteidl2.trigger.GetTriggerRevisionDetailsResponse\"\x03\x90\x02\x01\x12\x64\n\x0cListTriggers\x12&.flyteidl2.trigger.ListTriggersRequest\x1a\'.flyteidl2.trigger.ListTriggersResponse\"\x03\x90\x02\x01\x12\x8b\x01\n\x19GetTriggerRevisionHistory\x12\x33.flyteidl2.trigger.GetTriggerRevisionHistoryRequest\x1a\x34.flyteidl2.trigger.GetTriggerRevisionHistoryResponse\"\x03\x90\x02\x01\x12g\n\x0eUpdateTriggers\x12(.flyteidl2.trigger.UpdateTriggersRequest\x1a).flyteidl2.trigger.UpdateTriggersResponse\"\x00\x12k\n\x0e\x44\x65leteTriggers\x12(.flyteidl2.trigger.DeleteTriggersRequest\x1a).flyteidl2.trigger.DeleteTriggersResponse\"\x04\xa8\xbb\x18\x01\x42\xca\x01\n\x15\x63om.flyteidl2.triggerB\x13TriggerServiceProtoH\x02P\x01Z5github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger\xa2\x02\x03\x46TX\xaa\x02\x11\x46lyteidl2.Trigger\xca\x02\x11\x46lyteidl2\\Trigger\xe2\x02\x1d\x46lyteidl2\\Trigger\\GPBMetadata\xea\x02\x12\x46lyteidl2::Triggerb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -59,34 +60,36 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _TRIGGERSERVICE.methods_by_name['ListTriggers']._serialized_options = b'\220\002\001'
   _TRIGGERSERVICE.methods_by_name['GetTriggerRevisionHistory']._options = None
   _TRIGGERSERVICE.methods_by_name['GetTriggerRevisionHistory']._serialized_options = b'\220\002\001'
-  _globals['_DEPLOYTRIGGERREQUEST']._serialized_start=267
-  _globals['_DEPLOYTRIGGERREQUEST']._serialized_end=522
-  _globals['_DEPLOYTRIGGERRESPONSE']._serialized_start=524
-  _globals['_DEPLOYTRIGGERRESPONSE']._serialized_end=616
-  _globals['_GETTRIGGERDETAILSREQUEST']._serialized_start=618
-  _globals['_GETTRIGGERDETAILSREQUEST']._serialized_end=703
-  _globals['_GETTRIGGERDETAILSRESPONSE']._serialized_start=705
-  _globals['_GETTRIGGERDETAILSRESPONSE']._serialized_end=801
-  _globals['_GETTRIGGERREVISIONDETAILSREQUEST']._serialized_start=803
-  _globals['_GETTRIGGERREVISIONDETAILSREQUEST']._serialized_end=898
-  _globals['_GETTRIGGERREVISIONDETAILSRESPONSE']._serialized_start=900
-  _globals['_GETTRIGGERREVISIONDETAILSRESPONSE']._serialized_end=1004
-  _globals['_LISTTRIGGERSREQUEST']._serialized_start=1007
-  _globals['_LISTTRIGGERSREQUEST']._serialized_end=1319
-  _globals['_LISTTRIGGERSRESPONSE']._serialized_start=1321
-  _globals['_LISTTRIGGERSRESPONSE']._serialized_end=1421
-  _globals['_GETTRIGGERREVISIONHISTORYREQUEST']._serialized_start=1424
-  _globals['_GETTRIGGERREVISIONHISTORYREQUEST']._serialized_end=1574
-  _globals['_GETTRIGGERREVISIONHISTORYRESPONSE']._serialized_start=1576
-  _globals['_GETTRIGGERREVISIONHISTORYRESPONSE']._serialized_end=1697
-  _globals['_UPDATETRIGGERSREQUEST']._serialized_start=1699
-  _globals['_UPDATETRIGGERSREQUEST']._serialized_end=1809
-  _globals['_UPDATETRIGGERSRESPONSE']._serialized_start=1811
-  _globals['_UPDATETRIGGERSRESPONSE']._serialized_end=1835
-  _globals['_DELETETRIGGERSREQUEST']._serialized_start=1837
-  _globals['_DELETETRIGGERSREQUEST']._serialized_end=1923
-  _globals['_DELETETRIGGERSRESPONSE']._serialized_start=1925
-  _globals['_DELETETRIGGERSRESPONSE']._serialized_end=1949
-  _globals['_TRIGGERSERVICE']._serialized_start=1952
-  _globals['_TRIGGERSERVICE']._serialized_end=2783
+  _TRIGGERSERVICE.methods_by_name['DeleteTriggers']._options = None
+  _TRIGGERSERVICE.methods_by_name['DeleteTriggers']._serialized_options = b'\250\273\030\001'
+  _globals['_DEPLOYTRIGGERREQUEST']._serialized_start=303
+  _globals['_DEPLOYTRIGGERREQUEST']._serialized_end=558
+  _globals['_DEPLOYTRIGGERRESPONSE']._serialized_start=560
+  _globals['_DEPLOYTRIGGERRESPONSE']._serialized_end=652
+  _globals['_GETTRIGGERDETAILSREQUEST']._serialized_start=654
+  _globals['_GETTRIGGERDETAILSREQUEST']._serialized_end=739
+  _globals['_GETTRIGGERDETAILSRESPONSE']._serialized_start=741
+  _globals['_GETTRIGGERDETAILSRESPONSE']._serialized_end=837
+  _globals['_GETTRIGGERREVISIONDETAILSREQUEST']._serialized_start=839
+  _globals['_GETTRIGGERREVISIONDETAILSREQUEST']._serialized_end=934
+  _globals['_GETTRIGGERREVISIONDETAILSRESPONSE']._serialized_start=936
+  _globals['_GETTRIGGERREVISIONDETAILSRESPONSE']._serialized_end=1040
+  _globals['_LISTTRIGGERSREQUEST']._serialized_start=1043
+  _globals['_LISTTRIGGERSREQUEST']._serialized_end=1355
+  _globals['_LISTTRIGGERSRESPONSE']._serialized_start=1357
+  _globals['_LISTTRIGGERSRESPONSE']._serialized_end=1457
+  _globals['_GETTRIGGERREVISIONHISTORYREQUEST']._serialized_start=1460
+  _globals['_GETTRIGGERREVISIONHISTORYREQUEST']._serialized_end=1610
+  _globals['_GETTRIGGERREVISIONHISTORYRESPONSE']._serialized_start=1612
+  _globals['_GETTRIGGERREVISIONHISTORYRESPONSE']._serialized_end=1733
+  _globals['_UPDATETRIGGERSREQUEST']._serialized_start=1735
+  _globals['_UPDATETRIGGERSREQUEST']._serialized_end=1845
+  _globals['_UPDATETRIGGERSRESPONSE']._serialized_start=1847
+  _globals['_UPDATETRIGGERSRESPONSE']._serialized_end=1871
+  _globals['_DELETETRIGGERSREQUEST']._serialized_start=1873
+  _globals['_DELETETRIGGERSREQUEST']._serialized_end=1959
+  _globals['_DELETETRIGGERSRESPONSE']._serialized_start=1961
+  _globals['_DELETETRIGGERSRESPONSE']._serialized_end=1985
+  _globals['_TRIGGERSERVICE']._serialized_start=1988
+  _globals['_TRIGGERSERVICE']._serialized_end=2823
 # @@protoc_insertion_point(module_scope)

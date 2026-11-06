@@ -99,6 +99,7 @@ func NewDataProxyServiceClient(httpClient connect.HTTPClient, baseURL string, op
 			httpClient,
 			baseURL+DataProxyServiceCreateDownloadLinkProcedure,
 			connect.WithSchema(dataProxyServiceCreateDownloadLinkMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		getActionData: connect.NewClient[dataproxy.GetActionDataRequest, dataproxy.GetActionDataResponse](
@@ -187,6 +188,7 @@ func NewDataProxyServiceHandler(svc DataProxyServiceHandler, opts ...connect.Han
 		DataProxyServiceCreateDownloadLinkProcedure,
 		svc.CreateDownloadLink,
 		connect.WithSchema(dataProxyServiceCreateDownloadLinkMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	dataProxyServiceGetActionDataHandler := connect.NewUnaryHandler(

@@ -38,5 +38,7 @@ message UserInfoResponse {
 // IdentityService defines an RPC Service that interacts with user/app identities.
 service IdentityService {
   // Retrieves user information about the currently logged in user.
-  rpc UserInfo(UserInfoRequest) returns (UserInfoResponse) {}
+  rpc UserInfo(UserInfoRequest) returns (UserInfoResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package flyteidl2.common;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
+
+extend google.protobuf.MethodOptions {
+  // allowed_when_restricted marks an RPC that has side effects but is still served while
+  // the caller's organization is restricted to read-only: stopping work, work already
+  // running reporting its progress, and keeping the account in good standing. A
+  // deployment that restricts organizations refuses every other RPC with side effects
+  // (anything not declared idempotency_level = NO_SIDE_EFFECTS) for a restricted org.
+  bool allowed_when_restricted = 50101;
+}

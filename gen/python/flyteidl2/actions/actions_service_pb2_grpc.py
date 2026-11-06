@@ -52,6 +52,8 @@ class ActionsServiceServicer(object):
 
     def Enqueue(self, request, context):
         """Enqueue queues a new action for execution.
+        For a restricted org only a child action is served: a root action starts a new run,
+        and a deployment that restricts orgs refuses it.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')

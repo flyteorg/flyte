@@ -64,7 +64,7 @@ class DataProxyServiceASGIApplication(ConnectASGIApplication[DataProxyService]):
                         service_name="flyteidl2.dataproxy.DataProxyService",
                         input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest,
                         output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.create_download_link,
                 ),
@@ -147,6 +147,7 @@ class DataProxyServiceClient(ConnectClient):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse:
         return await self.execute_unary(
             request=request,
@@ -155,10 +156,11 @@ class DataProxyServiceClient(ConnectClient):
                 service_name="flyteidl2.dataproxy.DataProxyService",
                 input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest,
                 output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     async def get_action_data(
@@ -247,7 +249,7 @@ class DataProxyServiceWSGIApplication(ConnectWSGIApplication):
                         service_name="flyteidl2.dataproxy.DataProxyService",
                         input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest,
                         output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.create_download_link,
                 ),
@@ -330,6 +332,7 @@ class DataProxyServiceClientSync(ConnectClientSync):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse:
         return self.execute_unary(
             request=request,
@@ -338,10 +341,11 @@ class DataProxyServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.dataproxy.DataProxyService",
                 input=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkRequest,
                 output=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.CreateDownloadLinkResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     def get_action_data(
