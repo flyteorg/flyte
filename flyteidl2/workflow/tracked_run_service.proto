@@ -4,6 +4,7 @@ package flyteidl2.workflow;
 
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/rpc_options.proto";
 import "flyteidl2/common/run.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/run.proto";
@@ -33,7 +34,9 @@ service TrackedRunService {
   // Report state for one or more actions of a tracked run. Creates actions on first report and
   // updates them on subsequent reports. Reports are idempotent: an event with an
   // (attempt, version, phase) tuple that was already recorded is acknowledged as success.
-  rpc ReportActions(ReportTrackedActionsRequest) returns (ReportTrackedActionsResponse) {}
+  rpc ReportActions(ReportTrackedActionsRequest) returns (ReportTrackedActionsResponse) {
+    option (flyteidl2.common.allowed_when_restricted) = true;
+  }
 
   // Get detailed information about a tracked run.
   rpc GetRunDetails(GetRunDetailsRequest) returns (GetRunDetailsResponse) {
@@ -80,7 +83,9 @@ service TrackedRunService {
   // Abort a tracked run: mark the run and all of its non-terminal actions ABORTED on the server.
   // The platform cannot stop the client that owns the run; subsequent reports against aborted actions
   // are rejected. Aborting an already-terminal run is a no-op acknowledged as success.
-  rpc AbortRun(AbortRunRequest) returns (AbortRunResponse) {}
+  rpc AbortRun(AbortRunRequest) returns (AbortRunResponse) {
+    option (flyteidl2.common.allowed_when_restricted) = true;
+  }
 }
 
 // Request message for creating a tracked run.

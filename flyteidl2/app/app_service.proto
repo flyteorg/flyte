@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.app;
 
 import "flyteidl2/app/app_payload.proto";
+import "flyteidl2/common/rpc_options.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app";
 
@@ -20,10 +21,14 @@ service AppService {
   rpc Update(UpdateRequest) returns (UpdateResponse) {}
 
   // UpdateStatus updates the status of an existing app.
-  rpc UpdateStatus(UpdateStatusRequest) returns (UpdateStatusResponse) {}
+  rpc UpdateStatus(UpdateStatusRequest) returns (UpdateStatusResponse) {
+    option (flyteidl2.common.allowed_when_restricted) = true;
+  }
 
   // Delete deletes an app by its identifier.
-  rpc Delete(DeleteRequest) returns (DeleteResponse) {}
+  rpc Delete(DeleteRequest) returns (DeleteResponse) {
+    option (flyteidl2.common.allowed_when_restricted) = true;
+  }
 
   // List lists all apps with optional filtering.
   rpc List(ListRequest) returns (ListResponse) {
@@ -36,5 +41,7 @@ service AppService {
   }
 
   // Lease leases apps.
-  rpc Lease(LeaseRequest) returns (stream LeaseResponse) {}
+  rpc Lease(LeaseRequest) returns (stream LeaseResponse) {
+    option (flyteidl2.common.allowed_when_restricted) = true;
+  }
 }

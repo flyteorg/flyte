@@ -2,6 +2,7 @@ from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import list_pb2 as _list_pb2
 from flyteidl2.common import phase_pb2 as _phase_pb2
+from flyteidl2.common import rpc_options_pb2 as _rpc_options_pb2
 from flyteidl2.common import run_pb2 as _run_pb2
 from flyteidl2.core import execution_pb2 as _execution_pb2
 from flyteidl2.task import common_pb2 as _common_pb2

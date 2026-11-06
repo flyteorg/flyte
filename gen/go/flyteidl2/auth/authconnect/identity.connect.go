@@ -64,6 +64,7 @@ func NewIdentityServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			httpClient,
 			baseURL+IdentityServiceUserInfoProcedure,
 			connect.WithSchema(identityServiceUserInfoMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -95,6 +96,7 @@ func NewIdentityServiceHandler(svc IdentityServiceHandler, opts ...connect.Handl
 		IdentityServiceUserInfoProcedure,
 		svc.UserInfo,
 		connect.WithSchema(identityServiceUserInfoMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/flyteidl2.auth.IdentityService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

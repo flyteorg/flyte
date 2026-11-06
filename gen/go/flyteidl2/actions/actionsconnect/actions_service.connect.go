@@ -59,6 +59,8 @@ var (
 // ActionsServiceClient is a client for the flyteidl2.actions.ActionsService service.
 type ActionsServiceClient interface {
 	// Enqueue queues a new action for execution.
+	// For a restricted org only a child action is served: a root action starts a new run,
+	// and a deployment that restricts orgs refuses it.
 	Enqueue(context.Context, *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error)
 	// WatchForUpdates watches for updates to the state of actions.
 	// This API guarantees at-least-once delivery semantics.
@@ -159,6 +161,8 @@ func (c *actionsServiceClient) Signal(ctx context.Context, req *connect.Request[
 // ActionsServiceHandler is an implementation of the flyteidl2.actions.ActionsService service.
 type ActionsServiceHandler interface {
 	// Enqueue queues a new action for execution.
+	// For a restricted org only a child action is served: a root action starts a new run,
+	// and a deployment that restricts orgs refuses it.
 	Enqueue(context.Context, *connect.Request[actions.EnqueueRequest]) (*connect.Response[actions.EnqueueResponse], error)
 	// WatchForUpdates watches for updates to the state of actions.
 	// This API guarantees at-least-once delivery semantics.

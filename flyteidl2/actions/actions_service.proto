@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "flyteidl2/common/address.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/identity.proto";
+import "flyteidl2/common/rpc_options.proto";
 import "flyteidl2/core/literals.proto";
 import "flyteidl2/task/run.proto";
 import "flyteidl2/workflow/run_definition.proto";
@@ -18,7 +19,11 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions";
 // the state and execution of actions.
 service ActionsService {
   // Enqueue queues a new action for execution.
-  rpc Enqueue(EnqueueRequest) returns (EnqueueResponse) {}
+  // For a restricted org only a child action is served: a root action starts a new run,
+  // and a deployment that restricts orgs refuses it.
+  rpc Enqueue(EnqueueRequest) returns (EnqueueResponse) {
+    option (flyteidl2.common.allowed_when_restricted) = true;
+  }
 
   // WatchForUpdates watches for updates to the state of actions.
   // This API guarantees at-least-once delivery semantics.
@@ -28,11 +33,15 @@ service ActionsService {
 
   // Update updates the status of an action and saves serialized NodeStatus.
   // This deprecates Put in the current StateService.
-  rpc Update(UpdateRequest) returns (UpdateResponse) {}
+  rpc Update(UpdateRequest) returns (UpdateResponse) {
+    option (flyteidl2.common.allowed_when_restricted) = true;
+  }
 
   // Abort aborts a single action that was previously queued or is currently being processed by a worker.
   // Note that this will cascade aborts to all descendant actions of the specified action.
-  rpc Abort(AbortRequest) returns (AbortResponse) {}
+  rpc Abort(AbortRequest) returns (AbortResponse) {
+    option (flyteidl2.common.allowed_when_restricted) = true;
+  }
 
   // Signal resolves a ConditionAction by providing its signal value.
   // On success, transitions the condition to SUCCEEDED with the provided
@@ -40,7 +49,9 @@ service ActionsService {
   // Returns FAILED_PRECONDITION if the action is not a condition or is
   // already terminal. Returns NOT_FOUND if the action does not exist.
   // Returns ABORTED if the action has a write in-flight (retry).
-  rpc Signal(SignalRequest) returns (SignalResponse) {}
+  rpc Signal(SignalRequest) returns (SignalResponse) {
+    option (flyteidl2.common.allowed_when_restricted) = true;
+  }
 }
 
 // Action represents a unit of work to be executed. Theses can be task executions, traces, or conditions.

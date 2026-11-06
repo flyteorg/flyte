@@ -2,6 +2,7 @@ from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import address_pb2 as _address_pb2
 from flyteidl2.common import identifier_pb2 as _identifier_pb2
 from flyteidl2.common import identity_pb2 as _identity_pb2
+from flyteidl2.common import rpc_options_pb2 as _rpc_options_pb2
 from flyteidl2.core import literals_pb2 as _literals_pb2
 from flyteidl2.task import run_pb2 as _run_pb2
 from flyteidl2.workflow import run_definition_pb2 as _run_definition_pb2

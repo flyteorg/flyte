@@ -32,7 +32,7 @@ class IdentityServiceASGIApplication(ConnectASGIApplication[IdentityService]):
                         service_name="flyteidl2.auth.IdentityService",
                         input=flyteidl2_dot_auth_dot_identity__pb2.UserInfoRequest,
                         output=flyteidl2_dot_auth_dot_identity__pb2.UserInfoResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.user_info,
                 ),
@@ -55,6 +55,7 @@ class IdentityServiceClient(ConnectClient):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_auth_dot_identity__pb2.UserInfoResponse:
         return await self.execute_unary(
             request=request,
@@ -63,10 +64,11 @@ class IdentityServiceClient(ConnectClient):
                 service_name="flyteidl2.auth.IdentityService",
                 input=flyteidl2_dot_auth_dot_identity__pb2.UserInfoRequest,
                 output=flyteidl2_dot_auth_dot_identity__pb2.UserInfoResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
 
@@ -85,7 +87,7 @@ class IdentityServiceWSGIApplication(ConnectWSGIApplication):
                         service_name="flyteidl2.auth.IdentityService",
                         input=flyteidl2_dot_auth_dot_identity__pb2.UserInfoRequest,
                         output=flyteidl2_dot_auth_dot_identity__pb2.UserInfoResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.user_info,
                 ),
@@ -108,6 +110,7 @@ class IdentityServiceClientSync(ConnectClientSync):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_auth_dot_identity__pb2.UserInfoResponse:
         return self.execute_unary(
             request=request,
@@ -116,8 +119,9 @@ class IdentityServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.auth.IdentityService",
                 input=flyteidl2_dot_auth_dot_identity__pb2.UserInfoRequest,
                 output=flyteidl2_dot_auth_dot_identity__pb2.UserInfoResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )

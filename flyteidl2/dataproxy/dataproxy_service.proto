@@ -32,7 +32,9 @@ service DataProxyService {
   rpc UploadInputs(UploadInputsRequest) returns (UploadInputsResponse) {}
 
   // CreateDownloadLink generates signed URL(s) for downloading a given artifact.
-  rpc CreateDownloadLink(CreateDownloadLinkRequest) returns (CreateDownloadLinkResponse) {}
+  rpc CreateDownloadLink(CreateDownloadLinkRequest) returns (CreateDownloadLinkResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Get input and output data for an action.
   rpc GetActionData(GetActionDataRequest) returns (GetActionDataResponse) {

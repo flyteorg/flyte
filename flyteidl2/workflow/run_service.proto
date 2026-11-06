@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/list.proto";
 import "flyteidl2/common/phase.proto";
+import "flyteidl2/common/rpc_options.proto";
 import "flyteidl2/common/run.proto";
 import "flyteidl2/core/execution.proto";
 import "flyteidl2/task/common.proto";
@@ -23,7 +24,9 @@ service RunService {
   rpc CreateRun(CreateRunRequest) returns (CreateRunResponse) {}
 
   // Abort a run.
-  rpc AbortRun(AbortRunRequest) returns (AbortRunResponse) {}
+  rpc AbortRun(AbortRunRequest) returns (AbortRunResponse) {
+    option (flyteidl2.common.allowed_when_restricted) = true;
+  }
 
   // Get detailed information about a run.
   rpc GetRunDetails(GetRunDetailsRequest) returns (GetRunDetailsResponse) {
@@ -80,13 +83,17 @@ service RunService {
   }
 
   // AbortAction aborts a single action that was previously created or is currently being processed by a worker.
-  rpc AbortAction(AbortActionRequest) returns (AbortActionResponse) {}
+  rpc AbortAction(AbortActionRequest) returns (AbortActionResponse) {
+    option (flyteidl2.common.allowed_when_restricted) = true;
+  }
 
   // SignalEvent resolves a paused condition action by supplying its value.
   // It converts the user-facing EventPayload to a core.Literal and delegates
   // to ActionsService.Signal, resolving the condition's parent action for
   // routing.
-  rpc SignalEvent(SignalEventRequest) returns (SignalEventResponse) {}
+  rpc SignalEvent(SignalEventRequest) returns (SignalEventResponse) {
+    option (flyteidl2.common.allowed_when_restricted) = true;
+  }
 
   // Stream updates for task groups based on the provided filter criteria.
   rpc WatchGroups(WatchGroupsRequest) returns (stream WatchGroupsResponse) {

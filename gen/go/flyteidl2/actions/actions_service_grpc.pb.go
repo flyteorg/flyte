@@ -31,6 +31,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ActionsServiceClient interface {
 	// Enqueue queues a new action for execution.
+	// For a restricted org only a child action is served: a root action starts a new run,
+	// and a deployment that restricts orgs refuses it.
 	Enqueue(ctx context.Context, in *EnqueueRequest, opts ...grpc.CallOption) (*EnqueueResponse, error)
 	// WatchForUpdates watches for updates to the state of actions.
 	// This API guarantees at-least-once delivery semantics.
@@ -131,6 +133,8 @@ func (c *actionsServiceClient) Signal(ctx context.Context, in *SignalRequest, op
 // for forward compatibility
 type ActionsServiceServer interface {
 	// Enqueue queues a new action for execution.
+	// For a restricted org only a child action is served: a root action starts a new run,
+	// and a deployment that restricts orgs refuses it.
 	Enqueue(context.Context, *EnqueueRequest) (*EnqueueResponse, error)
 	// WatchForUpdates watches for updates to the state of actions.
 	// This API guarantees at-least-once delivery semantics.

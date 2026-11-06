@@ -5,6 +5,7 @@ package flyteidl2.trigger;
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/list.proto";
+import "flyteidl2/common/rpc_options.proto";
 import "flyteidl2/task/common.proto";
 import "flyteidl2/task/task_definition.proto";
 import "flyteidl2/trigger/trigger_definition.proto";
@@ -47,7 +48,9 @@ service TriggerService {
   rpc UpdateTriggers(UpdateTriggersRequest) returns (UpdateTriggersResponse) {}
 
   // Soft-delete multiple triggers at once.
-  rpc DeleteTriggers(DeleteTriggersRequest) returns (DeleteTriggersResponse) {}
+  rpc DeleteTriggers(DeleteTriggersRequest) returns (DeleteTriggersResponse) {
+    option (flyteidl2.common.allowed_when_restricted) = true;
+  }
 }
 
 // Request message for saving a trigger.
