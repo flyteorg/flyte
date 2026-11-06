@@ -7,7 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"golang.org/x/time/rate"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -32,13 +33,13 @@ type TriggerExecutorConfig struct {
 	// BaseURL is the URL of the runs service (e.g. "http://localhost:8090").
 	BaseURL string
 	// HTTPClient is the client used for outbound RunService calls.
-	HTTPClient connect.HTTPClient
+	HTTPClient connecthttp.HTTPClient
 	// QPS is the token-bucket rate for CreateRun calls (tokens/second).
 	QPS float64
 	// Burst is the token-bucket burst size.
 	Burst int
 	// ClientOpts are connect client options for the outbound RunService client.
-	ClientOpts []connect.ClientOption
+	ClientOpts []connect.ClientInterceptor
 }
 
 // NewTriggerExecutor constructs a TriggerExecutor.
@@ -48,7 +49,7 @@ func NewTriggerExecutor(cfg TriggerExecutorConfig) *TriggerExecutor {
 		httpClient = http.DefaultClient
 	}
 	return &TriggerExecutor{
-		runClient: workflowconnect.NewRunServiceClient(httpClient, cfg.BaseURL, cfg.ClientOpts...),
+		runClient: workflowconnect.NewRunServiceClient(connect.NewClient(connecthttp.NewTransport(httpClient, cfg.BaseURL, connecthttp.WithReadMaxBytes(0)), cfg.ClientOpts...)),
 		limiter:   rate.NewLimiter(rate.Limit(cfg.QPS), cfg.Burst),
 	}
 }
@@ -94,7 +95,7 @@ func (e *TriggerExecutor) Execute(ctx context.Context, t *models.Trigger, schedu
 		}
 	}
 
-	req := connect.NewRequest(createReq)
+	req := createReq
 
 	_, err := e.runClient.CreateRun(ctx, req)
 	if err != nil {

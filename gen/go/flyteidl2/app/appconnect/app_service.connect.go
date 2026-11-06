@@ -5,333 +5,425 @@
 package appconnect
 
 import (
-	connect "connectrpc.com/connect"
+	connect "connectrpc.com/connect/v2"
 	context "context"
-	errors "errors"
 	app "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
-	http "net/http"
-	strings "strings"
+	sync "sync"
 )
-
-// This is a compile-time assertion to ensure that this generated file and the connect package are
-// compatible. If you get a compiler error that this constant is not defined, this code was
-// generated with a version of connect newer than the one compiled into your binary. You can fix the
-// problem by either regenerating this code with an older version of connect or updating the connect
-// version compiled into your binary.
-const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// AppServiceName is the fully-qualified name of the AppService service.
 	AppServiceName = "flyteidl2.app.AppService"
 )
 
-// These constants are the fully-qualified names of the RPCs defined in this package. They're
-// exposed at runtime as Spec.Procedure and as the final two segments of the HTTP route.
+// These constants are the procedure names of the RPCs defined in this package. They're exposed at
+// runtime as Spec.Procedure and as the final two segments of the HTTP route.
 //
 // Note that these are different from the fully-qualified method names used by
 // google.golang.org/protobuf/reflect/protoreflect. To convert from these constants to
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// AppServiceCreateProcedure is the fully-qualified name of the AppService's Create RPC.
+	// AppServiceCreateProcedure is the procedure name of the AppService's Create RPC.
 	AppServiceCreateProcedure = "/flyteidl2.app.AppService/Create"
-	// AppServiceGetProcedure is the fully-qualified name of the AppService's Get RPC.
+	// AppServiceGetProcedure is the procedure name of the AppService's Get RPC.
 	AppServiceGetProcedure = "/flyteidl2.app.AppService/Get"
-	// AppServiceUpdateProcedure is the fully-qualified name of the AppService's Update RPC.
+	// AppServiceUpdateProcedure is the procedure name of the AppService's Update RPC.
 	AppServiceUpdateProcedure = "/flyteidl2.app.AppService/Update"
-	// AppServiceUpdateStatusProcedure is the fully-qualified name of the AppService's UpdateStatus RPC.
+	// AppServiceUpdateStatusProcedure is the procedure name of the AppService's UpdateStatus RPC.
 	AppServiceUpdateStatusProcedure = "/flyteidl2.app.AppService/UpdateStatus"
-	// AppServiceDeleteProcedure is the fully-qualified name of the AppService's Delete RPC.
+	// AppServiceDeleteProcedure is the procedure name of the AppService's Delete RPC.
 	AppServiceDeleteProcedure = "/flyteidl2.app.AppService/Delete"
-	// AppServiceListProcedure is the fully-qualified name of the AppService's List RPC.
+	// AppServiceListProcedure is the procedure name of the AppService's List RPC.
 	AppServiceListProcedure = "/flyteidl2.app.AppService/List"
-	// AppServiceWatchProcedure is the fully-qualified name of the AppService's Watch RPC.
+	// AppServiceWatchProcedure is the procedure name of the AppService's Watch RPC.
 	AppServiceWatchProcedure = "/flyteidl2.app.AppService/Watch"
-	// AppServiceLeaseProcedure is the fully-qualified name of the AppService's Lease RPC.
+	// AppServiceLeaseProcedure is the procedure name of the AppService's Lease RPC.
 	AppServiceLeaseProcedure = "/flyteidl2.app.AppService/Lease"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	appServiceServiceDescriptor            = app.File_flyteidl2_app_app_service_proto.Services().ByName("AppService")
-	appServiceCreateMethodDescriptor       = appServiceServiceDescriptor.Methods().ByName("Create")
-	appServiceGetMethodDescriptor          = appServiceServiceDescriptor.Methods().ByName("Get")
-	appServiceUpdateMethodDescriptor       = appServiceServiceDescriptor.Methods().ByName("Update")
-	appServiceUpdateStatusMethodDescriptor = appServiceServiceDescriptor.Methods().ByName("UpdateStatus")
-	appServiceDeleteMethodDescriptor       = appServiceServiceDescriptor.Methods().ByName("Delete")
-	appServiceListMethodDescriptor         = appServiceServiceDescriptor.Methods().ByName("List")
-	appServiceWatchMethodDescriptor        = appServiceServiceDescriptor.Methods().ByName("Watch")
-	appServiceLeaseMethodDescriptor        = appServiceServiceDescriptor.Methods().ByName("Lease")
+	appServiceCreateSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     app.File_flyteidl2_app_app_service_proto.Services().ByName("AppService").Methods().ByName("Create"),
+			Procedure:  AppServiceCreateProcedure,
+		}
+	})
+	appServiceGetSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           app.File_flyteidl2_app_app_service_proto.Services().ByName("AppService").Methods().ByName("Get"),
+			Procedure:        AppServiceGetProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	appServiceUpdateSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     app.File_flyteidl2_app_app_service_proto.Services().ByName("AppService").Methods().ByName("Update"),
+			Procedure:  AppServiceUpdateProcedure,
+		}
+	})
+	appServiceUpdateStatusSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     app.File_flyteidl2_app_app_service_proto.Services().ByName("AppService").Methods().ByName("UpdateStatus"),
+			Procedure:  AppServiceUpdateStatusProcedure,
+		}
+	})
+	appServiceDeleteSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     app.File_flyteidl2_app_app_service_proto.Services().ByName("AppService").Methods().ByName("Delete"),
+			Procedure:  AppServiceDeleteProcedure,
+		}
+	})
+	appServiceListSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           app.File_flyteidl2_app_app_service_proto.Services().ByName("AppService").Methods().ByName("List"),
+			Procedure:        AppServiceListProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	appServiceWatchSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeServer,
+			Schema:           app.File_flyteidl2_app_app_service_proto.Services().ByName("AppService").Methods().ByName("Watch"),
+			Procedure:        AppServiceWatchProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	appServiceLeaseSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeServer,
+			Schema:     app.File_flyteidl2_app_app_service_proto.Services().ByName("AppService").Methods().ByName("Lease"),
+			Procedure:  AppServiceLeaseProcedure,
+		}
+	})
 )
 
 // AppServiceClient is a client for the flyteidl2.app.AppService service.
 type AppServiceClient interface {
 	// Create creates a new app.
-	Create(context.Context, *connect.Request[app.CreateRequest]) (*connect.Response[app.CreateResponse], error)
+	Create(context.Context, *app.CreateRequest) (*app.CreateResponse, error)
 	// Get retrieves an app by its identifier.
-	Get(context.Context, *connect.Request[app.GetRequest]) (*connect.Response[app.GetResponse], error)
+	Get(context.Context, *app.GetRequest) (*app.GetResponse, error)
 	// Update updates an existing app.
-	Update(context.Context, *connect.Request[app.UpdateRequest]) (*connect.Response[app.UpdateResponse], error)
+	Update(context.Context, *app.UpdateRequest) (*app.UpdateResponse, error)
 	// UpdateStatus updates the status of an existing app.
-	UpdateStatus(context.Context, *connect.Request[app.UpdateStatusRequest]) (*connect.Response[app.UpdateStatusResponse], error)
+	UpdateStatus(context.Context, *app.UpdateStatusRequest) (*app.UpdateStatusResponse, error)
 	// Delete deletes an app by its identifier.
-	Delete(context.Context, *connect.Request[app.DeleteRequest]) (*connect.Response[app.DeleteResponse], error)
+	Delete(context.Context, *app.DeleteRequest) (*app.DeleteResponse, error)
 	// List lists all apps with optional filtering.
-	List(context.Context, *connect.Request[app.ListRequest]) (*connect.Response[app.ListResponse], error)
+	List(context.Context, *app.ListRequest) (*app.ListResponse, error)
 	// Watch watches for app events.
-	Watch(context.Context, *connect.Request[app.WatchRequest]) (*connect.ServerStreamForClient[app.WatchResponse], error)
+	Watch(context.Context, *app.WatchRequest) (AppServiceWatchClientStream, error)
 	// Lease leases apps.
-	Lease(context.Context, *connect.Request[app.LeaseRequest]) (*connect.ServerStreamForClient[app.LeaseResponse], error)
+	Lease(context.Context, *app.LeaseRequest) (AppServiceLeaseClientStream, error)
 }
 
-// NewAppServiceClient constructs a client for the flyteidl2.app.AppService service. By default, it
-// uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses, and sends
-// uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the connect.WithGRPC() or
-// connect.WithGRPCWeb() options.
-//
-// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
-// http://api.acme.com or https://acme.com/grpc).
-func NewAppServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) AppServiceClient {
-	baseURL = strings.TrimRight(baseURL, "/")
-	return &appServiceClient{
-		create: connect.NewClient[app.CreateRequest, app.CreateResponse](
-			httpClient,
-			baseURL+AppServiceCreateProcedure,
-			connect.WithSchema(appServiceCreateMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		get: connect.NewClient[app.GetRequest, app.GetResponse](
-			httpClient,
-			baseURL+AppServiceGetProcedure,
-			connect.WithSchema(appServiceGetMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		update: connect.NewClient[app.UpdateRequest, app.UpdateResponse](
-			httpClient,
-			baseURL+AppServiceUpdateProcedure,
-			connect.WithSchema(appServiceUpdateMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		updateStatus: connect.NewClient[app.UpdateStatusRequest, app.UpdateStatusResponse](
-			httpClient,
-			baseURL+AppServiceUpdateStatusProcedure,
-			connect.WithSchema(appServiceUpdateStatusMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		delete: connect.NewClient[app.DeleteRequest, app.DeleteResponse](
-			httpClient,
-			baseURL+AppServiceDeleteProcedure,
-			connect.WithSchema(appServiceDeleteMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		list: connect.NewClient[app.ListRequest, app.ListResponse](
-			httpClient,
-			baseURL+AppServiceListProcedure,
-			connect.WithSchema(appServiceListMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		watch: connect.NewClient[app.WatchRequest, app.WatchResponse](
-			httpClient,
-			baseURL+AppServiceWatchProcedure,
-			connect.WithSchema(appServiceWatchMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		lease: connect.NewClient[app.LeaseRequest, app.LeaseResponse](
-			httpClient,
-			baseURL+AppServiceLeaseProcedure,
-			connect.WithSchema(appServiceLeaseMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
+// NewAppServiceClient constructs a client for the flyteidl2.app.AppService service. Multiple
+// service clients may share a single connect.Client.
+func NewAppServiceClient(client *connect.Client) AppServiceClient {
+	return &appServiceClient{client: client}
+}
+
+// AppServiceWatchClientStream is the client stream for the AppService's Watch RPC.
+type AppServiceWatchClientStream struct {
+	stream connect.ClientStream
+}
+
+// Receive returns the next response message from the server.
+func (s AppServiceWatchClientStream) Receive() (*app.WatchResponse, error) {
+	var res app.WatchResponse
+	if err := s.stream.Receive(&res); err != nil {
+		return nil, err
 	}
+	return &res, nil
 }
 
-// appServiceClient implements AppServiceClient.
-type appServiceClient struct {
-	create       *connect.Client[app.CreateRequest, app.CreateResponse]
-	get          *connect.Client[app.GetRequest, app.GetResponse]
-	update       *connect.Client[app.UpdateRequest, app.UpdateResponse]
-	updateStatus *connect.Client[app.UpdateStatusRequest, app.UpdateStatusResponse]
-	delete       *connect.Client[app.DeleteRequest, app.DeleteResponse]
-	list         *connect.Client[app.ListRequest, app.ListResponse]
-	watch        *connect.Client[app.WatchRequest, app.WatchResponse]
-	lease        *connect.Client[app.LeaseRequest, app.LeaseResponse]
+// Close releases the stream's resources. It is idempotent and is typically deferred to clean up a
+// stream abandoned before io.EOF.
+func (s AppServiceWatchClientStream) Close() error {
+	return s.stream.Close()
 }
 
-// Create calls flyteidl2.app.AppService.Create.
-func (c *appServiceClient) Create(ctx context.Context, req *connect.Request[app.CreateRequest]) (*connect.Response[app.CreateResponse], error) {
-	return c.create.CallUnary(ctx, req)
+// AppServiceLeaseClientStream is the client stream for the AppService's Lease RPC.
+type AppServiceLeaseClientStream struct {
+	stream connect.ClientStream
 }
 
-// Get calls flyteidl2.app.AppService.Get.
-func (c *appServiceClient) Get(ctx context.Context, req *connect.Request[app.GetRequest]) (*connect.Response[app.GetResponse], error) {
-	return c.get.CallUnary(ctx, req)
+// Receive returns the next response message from the server.
+func (s AppServiceLeaseClientStream) Receive() (*app.LeaseResponse, error) {
+	var res app.LeaseResponse
+	if err := s.stream.Receive(&res); err != nil {
+		return nil, err
+	}
+	return &res, nil
 }
 
-// Update calls flyteidl2.app.AppService.Update.
-func (c *appServiceClient) Update(ctx context.Context, req *connect.Request[app.UpdateRequest]) (*connect.Response[app.UpdateResponse], error) {
-	return c.update.CallUnary(ctx, req)
-}
-
-// UpdateStatus calls flyteidl2.app.AppService.UpdateStatus.
-func (c *appServiceClient) UpdateStatus(ctx context.Context, req *connect.Request[app.UpdateStatusRequest]) (*connect.Response[app.UpdateStatusResponse], error) {
-	return c.updateStatus.CallUnary(ctx, req)
-}
-
-// Delete calls flyteidl2.app.AppService.Delete.
-func (c *appServiceClient) Delete(ctx context.Context, req *connect.Request[app.DeleteRequest]) (*connect.Response[app.DeleteResponse], error) {
-	return c.delete.CallUnary(ctx, req)
-}
-
-// List calls flyteidl2.app.AppService.List.
-func (c *appServiceClient) List(ctx context.Context, req *connect.Request[app.ListRequest]) (*connect.Response[app.ListResponse], error) {
-	return c.list.CallUnary(ctx, req)
-}
-
-// Watch calls flyteidl2.app.AppService.Watch.
-func (c *appServiceClient) Watch(ctx context.Context, req *connect.Request[app.WatchRequest]) (*connect.ServerStreamForClient[app.WatchResponse], error) {
-	return c.watch.CallServerStream(ctx, req)
-}
-
-// Lease calls flyteidl2.app.AppService.Lease.
-func (c *appServiceClient) Lease(ctx context.Context, req *connect.Request[app.LeaseRequest]) (*connect.ServerStreamForClient[app.LeaseResponse], error) {
-	return c.lease.CallServerStream(ctx, req)
+// Close releases the stream's resources. It is idempotent and is typically deferred to clean up a
+// stream abandoned before io.EOF.
+func (s AppServiceLeaseClientStream) Close() error {
+	return s.stream.Close()
 }
 
 // AppServiceHandler is an implementation of the flyteidl2.app.AppService service.
 type AppServiceHandler interface {
 	// Create creates a new app.
-	Create(context.Context, *connect.Request[app.CreateRequest]) (*connect.Response[app.CreateResponse], error)
+	Create(context.Context, *app.CreateRequest) (*app.CreateResponse, error)
 	// Get retrieves an app by its identifier.
-	Get(context.Context, *connect.Request[app.GetRequest]) (*connect.Response[app.GetResponse], error)
+	Get(context.Context, *app.GetRequest) (*app.GetResponse, error)
 	// Update updates an existing app.
-	Update(context.Context, *connect.Request[app.UpdateRequest]) (*connect.Response[app.UpdateResponse], error)
+	Update(context.Context, *app.UpdateRequest) (*app.UpdateResponse, error)
 	// UpdateStatus updates the status of an existing app.
-	UpdateStatus(context.Context, *connect.Request[app.UpdateStatusRequest]) (*connect.Response[app.UpdateStatusResponse], error)
+	UpdateStatus(context.Context, *app.UpdateStatusRequest) (*app.UpdateStatusResponse, error)
 	// Delete deletes an app by its identifier.
-	Delete(context.Context, *connect.Request[app.DeleteRequest]) (*connect.Response[app.DeleteResponse], error)
+	Delete(context.Context, *app.DeleteRequest) (*app.DeleteResponse, error)
 	// List lists all apps with optional filtering.
-	List(context.Context, *connect.Request[app.ListRequest]) (*connect.Response[app.ListResponse], error)
+	List(context.Context, *app.ListRequest) (*app.ListResponse, error)
 	// Watch watches for app events.
-	Watch(context.Context, *connect.Request[app.WatchRequest], *connect.ServerStream[app.WatchResponse]) error
+	Watch(context.Context, *app.WatchRequest, AppServiceWatchServerStream) error
 	// Lease leases apps.
-	Lease(context.Context, *connect.Request[app.LeaseRequest], *connect.ServerStream[app.LeaseResponse]) error
+	Lease(context.Context, *app.LeaseRequest, AppServiceLeaseServerStream) error
 }
 
-// NewAppServiceHandler builds an HTTP handler from the service implementation. It returns the path
-// on which to mount the handler and the handler itself.
-//
-// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
-// and JSON codecs. They also support gzip compression.
-func NewAppServiceHandler(svc AppServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	appServiceCreateHandler := connect.NewUnaryHandler(
-		AppServiceCreateProcedure,
-		svc.Create,
-		connect.WithSchema(appServiceCreateMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
+// RegisterAppServiceHandler registers svc as the flyteidl2.app.AppService implementation on server.
+func RegisterAppServiceHandler(server *connect.Server, svc AppServiceHandler) {
+	adapter := appServiceHandler{svc: svc}
+	server.Register(
+		connect.Method{Spec: appServiceCreateSpec(), Handler: adapter.create},
+		connect.Method{Spec: appServiceGetSpec(), Handler: adapter.get},
+		connect.Method{Spec: appServiceUpdateSpec(), Handler: adapter.update},
+		connect.Method{Spec: appServiceUpdateStatusSpec(), Handler: adapter.updateStatus},
+		connect.Method{Spec: appServiceDeleteSpec(), Handler: adapter.delete},
+		connect.Method{Spec: appServiceListSpec(), Handler: adapter.list},
+		connect.Method{Spec: appServiceWatchSpec(), Handler: adapter.watch},
+		connect.Method{Spec: appServiceLeaseSpec(), Handler: adapter.lease},
 	)
-	appServiceGetHandler := connect.NewUnaryHandler(
-		AppServiceGetProcedure,
-		svc.Get,
-		connect.WithSchema(appServiceGetMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	appServiceUpdateHandler := connect.NewUnaryHandler(
-		AppServiceUpdateProcedure,
-		svc.Update,
-		connect.WithSchema(appServiceUpdateMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	appServiceUpdateStatusHandler := connect.NewUnaryHandler(
-		AppServiceUpdateStatusProcedure,
-		svc.UpdateStatus,
-		connect.WithSchema(appServiceUpdateStatusMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	appServiceDeleteHandler := connect.NewUnaryHandler(
-		AppServiceDeleteProcedure,
-		svc.Delete,
-		connect.WithSchema(appServiceDeleteMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	appServiceListHandler := connect.NewUnaryHandler(
-		AppServiceListProcedure,
-		svc.List,
-		connect.WithSchema(appServiceListMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	appServiceWatchHandler := connect.NewServerStreamHandler(
-		AppServiceWatchProcedure,
-		svc.Watch,
-		connect.WithSchema(appServiceWatchMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	appServiceLeaseHandler := connect.NewServerStreamHandler(
-		AppServiceLeaseProcedure,
-		svc.Lease,
-		connect.WithSchema(appServiceLeaseMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	return "/flyteidl2.app.AppService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case AppServiceCreateProcedure:
-			appServiceCreateHandler.ServeHTTP(w, r)
-		case AppServiceGetProcedure:
-			appServiceGetHandler.ServeHTTP(w, r)
-		case AppServiceUpdateProcedure:
-			appServiceUpdateHandler.ServeHTTP(w, r)
-		case AppServiceUpdateStatusProcedure:
-			appServiceUpdateStatusHandler.ServeHTTP(w, r)
-		case AppServiceDeleteProcedure:
-			appServiceDeleteHandler.ServeHTTP(w, r)
-		case AppServiceListProcedure:
-			appServiceListHandler.ServeHTTP(w, r)
-		case AppServiceWatchProcedure:
-			appServiceWatchHandler.ServeHTTP(w, r)
-		case AppServiceLeaseProcedure:
-			appServiceLeaseHandler.ServeHTTP(w, r)
-		default:
-			http.NotFound(w, r)
-		}
-	})
+}
+
+// AppServiceWatchServerStream is the server stream for the AppService's Watch RPC.
+type AppServiceWatchServerStream struct {
+	stream connect.ServerStream
+}
+
+// SendHeaders flushes the response headers without a message. The first Send does this implicitly.
+func (s AppServiceWatchServerStream) SendHeaders() error {
+	return s.stream.SendHeaders()
+}
+
+// Send sends a response message to the client.
+func (s AppServiceWatchServerStream) Send(res *app.WatchResponse) error {
+	return s.stream.Send(res)
+}
+
+// AppServiceLeaseServerStream is the server stream for the AppService's Lease RPC.
+type AppServiceLeaseServerStream struct {
+	stream connect.ServerStream
+}
+
+// SendHeaders flushes the response headers without a message. The first Send does this implicitly.
+func (s AppServiceLeaseServerStream) SendHeaders() error {
+	return s.stream.SendHeaders()
+}
+
+// Send sends a response message to the client.
+func (s AppServiceLeaseServerStream) Send(res *app.LeaseResponse) error {
+	return s.stream.Send(res)
 }
 
 // UnimplementedAppServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedAppServiceHandler struct{}
 
-func (UnimplementedAppServiceHandler) Create(context.Context, *connect.Request[app.CreateRequest]) (*connect.Response[app.CreateResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.app.AppService.Create is not implemented"))
+func (UnimplementedAppServiceHandler) Create(context.Context, *app.CreateRequest) (*app.CreateResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.app.AppService.Create is not implemented")
 }
 
-func (UnimplementedAppServiceHandler) Get(context.Context, *connect.Request[app.GetRequest]) (*connect.Response[app.GetResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.app.AppService.Get is not implemented"))
+func (UnimplementedAppServiceHandler) Get(context.Context, *app.GetRequest) (*app.GetResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.app.AppService.Get is not implemented")
 }
 
-func (UnimplementedAppServiceHandler) Update(context.Context, *connect.Request[app.UpdateRequest]) (*connect.Response[app.UpdateResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.app.AppService.Update is not implemented"))
+func (UnimplementedAppServiceHandler) Update(context.Context, *app.UpdateRequest) (*app.UpdateResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.app.AppService.Update is not implemented")
 }
 
-func (UnimplementedAppServiceHandler) UpdateStatus(context.Context, *connect.Request[app.UpdateStatusRequest]) (*connect.Response[app.UpdateStatusResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.app.AppService.UpdateStatus is not implemented"))
+func (UnimplementedAppServiceHandler) UpdateStatus(context.Context, *app.UpdateStatusRequest) (*app.UpdateStatusResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.app.AppService.UpdateStatus is not implemented")
 }
 
-func (UnimplementedAppServiceHandler) Delete(context.Context, *connect.Request[app.DeleteRequest]) (*connect.Response[app.DeleteResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.app.AppService.Delete is not implemented"))
+func (UnimplementedAppServiceHandler) Delete(context.Context, *app.DeleteRequest) (*app.DeleteResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.app.AppService.Delete is not implemented")
 }
 
-func (UnimplementedAppServiceHandler) List(context.Context, *connect.Request[app.ListRequest]) (*connect.Response[app.ListResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.app.AppService.List is not implemented"))
+func (UnimplementedAppServiceHandler) List(context.Context, *app.ListRequest) (*app.ListResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.app.AppService.List is not implemented")
 }
 
-func (UnimplementedAppServiceHandler) Watch(context.Context, *connect.Request[app.WatchRequest], *connect.ServerStream[app.WatchResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.app.AppService.Watch is not implemented"))
+func (UnimplementedAppServiceHandler) Watch(context.Context, *app.WatchRequest, AppServiceWatchServerStream) error {
+	return connect.NewError(connect.CodeUnimplemented, "flyteidl2.app.AppService.Watch is not implemented")
 }
 
-func (UnimplementedAppServiceHandler) Lease(context.Context, *connect.Request[app.LeaseRequest], *connect.ServerStream[app.LeaseResponse]) error {
-	return connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.app.AppService.Lease is not implemented"))
+func (UnimplementedAppServiceHandler) Lease(context.Context, *app.LeaseRequest, AppServiceLeaseServerStream) error {
+	return connect.NewError(connect.CodeUnimplemented, "flyteidl2.app.AppService.Lease is not implemented")
+}
+
+type appServiceClient struct {
+	client *connect.Client
+}
+
+func (c *appServiceClient) Create(ctx context.Context, req *app.CreateRequest) (*app.CreateResponse, error) {
+	var res app.CreateResponse
+	if err := c.client.CallUnary(ctx, appServiceCreateSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *appServiceClient) Get(ctx context.Context, req *app.GetRequest) (*app.GetResponse, error) {
+	var res app.GetResponse
+	if err := c.client.CallUnary(ctx, appServiceGetSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *appServiceClient) Update(ctx context.Context, req *app.UpdateRequest) (*app.UpdateResponse, error) {
+	var res app.UpdateResponse
+	if err := c.client.CallUnary(ctx, appServiceUpdateSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *appServiceClient) UpdateStatus(ctx context.Context, req *app.UpdateStatusRequest) (*app.UpdateStatusResponse, error) {
+	var res app.UpdateStatusResponse
+	if err := c.client.CallUnary(ctx, appServiceUpdateStatusSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *appServiceClient) Delete(ctx context.Context, req *app.DeleteRequest) (*app.DeleteResponse, error) {
+	var res app.DeleteResponse
+	if err := c.client.CallUnary(ctx, appServiceDeleteSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *appServiceClient) List(ctx context.Context, req *app.ListRequest) (*app.ListResponse, error) {
+	var res app.ListResponse
+	if err := c.client.CallUnary(ctx, appServiceListSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *appServiceClient) Watch(ctx context.Context, req *app.WatchRequest) (AppServiceWatchClientStream, error) {
+	stream, err := c.client.CallServerStream(ctx, appServiceWatchSpec(), req)
+	if err != nil {
+		return AppServiceWatchClientStream{}, err
+	}
+	return AppServiceWatchClientStream{stream: stream}, nil
+}
+
+func (c *appServiceClient) Lease(ctx context.Context, req *app.LeaseRequest) (AppServiceLeaseClientStream, error) {
+	stream, err := c.client.CallServerStream(ctx, appServiceLeaseSpec(), req)
+	if err != nil {
+		return AppServiceLeaseClientStream{}, err
+	}
+	return AppServiceLeaseClientStream{stream: stream}, nil
+}
+
+type appServiceHandler struct{ svc AppServiceHandler }
+
+func (h appServiceHandler) create(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req app.CreateRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.Create(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h appServiceHandler) get(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req app.GetRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.Get(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h appServiceHandler) update(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req app.UpdateRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.Update(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h appServiceHandler) updateStatus(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req app.UpdateStatusRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.UpdateStatus(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h appServiceHandler) delete(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req app.DeleteRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.Delete(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h appServiceHandler) list(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req app.ListRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.List(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h appServiceHandler) watch(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req app.WatchRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	return h.svc.Watch(ctx, &req, AppServiceWatchServerStream{stream: stream})
+}
+
+func (h appServiceHandler) lease(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req app.LeaseRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	return h.svc.Lease(ctx, &req, AppServiceLeaseServerStream{stream: stream})
 }

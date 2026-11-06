@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -30,13 +30,12 @@ type fakeTriggerClient struct {
 }
 
 func (f *fakeTriggerClient) GetTriggerRevisionDetails(
-	context.Context,
-	*connect.Request[trigger.GetTriggerRevisionDetailsRequest],
-) (*connect.Response[trigger.GetTriggerRevisionDetailsResponse], error) {
+	context.Context, *trigger.GetTriggerRevisionDetailsRequest,
+) (*trigger.GetTriggerRevisionDetailsResponse, error) {
 	if f.err != nil {
 		return nil, f.err
 	}
-	return connect.NewResponse(f.resp), nil
+	return f.resp, nil
 }
 
 func testTriggerID() *common.TriggerIdentifier {
@@ -97,9 +96,9 @@ func testVariableMap() *core.VariableMap {
 	}
 }
 
-func assertHelloWorldSchema(t *testing.T, resp *connect.Response[workflow.LiteralsToLaunchFormJsonResponse]) {
+func assertHelloWorldSchema(t *testing.T, resp *workflow.LiteralsToLaunchFormJsonResponse) {
 	t.Helper()
-	schema := resp.Msg.GetJson().AsMap()
+	schema := resp.GetJson().AsMap()
 	properties, ok := schema["properties"].(map[string]any)
 	require.True(t, ok)
 	testField, ok := properties["test"].(map[string]any)
@@ -110,10 +109,10 @@ func assertHelloWorldSchema(t *testing.T, resp *connect.Response[workflow.Litera
 func TestLiteralsToLaunchFormJson_Inline(t *testing.T) {
 	svc := NewTranslatorService(nil, nil, nil)
 
-	resp, err := svc.LiteralsToLaunchFormJson(context.Background(), connect.NewRequest(&workflow.LiteralsToLaunchFormJsonRequest{
+	resp, err := svc.LiteralsToLaunchFormJson(context.Background(), &workflow.LiteralsToLaunchFormJsonRequest{
 		Literals:  testNamedLiterals(),
 		Variables: testVariableMap(),
-	}))
+	})
 
 	require.NoError(t, err)
 	assertHelloWorldSchema(t, resp)
@@ -125,10 +124,10 @@ func TestLiteralsToLaunchFormJson_OffloadedURI(t *testing.T) {
 
 	runClient := workflowMocks.NewRunServiceClient(t)
 	runClient.EXPECT().GetActionDataURIs(mock.Anything, mock.Anything).Return(
-		connect.NewResponse(&workflow.GetActionDataURIsResponse{
+		&workflow.GetActionDataURIsResponse{
 			InputsUri:  inputsURI,
 			OutputsUri: "s3://test-bucket/metadata/proj/dev/run1/a0/outputs.pb",
-		}), nil)
+		}, nil)
 
 	mockComposedStore := storageMocks.NewComposedProtobufStore(t)
 	mockComposedStore.On("ReadProtobuf", mock.Anything, storage.DataReference(inputsURI), mock.Anything).
@@ -140,11 +139,11 @@ func TestLiteralsToLaunchFormJson_OffloadedURI(t *testing.T) {
 
 	svc := NewTranslatorService(&storage.DataStore{ComposedProtobufStore: mockComposedStore}, runClient, nil)
 
-	resp, err := svc.LiteralsToLaunchFormJson(context.Background(), connect.NewRequest(&workflow.LiteralsToLaunchFormJsonRequest{
+	resp, err := svc.LiteralsToLaunchFormJson(context.Background(), &workflow.LiteralsToLaunchFormJsonRequest{
 		Variables:   testVariableMap(),
 		LiteralsUri: inputsURI,
 		Owner:       &workflow.LiteralsToLaunchFormJsonRequest_ActionId{ActionId: testActionID()},
-	}))
+	})
 
 	require.NoError(t, err)
 	assertHelloWorldSchema(t, resp)
@@ -180,10 +179,10 @@ func TestLiteralsToLaunchFormJson_Trigger(t *testing.T) {
 
 	svc := NewTranslatorService(&storage.DataStore{ComposedProtobufStore: mockComposedStore}, nil, triggerClient)
 
-	resp, err := svc.LiteralsToLaunchFormJson(context.Background(), connect.NewRequest(&workflow.LiteralsToLaunchFormJsonRequest{
+	resp, err := svc.LiteralsToLaunchFormJson(context.Background(), &workflow.LiteralsToLaunchFormJsonRequest{
 		Variables: testVariableMap(),
 		Owner:     &workflow.LiteralsToLaunchFormJsonRequest_TriggerId{TriggerId: testTriggerID()},
-	}))
+	})
 
 	require.NoError(t, err)
 	assertHelloWorldSchema(t, resp)
@@ -223,10 +222,10 @@ func TestLiteralsToLaunchFormJson_Trigger_DirectoryURI(t *testing.T) {
 
 	svc := NewTranslatorService(&storage.DataStore{ComposedProtobufStore: mockComposedStore}, nil, triggerClient)
 
-	resp, err := svc.LiteralsToLaunchFormJson(context.Background(), connect.NewRequest(&workflow.LiteralsToLaunchFormJsonRequest{
+	resp, err := svc.LiteralsToLaunchFormJson(context.Background(), &workflow.LiteralsToLaunchFormJsonRequest{
 		Variables: testVariableMap(),
 		Owner:     &workflow.LiteralsToLaunchFormJsonRequest_TriggerId{TriggerId: testTriggerID()},
-	}))
+	})
 
 	require.NoError(t, err)
 	assertHelloWorldSchema(t, resp)
@@ -244,10 +243,10 @@ func TestLiteralsToLaunchFormJson_Trigger_NoOffloadedData(t *testing.T) {
 
 	svc := NewTranslatorService(nil, nil, triggerClient)
 
-	_, err := svc.LiteralsToLaunchFormJson(context.Background(), connect.NewRequest(&workflow.LiteralsToLaunchFormJsonRequest{
+	_, err := svc.LiteralsToLaunchFormJson(context.Background(), &workflow.LiteralsToLaunchFormJsonRequest{
 		Variables: testVariableMap(),
 		Owner:     &workflow.LiteralsToLaunchFormJsonRequest_TriggerId{TriggerId: testTriggerID()},
-	}))
+	})
 
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
@@ -257,10 +256,10 @@ func TestLiteralsToLaunchFormJson_Trigger_NoOffloadedData(t *testing.T) {
 func TestLiteralsToLaunchFormJson_OffloadedURI_MissingActionId(t *testing.T) {
 	svc := NewTranslatorService(nil, nil, nil)
 
-	_, err := svc.LiteralsToLaunchFormJson(context.Background(), connect.NewRequest(&workflow.LiteralsToLaunchFormJsonRequest{
+	_, err := svc.LiteralsToLaunchFormJson(context.Background(), &workflow.LiteralsToLaunchFormJsonRequest{
 		Variables:   testVariableMap(),
 		LiteralsUri: "s3://test-bucket/metadata/proj/dev/run1/a0/inputs.pb",
-	}))
+	})
 
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
@@ -270,18 +269,18 @@ func TestLiteralsToLaunchFormJson_OffloadedURI_MissingActionId(t *testing.T) {
 func TestLiteralsToLaunchFormJson_OffloadedURI_Mismatch(t *testing.T) {
 	runClient := workflowMocks.NewRunServiceClient(t)
 	runClient.EXPECT().GetActionDataURIs(mock.Anything, mock.Anything).Return(
-		connect.NewResponse(&workflow.GetActionDataURIsResponse{
+		&workflow.GetActionDataURIsResponse{
 			InputsUri:  "s3://test-bucket/metadata/proj/dev/run1/a0/inputs.pb",
 			OutputsUri: "s3://test-bucket/metadata/proj/dev/run1/a0/outputs.pb",
-		}), nil)
+		}, nil)
 
 	svc := NewTranslatorService(nil, runClient, nil)
 
-	_, err := svc.LiteralsToLaunchFormJson(context.Background(), connect.NewRequest(&workflow.LiteralsToLaunchFormJsonRequest{
+	_, err := svc.LiteralsToLaunchFormJson(context.Background(), &workflow.LiteralsToLaunchFormJsonRequest{
 		Variables:   testVariableMap(),
 		LiteralsUri: "s3://test-bucket/some/other/object.pb",
 		Owner:       &workflow.LiteralsToLaunchFormJsonRequest_ActionId{ActionId: testActionID()},
-	}))
+	})
 
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))

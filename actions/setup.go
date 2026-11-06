@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"connectrpc.com/otelconnect"
 	"github.com/flyteorg/flyte/v2/actions/config"
 	actionsk8s "github.com/flyteorg/flyte/v2/actions/k8s"
@@ -31,12 +32,19 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
-	otelInterceptor, err := otelconnect.NewInterceptor(
+	otelInterceptor, err := otelconnect.NewServerInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
 		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
 	)
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
+	}
+	otelClientInterceptor, err := otelconnect.NewClientInterceptor(
+		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
+		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
+	)
+	if err != nil {
+		return fmt.Errorf("creating otel client interceptor: %w", err)
 	}
 
 	if err := actionsk8s.InitScheme(); err != nil {
@@ -55,7 +63,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err != nil {
 		return fmt.Errorf("actions: configure run service client: %w", err)
 	}
-	runClient := workflowconnect.NewInternalRunServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
+	runClient := workflowconnect.NewInternalRunServiceClient(connect.NewClient(connecthttp.NewTransport(runHTTPClient, runServiceCfg.URL, connecthttp.WithReadMaxBytes(0)), otelClientInterceptor))
 
 	actionsClient, err := actionsk8s.NewActionsClient(
 		sc.K8sClient,
@@ -83,8 +91,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 	actionsSvc := service.NewActionsService(actionsClient)
 
-	path, handler := actionsconnect.NewActionsServiceHandler(actionsSvc, connect.WithInterceptors(otelInterceptor))
-	sc.Mux.Handle(path, handler)
+	handler := connect.NewServer(otelInterceptor)
+	actionsconnect.RegisterActionsServiceHandler(handler, actionsSvc)
+	connecthttp.Mount(sc.Mux, handler, connecthttp.WithReadMaxBytes(0))
+	path := "/" + actionsconnect.ActionsServiceName + "/"
 	logger.Infof(ctx, "Mounted ActionsService at %s", path)
 
 	return nil

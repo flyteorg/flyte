@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -61,20 +61,20 @@ func New(cfg *cacheconfig.Config, outputs interfaces.CachedOutputRepo, reservati
 // Get returns the materialized cache entry for the given key, if one exists.
 func (m *Manager) Get(ctx context.Context, request *cacheservicepb.GetCacheRequest) (*CacheEntry, error) {
 	if request.GetKey() == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("key is required"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "key is required")
 	}
 
 	output, err := m.outputs.Get(ctx, request.GetKey())
 	if err != nil {
 		if repositoryerrors.IsNotFound(err) {
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("cache entry %q not found", request.GetKey()))
+			return nil, connect.Errorf(connect.CodeNotFound, "cache entry %q not found", request.GetKey())
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
 	metadata, err := unmarshalMetadata(output.Metadata)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
 	return &CacheEntry{
@@ -89,16 +89,16 @@ func (m *Manager) Get(ctx context.Context, request *cacheservicepb.GetCacheReque
 // live in object storage; cache service stores the lookup record plus metadata.
 func (m *Manager) Put(ctx context.Context, request *cacheservicepb.PutCacheRequest) error {
 	if request.GetKey() == "" {
-		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("key is required"))
+		return connect.Errorf(connect.CodeInvalidArgument, "key is required")
 	}
 	if request.GetOutput() == nil || request.GetOutput().GetOutputUri() == "" {
-		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("output_uri is required"))
+		return connect.Errorf(connect.CodeInvalidArgument, "output_uri is required")
 	}
 
 	now := time.Now().UTC()
 	existing, err := m.outputs.Get(ctx, request.GetKey())
 	if err != nil && !repositoryerrors.IsNotFound(err) {
-		return connect.NewError(connect.CodeInternal, err)
+		return connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
 	if err == nil {
@@ -107,14 +107,14 @@ func (m *Manager) Put(ctx context.Context, request *cacheservicepb.PutCacheReque
 			expired = time.Since(existing.LastUpdated) > maxAge.AsDuration()
 		}
 		if !request.GetOverwrite().GetOverwrite() && !expired {
-			return connect.NewError(connect.CodeAlreadyExists, fmt.Errorf("cache entry %q already exists", request.GetKey()))
+			return connect.Errorf(connect.CodeAlreadyExists, "cache entry %q already exists", request.GetKey())
 		}
 	}
 
 	metadata := mergeMetadata(existing, request.GetOutput().GetMetadata(), now)
 	metadataBytes, err := proto.Marshal(metadata)
 	if err != nil {
-		return connect.NewError(connect.CodeInternal, err)
+		return connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
 	model := &models.CachedOutput{
@@ -124,7 +124,7 @@ func (m *Manager) Put(ctx context.Context, request *cacheservicepb.PutCacheReque
 		LastUpdated: metadata.GetLastUpdatedAt().AsTime(),
 	}
 	if err := m.outputs.Put(ctx, model); err != nil {
-		return connect.NewError(connect.CodeInternal, err)
+		return connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
 	return nil
@@ -136,13 +136,13 @@ func (m *Manager) Put(ctx context.Context, request *cacheservicepb.PutCacheReque
 // pointing at a shared URI, and blob lifecycle is better handled separately.
 func (m *Manager) Delete(ctx context.Context, request *cacheservicepb.DeleteCacheRequest) error {
 	if request.GetKey() == "" {
-		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("key is required"))
+		return connect.Errorf(connect.CodeInvalidArgument, "key is required")
 	}
 	if err := m.outputs.Delete(ctx, request.GetKey()); err != nil {
 		if repositoryerrors.IsNotFound(err) {
-			return connect.NewError(connect.CodeNotFound, fmt.Errorf("cache entry %q not found", request.GetKey()))
+			return connect.Errorf(connect.CodeNotFound, "cache entry %q not found", request.GetKey())
 		}
-		return connect.NewError(connect.CodeInternal, err)
+		return connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 	return nil
 }
@@ -156,10 +156,10 @@ func (m *Manager) Delete(ctx context.Context, request *cacheservicepb.DeleteCach
 // appear.
 func (m *Manager) GetOrExtendReservation(ctx context.Context, request *cacheservicepb.GetOrExtendReservationRequest, now time.Time) (*cacheservicepb.Reservation, error) {
 	if request.GetKey() == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("key is required"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "key is required")
 	}
 	if request.GetOwnerId() == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("owner_id is required"))
+		return nil, connect.Errorf(connect.CodeInvalidArgument, "owner_id is required")
 	}
 
 	reservationKey := fmt.Sprintf("%s:%s", reservationPrefix, request.GetKey())
@@ -173,7 +173,7 @@ func (m *Manager) GetOrExtendReservation(ctx context.Context, request *cacheserv
 
 	_, err := m.reservations.Get(ctx, reservationKey)
 	if err != nil && !repositoryerrors.IsNotFound(err) {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
 	// Existing reservations follow one of two paths:
@@ -186,11 +186,11 @@ func (m *Manager) GetOrExtendReservation(ctx context.Context, request *cacheserv
 				// could refresh an expired one. Re-read to return the current holder.
 				current, getErr := m.reservations.Get(ctx, reservationKey)
 				if getErr != nil {
-					return nil, connect.NewError(connect.CodeInternal, getErr)
+					return nil, connect.NewError(connect.CodeInternal, getErr.Error()).WithCause(getErr)
 				}
 				return reservationFromModel(current), nil
 			}
-			return nil, connect.NewError(connect.CodeInternal, err)
+			return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 		}
 		return reservationFromModel(reservation), nil
 	}
@@ -200,11 +200,11 @@ func (m *Manager) GetOrExtendReservation(ctx context.Context, request *cacheserv
 			// Another caller created the reservation after our initial read.
 			current, getErr := m.reservations.Get(ctx, reservationKey)
 			if getErr != nil {
-				return nil, connect.NewError(connect.CodeInternal, getErr)
+				return nil, connect.NewError(connect.CodeInternal, getErr.Error()).WithCause(getErr)
 			}
 			return reservationFromModel(current), nil
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 
 	return reservationFromModel(reservation), nil
@@ -216,10 +216,10 @@ func (m *Manager) GetOrExtendReservation(ctx context.Context, request *cacheserv
 // idempotently.
 func (m *Manager) ReleaseReservation(ctx context.Context, request *cacheservicepb.ReleaseReservationRequest) error {
 	if request.GetKey() == "" {
-		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("key is required"))
+		return connect.Errorf(connect.CodeInvalidArgument, "key is required")
 	}
 	if request.GetOwnerId() == "" {
-		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("owner_id is required"))
+		return connect.Errorf(connect.CodeInvalidArgument, "owner_id is required")
 	}
 
 	reservationKey := fmt.Sprintf("%s:%s", reservationPrefix, request.GetKey())
@@ -227,7 +227,7 @@ func (m *Manager) ReleaseReservation(ctx context.Context, request *cacheservicep
 		if repositoryerrors.IsNotFound(err) {
 			return nil
 		}
-		return connect.NewError(connect.CodeInternal, err)
+		return connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 	return nil
 }

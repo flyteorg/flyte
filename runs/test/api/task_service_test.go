@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -29,9 +30,9 @@ func TestDeployTask(t *testing.T) {
 
 	ctx := context.Background()
 	httpClient := newClient()
-	opts := []connect.ClientOption{}
+	opts := []connecthttp.Option{}
 
-	taskClient := taskconnect.NewTaskServiceClient(httpClient, endpoint, opts...)
+	taskClient := taskconnect.NewTaskServiceClient(connect.NewClient(connecthttp.NewTransport(httpClient, endpoint, append([]connecthttp.Option{connecthttp.WithReadMaxBytes(0)}, opts...)...)))
 
 	// Deploy a task
 	taskID := &task.TaskIdentifier{
@@ -42,7 +43,7 @@ func TestDeployTask(t *testing.T) {
 		Version: uniqueString(),
 	}
 
-	deployResp, err := taskClient.DeployTask(ctx, connect.NewRequest(&task.DeployTaskRequest{
+	deployResp, err := taskClient.DeployTask(ctx, &task.DeployTaskRequest{
 		TaskId: taskID,
 		Spec: &task.TaskSpec{
 			TaskTemplate: &core.TaskTemplate{
@@ -55,20 +56,20 @@ func TestDeployTask(t *testing.T) {
 				},
 			},
 		},
-	}))
+	})
 
 	require.NoError(t, err)
 	require.NotNil(t, deployResp)
 	t.Logf("Task deployed successfully: %v", taskID)
 
 	// Get task details
-	getTaskDetailsResp, err := taskClient.GetTaskDetails(ctx, connect.NewRequest(&task.GetTaskDetailsRequest{
+	getTaskDetailsResp, err := taskClient.GetTaskDetails(ctx, &task.GetTaskDetailsRequest{
 		TaskId: taskID,
-	}))
+	})
 
 	require.NoError(t, err)
 	require.NotNil(t, getTaskDetailsResp)
-	details := getTaskDetailsResp.Msg.GetDetails()
+	details := getTaskDetailsResp.GetDetails()
 	assert.Equal(t, taskID.GetProject(), details.GetTaskId().GetProject())
 	assert.Equal(t, taskID.GetDomain(), details.GetTaskId().GetDomain())
 	assert.Equal(t, taskID.GetName(), details.GetTaskId().GetName())
@@ -76,18 +77,18 @@ func TestDeployTask(t *testing.T) {
 	t.Logf("Task details retrieved successfully: %v", details)
 
 	// Get versions of the task
-	getVersionsResp, err := taskClient.ListVersions(ctx, connect.NewRequest(&task.ListVersionsRequest{
+	getVersionsResp, err := taskClient.ListVersions(ctx, &task.ListVersionsRequest{
 		TaskName: &task.TaskName{
 			Org:     testOrg,
 			Project: testProject,
 			Domain:  testDomain,
 			Name:    "test-task",
 		},
-	}))
+	})
 
 	require.NoError(t, err)
 	require.NotNil(t, getVersionsResp)
-	versions := getVersionsResp.Msg.GetVersions()
+	versions := getVersionsResp.GetVersions()
 	assert.Equal(t, 1, len(versions))
 	assert.Equal(t, taskID.GetVersion(), versions[0].Version)
 	t.Logf("Task versions retrieved successfully: %v", versions)
@@ -100,9 +101,9 @@ func TestListTasks(t *testing.T) {
 
 	ctx := context.Background()
 	httpClient := newClient()
-	opts := []connect.ClientOption{}
+	opts := []connecthttp.Option{}
 
-	taskClient := taskconnect.NewTaskServiceClient(httpClient, endpoint, opts...)
+	taskClient := taskconnect.NewTaskServiceClient(connect.NewClient(connecthttp.NewTransport(httpClient, endpoint, append([]connecthttp.Option{connecthttp.WithReadMaxBytes(0)}, opts...)...)))
 
 	// Deploy multiple tasks
 	count := 3
@@ -115,7 +116,7 @@ func TestListTasks(t *testing.T) {
 			Version: uniqueString(),
 		}
 
-		deployResp, err := taskClient.DeployTask(ctx, connect.NewRequest(&task.DeployTaskRequest{
+		deployResp, err := taskClient.DeployTask(ctx, &task.DeployTaskRequest{
 			TaskId: taskID,
 			Spec: &task.TaskSpec{
 				TaskTemplate: &core.TaskTemplate{
@@ -128,24 +129,24 @@ func TestListTasks(t *testing.T) {
 					},
 				},
 			},
-		}))
+		})
 		require.NotNil(t, deployResp)
 		require.NoError(t, err)
 	}
 
 	// List tasks
-	listResp, err := taskClient.ListTasks(ctx, connect.NewRequest(&task.ListTasksRequest{
+	listResp, err := taskClient.ListTasks(ctx, &task.ListTasksRequest{
 		ScopeBy: &task.ListTasksRequest_Org{
 			Org: "test-org",
 		},
 		Request: &common.ListRequest{
 			Limit: 10,
 		},
-	}))
+	})
 	require.NoError(t, err)
 	require.NotNil(t, listResp)
 
-	tasks := listResp.Msg.GetTasks()
+	tasks := listResp.GetTasks()
 	assert.Equal(t, count, len(tasks))
 	t.Logf("Listed %d tasks", len(tasks))
 }

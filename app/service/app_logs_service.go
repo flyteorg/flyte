@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+	"errors"
+	"io"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app/appconnect"
@@ -26,18 +28,27 @@ var _ appconnect.AppLogsServiceHandler = (*AppLogsService)(nil)
 // TailLogs proxies the server-streaming TailLogs RPC to InternalAppLogsService.
 func (s *AppLogsService) TailLogs(
 	ctx context.Context,
-	req *connect.Request[flyteapp.TailLogsRequest],
-	stream *connect.ServerStream[flyteapp.TailLogsResponse],
+	req *flyteapp.TailLogsRequest,
+	stream appconnect.AppLogsServiceTailLogsServerStream,
 ) error {
 	clientStream, err := s.internalClient.TailLogs(ctx, req)
 	if err != nil {
-		return connect.NewError(connect.CodeInternal, err)
+		return connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 	defer clientStream.Close() //nolint:errcheck
-	for clientStream.Receive() {
-		if err := stream.Send(clientStream.Msg()); err != nil {
+	var streamErr error
+	for {
+		msg, err2 := clientStream.Receive()
+		if err2 != nil {
+			streamErr = err2
+			break
+		}
+		if err := stream.Send(msg); err != nil {
 			return err
 		}
 	}
-	return clientStream.Err()
+	if errors.Is(streamErr, io.EOF) {
+		streamErr = nil
+	}
+	return streamErr
 }

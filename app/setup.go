@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	"connectrpc.com/otelconnect"
 	stdlibapp "github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -43,15 +44,22 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
-	otelInterceptor, err := otelconnect.NewInterceptor(
+	otelInterceptor, err := otelconnect.NewServerInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
 		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
 	)
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
+	otelClientInterceptor, err := otelconnect.NewClientInterceptor(
+		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
+		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
+	)
+	if err != nil {
+		return fmt.Errorf("creating otel client interceptor: %w", err)
+	}
 
-	interceptors := []connect.Interceptor{otelInterceptor}
+	interceptors := []connect.ServerInterceptor{otelInterceptor}
 	if sentryutils.Init(ctx, otelServiceName) {
 		interceptors = append(interceptors, sentryutils.Interceptor(sentryOperations))
 		sc.AddWorker("app-sentry-flush", func(ctx context.Context) error {
@@ -71,26 +79,32 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext) error {
 	}
 	internalAppURL := internalAppServiceCfg.URL + "/internal"
 
-	internalClient := appconnect.NewAppServiceClient(
+	internalClient := appconnect.NewAppServiceClient(connect.NewClient(connecthttp.NewTransport(
 		internalHTTPClient,
 		internalAppURL,
-		connect.WithInterceptors(otelInterceptor),
-	)
+		connecthttp.WithReadMaxBytes(0),
+	), otelClientInterceptor,
+	))
 
 	appSvc := service.NewAppService(internalClient, cfg.CacheTTL)
 
-	path, handler := appconnect.NewAppServiceHandler(appSvc, connect.WithInterceptors(interceptors...))
-	sc.Mux.Handle(path, handler)
+	handler := connect.NewServer(interceptors...)
+	appconnect.RegisterAppServiceHandler(handler, appSvc)
+	connecthttp.Mount(sc.Mux, handler, connecthttp.WithReadMaxBytes(0))
+	path := "/" + appconnect.AppServiceName + "/"
 	logger.Infof(ctx, "Mounted AppService at %s", path)
 
-	internalLogsClient := appconnect.NewAppLogsServiceClient(
+	internalLogsClient := appconnect.NewAppLogsServiceClient(connect.NewClient(connecthttp.NewTransport(
 		internalHTTPClient,
 		internalAppURL,
-		connect.WithInterceptors(otelInterceptor),
-	)
+		connecthttp.WithReadMaxBytes(0),
+	), otelClientInterceptor,
+	))
 	logsSvc := service.NewAppLogsService(internalLogsClient)
-	logsPath, logsHandler := appconnect.NewAppLogsServiceHandler(logsSvc, connect.WithInterceptors(otelInterceptor))
-	sc.Mux.Handle(logsPath, logsHandler)
+	logsHandler := connect.NewServer(otelInterceptor)
+	appconnect.RegisterAppLogsServiceHandler(logsHandler, logsSvc)
+	connecthttp.Mount(sc.Mux, logsHandler, connecthttp.WithReadMaxBytes(0))
+	logsPath := "/" + appconnect.AppLogsServiceName + "/"
 	logger.Infof(ctx, "Mounted AppLogsService at %s", logsPath)
 
 	return nil

@@ -5,211 +5,212 @@
 package taskconnect
 
 import (
-	connect "connectrpc.com/connect"
+	connect "connectrpc.com/connect/v2"
 	context "context"
-	errors "errors"
 	task "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
-	http "net/http"
-	strings "strings"
+	sync "sync"
 )
-
-// This is a compile-time assertion to ensure that this generated file and the connect package are
-// compatible. If you get a compiler error that this constant is not defined, this code was
-// generated with a version of connect newer than the one compiled into your binary. You can fix the
-// problem by either regenerating this code with an older version of connect or updating the connect
-// version compiled into your binary.
-const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// TaskServiceName is the fully-qualified name of the TaskService service.
 	TaskServiceName = "flyteidl2.task.TaskService"
 )
 
-// These constants are the fully-qualified names of the RPCs defined in this package. They're
-// exposed at runtime as Spec.Procedure and as the final two segments of the HTTP route.
+// These constants are the procedure names of the RPCs defined in this package. They're exposed at
+// runtime as Spec.Procedure and as the final two segments of the HTTP route.
 //
 // Note that these are different from the fully-qualified method names used by
 // google.golang.org/protobuf/reflect/protoreflect. To convert from these constants to
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// TaskServiceDeployTaskProcedure is the fully-qualified name of the TaskService's DeployTask RPC.
+	// TaskServiceDeployTaskProcedure is the procedure name of the TaskService's DeployTask RPC.
 	TaskServiceDeployTaskProcedure = "/flyteidl2.task.TaskService/DeployTask"
-	// TaskServiceGetTaskDetailsProcedure is the fully-qualified name of the TaskService's
-	// GetTaskDetails RPC.
+	// TaskServiceGetTaskDetailsProcedure is the procedure name of the TaskService's GetTaskDetails RPC.
 	TaskServiceGetTaskDetailsProcedure = "/flyteidl2.task.TaskService/GetTaskDetails"
-	// TaskServiceListTasksProcedure is the fully-qualified name of the TaskService's ListTasks RPC.
+	// TaskServiceListTasksProcedure is the procedure name of the TaskService's ListTasks RPC.
 	TaskServiceListTasksProcedure = "/flyteidl2.task.TaskService/ListTasks"
-	// TaskServiceListVersionsProcedure is the fully-qualified name of the TaskService's ListVersions
-	// RPC.
+	// TaskServiceListVersionsProcedure is the procedure name of the TaskService's ListVersions RPC.
 	TaskServiceListVersionsProcedure = "/flyteidl2.task.TaskService/ListVersions"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	taskServiceServiceDescriptor              = task.File_flyteidl2_task_task_service_proto.Services().ByName("TaskService")
-	taskServiceDeployTaskMethodDescriptor     = taskServiceServiceDescriptor.Methods().ByName("DeployTask")
-	taskServiceGetTaskDetailsMethodDescriptor = taskServiceServiceDescriptor.Methods().ByName("GetTaskDetails")
-	taskServiceListTasksMethodDescriptor      = taskServiceServiceDescriptor.Methods().ByName("ListTasks")
-	taskServiceListVersionsMethodDescriptor   = taskServiceServiceDescriptor.Methods().ByName("ListVersions")
+	taskServiceDeployTaskSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     task.File_flyteidl2_task_task_service_proto.Services().ByName("TaskService").Methods().ByName("DeployTask"),
+			Procedure:  TaskServiceDeployTaskProcedure,
+		}
+	})
+	taskServiceGetTaskDetailsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           task.File_flyteidl2_task_task_service_proto.Services().ByName("TaskService").Methods().ByName("GetTaskDetails"),
+			Procedure:        TaskServiceGetTaskDetailsProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	taskServiceListTasksSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           task.File_flyteidl2_task_task_service_proto.Services().ByName("TaskService").Methods().ByName("ListTasks"),
+			Procedure:        TaskServiceListTasksProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	taskServiceListVersionsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           task.File_flyteidl2_task_task_service_proto.Services().ByName("TaskService").Methods().ByName("ListVersions"),
+			Procedure:        TaskServiceListVersionsProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
 )
 
 // TaskServiceClient is a client for the flyteidl2.task.TaskService service.
 type TaskServiceClient interface {
 	// Deploy a task.
-	DeployTask(context.Context, *connect.Request[task.DeployTaskRequest]) (*connect.Response[task.DeployTaskResponse], error)
+	DeployTask(context.Context, *task.DeployTaskRequest) (*task.DeployTaskResponse, error)
 	// Get detailed information about a task.
-	GetTaskDetails(context.Context, *connect.Request[task.GetTaskDetailsRequest]) (*connect.Response[task.GetTaskDetailsResponse], error)
+	GetTaskDetails(context.Context, *task.GetTaskDetailsRequest) (*task.GetTaskDetailsResponse, error)
 	// Lists tasks, one per task name, returning the latest version and who it was deployed by.
-	ListTasks(context.Context, *connect.Request[task.ListTasksRequest]) (*connect.Response[task.ListTasksResponse], error)
+	ListTasks(context.Context, *task.ListTasksRequest) (*task.ListTasksResponse, error)
 	// Lists all versions for a task.
-	ListVersions(context.Context, *connect.Request[task.ListVersionsRequest]) (*connect.Response[task.ListVersionsResponse], error)
+	ListVersions(context.Context, *task.ListVersionsRequest) (*task.ListVersionsResponse, error)
 }
 
-// NewTaskServiceClient constructs a client for the flyteidl2.task.TaskService service. By default,
-// it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses, and
-// sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the connect.WithGRPC()
-// or connect.WithGRPCWeb() options.
-//
-// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
-// http://api.acme.com or https://acme.com/grpc).
-func NewTaskServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) TaskServiceClient {
-	baseURL = strings.TrimRight(baseURL, "/")
-	return &taskServiceClient{
-		deployTask: connect.NewClient[task.DeployTaskRequest, task.DeployTaskResponse](
-			httpClient,
-			baseURL+TaskServiceDeployTaskProcedure,
-			connect.WithSchema(taskServiceDeployTaskMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		getTaskDetails: connect.NewClient[task.GetTaskDetailsRequest, task.GetTaskDetailsResponse](
-			httpClient,
-			baseURL+TaskServiceGetTaskDetailsProcedure,
-			connect.WithSchema(taskServiceGetTaskDetailsMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		listTasks: connect.NewClient[task.ListTasksRequest, task.ListTasksResponse](
-			httpClient,
-			baseURL+TaskServiceListTasksProcedure,
-			connect.WithSchema(taskServiceListTasksMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		listVersions: connect.NewClient[task.ListVersionsRequest, task.ListVersionsResponse](
-			httpClient,
-			baseURL+TaskServiceListVersionsProcedure,
-			connect.WithSchema(taskServiceListVersionsMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-	}
-}
-
-// taskServiceClient implements TaskServiceClient.
-type taskServiceClient struct {
-	deployTask     *connect.Client[task.DeployTaskRequest, task.DeployTaskResponse]
-	getTaskDetails *connect.Client[task.GetTaskDetailsRequest, task.GetTaskDetailsResponse]
-	listTasks      *connect.Client[task.ListTasksRequest, task.ListTasksResponse]
-	listVersions   *connect.Client[task.ListVersionsRequest, task.ListVersionsResponse]
-}
-
-// DeployTask calls flyteidl2.task.TaskService.DeployTask.
-func (c *taskServiceClient) DeployTask(ctx context.Context, req *connect.Request[task.DeployTaskRequest]) (*connect.Response[task.DeployTaskResponse], error) {
-	return c.deployTask.CallUnary(ctx, req)
-}
-
-// GetTaskDetails calls flyteidl2.task.TaskService.GetTaskDetails.
-func (c *taskServiceClient) GetTaskDetails(ctx context.Context, req *connect.Request[task.GetTaskDetailsRequest]) (*connect.Response[task.GetTaskDetailsResponse], error) {
-	return c.getTaskDetails.CallUnary(ctx, req)
-}
-
-// ListTasks calls flyteidl2.task.TaskService.ListTasks.
-func (c *taskServiceClient) ListTasks(ctx context.Context, req *connect.Request[task.ListTasksRequest]) (*connect.Response[task.ListTasksResponse], error) {
-	return c.listTasks.CallUnary(ctx, req)
-}
-
-// ListVersions calls flyteidl2.task.TaskService.ListVersions.
-func (c *taskServiceClient) ListVersions(ctx context.Context, req *connect.Request[task.ListVersionsRequest]) (*connect.Response[task.ListVersionsResponse], error) {
-	return c.listVersions.CallUnary(ctx, req)
+// NewTaskServiceClient constructs a client for the flyteidl2.task.TaskService service. Multiple
+// service clients may share a single connect.Client.
+func NewTaskServiceClient(client *connect.Client) TaskServiceClient {
+	return &taskServiceClient{client: client}
 }
 
 // TaskServiceHandler is an implementation of the flyteidl2.task.TaskService service.
 type TaskServiceHandler interface {
 	// Deploy a task.
-	DeployTask(context.Context, *connect.Request[task.DeployTaskRequest]) (*connect.Response[task.DeployTaskResponse], error)
+	DeployTask(context.Context, *task.DeployTaskRequest) (*task.DeployTaskResponse, error)
 	// Get detailed information about a task.
-	GetTaskDetails(context.Context, *connect.Request[task.GetTaskDetailsRequest]) (*connect.Response[task.GetTaskDetailsResponse], error)
+	GetTaskDetails(context.Context, *task.GetTaskDetailsRequest) (*task.GetTaskDetailsResponse, error)
 	// Lists tasks, one per task name, returning the latest version and who it was deployed by.
-	ListTasks(context.Context, *connect.Request[task.ListTasksRequest]) (*connect.Response[task.ListTasksResponse], error)
+	ListTasks(context.Context, *task.ListTasksRequest) (*task.ListTasksResponse, error)
 	// Lists all versions for a task.
-	ListVersions(context.Context, *connect.Request[task.ListVersionsRequest]) (*connect.Response[task.ListVersionsResponse], error)
+	ListVersions(context.Context, *task.ListVersionsRequest) (*task.ListVersionsResponse, error)
 }
 
-// NewTaskServiceHandler builds an HTTP handler from the service implementation. It returns the path
-// on which to mount the handler and the handler itself.
-//
-// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
-// and JSON codecs. They also support gzip compression.
-func NewTaskServiceHandler(svc TaskServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	taskServiceDeployTaskHandler := connect.NewUnaryHandler(
-		TaskServiceDeployTaskProcedure,
-		svc.DeployTask,
-		connect.WithSchema(taskServiceDeployTaskMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
+// RegisterTaskServiceHandler registers svc as the flyteidl2.task.TaskService implementation on
+// server.
+func RegisterTaskServiceHandler(server *connect.Server, svc TaskServiceHandler) {
+	adapter := taskServiceHandler{svc: svc}
+	server.Register(
+		connect.Method{Spec: taskServiceDeployTaskSpec(), Handler: adapter.deployTask},
+		connect.Method{Spec: taskServiceGetTaskDetailsSpec(), Handler: adapter.getTaskDetails},
+		connect.Method{Spec: taskServiceListTasksSpec(), Handler: adapter.listTasks},
+		connect.Method{Spec: taskServiceListVersionsSpec(), Handler: adapter.listVersions},
 	)
-	taskServiceGetTaskDetailsHandler := connect.NewUnaryHandler(
-		TaskServiceGetTaskDetailsProcedure,
-		svc.GetTaskDetails,
-		connect.WithSchema(taskServiceGetTaskDetailsMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	taskServiceListTasksHandler := connect.NewUnaryHandler(
-		TaskServiceListTasksProcedure,
-		svc.ListTasks,
-		connect.WithSchema(taskServiceListTasksMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	taskServiceListVersionsHandler := connect.NewUnaryHandler(
-		TaskServiceListVersionsProcedure,
-		svc.ListVersions,
-		connect.WithSchema(taskServiceListVersionsMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	return "/flyteidl2.task.TaskService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case TaskServiceDeployTaskProcedure:
-			taskServiceDeployTaskHandler.ServeHTTP(w, r)
-		case TaskServiceGetTaskDetailsProcedure:
-			taskServiceGetTaskDetailsHandler.ServeHTTP(w, r)
-		case TaskServiceListTasksProcedure:
-			taskServiceListTasksHandler.ServeHTTP(w, r)
-		case TaskServiceListVersionsProcedure:
-			taskServiceListVersionsHandler.ServeHTTP(w, r)
-		default:
-			http.NotFound(w, r)
-		}
-	})
 }
 
 // UnimplementedTaskServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedTaskServiceHandler struct{}
 
-func (UnimplementedTaskServiceHandler) DeployTask(context.Context, *connect.Request[task.DeployTaskRequest]) (*connect.Response[task.DeployTaskResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.task.TaskService.DeployTask is not implemented"))
+func (UnimplementedTaskServiceHandler) DeployTask(context.Context, *task.DeployTaskRequest) (*task.DeployTaskResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.task.TaskService.DeployTask is not implemented")
 }
 
-func (UnimplementedTaskServiceHandler) GetTaskDetails(context.Context, *connect.Request[task.GetTaskDetailsRequest]) (*connect.Response[task.GetTaskDetailsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.task.TaskService.GetTaskDetails is not implemented"))
+func (UnimplementedTaskServiceHandler) GetTaskDetails(context.Context, *task.GetTaskDetailsRequest) (*task.GetTaskDetailsResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.task.TaskService.GetTaskDetails is not implemented")
 }
 
-func (UnimplementedTaskServiceHandler) ListTasks(context.Context, *connect.Request[task.ListTasksRequest]) (*connect.Response[task.ListTasksResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.task.TaskService.ListTasks is not implemented"))
+func (UnimplementedTaskServiceHandler) ListTasks(context.Context, *task.ListTasksRequest) (*task.ListTasksResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.task.TaskService.ListTasks is not implemented")
 }
 
-func (UnimplementedTaskServiceHandler) ListVersions(context.Context, *connect.Request[task.ListVersionsRequest]) (*connect.Response[task.ListVersionsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.task.TaskService.ListVersions is not implemented"))
+func (UnimplementedTaskServiceHandler) ListVersions(context.Context, *task.ListVersionsRequest) (*task.ListVersionsResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.task.TaskService.ListVersions is not implemented")
+}
+
+type taskServiceClient struct {
+	client *connect.Client
+}
+
+func (c *taskServiceClient) DeployTask(ctx context.Context, req *task.DeployTaskRequest) (*task.DeployTaskResponse, error) {
+	var res task.DeployTaskResponse
+	if err := c.client.CallUnary(ctx, taskServiceDeployTaskSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *taskServiceClient) GetTaskDetails(ctx context.Context, req *task.GetTaskDetailsRequest) (*task.GetTaskDetailsResponse, error) {
+	var res task.GetTaskDetailsResponse
+	if err := c.client.CallUnary(ctx, taskServiceGetTaskDetailsSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *taskServiceClient) ListTasks(ctx context.Context, req *task.ListTasksRequest) (*task.ListTasksResponse, error) {
+	var res task.ListTasksResponse
+	if err := c.client.CallUnary(ctx, taskServiceListTasksSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *taskServiceClient) ListVersions(ctx context.Context, req *task.ListVersionsRequest) (*task.ListVersionsResponse, error) {
+	var res task.ListVersionsResponse
+	if err := c.client.CallUnary(ctx, taskServiceListVersionsSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+type taskServiceHandler struct{ svc TaskServiceHandler }
+
+func (h taskServiceHandler) deployTask(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req task.DeployTaskRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.DeployTask(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h taskServiceHandler) getTaskDetails(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req task.GetTaskDetailsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.GetTaskDetails(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h taskServiceHandler) listTasks(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req task.ListTasksRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.ListTasks(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h taskServiceHandler) listVersions(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req task.ListVersionsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.ListVersions(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
 }

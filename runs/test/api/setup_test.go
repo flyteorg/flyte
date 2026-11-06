@@ -10,7 +10,8 @@ import (
 
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
 	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 	"github.com/jmoiron/sqlx"
 	metricnoop "go.opentelemetry.io/otel/metric/noop"
@@ -134,30 +135,35 @@ func TestMain(m *testing.M) {
 	// real ProjectService on the same mux (mirrors production unified mode in setup.go).
 	endpointURL := fmt.Sprintf("http://localhost:%d", testPort)
 	projectSvc := service.NewProjectService(impl.NewProjectRepo(testDB), nil)
-	projectClient := projectconnect.NewProjectServiceClient(http.DefaultClient, endpointURL)
+	projectClient := projectconnect.NewProjectServiceClient(connect.NewClient(connecthttp.NewTransport(http.DefaultClient, endpointURL, connecthttp.WithReadMaxBytes(0))))
 	taskSvc := service.NewTaskService(repo, projectClient)
 
 	// Create RunService with a no-op actions client (points at test server; not used by watch tests)
-	actionsClient := actionsconnect.NewActionsServiceClient(http.DefaultClient, endpointURL)
+	actionsClient := actionsconnect.NewActionsServiceClient(connect.NewClient(connecthttp.NewTransport(http.DefaultClient, endpointURL, connecthttp.WithReadMaxBytes(0))))
 	runSvc := service.NewRunService(repo, settingsRepo, actionsClient, projectClient, "", nil, nil, "", true, runsConfig.IdentityHeaders)
 
 	// Setup HTTP server
 	mux := http.NewServeMux()
-	taskPath, taskHandler := taskconnect.NewTaskServiceHandler(taskSvc)
-	mux.Handle(taskPath, taskHandler)
+	taskHandler := connect.NewServer()
+	taskconnect.RegisterTaskServiceHandler(taskHandler, taskSvc)
+	connecthttp.Mount(mux, taskHandler, connecthttp.WithReadMaxBytes(0))
 
-	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(projectSvc)
-	mux.Handle(projectPath, projectHandler)
+	projectHandler := connect.NewServer()
+	projectconnect.RegisterProjectServiceHandler(projectHandler, projectSvc)
+	connecthttp.Mount(mux, projectHandler, connecthttp.WithReadMaxBytes(0))
 
-	runPath, runHandler := workflowconnect.NewRunServiceHandler(runSvc)
-	mux.Handle(runPath, runHandler)
+	runHandler := connect.NewServer()
+	workflowconnect.RegisterRunServiceHandler(runHandler, runSvc)
+	connecthttp.Mount(mux, runHandler, connecthttp.WithReadMaxBytes(0))
 
-	internalRunPath, internalRunHandler := workflowconnect.NewInternalRunServiceHandler(runSvc)
-	mux.Handle(internalRunPath, internalRunHandler)
+	internalRunHandler := connect.NewServer()
+	workflowconnect.RegisterInternalRunServiceHandler(internalRunHandler, runSvc)
+	connecthttp.Mount(mux, internalRunHandler, connecthttp.WithReadMaxBytes(0))
 
 	settingsSvc := service.NewSettingsService(settingsRepo)
-	settingsPath, settingsHandler := settingsconnect.NewSettingsServiceHandler(settingsSvc)
-	mux.Handle(settingsPath, settingsHandler)
+	settingsHandler := connect.NewServer()
+	settingsconnect.RegisterSettingsServiceHandler(settingsHandler, settingsSvc)
+	connecthttp.Mount(mux, settingsHandler, connecthttp.WithReadMaxBytes(0))
 
 	// Add health check
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
@@ -202,9 +208,9 @@ func TestMain(m *testing.M) {
 	log.Println("Test server is ready")
 
 	// Create the shared fixture project that all tests reference.
-	if _, err := projectSvc.CreateProject(ctx, connect.NewRequest(&projectpb.CreateProjectRequest{
+	if _, err := projectSvc.CreateProject(ctx, &projectpb.CreateProjectRequest{
 		Project: &projectpb.Project{Id: testProject, Name: testProject},
-	})); err != nil {
+	}); err != nil {
 		log.Printf("Failed to create test project: %v", err)
 		exitCode = 1
 		return

@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -28,7 +28,7 @@ func TestListActionsRejectsUnsupportedAndInvalidQueueScopes(t *testing.T) {
 		{"nil queue scope", &workflow.ListActionsRequest{ScopeBy: &workflow.ListActionsRequest_QueueId{}}, connect.CodeInvalidArgument},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := (&RunService{}).ListActions(context.Background(), connect.NewRequest(tt.request))
+			_, err := (&RunService{}).ListActions(context.Background(), tt.request)
 			assert.Equal(t, tt.code, connect.CodeOf(err))
 		})
 	}

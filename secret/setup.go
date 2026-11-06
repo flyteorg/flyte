@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2/connecthttp"
+
+	"connectrpc.com/connect/v2"
 	"connectrpc.com/otelconnect"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -31,7 +33,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
-	otelInterceptor, err := otelconnect.NewInterceptor(
+	otelInterceptor, err := otelconnect.NewServerInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
 		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
 	)
@@ -39,8 +41,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
 
-	path, handler := secretconnect.NewSecretServiceHandler(svc, connect.WithInterceptors(otelInterceptor))
-	sc.Mux.Handle(path, handler)
+	handler := connect.NewServer(otelInterceptor)
+	secretconnect.RegisterSecretServiceHandler(handler, svc)
+	connecthttp.Mount(sc.Mux, handler, connecthttp.WithReadMaxBytes(0))
+	path := "/" + secretconnect.SecretServiceName + "/"
 	logger.Infof(ctx, "Mounted SecretService at %s", path)
 
 	return nil
