@@ -39,6 +39,7 @@ import (
 	webhookConfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	connectorplugin "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/webapi/connector"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
@@ -142,6 +143,9 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	mgr, err := ctrl.NewManager(sc.K8sConfig, ctrl.Options{
+		BaseContext: func() context.Context {
+			return context.WithValue(context.Background(), contextutils.ClusterNameKey, cfg.Cluster)
+		},
 		Scheme:                 scheme,
 		Metrics:                metricsServerOptions,
 		PprofBindAddress:       cfg.PprofBindAddress,

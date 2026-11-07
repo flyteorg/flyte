@@ -22,6 +22,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	k8smocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
@@ -453,7 +454,7 @@ func TestContainerTaskExecutor_GetTaskPhase(t *testing.T) {
 	startTime := time.Now()
 	endTime := startTime.Add(time.Hour)
 
-	ctx := context.TODO()
+	ctx := contextutils.WithCluster(t.Context(), "", "west")
 	t.Run("running", func(t *testing.T) {
 		j.Status.Phase = v1.PodRunning
 		j.Name = "exec-n0-0"
@@ -484,6 +485,7 @@ func TestContainerTaskExecutor_GetTaskPhase(t *testing.T) {
 			PrimaryPodName: j.Name,
 			Pods: []*core.PodLogContext{
 				{
+					Cluster:              "west",
 					Namespace:            j.Namespace,
 					PodName:              j.Name,
 					PrimaryContainerName: "primary",
