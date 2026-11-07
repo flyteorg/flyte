@@ -99,11 +99,12 @@ var (
 			RetryPeriod:   config.Duration{Duration: time.Second * 2},
 		},
 		NodeConfig: NodeConfig{
-			MaxNodeRetriesOnSystemFailures: 3,
-			InterruptibleFailureThreshold:  -1,
-			DefaultMaxAttempts:             1,
-			IgnoreRetryCause:               false,
-			EnableCRDebugMetadata:          false,
+			MaxNodeRetriesOnSystemFailures:         3,
+			InterruptibleFailureThreshold:          -1,
+			DefaultMaxAttempts:                     1,
+			IgnoreRetryCause:                       false,
+			EnableCRDebugMetadata:                  false,
+			BypassParallelismCheckForWorkflowNodes: false,
 		},
 		MaxStreakLength: 8, // Turbo mode is enabled by default
 		ProfilerPort: config.Port{
@@ -277,12 +278,13 @@ type WorkqueueConfig struct {
 
 // NodeConfig contains configuration that is useful for every node execution
 type NodeConfig struct {
-	DefaultDeadlines               DefaultDeadlines `json:"default-deadlines,omitempty" pflag:",Default value for timeouts"`
-	MaxNodeRetriesOnSystemFailures int64            `json:"max-node-retries-system-failures" pflag:"2,Maximum number of retries per node for node failure due to infra issues"`
-	InterruptibleFailureThreshold  int32            `json:"interruptible-failure-threshold" pflag:"1,number of failures for a node to be still considered interruptible. Negative numbers are treated as complementary (ex. -1 means last attempt is non-interruptible).'"`
-	DefaultMaxAttempts             int32            `json:"default-max-attempts" pflag:"3,Default maximum number of attempts for a node"`
-	IgnoreRetryCause               bool             `json:"ignore-retry-cause" pflag:",Ignore retry cause and count all attempts toward a node's max attempts"`
-	EnableCRDebugMetadata          bool             `json:"enable-cr-debug-metadata" pflag:",Collapse node on any terminal state, not just successful terminations. This is useful to reduce the size of workflow state in etcd."`
+	DefaultDeadlines                       DefaultDeadlines `json:"default-deadlines,omitempty" pflag:",Default value for timeouts"`
+	MaxNodeRetriesOnSystemFailures         int64            `json:"max-node-retries-system-failures" pflag:"2,Maximum number of retries per node for node failure due to infra issues"`
+	InterruptibleFailureThreshold          int32            `json:"interruptible-failure-threshold" pflag:"1,number of failures for a node to be still considered interruptible. Negative numbers are treated as complementary (ex. -1 means last attempt is non-interruptible).'"`
+	DefaultMaxAttempts                     int32            `json:"default-max-attempts" pflag:"3,Default maximum number of attempts for a node"`
+	IgnoreRetryCause                       bool             `json:"ignore-retry-cause" pflag:",Ignore retry cause and count all attempts toward a node's max attempts"`
+	EnableCRDebugMetadata                  bool             `json:"enable-cr-debug-metadata" pflag:",Collapse node on any terminal state, not just successful terminations. This is useful to reduce the size of workflow state in etcd."`
+	BypassParallelismCheckForWorkflowNodes bool             `json:"bypass-parallelism-check-for-workflow-nodes" pflag:",Bypass max parallelism checks for workflow (subworkflow/launchplan) nodes that are already running"`
 }
 
 // DefaultDeadlines contains default values for timeouts
