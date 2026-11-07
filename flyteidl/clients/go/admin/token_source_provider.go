@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/deviceflow"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/externalprocess"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/oauth"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/pkce"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/tokenorchestrator"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/utils"
@@ -43,10 +44,18 @@ type TokenSourceProvider interface {
 func NewTokenSourceProvider(ctx context.Context, cfg *Config, tokenCache cache.TokenCache,
 	authClient service.AuthMetadataServiceClient) (TokenSourceProvider, error) {
 
+	tokenType, err := oauth.NormalizeTokenType(cfg.TokenType)
+	if err != nil {
+		return nil, err
+	}
+
 	var tokenProvider TokenSourceProvider
-	var err error
 	switch cfg.AuthType {
 	case AuthTypeClientSecret:
+		if tokenType != oauth.TokenTypeBearer {
+			return nil, fmt.Errorf("tokenType %v is not supported with authType %v: the client credentials grant does not issue an id_token", tokenType, cfg.AuthType)
+		}
+
 		tokenURL := cfg.TokenURL
 		if len(tokenURL) == 0 {
 			metadata, err := authClient.GetOAuth2Metadata(ctx, &service.OAuth2MetadataRequest{})
@@ -80,7 +89,7 @@ func NewTokenSourceProvider(ctx context.Context, cfg *Config, tokenCache cache.T
 			return nil, err
 		}
 	case AuthTypePkce:
-		baseTokenOrchestrator, err := tokenorchestrator.NewBaseTokenOrchestrator(ctx, tokenCache, authClient)
+		baseTokenOrchestrator, err := newBaseTokenOrchestrator(ctx, cfg, tokenType, tokenCache, authClient)
 		if err != nil {
 			return nil, err
 		}
@@ -90,12 +99,12 @@ func NewTokenSourceProvider(ctx context.Context, cfg *Config, tokenCache cache.T
 			return nil, err
 		}
 	case AuthTypeExternalCommand:
-		tokenProvider, err = NewExternalTokenSourceProvider(cfg.Command)
+		tokenProvider, err = NewExternalTokenSourceProviderWithTokenType(cfg.Command, tokenType)
 		if err != nil {
 			return nil, err
 		}
 	case AuthTypeDeviceFlow:
-		baseTokenOrchestrator, err := tokenorchestrator.NewBaseTokenOrchestrator(ctx, tokenCache, authClient)
+		baseTokenOrchestrator, err := newBaseTokenOrchestrator(ctx, cfg, tokenType, tokenCache, authClient)
 		if err != nil {
 			return nil, err
 		}
@@ -111,12 +120,71 @@ func NewTokenSourceProvider(ctx context.Context, cfg *Config, tokenCache cache.T
 	return tokenProvider, nil
 }
 
+// newBaseTokenOrchestrator builds the OAuth2 client config shared by the Pkce and DeviceFlow auth types. Everything is
+// discovered from admin's anonymously accessible metadata unless the endpoint for the auth type in use is configured
+// explicitly (AuthorizationURL for Pkce, DeviceAuthorizationURL for DeviceFlow, each together with TokenURL), in which
+// case those endpoints are used and the client id, scopes and audience come from cfg because the client has to be
+// registered with that server.
+func newBaseTokenOrchestrator(ctx context.Context, cfg *Config, tokenType string, tokenCache cache.TokenCache,
+	authClient service.AuthMetadataServiceClient) (tokenorchestrator.BaseTokenOrchestrator, error) {
+	orchestrator, err := tokenorchestrator.NewBaseTokenOrchestrator(ctx, tokenCache, authClient)
+	if err != nil {
+		return tokenorchestrator.BaseTokenOrchestrator{}, err
+	}
+
+	var endpointKey, endpoint string
+	switch cfg.AuthType {
+	case AuthTypePkce:
+		endpointKey, endpoint = "authorizationUrl", cfg.AuthorizationURL
+	case AuthTypeDeviceFlow:
+		endpointKey, endpoint = "deviceAuthorizationUrl", cfg.DeviceAuthorizationURL
+	}
+
+	if len(endpoint) > 0 {
+		if len(cfg.TokenURL) == 0 {
+			return tokenorchestrator.BaseTokenOrchestrator{}, fmt.Errorf("tokenUrl must be configured together with %v", endpointKey)
+		}
+
+		if len(cfg.Scopes) == 0 {
+			return tokenorchestrator.BaseTokenOrchestrator{}, fmt.Errorf("scopes must be configured together with %v", endpointKey)
+		}
+
+		if cfg.ClientID == DefaultClientID {
+			logger.Warnf(ctx, "clientId is the default %q; with %v it must be a client registered with that authorization server", DefaultClientID, endpointKey)
+		}
+
+		orchestrator.ClientConfig.Endpoint.TokenURL = cfg.TokenURL
+		orchestrator.ClientConfig.Endpoint.AuthURL = cfg.AuthorizationURL
+		orchestrator.ClientConfig.DeviceEndpoint = cfg.DeviceAuthorizationURL
+		orchestrator.ClientConfig.ClientID = cfg.ClientID
+		orchestrator.ClientConfig.Scopes = cfg.Scopes
+		if len(cfg.Audience) > 0 {
+			orchestrator.ClientConfig.Audience = cfg.Audience
+		}
+	}
+
+	orchestrator.ClientConfig.TokenType = tokenType
+	return orchestrator, nil
+}
+
 type ExternalTokenSourceProvider struct {
-	command []string
+	command   []string
+	tokenType string
 }
 
 func NewExternalTokenSourceProvider(command []string) (TokenSourceProvider, error) {
-	return &ExternalTokenSourceProvider{command: command}, nil
+	return NewExternalTokenSourceProviderWithTokenType(command, oauth.TokenTypeBearer)
+}
+
+// NewExternalTokenSourceProviderWithTokenType returns a provider that sends the command's output with the given
+// token type (see oauth.NormalizeTokenType).
+func NewExternalTokenSourceProviderWithTokenType(command []string, tokenType string) (TokenSourceProvider, error) {
+	tokenType, err := oauth.NormalizeTokenType(tokenType)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ExternalTokenSourceProvider{command: command, tokenType: tokenType}, nil
 }
 
 func (e ExternalTokenSourceProvider) GetTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
@@ -127,7 +195,7 @@ func (e ExternalTokenSourceProvider) GetTokenSource(ctx context.Context) (oauth2
 
 	return oauth2.StaticTokenSource(&oauth2.Token{
 		AccessToken: strings.Trim(string(output), "\t \n"),
-		TokenType:   "bearer",
+		TokenType:   e.tokenType,
 	}), nil
 }
 
