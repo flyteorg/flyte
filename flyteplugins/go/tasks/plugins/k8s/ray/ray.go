@@ -913,7 +913,7 @@ func getEventInfoForRayJob(ctx context.Context, logConfig logs.LogConfig, plugin
 
 	return &pluginsCore.TaskInfo{
 		Logs:       taskLogs,
-		LogContext: logContextForPods(rayJob.Name, podList.Items),
+		LogContext: logContextForPods(ctx, rayJob.Name, podList.Items),
 		OccurredAt: &occurredAt,
 	}, nil
 }
@@ -965,7 +965,7 @@ func isRayHeadReady(ctx context.Context, rayJobName, rayClusterName string, plug
 	return true, fmt.Errorf("more than one head pod found for Ray job %s", rayJobName)
 }
 
-func logContextForPods(rayJobName string, pods []v1.Pod) *core.LogContext {
+func logContextForPods(ctx context.Context, rayJobName string, pods []v1.Pod) *core.LogContext {
 	pods = lo.Filter(pods, func(item v1.Pod, _ int) bool {
 		// Running, Succeeded or Failed is OK
 		return item.Status.Phase != v1.PodPending
@@ -980,7 +980,7 @@ func logContextForPods(rayJobName string, pods []v1.Pod) *core.LogContext {
 		if strings.HasPrefix(p.Name, rayJobName) && strings.Contains(p.Name, "head") && flytek8s.GetPrimaryContainerName(&p) == RayHeadContainerName {
 			logCtx.PrimaryPodName = p.Name
 		}
-		logCtx.Pods[i] = flytek8s.BuildPodLogContext(&p)
+		logCtx.Pods[i] = flytek8s.BuildPodLogContextWithContext(ctx, &p)
 	}
 	return logCtx
 }

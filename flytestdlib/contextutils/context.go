@@ -136,6 +136,12 @@ func WithCluster(ctx context.Context, organization, name string) context.Context
 	return context.WithValue(c, ClusterNameKey, name)
 }
 
+// ClusterName returns the cluster carried by ctx, or an empty string if unset.
+func ClusterName(ctx context.Context) string {
+	name, _ := ctx.Value(ClusterNameKey).(string)
+	return name
+}
+
 // WithTaskID gets a new context with WorkflowName set.
 func WithTaskID(ctx context.Context, taskID string) context.Context {
 	return context.WithValue(ctx, TaskIDKey, taskID)

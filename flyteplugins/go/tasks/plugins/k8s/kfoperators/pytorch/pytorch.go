@@ -234,7 +234,7 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginCo
 	logger.Debugf(ctx, "podlist: %+v", podList)
 	taskPhaseInfo := pluginsCore.TaskInfo{
 		Logs:       taskLogs,
-		LogContext: logContextForPods(app.Name, podList.Items),
+		LogContext: logContextForPods(ctx, app.Name, podList.Items),
 		OccurredAt: &occurredAt,
 		CustomInfo: statusDetails,
 	}
@@ -261,7 +261,7 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginCo
 	return phaseInfo, err
 }
 
-func logContextForPods(pytorchJobName string, pods []v1.Pod) *core.LogContext {
+func logContextForPods(ctx context.Context, pytorchJobName string, pods []v1.Pod) *core.LogContext {
 	pods = lo.Filter(pods, func(item v1.Pod, _ int) bool {
 		// Running, Succeeded or Failed is OK
 		return item.Status.Phase != v1.PodPending
@@ -274,7 +274,7 @@ func logContextForPods(pytorchJobName string, pods []v1.Pod) *core.LogContext {
 		if strings.HasPrefix(p.Name, pytorchJobName) && strings.Contains(p.Name, "worker-0") {
 			logCtx.PrimaryPodName = p.Name
 		}
-		logCtx.Pods[i] = flytek8s.BuildPodLogContext(&p)
+		logCtx.Pods[i] = flytek8s.BuildPodLogContextWithContext(ctx, &p)
 	}
 	return logCtx
 }

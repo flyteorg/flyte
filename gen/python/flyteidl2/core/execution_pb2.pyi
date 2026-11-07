@@ -239,18 +239,20 @@ class ConnectorLogContext(_message.Message):
     def __init__(self, endpoint: _Optional[str] = ...) -> None: ...
 
 class PodLogContext(_message.Message):
-    __slots__ = ["namespace", "pod_name", "containers", "primary_container_name", "init_containers"]
+    __slots__ = ["namespace", "pod_name", "containers", "primary_container_name", "init_containers", "cluster"]
     NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     POD_NAME_FIELD_NUMBER: _ClassVar[int]
     CONTAINERS_FIELD_NUMBER: _ClassVar[int]
     PRIMARY_CONTAINER_NAME_FIELD_NUMBER: _ClassVar[int]
     INIT_CONTAINERS_FIELD_NUMBER: _ClassVar[int]
+    CLUSTER_FIELD_NUMBER: _ClassVar[int]
     namespace: str
     pod_name: str
     containers: _containers.RepeatedCompositeFieldContainer[ContainerContext]
     primary_container_name: str
     init_containers: _containers.RepeatedCompositeFieldContainer[ContainerContext]
-    def __init__(self, namespace: _Optional[str] = ..., pod_name: _Optional[str] = ..., containers: _Optional[_Iterable[_Union[ContainerContext, _Mapping]]] = ..., primary_container_name: _Optional[str] = ..., init_containers: _Optional[_Iterable[_Union[ContainerContext, _Mapping]]] = ...) -> None: ...
+    cluster: str
+    def __init__(self, namespace: _Optional[str] = ..., pod_name: _Optional[str] = ..., containers: _Optional[_Iterable[_Union[ContainerContext, _Mapping]]] = ..., primary_container_name: _Optional[str] = ..., init_containers: _Optional[_Iterable[_Union[ContainerContext, _Mapping]]] = ..., cluster: _Optional[str] = ...) -> None: ...
 
 class ContainerContext(_message.Message):
     __slots__ = ["container_name", "process"]

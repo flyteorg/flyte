@@ -112,7 +112,7 @@ func getLogContext(ctx context.Context, pluginContext k8s.PluginContext, jobSet 
 		if isRank0PodName(jobSet.Name, pod.Name) {
 			logCtx.PrimaryPodName = pod.Name
 		}
-		podLogCtx := flytek8s.BuildPodLogContext(pod)
+		podLogCtx := flytek8s.BuildPodLogContextWithContext(ctx, pod)
 		if primaryContainerName != "" {
 			podLogCtx.PrimaryContainerName = primaryContainerName
 		}
