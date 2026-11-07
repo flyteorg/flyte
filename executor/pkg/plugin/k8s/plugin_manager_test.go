@@ -30,8 +30,13 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/gpufault"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
+	ioMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	k8sMocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
+	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
+	storageMocks "github.com/flyteorg/flyte/v2/flytestdlib/storage/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
@@ -1336,4 +1341,48 @@ func TestCheckResourcePhase_PluginReaderIsScopedToTheAttempt(t *testing.T) {
 			assert.Equal(t, []string{"ns/unlabelled"}, configMaps)
 		})
 	}
+}
+
+type absentMetadata struct{}
+
+func (absentMetadata) Exists() bool       { return false }
+func (absentMetadata) Size() int64        { return 0 }
+func (absentMetadata) Etag() string       { return "" }
+func (absentMetadata) ContentMD5() string { return "" }
+
+// Outputs over the store's download limit fail the task permanently instead of as a retryable system error.
+func TestCheckResourcePhase_OutputsOverTheDownloadLimitFailPermanently(t *testing.T) {
+	pod := failedPod()
+	pod.Status.Phase = v1.PodSucceeded
+	fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pod).Build()
+	kubeClient := &pluginsCoreMock.KubeClient{}
+	kubeClient.EXPECT().GetClient().Return(fakeClient)
+
+	plugin := &k8sMocks.Plugin{}
+	plugin.EXPECT().GetTaskPhase(mock.Anything, mock.Anything, mock.Anything).Return(pluginsCore.PhaseInfoSuccess(nil), nil)
+	pm := NewPluginManager("test-plugin", plugin, kubeClient)
+
+	store := &storageMocks.ComposedProtobufStore{}
+	store.EXPECT().Head(mock.Anything, mock.Anything).Return(absentMetadata{}, nil)
+	store.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).
+		Return(stdErrors.Errorf(storage.ErrExceedsLimit, "limit exceeded. 3.6mb > 2mb."))
+
+	ow := &ioMocks.OutputWriter{}
+	ow.EXPECT().GetErrorPath().Return("s3://bucket/error.pb")
+	ow.EXPECT().GetOutputPath().Return("s3://bucket/outputs.pb")
+	ow.EXPECT().Put(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, r io.OutputReader) error {
+		_, _, err := r.Read(ctx)
+		return err
+	})
+
+	tCtx := &pluginsCoreMock.TaskExecutionContext{}
+	tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock(pod.Name))
+	tCtx.EXPECT().DataStore().Return(storage.NewCompositeDataStore(storage.NewURLPathConstructor(), store))
+	tCtx.EXPECT().OutputWriter().Return(ow)
+	queryObj := &v1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: pod.Namespace, Name: pod.Name}}
+
+	transition, err := pm.checkResourcePhase(context.Background(), tCtx, queryObj, &k8s.PluginState{})
+	require.NoError(t, err)
+	assert.Equal(t, pluginsCore.PhasePermanentFailure, transition.Info().Phase())
+	assert.Equal(t, "OutputsTooLarge", transition.Info().Err().GetCode())
 }
