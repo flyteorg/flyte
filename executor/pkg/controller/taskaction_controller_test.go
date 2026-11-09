@@ -22,7 +22,6 @@ import (
 	"sync"
 	"time"
 
-	"connectrpc.com/connect"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"google.golang.org/protobuf/proto"
@@ -103,8 +102,8 @@ func (f *fakePlugin) Finalize(_ context.Context, _ pluginsCore.TaskExecutionCont
 // fakeEventsClient is a no-op implementation of EventsProxyServiceClient for tests.
 type fakeEventsClient struct{}
 
-func (f *fakeEventsClient) Record(_ context.Context, _ *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
-	return connect.NewResponse(&workflow.RecordResponse{}), nil
+func (f *fakeEventsClient) Record(_ context.Context, _ *workflow.RecordRequest) (*workflow.RecordResponse, error) {
+	return &workflow.RecordResponse{}, nil
 }
 
 type failingEventsClient struct {
@@ -112,7 +111,7 @@ type failingEventsClient struct {
 	failures int
 }
 
-func (f *failingEventsClient) Record(ctx context.Context, req *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
+func (f *failingEventsClient) Record(ctx context.Context, req *workflow.RecordRequest) (*workflow.RecordResponse, error) {
 	if f.failures > 0 {
 		f.failures--
 		return nil, stderrors.New("events unavailable")
@@ -127,8 +126,8 @@ type retryEventRejectingClient struct {
 	rejected int
 }
 
-func (c *retryEventRejectingClient) Record(ctx context.Context, req *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
-	for _, e := range req.Msg.GetEvents() {
+func (c *retryEventRejectingClient) Record(ctx context.Context, req *workflow.RecordRequest) (*workflow.RecordResponse, error) {
+	for _, e := range req.GetEvents() {
 		if e.GetVersion() >= systemRetryEventVersionBase {
 			c.rejected++
 			return nil, stderrors.New("unable to encode version")
@@ -183,11 +182,11 @@ type recordingEventsClient struct {
 	events []*workflow.ActionEvent
 }
 
-func (r *recordingEventsClient) Record(_ context.Context, req *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
+func (r *recordingEventsClient) Record(_ context.Context, req *workflow.RecordRequest) (*workflow.RecordResponse, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.events = append(r.events, req.Msg.GetEvents()...)
-	return connect.NewResponse(&workflow.RecordResponse{}), nil
+	r.events = append(r.events, req.GetEvents()...)
+	return &workflow.RecordResponse{}, nil
 }
 
 func (r *recordingEventsClient) RecordedEvents() []*workflow.ActionEvent {

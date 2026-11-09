@@ -29,7 +29,7 @@ import (
 	"k8s.io/client-go/tools/events"
 	"k8s.io/client-go/util/retry"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"go.opentelemetry.io/otel/metric"
 	"google.golang.org/protobuf/proto"
 
@@ -133,14 +133,14 @@ type TaskActionReconciler struct {
 // when no batcher is set (unit tests).
 func (r *TaskActionReconciler) recordEvent(ctx context.Context, event *workflow.ActionEvent) error {
 	if err := event.Validate(); err != nil {
-		return connect.NewError(connect.CodeInvalidArgument, err)
+		return connect.NewError(connect.CodeInvalidArgument, err.Error()).WithCause(err)
 	}
 	if r.eventBatcher != nil {
 		return r.eventBatcher.Record(ctx, event)
 	}
-	_, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
+	_, err := r.eventsClient.Record(ctx, &workflow.RecordRequest{
 		Events: []*workflow.ActionEvent{event},
-	}))
+	})
 	return err
 }
 

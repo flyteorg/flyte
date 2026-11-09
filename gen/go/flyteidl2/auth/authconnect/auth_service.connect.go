@@ -5,150 +5,140 @@
 package authconnect
 
 import (
-	connect "connectrpc.com/connect"
+	connect "connectrpc.com/connect/v2"
 	context "context"
-	errors "errors"
 	auth "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/auth"
-	http "net/http"
-	strings "strings"
+	sync "sync"
 )
-
-// This is a compile-time assertion to ensure that this generated file and the connect package are
-// compatible. If you get a compiler error that this constant is not defined, this code was
-// generated with a version of connect newer than the one compiled into your binary. You can fix the
-// problem by either regenerating this code with an older version of connect or updating the connect
-// version compiled into your binary.
-const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// AuthMetadataServiceName is the fully-qualified name of the AuthMetadataService service.
 	AuthMetadataServiceName = "flyteidl2.auth.AuthMetadataService"
 )
 
-// These constants are the fully-qualified names of the RPCs defined in this package. They're
-// exposed at runtime as Spec.Procedure and as the final two segments of the HTTP route.
+// These constants are the procedure names of the RPCs defined in this package. They're exposed at
+// runtime as Spec.Procedure and as the final two segments of the HTTP route.
 //
 // Note that these are different from the fully-qualified method names used by
 // google.golang.org/protobuf/reflect/protoreflect. To convert from these constants to
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// AuthMetadataServiceGetOAuth2MetadataProcedure is the fully-qualified name of the
-	// AuthMetadataService's GetOAuth2Metadata RPC.
+	// AuthMetadataServiceGetOAuth2MetadataProcedure is the procedure name of the AuthMetadataService's
+	// GetOAuth2Metadata RPC.
 	AuthMetadataServiceGetOAuth2MetadataProcedure = "/flyteidl2.auth.AuthMetadataService/GetOAuth2Metadata"
-	// AuthMetadataServiceGetPublicClientConfigProcedure is the fully-qualified name of the
+	// AuthMetadataServiceGetPublicClientConfigProcedure is the procedure name of the
 	// AuthMetadataService's GetPublicClientConfig RPC.
 	AuthMetadataServiceGetPublicClientConfigProcedure = "/flyteidl2.auth.AuthMetadataService/GetPublicClientConfig"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	authMetadataServiceServiceDescriptor                     = auth.File_flyteidl2_auth_auth_service_proto.Services().ByName("AuthMetadataService")
-	authMetadataServiceGetOAuth2MetadataMethodDescriptor     = authMetadataServiceServiceDescriptor.Methods().ByName("GetOAuth2Metadata")
-	authMetadataServiceGetPublicClientConfigMethodDescriptor = authMetadataServiceServiceDescriptor.Methods().ByName("GetPublicClientConfig")
+	authMetadataServiceGetOAuth2MetadataSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           auth.File_flyteidl2_auth_auth_service_proto.Services().ByName("AuthMetadataService").Methods().ByName("GetOAuth2Metadata"),
+			Procedure:        AuthMetadataServiceGetOAuth2MetadataProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	authMetadataServiceGetPublicClientConfigSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           auth.File_flyteidl2_auth_auth_service_proto.Services().ByName("AuthMetadataService").Methods().ByName("GetPublicClientConfig"),
+			Procedure:        AuthMetadataServiceGetPublicClientConfigProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
 )
 
 // AuthMetadataServiceClient is a client for the flyteidl2.auth.AuthMetadataService service.
 type AuthMetadataServiceClient interface {
 	// Anonymously accessible. Retrieves local or external oauth authorization server metadata.
-	GetOAuth2Metadata(context.Context, *connect.Request[auth.GetOAuth2MetadataRequest]) (*connect.Response[auth.GetOAuth2MetadataResponse], error)
+	GetOAuth2Metadata(context.Context, *auth.GetOAuth2MetadataRequest) (*auth.GetOAuth2MetadataResponse, error)
 	// Anonymously accessible. Retrieves the client information clients should use when initiating OAuth2 authorization
 	// requests.
-	GetPublicClientConfig(context.Context, *connect.Request[auth.GetPublicClientConfigRequest]) (*connect.Response[auth.GetPublicClientConfigResponse], error)
+	GetPublicClientConfig(context.Context, *auth.GetPublicClientConfigRequest) (*auth.GetPublicClientConfigResponse, error)
 }
 
 // NewAuthMetadataServiceClient constructs a client for the flyteidl2.auth.AuthMetadataService
-// service. By default, it uses the Connect protocol with the binary Protobuf Codec, asks for
-// gzipped responses, and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply
-// the connect.WithGRPC() or connect.WithGRPCWeb() options.
-//
-// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
-// http://api.acme.com or https://acme.com/grpc).
-func NewAuthMetadataServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) AuthMetadataServiceClient {
-	baseURL = strings.TrimRight(baseURL, "/")
-	return &authMetadataServiceClient{
-		getOAuth2Metadata: connect.NewClient[auth.GetOAuth2MetadataRequest, auth.GetOAuth2MetadataResponse](
-			httpClient,
-			baseURL+AuthMetadataServiceGetOAuth2MetadataProcedure,
-			connect.WithSchema(authMetadataServiceGetOAuth2MetadataMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		getPublicClientConfig: connect.NewClient[auth.GetPublicClientConfigRequest, auth.GetPublicClientConfigResponse](
-			httpClient,
-			baseURL+AuthMetadataServiceGetPublicClientConfigProcedure,
-			connect.WithSchema(authMetadataServiceGetPublicClientConfigMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-	}
-}
-
-// authMetadataServiceClient implements AuthMetadataServiceClient.
-type authMetadataServiceClient struct {
-	getOAuth2Metadata     *connect.Client[auth.GetOAuth2MetadataRequest, auth.GetOAuth2MetadataResponse]
-	getPublicClientConfig *connect.Client[auth.GetPublicClientConfigRequest, auth.GetPublicClientConfigResponse]
-}
-
-// GetOAuth2Metadata calls flyteidl2.auth.AuthMetadataService.GetOAuth2Metadata.
-func (c *authMetadataServiceClient) GetOAuth2Metadata(ctx context.Context, req *connect.Request[auth.GetOAuth2MetadataRequest]) (*connect.Response[auth.GetOAuth2MetadataResponse], error) {
-	return c.getOAuth2Metadata.CallUnary(ctx, req)
-}
-
-// GetPublicClientConfig calls flyteidl2.auth.AuthMetadataService.GetPublicClientConfig.
-func (c *authMetadataServiceClient) GetPublicClientConfig(ctx context.Context, req *connect.Request[auth.GetPublicClientConfigRequest]) (*connect.Response[auth.GetPublicClientConfigResponse], error) {
-	return c.getPublicClientConfig.CallUnary(ctx, req)
+// service. Multiple service clients may share a single connect.Client.
+func NewAuthMetadataServiceClient(client *connect.Client) AuthMetadataServiceClient {
+	return &authMetadataServiceClient{client: client}
 }
 
 // AuthMetadataServiceHandler is an implementation of the flyteidl2.auth.AuthMetadataService
 // service.
 type AuthMetadataServiceHandler interface {
 	// Anonymously accessible. Retrieves local or external oauth authorization server metadata.
-	GetOAuth2Metadata(context.Context, *connect.Request[auth.GetOAuth2MetadataRequest]) (*connect.Response[auth.GetOAuth2MetadataResponse], error)
+	GetOAuth2Metadata(context.Context, *auth.GetOAuth2MetadataRequest) (*auth.GetOAuth2MetadataResponse, error)
 	// Anonymously accessible. Retrieves the client information clients should use when initiating OAuth2 authorization
 	// requests.
-	GetPublicClientConfig(context.Context, *connect.Request[auth.GetPublicClientConfigRequest]) (*connect.Response[auth.GetPublicClientConfigResponse], error)
+	GetPublicClientConfig(context.Context, *auth.GetPublicClientConfigRequest) (*auth.GetPublicClientConfigResponse, error)
 }
 
-// NewAuthMetadataServiceHandler builds an HTTP handler from the service implementation. It returns
-// the path on which to mount the handler and the handler itself.
-//
-// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
-// and JSON codecs. They also support gzip compression.
-func NewAuthMetadataServiceHandler(svc AuthMetadataServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	authMetadataServiceGetOAuth2MetadataHandler := connect.NewUnaryHandler(
-		AuthMetadataServiceGetOAuth2MetadataProcedure,
-		svc.GetOAuth2Metadata,
-		connect.WithSchema(authMetadataServiceGetOAuth2MetadataMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
+// RegisterAuthMetadataServiceHandler registers svc as the flyteidl2.auth.AuthMetadataService
+// implementation on server.
+func RegisterAuthMetadataServiceHandler(server *connect.Server, svc AuthMetadataServiceHandler) {
+	adapter := authMetadataServiceHandler{svc: svc}
+	server.Register(
+		connect.Method{Spec: authMetadataServiceGetOAuth2MetadataSpec(), Handler: adapter.getOAuth2Metadata},
+		connect.Method{Spec: authMetadataServiceGetPublicClientConfigSpec(), Handler: adapter.getPublicClientConfig},
 	)
-	authMetadataServiceGetPublicClientConfigHandler := connect.NewUnaryHandler(
-		AuthMetadataServiceGetPublicClientConfigProcedure,
-		svc.GetPublicClientConfig,
-		connect.WithSchema(authMetadataServiceGetPublicClientConfigMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	return "/flyteidl2.auth.AuthMetadataService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case AuthMetadataServiceGetOAuth2MetadataProcedure:
-			authMetadataServiceGetOAuth2MetadataHandler.ServeHTTP(w, r)
-		case AuthMetadataServiceGetPublicClientConfigProcedure:
-			authMetadataServiceGetPublicClientConfigHandler.ServeHTTP(w, r)
-		default:
-			http.NotFound(w, r)
-		}
-	})
 }
 
 // UnimplementedAuthMetadataServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedAuthMetadataServiceHandler struct{}
 
-func (UnimplementedAuthMetadataServiceHandler) GetOAuth2Metadata(context.Context, *connect.Request[auth.GetOAuth2MetadataRequest]) (*connect.Response[auth.GetOAuth2MetadataResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.auth.AuthMetadataService.GetOAuth2Metadata is not implemented"))
+func (UnimplementedAuthMetadataServiceHandler) GetOAuth2Metadata(context.Context, *auth.GetOAuth2MetadataRequest) (*auth.GetOAuth2MetadataResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.auth.AuthMetadataService.GetOAuth2Metadata is not implemented")
 }
 
-func (UnimplementedAuthMetadataServiceHandler) GetPublicClientConfig(context.Context, *connect.Request[auth.GetPublicClientConfigRequest]) (*connect.Response[auth.GetPublicClientConfigResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.auth.AuthMetadataService.GetPublicClientConfig is not implemented"))
+func (UnimplementedAuthMetadataServiceHandler) GetPublicClientConfig(context.Context, *auth.GetPublicClientConfigRequest) (*auth.GetPublicClientConfigResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.auth.AuthMetadataService.GetPublicClientConfig is not implemented")
+}
+
+type authMetadataServiceClient struct {
+	client *connect.Client
+}
+
+func (c *authMetadataServiceClient) GetOAuth2Metadata(ctx context.Context, req *auth.GetOAuth2MetadataRequest) (*auth.GetOAuth2MetadataResponse, error) {
+	var res auth.GetOAuth2MetadataResponse
+	if err := c.client.CallUnary(ctx, authMetadataServiceGetOAuth2MetadataSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *authMetadataServiceClient) GetPublicClientConfig(ctx context.Context, req *auth.GetPublicClientConfigRequest) (*auth.GetPublicClientConfigResponse, error) {
+	var res auth.GetPublicClientConfigResponse
+	if err := c.client.CallUnary(ctx, authMetadataServiceGetPublicClientConfigSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+type authMetadataServiceHandler struct{ svc AuthMetadataServiceHandler }
+
+func (h authMetadataServiceHandler) getOAuth2Metadata(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req auth.GetOAuth2MetadataRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.GetOAuth2Metadata(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h authMetadataServiceHandler) getPublicClientConfig(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req auth.GetPublicClientConfigRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.GetPublicClientConfig(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
 }

@@ -7,7 +7,6 @@ package mocks
 import (
 	"context"
 
-	"connectrpc.com/connect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	mock "github.com/stretchr/testify/mock"
 )
@@ -18,10 +17,19 @@ func NewSettingsServiceClient(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *SettingsServiceClient {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &SettingsServiceClient{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -40,27 +48,27 @@ func (_m *SettingsServiceClient) EXPECT() *SettingsServiceClient_Expecter {
 }
 
 // CreateSettings provides a mock function for the type SettingsServiceClient
-func (_mock *SettingsServiceClient) CreateSettings(context1 context.Context, request *connect.Request[settings.CreateSettingsRequest]) (*connect.Response[settings.CreateSettingsResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *SettingsServiceClient) CreateSettings(context1 context.Context, createSettingsRequest *settings.CreateSettingsRequest) (*settings.CreateSettingsResponse, error) {
+	ret := _mock.Called(context1, createSettingsRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateSettings")
 	}
 
-	var r0 *connect.Response[settings.CreateSettingsResponse]
+	var r0 *settings.CreateSettingsResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[settings.CreateSettingsRequest]) (*connect.Response[settings.CreateSettingsResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *settings.CreateSettingsRequest) (*settings.CreateSettingsResponse, error)); ok {
+		return returnFunc(context1, createSettingsRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[settings.CreateSettingsRequest]) *connect.Response[settings.CreateSettingsResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *settings.CreateSettingsRequest) *settings.CreateSettingsResponse); ok {
+		r0 = returnFunc(context1, createSettingsRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[settings.CreateSettingsResponse])
+			r0 = ret.Get(0).(*settings.CreateSettingsResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[settings.CreateSettingsRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *settings.CreateSettingsRequest) error); ok {
+		r1 = returnFunc(context1, createSettingsRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -74,20 +82,20 @@ type SettingsServiceClient_CreateSettings_Call struct {
 
 // CreateSettings is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[settings.CreateSettingsRequest]
-func (_e *SettingsServiceClient_Expecter) CreateSettings(context1 interface{}, request interface{}) *SettingsServiceClient_CreateSettings_Call {
-	return &SettingsServiceClient_CreateSettings_Call{Call: _e.mock.On("CreateSettings", context1, request)}
+//   - createSettingsRequest *settings.CreateSettingsRequest
+func (_e *SettingsServiceClient_Expecter) CreateSettings(context1 any, createSettingsRequest any) *SettingsServiceClient_CreateSettings_Call {
+	return &SettingsServiceClient_CreateSettings_Call{Call: _e.mock.On("CreateSettings", context1, createSettingsRequest)}
 }
 
-func (_c *SettingsServiceClient_CreateSettings_Call) Run(run func(context1 context.Context, request *connect.Request[settings.CreateSettingsRequest])) *SettingsServiceClient_CreateSettings_Call {
+func (_c *SettingsServiceClient_CreateSettings_Call) Run(run func(context1 context.Context, createSettingsRequest *settings.CreateSettingsRequest)) *SettingsServiceClient_CreateSettings_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[settings.CreateSettingsRequest]
+		var arg1 *settings.CreateSettingsRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[settings.CreateSettingsRequest])
+			arg1 = args[1].(*settings.CreateSettingsRequest)
 		}
 		run(
 			arg0,
@@ -97,38 +105,38 @@ func (_c *SettingsServiceClient_CreateSettings_Call) Run(run func(context1 conte
 	return _c
 }
 
-func (_c *SettingsServiceClient_CreateSettings_Call) Return(response *connect.Response[settings.CreateSettingsResponse], err error) *SettingsServiceClient_CreateSettings_Call {
-	_c.Call.Return(response, err)
+func (_c *SettingsServiceClient_CreateSettings_Call) Return(createSettingsResponse *settings.CreateSettingsResponse, err error) *SettingsServiceClient_CreateSettings_Call {
+	_c.Call.Return(createSettingsResponse, err)
 	return _c
 }
 
-func (_c *SettingsServiceClient_CreateSettings_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[settings.CreateSettingsRequest]) (*connect.Response[settings.CreateSettingsResponse], error)) *SettingsServiceClient_CreateSettings_Call {
+func (_c *SettingsServiceClient_CreateSettings_Call) RunAndReturn(run func(context1 context.Context, createSettingsRequest *settings.CreateSettingsRequest) (*settings.CreateSettingsResponse, error)) *SettingsServiceClient_CreateSettings_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetSettings provides a mock function for the type SettingsServiceClient
-func (_mock *SettingsServiceClient) GetSettings(context1 context.Context, request *connect.Request[settings.GetSettingsRequest]) (*connect.Response[settings.GetSettingsResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *SettingsServiceClient) GetSettings(context1 context.Context, getSettingsRequest *settings.GetSettingsRequest) (*settings.GetSettingsResponse, error) {
+	ret := _mock.Called(context1, getSettingsRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetSettings")
 	}
 
-	var r0 *connect.Response[settings.GetSettingsResponse]
+	var r0 *settings.GetSettingsResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[settings.GetSettingsRequest]) (*connect.Response[settings.GetSettingsResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *settings.GetSettingsRequest) (*settings.GetSettingsResponse, error)); ok {
+		return returnFunc(context1, getSettingsRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[settings.GetSettingsRequest]) *connect.Response[settings.GetSettingsResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *settings.GetSettingsRequest) *settings.GetSettingsResponse); ok {
+		r0 = returnFunc(context1, getSettingsRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[settings.GetSettingsResponse])
+			r0 = ret.Get(0).(*settings.GetSettingsResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[settings.GetSettingsRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *settings.GetSettingsRequest) error); ok {
+		r1 = returnFunc(context1, getSettingsRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -142,20 +150,20 @@ type SettingsServiceClient_GetSettings_Call struct {
 
 // GetSettings is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[settings.GetSettingsRequest]
-func (_e *SettingsServiceClient_Expecter) GetSettings(context1 interface{}, request interface{}) *SettingsServiceClient_GetSettings_Call {
-	return &SettingsServiceClient_GetSettings_Call{Call: _e.mock.On("GetSettings", context1, request)}
+//   - getSettingsRequest *settings.GetSettingsRequest
+func (_e *SettingsServiceClient_Expecter) GetSettings(context1 any, getSettingsRequest any) *SettingsServiceClient_GetSettings_Call {
+	return &SettingsServiceClient_GetSettings_Call{Call: _e.mock.On("GetSettings", context1, getSettingsRequest)}
 }
 
-func (_c *SettingsServiceClient_GetSettings_Call) Run(run func(context1 context.Context, request *connect.Request[settings.GetSettingsRequest])) *SettingsServiceClient_GetSettings_Call {
+func (_c *SettingsServiceClient_GetSettings_Call) Run(run func(context1 context.Context, getSettingsRequest *settings.GetSettingsRequest)) *SettingsServiceClient_GetSettings_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[settings.GetSettingsRequest]
+		var arg1 *settings.GetSettingsRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[settings.GetSettingsRequest])
+			arg1 = args[1].(*settings.GetSettingsRequest)
 		}
 		run(
 			arg0,
@@ -165,38 +173,38 @@ func (_c *SettingsServiceClient_GetSettings_Call) Run(run func(context1 context.
 	return _c
 }
 
-func (_c *SettingsServiceClient_GetSettings_Call) Return(response *connect.Response[settings.GetSettingsResponse], err error) *SettingsServiceClient_GetSettings_Call {
-	_c.Call.Return(response, err)
+func (_c *SettingsServiceClient_GetSettings_Call) Return(getSettingsResponse *settings.GetSettingsResponse, err error) *SettingsServiceClient_GetSettings_Call {
+	_c.Call.Return(getSettingsResponse, err)
 	return _c
 }
 
-func (_c *SettingsServiceClient_GetSettings_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[settings.GetSettingsRequest]) (*connect.Response[settings.GetSettingsResponse], error)) *SettingsServiceClient_GetSettings_Call {
+func (_c *SettingsServiceClient_GetSettings_Call) RunAndReturn(run func(context1 context.Context, getSettingsRequest *settings.GetSettingsRequest) (*settings.GetSettingsResponse, error)) *SettingsServiceClient_GetSettings_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetSettingsForEdit provides a mock function for the type SettingsServiceClient
-func (_mock *SettingsServiceClient) GetSettingsForEdit(context1 context.Context, request *connect.Request[settings.GetSettingsForEditRequest]) (*connect.Response[settings.GetSettingsForEditResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *SettingsServiceClient) GetSettingsForEdit(context1 context.Context, getSettingsForEditRequest *settings.GetSettingsForEditRequest) (*settings.GetSettingsForEditResponse, error) {
+	ret := _mock.Called(context1, getSettingsForEditRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetSettingsForEdit")
 	}
 
-	var r0 *connect.Response[settings.GetSettingsForEditResponse]
+	var r0 *settings.GetSettingsForEditResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[settings.GetSettingsForEditRequest]) (*connect.Response[settings.GetSettingsForEditResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *settings.GetSettingsForEditRequest) (*settings.GetSettingsForEditResponse, error)); ok {
+		return returnFunc(context1, getSettingsForEditRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[settings.GetSettingsForEditRequest]) *connect.Response[settings.GetSettingsForEditResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *settings.GetSettingsForEditRequest) *settings.GetSettingsForEditResponse); ok {
+		r0 = returnFunc(context1, getSettingsForEditRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[settings.GetSettingsForEditResponse])
+			r0 = ret.Get(0).(*settings.GetSettingsForEditResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[settings.GetSettingsForEditRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *settings.GetSettingsForEditRequest) error); ok {
+		r1 = returnFunc(context1, getSettingsForEditRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -210,20 +218,20 @@ type SettingsServiceClient_GetSettingsForEdit_Call struct {
 
 // GetSettingsForEdit is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[settings.GetSettingsForEditRequest]
-func (_e *SettingsServiceClient_Expecter) GetSettingsForEdit(context1 interface{}, request interface{}) *SettingsServiceClient_GetSettingsForEdit_Call {
-	return &SettingsServiceClient_GetSettingsForEdit_Call{Call: _e.mock.On("GetSettingsForEdit", context1, request)}
+//   - getSettingsForEditRequest *settings.GetSettingsForEditRequest
+func (_e *SettingsServiceClient_Expecter) GetSettingsForEdit(context1 any, getSettingsForEditRequest any) *SettingsServiceClient_GetSettingsForEdit_Call {
+	return &SettingsServiceClient_GetSettingsForEdit_Call{Call: _e.mock.On("GetSettingsForEdit", context1, getSettingsForEditRequest)}
 }
 
-func (_c *SettingsServiceClient_GetSettingsForEdit_Call) Run(run func(context1 context.Context, request *connect.Request[settings.GetSettingsForEditRequest])) *SettingsServiceClient_GetSettingsForEdit_Call {
+func (_c *SettingsServiceClient_GetSettingsForEdit_Call) Run(run func(context1 context.Context, getSettingsForEditRequest *settings.GetSettingsForEditRequest)) *SettingsServiceClient_GetSettingsForEdit_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[settings.GetSettingsForEditRequest]
+		var arg1 *settings.GetSettingsForEditRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[settings.GetSettingsForEditRequest])
+			arg1 = args[1].(*settings.GetSettingsForEditRequest)
 		}
 		run(
 			arg0,
@@ -233,38 +241,38 @@ func (_c *SettingsServiceClient_GetSettingsForEdit_Call) Run(run func(context1 c
 	return _c
 }
 
-func (_c *SettingsServiceClient_GetSettingsForEdit_Call) Return(response *connect.Response[settings.GetSettingsForEditResponse], err error) *SettingsServiceClient_GetSettingsForEdit_Call {
-	_c.Call.Return(response, err)
+func (_c *SettingsServiceClient_GetSettingsForEdit_Call) Return(getSettingsForEditResponse *settings.GetSettingsForEditResponse, err error) *SettingsServiceClient_GetSettingsForEdit_Call {
+	_c.Call.Return(getSettingsForEditResponse, err)
 	return _c
 }
 
-func (_c *SettingsServiceClient_GetSettingsForEdit_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[settings.GetSettingsForEditRequest]) (*connect.Response[settings.GetSettingsForEditResponse], error)) *SettingsServiceClient_GetSettingsForEdit_Call {
+func (_c *SettingsServiceClient_GetSettingsForEdit_Call) RunAndReturn(run func(context1 context.Context, getSettingsForEditRequest *settings.GetSettingsForEditRequest) (*settings.GetSettingsForEditResponse, error)) *SettingsServiceClient_GetSettingsForEdit_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // UpdateSettings provides a mock function for the type SettingsServiceClient
-func (_mock *SettingsServiceClient) UpdateSettings(context1 context.Context, request *connect.Request[settings.UpdateSettingsRequest]) (*connect.Response[settings.UpdateSettingsResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *SettingsServiceClient) UpdateSettings(context1 context.Context, updateSettingsRequest *settings.UpdateSettingsRequest) (*settings.UpdateSettingsResponse, error) {
+	ret := _mock.Called(context1, updateSettingsRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateSettings")
 	}
 
-	var r0 *connect.Response[settings.UpdateSettingsResponse]
+	var r0 *settings.UpdateSettingsResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[settings.UpdateSettingsRequest]) (*connect.Response[settings.UpdateSettingsResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *settings.UpdateSettingsRequest) (*settings.UpdateSettingsResponse, error)); ok {
+		return returnFunc(context1, updateSettingsRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[settings.UpdateSettingsRequest]) *connect.Response[settings.UpdateSettingsResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *settings.UpdateSettingsRequest) *settings.UpdateSettingsResponse); ok {
+		r0 = returnFunc(context1, updateSettingsRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[settings.UpdateSettingsResponse])
+			r0 = ret.Get(0).(*settings.UpdateSettingsResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[settings.UpdateSettingsRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *settings.UpdateSettingsRequest) error); ok {
+		r1 = returnFunc(context1, updateSettingsRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -278,20 +286,20 @@ type SettingsServiceClient_UpdateSettings_Call struct {
 
 // UpdateSettings is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[settings.UpdateSettingsRequest]
-func (_e *SettingsServiceClient_Expecter) UpdateSettings(context1 interface{}, request interface{}) *SettingsServiceClient_UpdateSettings_Call {
-	return &SettingsServiceClient_UpdateSettings_Call{Call: _e.mock.On("UpdateSettings", context1, request)}
+//   - updateSettingsRequest *settings.UpdateSettingsRequest
+func (_e *SettingsServiceClient_Expecter) UpdateSettings(context1 any, updateSettingsRequest any) *SettingsServiceClient_UpdateSettings_Call {
+	return &SettingsServiceClient_UpdateSettings_Call{Call: _e.mock.On("UpdateSettings", context1, updateSettingsRequest)}
 }
 
-func (_c *SettingsServiceClient_UpdateSettings_Call) Run(run func(context1 context.Context, request *connect.Request[settings.UpdateSettingsRequest])) *SettingsServiceClient_UpdateSettings_Call {
+func (_c *SettingsServiceClient_UpdateSettings_Call) Run(run func(context1 context.Context, updateSettingsRequest *settings.UpdateSettingsRequest)) *SettingsServiceClient_UpdateSettings_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[settings.UpdateSettingsRequest]
+		var arg1 *settings.UpdateSettingsRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[settings.UpdateSettingsRequest])
+			arg1 = args[1].(*settings.UpdateSettingsRequest)
 		}
 		run(
 			arg0,
@@ -301,12 +309,12 @@ func (_c *SettingsServiceClient_UpdateSettings_Call) Run(run func(context1 conte
 	return _c
 }
 
-func (_c *SettingsServiceClient_UpdateSettings_Call) Return(response *connect.Response[settings.UpdateSettingsResponse], err error) *SettingsServiceClient_UpdateSettings_Call {
-	_c.Call.Return(response, err)
+func (_c *SettingsServiceClient_UpdateSettings_Call) Return(updateSettingsResponse *settings.UpdateSettingsResponse, err error) *SettingsServiceClient_UpdateSettings_Call {
+	_c.Call.Return(updateSettingsResponse, err)
 	return _c
 }
 
-func (_c *SettingsServiceClient_UpdateSettings_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[settings.UpdateSettingsRequest]) (*connect.Response[settings.UpdateSettingsResponse], error)) *SettingsServiceClient_UpdateSettings_Call {
+func (_c *SettingsServiceClient_UpdateSettings_Call) RunAndReturn(run func(context1 context.Context, updateSettingsRequest *settings.UpdateSettingsRequest) (*settings.UpdateSettingsResponse, error)) *SettingsServiceClient_UpdateSettings_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -317,10 +325,19 @@ func NewSettingsServiceHandler(t interface {
 	mock.TestingT
 	Cleanup(func())
 }) *SettingsServiceHandler {
+	if helper, ok := t.(interface{ Helper() }); ok {
+		helper.Helper()
+	}
+
 	mock := &SettingsServiceHandler{}
 	mock.Mock.Test(t)
 
-	t.Cleanup(func() { mock.AssertExpectations(t) })
+	t.Cleanup(func() {
+		if helper, ok := t.(interface{ Helper() }); ok {
+			helper.Helper()
+		}
+		mock.AssertExpectations(t)
+	})
 
 	return mock
 }
@@ -339,27 +356,27 @@ func (_m *SettingsServiceHandler) EXPECT() *SettingsServiceHandler_Expecter {
 }
 
 // CreateSettings provides a mock function for the type SettingsServiceHandler
-func (_mock *SettingsServiceHandler) CreateSettings(context1 context.Context, request *connect.Request[settings.CreateSettingsRequest]) (*connect.Response[settings.CreateSettingsResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *SettingsServiceHandler) CreateSettings(context1 context.Context, createSettingsRequest *settings.CreateSettingsRequest) (*settings.CreateSettingsResponse, error) {
+	ret := _mock.Called(context1, createSettingsRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateSettings")
 	}
 
-	var r0 *connect.Response[settings.CreateSettingsResponse]
+	var r0 *settings.CreateSettingsResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[settings.CreateSettingsRequest]) (*connect.Response[settings.CreateSettingsResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *settings.CreateSettingsRequest) (*settings.CreateSettingsResponse, error)); ok {
+		return returnFunc(context1, createSettingsRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[settings.CreateSettingsRequest]) *connect.Response[settings.CreateSettingsResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *settings.CreateSettingsRequest) *settings.CreateSettingsResponse); ok {
+		r0 = returnFunc(context1, createSettingsRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[settings.CreateSettingsResponse])
+			r0 = ret.Get(0).(*settings.CreateSettingsResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[settings.CreateSettingsRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *settings.CreateSettingsRequest) error); ok {
+		r1 = returnFunc(context1, createSettingsRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -373,20 +390,20 @@ type SettingsServiceHandler_CreateSettings_Call struct {
 
 // CreateSettings is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[settings.CreateSettingsRequest]
-func (_e *SettingsServiceHandler_Expecter) CreateSettings(context1 interface{}, request interface{}) *SettingsServiceHandler_CreateSettings_Call {
-	return &SettingsServiceHandler_CreateSettings_Call{Call: _e.mock.On("CreateSettings", context1, request)}
+//   - createSettingsRequest *settings.CreateSettingsRequest
+func (_e *SettingsServiceHandler_Expecter) CreateSettings(context1 any, createSettingsRequest any) *SettingsServiceHandler_CreateSettings_Call {
+	return &SettingsServiceHandler_CreateSettings_Call{Call: _e.mock.On("CreateSettings", context1, createSettingsRequest)}
 }
 
-func (_c *SettingsServiceHandler_CreateSettings_Call) Run(run func(context1 context.Context, request *connect.Request[settings.CreateSettingsRequest])) *SettingsServiceHandler_CreateSettings_Call {
+func (_c *SettingsServiceHandler_CreateSettings_Call) Run(run func(context1 context.Context, createSettingsRequest *settings.CreateSettingsRequest)) *SettingsServiceHandler_CreateSettings_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[settings.CreateSettingsRequest]
+		var arg1 *settings.CreateSettingsRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[settings.CreateSettingsRequest])
+			arg1 = args[1].(*settings.CreateSettingsRequest)
 		}
 		run(
 			arg0,
@@ -396,38 +413,38 @@ func (_c *SettingsServiceHandler_CreateSettings_Call) Run(run func(context1 cont
 	return _c
 }
 
-func (_c *SettingsServiceHandler_CreateSettings_Call) Return(response *connect.Response[settings.CreateSettingsResponse], err error) *SettingsServiceHandler_CreateSettings_Call {
-	_c.Call.Return(response, err)
+func (_c *SettingsServiceHandler_CreateSettings_Call) Return(createSettingsResponse *settings.CreateSettingsResponse, err error) *SettingsServiceHandler_CreateSettings_Call {
+	_c.Call.Return(createSettingsResponse, err)
 	return _c
 }
 
-func (_c *SettingsServiceHandler_CreateSettings_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[settings.CreateSettingsRequest]) (*connect.Response[settings.CreateSettingsResponse], error)) *SettingsServiceHandler_CreateSettings_Call {
+func (_c *SettingsServiceHandler_CreateSettings_Call) RunAndReturn(run func(context1 context.Context, createSettingsRequest *settings.CreateSettingsRequest) (*settings.CreateSettingsResponse, error)) *SettingsServiceHandler_CreateSettings_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetSettings provides a mock function for the type SettingsServiceHandler
-func (_mock *SettingsServiceHandler) GetSettings(context1 context.Context, request *connect.Request[settings.GetSettingsRequest]) (*connect.Response[settings.GetSettingsResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *SettingsServiceHandler) GetSettings(context1 context.Context, getSettingsRequest *settings.GetSettingsRequest) (*settings.GetSettingsResponse, error) {
+	ret := _mock.Called(context1, getSettingsRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetSettings")
 	}
 
-	var r0 *connect.Response[settings.GetSettingsResponse]
+	var r0 *settings.GetSettingsResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[settings.GetSettingsRequest]) (*connect.Response[settings.GetSettingsResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *settings.GetSettingsRequest) (*settings.GetSettingsResponse, error)); ok {
+		return returnFunc(context1, getSettingsRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[settings.GetSettingsRequest]) *connect.Response[settings.GetSettingsResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *settings.GetSettingsRequest) *settings.GetSettingsResponse); ok {
+		r0 = returnFunc(context1, getSettingsRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[settings.GetSettingsResponse])
+			r0 = ret.Get(0).(*settings.GetSettingsResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[settings.GetSettingsRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *settings.GetSettingsRequest) error); ok {
+		r1 = returnFunc(context1, getSettingsRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -441,20 +458,20 @@ type SettingsServiceHandler_GetSettings_Call struct {
 
 // GetSettings is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[settings.GetSettingsRequest]
-func (_e *SettingsServiceHandler_Expecter) GetSettings(context1 interface{}, request interface{}) *SettingsServiceHandler_GetSettings_Call {
-	return &SettingsServiceHandler_GetSettings_Call{Call: _e.mock.On("GetSettings", context1, request)}
+//   - getSettingsRequest *settings.GetSettingsRequest
+func (_e *SettingsServiceHandler_Expecter) GetSettings(context1 any, getSettingsRequest any) *SettingsServiceHandler_GetSettings_Call {
+	return &SettingsServiceHandler_GetSettings_Call{Call: _e.mock.On("GetSettings", context1, getSettingsRequest)}
 }
 
-func (_c *SettingsServiceHandler_GetSettings_Call) Run(run func(context1 context.Context, request *connect.Request[settings.GetSettingsRequest])) *SettingsServiceHandler_GetSettings_Call {
+func (_c *SettingsServiceHandler_GetSettings_Call) Run(run func(context1 context.Context, getSettingsRequest *settings.GetSettingsRequest)) *SettingsServiceHandler_GetSettings_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[settings.GetSettingsRequest]
+		var arg1 *settings.GetSettingsRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[settings.GetSettingsRequest])
+			arg1 = args[1].(*settings.GetSettingsRequest)
 		}
 		run(
 			arg0,
@@ -464,38 +481,38 @@ func (_c *SettingsServiceHandler_GetSettings_Call) Run(run func(context1 context
 	return _c
 }
 
-func (_c *SettingsServiceHandler_GetSettings_Call) Return(response *connect.Response[settings.GetSettingsResponse], err error) *SettingsServiceHandler_GetSettings_Call {
-	_c.Call.Return(response, err)
+func (_c *SettingsServiceHandler_GetSettings_Call) Return(getSettingsResponse *settings.GetSettingsResponse, err error) *SettingsServiceHandler_GetSettings_Call {
+	_c.Call.Return(getSettingsResponse, err)
 	return _c
 }
 
-func (_c *SettingsServiceHandler_GetSettings_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[settings.GetSettingsRequest]) (*connect.Response[settings.GetSettingsResponse], error)) *SettingsServiceHandler_GetSettings_Call {
+func (_c *SettingsServiceHandler_GetSettings_Call) RunAndReturn(run func(context1 context.Context, getSettingsRequest *settings.GetSettingsRequest) (*settings.GetSettingsResponse, error)) *SettingsServiceHandler_GetSettings_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetSettingsForEdit provides a mock function for the type SettingsServiceHandler
-func (_mock *SettingsServiceHandler) GetSettingsForEdit(context1 context.Context, request *connect.Request[settings.GetSettingsForEditRequest]) (*connect.Response[settings.GetSettingsForEditResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *SettingsServiceHandler) GetSettingsForEdit(context1 context.Context, getSettingsForEditRequest *settings.GetSettingsForEditRequest) (*settings.GetSettingsForEditResponse, error) {
+	ret := _mock.Called(context1, getSettingsForEditRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetSettingsForEdit")
 	}
 
-	var r0 *connect.Response[settings.GetSettingsForEditResponse]
+	var r0 *settings.GetSettingsForEditResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[settings.GetSettingsForEditRequest]) (*connect.Response[settings.GetSettingsForEditResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *settings.GetSettingsForEditRequest) (*settings.GetSettingsForEditResponse, error)); ok {
+		return returnFunc(context1, getSettingsForEditRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[settings.GetSettingsForEditRequest]) *connect.Response[settings.GetSettingsForEditResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *settings.GetSettingsForEditRequest) *settings.GetSettingsForEditResponse); ok {
+		r0 = returnFunc(context1, getSettingsForEditRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[settings.GetSettingsForEditResponse])
+			r0 = ret.Get(0).(*settings.GetSettingsForEditResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[settings.GetSettingsForEditRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *settings.GetSettingsForEditRequest) error); ok {
+		r1 = returnFunc(context1, getSettingsForEditRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -509,20 +526,20 @@ type SettingsServiceHandler_GetSettingsForEdit_Call struct {
 
 // GetSettingsForEdit is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[settings.GetSettingsForEditRequest]
-func (_e *SettingsServiceHandler_Expecter) GetSettingsForEdit(context1 interface{}, request interface{}) *SettingsServiceHandler_GetSettingsForEdit_Call {
-	return &SettingsServiceHandler_GetSettingsForEdit_Call{Call: _e.mock.On("GetSettingsForEdit", context1, request)}
+//   - getSettingsForEditRequest *settings.GetSettingsForEditRequest
+func (_e *SettingsServiceHandler_Expecter) GetSettingsForEdit(context1 any, getSettingsForEditRequest any) *SettingsServiceHandler_GetSettingsForEdit_Call {
+	return &SettingsServiceHandler_GetSettingsForEdit_Call{Call: _e.mock.On("GetSettingsForEdit", context1, getSettingsForEditRequest)}
 }
 
-func (_c *SettingsServiceHandler_GetSettingsForEdit_Call) Run(run func(context1 context.Context, request *connect.Request[settings.GetSettingsForEditRequest])) *SettingsServiceHandler_GetSettingsForEdit_Call {
+func (_c *SettingsServiceHandler_GetSettingsForEdit_Call) Run(run func(context1 context.Context, getSettingsForEditRequest *settings.GetSettingsForEditRequest)) *SettingsServiceHandler_GetSettingsForEdit_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[settings.GetSettingsForEditRequest]
+		var arg1 *settings.GetSettingsForEditRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[settings.GetSettingsForEditRequest])
+			arg1 = args[1].(*settings.GetSettingsForEditRequest)
 		}
 		run(
 			arg0,
@@ -532,38 +549,38 @@ func (_c *SettingsServiceHandler_GetSettingsForEdit_Call) Run(run func(context1 
 	return _c
 }
 
-func (_c *SettingsServiceHandler_GetSettingsForEdit_Call) Return(response *connect.Response[settings.GetSettingsForEditResponse], err error) *SettingsServiceHandler_GetSettingsForEdit_Call {
-	_c.Call.Return(response, err)
+func (_c *SettingsServiceHandler_GetSettingsForEdit_Call) Return(getSettingsForEditResponse *settings.GetSettingsForEditResponse, err error) *SettingsServiceHandler_GetSettingsForEdit_Call {
+	_c.Call.Return(getSettingsForEditResponse, err)
 	return _c
 }
 
-func (_c *SettingsServiceHandler_GetSettingsForEdit_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[settings.GetSettingsForEditRequest]) (*connect.Response[settings.GetSettingsForEditResponse], error)) *SettingsServiceHandler_GetSettingsForEdit_Call {
+func (_c *SettingsServiceHandler_GetSettingsForEdit_Call) RunAndReturn(run func(context1 context.Context, getSettingsForEditRequest *settings.GetSettingsForEditRequest) (*settings.GetSettingsForEditResponse, error)) *SettingsServiceHandler_GetSettingsForEdit_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // UpdateSettings provides a mock function for the type SettingsServiceHandler
-func (_mock *SettingsServiceHandler) UpdateSettings(context1 context.Context, request *connect.Request[settings.UpdateSettingsRequest]) (*connect.Response[settings.UpdateSettingsResponse], error) {
-	ret := _mock.Called(context1, request)
+func (_mock *SettingsServiceHandler) UpdateSettings(context1 context.Context, updateSettingsRequest *settings.UpdateSettingsRequest) (*settings.UpdateSettingsResponse, error) {
+	ret := _mock.Called(context1, updateSettingsRequest)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateSettings")
 	}
 
-	var r0 *connect.Response[settings.UpdateSettingsResponse]
+	var r0 *settings.UpdateSettingsResponse
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[settings.UpdateSettingsRequest]) (*connect.Response[settings.UpdateSettingsResponse], error)); ok {
-		return returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *settings.UpdateSettingsRequest) (*settings.UpdateSettingsResponse, error)); ok {
+		return returnFunc(context1, updateSettingsRequest)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *connect.Request[settings.UpdateSettingsRequest]) *connect.Response[settings.UpdateSettingsResponse]); ok {
-		r0 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *settings.UpdateSettingsRequest) *settings.UpdateSettingsResponse); ok {
+		r0 = returnFunc(context1, updateSettingsRequest)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*connect.Response[settings.UpdateSettingsResponse])
+			r0 = ret.Get(0).(*settings.UpdateSettingsResponse)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *connect.Request[settings.UpdateSettingsRequest]) error); ok {
-		r1 = returnFunc(context1, request)
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *settings.UpdateSettingsRequest) error); ok {
+		r1 = returnFunc(context1, updateSettingsRequest)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -577,20 +594,20 @@ type SettingsServiceHandler_UpdateSettings_Call struct {
 
 // UpdateSettings is a helper method to define mock.On call
 //   - context1 context.Context
-//   - request *connect.Request[settings.UpdateSettingsRequest]
-func (_e *SettingsServiceHandler_Expecter) UpdateSettings(context1 interface{}, request interface{}) *SettingsServiceHandler_UpdateSettings_Call {
-	return &SettingsServiceHandler_UpdateSettings_Call{Call: _e.mock.On("UpdateSettings", context1, request)}
+//   - updateSettingsRequest *settings.UpdateSettingsRequest
+func (_e *SettingsServiceHandler_Expecter) UpdateSettings(context1 any, updateSettingsRequest any) *SettingsServiceHandler_UpdateSettings_Call {
+	return &SettingsServiceHandler_UpdateSettings_Call{Call: _e.mock.On("UpdateSettings", context1, updateSettingsRequest)}
 }
 
-func (_c *SettingsServiceHandler_UpdateSettings_Call) Run(run func(context1 context.Context, request *connect.Request[settings.UpdateSettingsRequest])) *SettingsServiceHandler_UpdateSettings_Call {
+func (_c *SettingsServiceHandler_UpdateSettings_Call) Run(run func(context1 context.Context, updateSettingsRequest *settings.UpdateSettingsRequest)) *SettingsServiceHandler_UpdateSettings_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *connect.Request[settings.UpdateSettingsRequest]
+		var arg1 *settings.UpdateSettingsRequest
 		if args[1] != nil {
-			arg1 = args[1].(*connect.Request[settings.UpdateSettingsRequest])
+			arg1 = args[1].(*settings.UpdateSettingsRequest)
 		}
 		run(
 			arg0,
@@ -600,12 +617,12 @@ func (_c *SettingsServiceHandler_UpdateSettings_Call) Run(run func(context1 cont
 	return _c
 }
 
-func (_c *SettingsServiceHandler_UpdateSettings_Call) Return(response *connect.Response[settings.UpdateSettingsResponse], err error) *SettingsServiceHandler_UpdateSettings_Call {
-	_c.Call.Return(response, err)
+func (_c *SettingsServiceHandler_UpdateSettings_Call) Return(updateSettingsResponse *settings.UpdateSettingsResponse, err error) *SettingsServiceHandler_UpdateSettings_Call {
+	_c.Call.Return(updateSettingsResponse, err)
 	return _c
 }
 
-func (_c *SettingsServiceHandler_UpdateSettings_Call) RunAndReturn(run func(context1 context.Context, request *connect.Request[settings.UpdateSettingsRequest]) (*connect.Response[settings.UpdateSettingsResponse], error)) *SettingsServiceHandler_UpdateSettings_Call {
+func (_c *SettingsServiceHandler_UpdateSettings_Call) RunAndReturn(run func(context1 context.Context, updateSettingsRequest *settings.UpdateSettingsRequest) (*settings.UpdateSettingsResponse, error)) *SettingsServiceHandler_UpdateSettings_Call {
 	_c.Call.Return(run)
 	return _c
 }

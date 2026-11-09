@@ -2,10 +2,12 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"time"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
 	"github.com/hashicorp/golang-lru/v2/expirable"
 
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
@@ -41,14 +43,14 @@ var _ appconnect.AppServiceHandler = (*AppService)(nil)
 // Create forwards to InternalAppService and invalidates the cache entry.
 func (s *AppService) Create(
 	ctx context.Context,
-	req *connect.Request[flyteapp.CreateRequest],
-) (*connect.Response[flyteapp.CreateResponse], error) {
+	req *flyteapp.CreateRequest,
+) (*flyteapp.CreateResponse, error) {
 	resp, err := s.internalClient.Create(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 	if s.cache != nil {
-		s.cache.Remove(cacheKey(req.Msg.GetApp().GetMetadata().GetId()))
+		s.cache.Remove(cacheKey(req.GetApp().GetMetadata().GetId()))
 	}
 	return resp, nil
 }
@@ -56,12 +58,12 @@ func (s *AppService) Create(
 // Get returns the app, using the cache on hit and calling InternalAppService on miss.
 func (s *AppService) Get(
 	ctx context.Context,
-	req *connect.Request[flyteapp.GetRequest],
-) (*connect.Response[flyteapp.GetResponse], error) {
-	appID, ok := req.Msg.GetIdentifier().(*flyteapp.GetRequest_AppId)
+	req *flyteapp.GetRequest,
+) (*flyteapp.GetResponse, error) {
+	appID, ok := req.GetIdentifier().(*flyteapp.GetRequest_AppId)
 	if ok && appID.AppId != nil && s.cache != nil {
 		if app, hit := s.cache.Get(cacheKey(appID.AppId)); hit {
-			return connect.NewResponse(&flyteapp.GetResponse{App: app}), nil
+			return &flyteapp.GetResponse{App: app}, nil
 		}
 	}
 
@@ -69,8 +71,8 @@ func (s *AppService) Get(
 	if err != nil {
 		return nil, err
 	}
-	if ok && appID.AppId != nil && s.cache != nil && !isTransitionalState(resp.Msg.GetApp()) {
-		s.cache.Add(cacheKey(appID.AppId), resp.Msg.GetApp())
+	if ok && appID.AppId != nil && s.cache != nil && !isTransitionalState(resp.GetApp()) {
+		s.cache.Add(cacheKey(appID.AppId), resp.GetApp())
 	}
 	return resp, nil
 }
@@ -97,14 +99,14 @@ func isTransitionalState(app *flyteapp.App) bool {
 // Update forwards to InternalAppService and invalidates the cache entry.
 func (s *AppService) Update(
 	ctx context.Context,
-	req *connect.Request[flyteapp.UpdateRequest],
-) (*connect.Response[flyteapp.UpdateResponse], error) {
+	req *flyteapp.UpdateRequest,
+) (*flyteapp.UpdateResponse, error) {
 	resp, err := s.internalClient.Update(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 	if s.cache != nil {
-		s.cache.Remove(cacheKey(req.Msg.GetApp().GetMetadata().GetId()))
+		s.cache.Remove(cacheKey(req.GetApp().GetMetadata().GetId()))
 	}
 	return resp, nil
 }
@@ -112,14 +114,14 @@ func (s *AppService) Update(
 // Delete forwards to InternalAppService and invalidates the cache entry.
 func (s *AppService) Delete(
 	ctx context.Context,
-	req *connect.Request[flyteapp.DeleteRequest],
-) (*connect.Response[flyteapp.DeleteResponse], error) {
+	req *flyteapp.DeleteRequest,
+) (*flyteapp.DeleteResponse, error) {
 	resp, err := s.internalClient.Delete(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 	if s.cache != nil {
-		s.cache.Remove(cacheKey(req.Msg.GetAppId()))
+		s.cache.Remove(cacheKey(req.GetAppId()))
 	}
 	return resp, nil
 }
@@ -127,28 +129,37 @@ func (s *AppService) Delete(
 // List always forwards to InternalAppService — results vary by filter/pagination.
 func (s *AppService) List(
 	ctx context.Context,
-	req *connect.Request[flyteapp.ListRequest],
-) (*connect.Response[flyteapp.ListResponse], error) {
+	req *flyteapp.ListRequest,
+) (*flyteapp.ListResponse, error) {
 	return s.internalClient.List(ctx, req)
 }
 
 // Watch proxies the server-streaming Watch RPC to InternalAppService.
 func (s *AppService) Watch(
 	ctx context.Context,
-	req *connect.Request[flyteapp.WatchRequest],
-	stream *connect.ServerStream[flyteapp.WatchResponse],
+	req *flyteapp.WatchRequest,
+	stream appconnect.AppServiceWatchServerStream,
 ) error {
 	clientStream, err := s.internalClient.Watch(ctx, req)
 	if err != nil {
-		return connect.NewError(connect.CodeInternal, err)
+		return connect.NewError(connect.CodeInternal, err.Error()).WithCause(err)
 	}
 	defer clientStream.Close() //nolint:errcheck
-	for clientStream.Receive() {
-		if err := stream.Send(clientStream.Msg()); err != nil {
+	var streamErr error
+	for {
+		msg, err2 := clientStream.Receive()
+		if err2 != nil {
+			streamErr = err2
+			break
+		}
+		if err := stream.Send(msg); err != nil {
 			return err
 		}
 	}
-	return clientStream.Err()
+	if errors.Is(streamErr, io.EOF) {
+		streamErr = nil
+	}
+	return streamErr
 }
 
 // cacheKey returns a stable string key for an app identifier.

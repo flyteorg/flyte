@@ -5,242 +5,249 @@
 package orgconnect
 
 import (
-	connect "connectrpc.com/connect"
+	connect "connectrpc.com/connect/v2"
 	context "context"
-	errors "errors"
 	org "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/org"
-	http "net/http"
-	strings "strings"
+	sync "sync"
 )
-
-// This is a compile-time assertion to ensure that this generated file and the connect package are
-// compatible. If you get a compiler error that this constant is not defined, this code was
-// generated with a version of connect newer than the one compiled into your binary. You can fix the
-// problem by either regenerating this code with an older version of connect or updating the connect
-// version compiled into your binary.
-const _ = connect.IsAtLeastVersion1_13_0
 
 const (
 	// DomainServiceName is the fully-qualified name of the DomainService service.
 	DomainServiceName = "flyteidl2.org.DomainService"
 )
 
-// These constants are the fully-qualified names of the RPCs defined in this package. They're
-// exposed at runtime as Spec.Procedure and as the final two segments of the HTTP route.
+// These constants are the procedure names of the RPCs defined in this package. They're exposed at
+// runtime as Spec.Procedure and as the final two segments of the HTTP route.
 //
 // Note that these are different from the fully-qualified method names used by
 // google.golang.org/protobuf/reflect/protoreflect. To convert from these constants to
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// DomainServiceListDomainsProcedure is the fully-qualified name of the DomainService's ListDomains
-	// RPC.
+	// DomainServiceListDomainsProcedure is the procedure name of the DomainService's ListDomains RPC.
 	DomainServiceListDomainsProcedure = "/flyteidl2.org.DomainService/ListDomains"
-	// DomainServiceCreateDomainProcedure is the fully-qualified name of the DomainService's
-	// CreateDomain RPC.
+	// DomainServiceCreateDomainProcedure is the procedure name of the DomainService's CreateDomain RPC.
 	DomainServiceCreateDomainProcedure = "/flyteidl2.org.DomainService/CreateDomain"
-	// DomainServiceGetDomainProcedure is the fully-qualified name of the DomainService's GetDomain RPC.
+	// DomainServiceGetDomainProcedure is the procedure name of the DomainService's GetDomain RPC.
 	DomainServiceGetDomainProcedure = "/flyteidl2.org.DomainService/GetDomain"
-	// DomainServiceUpdateDomainProcedure is the fully-qualified name of the DomainService's
-	// UpdateDomain RPC.
+	// DomainServiceUpdateDomainProcedure is the procedure name of the DomainService's UpdateDomain RPC.
 	DomainServiceUpdateDomainProcedure = "/flyteidl2.org.DomainService/UpdateDomain"
-	// DomainServiceDeleteDomainProcedure is the fully-qualified name of the DomainService's
-	// DeleteDomain RPC.
+	// DomainServiceDeleteDomainProcedure is the procedure name of the DomainService's DeleteDomain RPC.
 	DomainServiceDeleteDomainProcedure = "/flyteidl2.org.DomainService/DeleteDomain"
 )
 
-// These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	domainServiceServiceDescriptor            = org.File_flyteidl2_org_domain_service_proto.Services().ByName("DomainService")
-	domainServiceListDomainsMethodDescriptor  = domainServiceServiceDescriptor.Methods().ByName("ListDomains")
-	domainServiceCreateDomainMethodDescriptor = domainServiceServiceDescriptor.Methods().ByName("CreateDomain")
-	domainServiceGetDomainMethodDescriptor    = domainServiceServiceDescriptor.Methods().ByName("GetDomain")
-	domainServiceUpdateDomainMethodDescriptor = domainServiceServiceDescriptor.Methods().ByName("UpdateDomain")
-	domainServiceDeleteDomainMethodDescriptor = domainServiceServiceDescriptor.Methods().ByName("DeleteDomain")
+	domainServiceListDomainsSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           org.File_flyteidl2_org_domain_service_proto.Services().ByName("DomainService").Methods().ByName("ListDomains"),
+			Procedure:        DomainServiceListDomainsProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	domainServiceCreateDomainSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     org.File_flyteidl2_org_domain_service_proto.Services().ByName("DomainService").Methods().ByName("CreateDomain"),
+			Procedure:  DomainServiceCreateDomainProcedure,
+		}
+	})
+	domainServiceGetDomainSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType:       connect.StreamTypeUnary,
+			Schema:           org.File_flyteidl2_org_domain_service_proto.Services().ByName("DomainService").Methods().ByName("GetDomain"),
+			Procedure:        DomainServiceGetDomainProcedure,
+			IdempotencyLevel: connect.IdempotencyNoSideEffects,
+		}
+	})
+	domainServiceUpdateDomainSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     org.File_flyteidl2_org_domain_service_proto.Services().ByName("DomainService").Methods().ByName("UpdateDomain"),
+			Procedure:  DomainServiceUpdateDomainProcedure,
+		}
+	})
+	domainServiceDeleteDomainSpec = sync.OnceValue(func() connect.Spec {
+		return connect.Spec{
+			StreamType: connect.StreamTypeUnary,
+			Schema:     org.File_flyteidl2_org_domain_service_proto.Services().ByName("DomainService").Methods().ByName("DeleteDomain"),
+			Procedure:  DomainServiceDeleteDomainProcedure,
+		}
+	})
 )
 
 // DomainServiceClient is a client for the flyteidl2.org.DomainService service.
 type DomainServiceClient interface {
 	// ListDomains returns all domains for an organization.
-	ListDomains(context.Context, *connect.Request[org.ListDomainsRequest]) (*connect.Response[org.ListDomainsResponse], error)
+	ListDomains(context.Context, *org.ListDomainsRequest) (*org.ListDomainsResponse, error)
 	// CreateDomain creates a new domain within an organization.
 	// Domain creation is primarily an administrative operation.
-	CreateDomain(context.Context, *connect.Request[org.CreateDomainRequest]) (*connect.Response[org.CreateDomainResponse], error)
+	CreateDomain(context.Context, *org.CreateDomainRequest) (*org.CreateDomainResponse, error)
 	// GetDomain returns a specific domain by ID.
-	GetDomain(context.Context, *connect.Request[org.GetDomainRequest]) (*connect.Response[org.GetDomainResponse], error)
+	GetDomain(context.Context, *org.GetDomainRequest) (*org.GetDomainResponse, error)
 	// UpdateDomain updates a domain's metadata.
-	UpdateDomain(context.Context, *connect.Request[org.UpdateDomainRequest]) (*connect.Response[org.UpdateDomainResponse], error)
-	DeleteDomain(context.Context, *connect.Request[org.DeleteDomainRequest]) (*connect.Response[org.DeleteDomainResponse], error)
+	UpdateDomain(context.Context, *org.UpdateDomainRequest) (*org.UpdateDomainResponse, error)
+	DeleteDomain(context.Context, *org.DeleteDomainRequest) (*org.DeleteDomainResponse, error)
 }
 
-// NewDomainServiceClient constructs a client for the flyteidl2.org.DomainService service. By
-// default, it uses the Connect protocol with the binary Protobuf Codec, asks for gzipped responses,
-// and sends uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the
-// connect.WithGRPC() or connect.WithGRPCWeb() options.
-//
-// The URL supplied here should be the base URL for the Connect or gRPC server (for example,
-// http://api.acme.com or https://acme.com/grpc).
-func NewDomainServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) DomainServiceClient {
-	baseURL = strings.TrimRight(baseURL, "/")
-	return &domainServiceClient{
-		listDomains: connect.NewClient[org.ListDomainsRequest, org.ListDomainsResponse](
-			httpClient,
-			baseURL+DomainServiceListDomainsProcedure,
-			connect.WithSchema(domainServiceListDomainsMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		createDomain: connect.NewClient[org.CreateDomainRequest, org.CreateDomainResponse](
-			httpClient,
-			baseURL+DomainServiceCreateDomainProcedure,
-			connect.WithSchema(domainServiceCreateDomainMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		getDomain: connect.NewClient[org.GetDomainRequest, org.GetDomainResponse](
-			httpClient,
-			baseURL+DomainServiceGetDomainProcedure,
-			connect.WithSchema(domainServiceGetDomainMethodDescriptor),
-			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-			connect.WithClientOptions(opts...),
-		),
-		updateDomain: connect.NewClient[org.UpdateDomainRequest, org.UpdateDomainResponse](
-			httpClient,
-			baseURL+DomainServiceUpdateDomainProcedure,
-			connect.WithSchema(domainServiceUpdateDomainMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-		deleteDomain: connect.NewClient[org.DeleteDomainRequest, org.DeleteDomainResponse](
-			httpClient,
-			baseURL+DomainServiceDeleteDomainProcedure,
-			connect.WithSchema(domainServiceDeleteDomainMethodDescriptor),
-			connect.WithClientOptions(opts...),
-		),
-	}
-}
-
-// domainServiceClient implements DomainServiceClient.
-type domainServiceClient struct {
-	listDomains  *connect.Client[org.ListDomainsRequest, org.ListDomainsResponse]
-	createDomain *connect.Client[org.CreateDomainRequest, org.CreateDomainResponse]
-	getDomain    *connect.Client[org.GetDomainRequest, org.GetDomainResponse]
-	updateDomain *connect.Client[org.UpdateDomainRequest, org.UpdateDomainResponse]
-	deleteDomain *connect.Client[org.DeleteDomainRequest, org.DeleteDomainResponse]
-}
-
-// ListDomains calls flyteidl2.org.DomainService.ListDomains.
-func (c *domainServiceClient) ListDomains(ctx context.Context, req *connect.Request[org.ListDomainsRequest]) (*connect.Response[org.ListDomainsResponse], error) {
-	return c.listDomains.CallUnary(ctx, req)
-}
-
-// CreateDomain calls flyteidl2.org.DomainService.CreateDomain.
-func (c *domainServiceClient) CreateDomain(ctx context.Context, req *connect.Request[org.CreateDomainRequest]) (*connect.Response[org.CreateDomainResponse], error) {
-	return c.createDomain.CallUnary(ctx, req)
-}
-
-// GetDomain calls flyteidl2.org.DomainService.GetDomain.
-func (c *domainServiceClient) GetDomain(ctx context.Context, req *connect.Request[org.GetDomainRequest]) (*connect.Response[org.GetDomainResponse], error) {
-	return c.getDomain.CallUnary(ctx, req)
-}
-
-// UpdateDomain calls flyteidl2.org.DomainService.UpdateDomain.
-func (c *domainServiceClient) UpdateDomain(ctx context.Context, req *connect.Request[org.UpdateDomainRequest]) (*connect.Response[org.UpdateDomainResponse], error) {
-	return c.updateDomain.CallUnary(ctx, req)
-}
-
-// DeleteDomain calls flyteidl2.org.DomainService.DeleteDomain.
-func (c *domainServiceClient) DeleteDomain(ctx context.Context, req *connect.Request[org.DeleteDomainRequest]) (*connect.Response[org.DeleteDomainResponse], error) {
-	return c.deleteDomain.CallUnary(ctx, req)
+// NewDomainServiceClient constructs a client for the flyteidl2.org.DomainService service. Multiple
+// service clients may share a single connect.Client.
+func NewDomainServiceClient(client *connect.Client) DomainServiceClient {
+	return &domainServiceClient{client: client}
 }
 
 // DomainServiceHandler is an implementation of the flyteidl2.org.DomainService service.
 type DomainServiceHandler interface {
 	// ListDomains returns all domains for an organization.
-	ListDomains(context.Context, *connect.Request[org.ListDomainsRequest]) (*connect.Response[org.ListDomainsResponse], error)
+	ListDomains(context.Context, *org.ListDomainsRequest) (*org.ListDomainsResponse, error)
 	// CreateDomain creates a new domain within an organization.
 	// Domain creation is primarily an administrative operation.
-	CreateDomain(context.Context, *connect.Request[org.CreateDomainRequest]) (*connect.Response[org.CreateDomainResponse], error)
+	CreateDomain(context.Context, *org.CreateDomainRequest) (*org.CreateDomainResponse, error)
 	// GetDomain returns a specific domain by ID.
-	GetDomain(context.Context, *connect.Request[org.GetDomainRequest]) (*connect.Response[org.GetDomainResponse], error)
+	GetDomain(context.Context, *org.GetDomainRequest) (*org.GetDomainResponse, error)
 	// UpdateDomain updates a domain's metadata.
-	UpdateDomain(context.Context, *connect.Request[org.UpdateDomainRequest]) (*connect.Response[org.UpdateDomainResponse], error)
-	DeleteDomain(context.Context, *connect.Request[org.DeleteDomainRequest]) (*connect.Response[org.DeleteDomainResponse], error)
+	UpdateDomain(context.Context, *org.UpdateDomainRequest) (*org.UpdateDomainResponse, error)
+	DeleteDomain(context.Context, *org.DeleteDomainRequest) (*org.DeleteDomainResponse, error)
 }
 
-// NewDomainServiceHandler builds an HTTP handler from the service implementation. It returns the
-// path on which to mount the handler and the handler itself.
-//
-// By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
-// and JSON codecs. They also support gzip compression.
-func NewDomainServiceHandler(svc DomainServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	domainServiceListDomainsHandler := connect.NewUnaryHandler(
-		DomainServiceListDomainsProcedure,
-		svc.ListDomains,
-		connect.WithSchema(domainServiceListDomainsMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
+// RegisterDomainServiceHandler registers svc as the flyteidl2.org.DomainService implementation on
+// server.
+func RegisterDomainServiceHandler(server *connect.Server, svc DomainServiceHandler) {
+	adapter := domainServiceHandler{svc: svc}
+	server.Register(
+		connect.Method{Spec: domainServiceListDomainsSpec(), Handler: adapter.listDomains},
+		connect.Method{Spec: domainServiceCreateDomainSpec(), Handler: adapter.createDomain},
+		connect.Method{Spec: domainServiceGetDomainSpec(), Handler: adapter.getDomain},
+		connect.Method{Spec: domainServiceUpdateDomainSpec(), Handler: adapter.updateDomain},
+		connect.Method{Spec: domainServiceDeleteDomainSpec(), Handler: adapter.deleteDomain},
 	)
-	domainServiceCreateDomainHandler := connect.NewUnaryHandler(
-		DomainServiceCreateDomainProcedure,
-		svc.CreateDomain,
-		connect.WithSchema(domainServiceCreateDomainMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	domainServiceGetDomainHandler := connect.NewUnaryHandler(
-		DomainServiceGetDomainProcedure,
-		svc.GetDomain,
-		connect.WithSchema(domainServiceGetDomainMethodDescriptor),
-		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
-		connect.WithHandlerOptions(opts...),
-	)
-	domainServiceUpdateDomainHandler := connect.NewUnaryHandler(
-		DomainServiceUpdateDomainProcedure,
-		svc.UpdateDomain,
-		connect.WithSchema(domainServiceUpdateDomainMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	domainServiceDeleteDomainHandler := connect.NewUnaryHandler(
-		DomainServiceDeleteDomainProcedure,
-		svc.DeleteDomain,
-		connect.WithSchema(domainServiceDeleteDomainMethodDescriptor),
-		connect.WithHandlerOptions(opts...),
-	)
-	return "/flyteidl2.org.DomainService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.URL.Path {
-		case DomainServiceListDomainsProcedure:
-			domainServiceListDomainsHandler.ServeHTTP(w, r)
-		case DomainServiceCreateDomainProcedure:
-			domainServiceCreateDomainHandler.ServeHTTP(w, r)
-		case DomainServiceGetDomainProcedure:
-			domainServiceGetDomainHandler.ServeHTTP(w, r)
-		case DomainServiceUpdateDomainProcedure:
-			domainServiceUpdateDomainHandler.ServeHTTP(w, r)
-		case DomainServiceDeleteDomainProcedure:
-			domainServiceDeleteDomainHandler.ServeHTTP(w, r)
-		default:
-			http.NotFound(w, r)
-		}
-	})
 }
 
 // UnimplementedDomainServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedDomainServiceHandler struct{}
 
-func (UnimplementedDomainServiceHandler) ListDomains(context.Context, *connect.Request[org.ListDomainsRequest]) (*connect.Response[org.ListDomainsResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.org.DomainService.ListDomains is not implemented"))
+func (UnimplementedDomainServiceHandler) ListDomains(context.Context, *org.ListDomainsRequest) (*org.ListDomainsResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.org.DomainService.ListDomains is not implemented")
 }
 
-func (UnimplementedDomainServiceHandler) CreateDomain(context.Context, *connect.Request[org.CreateDomainRequest]) (*connect.Response[org.CreateDomainResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.org.DomainService.CreateDomain is not implemented"))
+func (UnimplementedDomainServiceHandler) CreateDomain(context.Context, *org.CreateDomainRequest) (*org.CreateDomainResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.org.DomainService.CreateDomain is not implemented")
 }
 
-func (UnimplementedDomainServiceHandler) GetDomain(context.Context, *connect.Request[org.GetDomainRequest]) (*connect.Response[org.GetDomainResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.org.DomainService.GetDomain is not implemented"))
+func (UnimplementedDomainServiceHandler) GetDomain(context.Context, *org.GetDomainRequest) (*org.GetDomainResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.org.DomainService.GetDomain is not implemented")
 }
 
-func (UnimplementedDomainServiceHandler) UpdateDomain(context.Context, *connect.Request[org.UpdateDomainRequest]) (*connect.Response[org.UpdateDomainResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.org.DomainService.UpdateDomain is not implemented"))
+func (UnimplementedDomainServiceHandler) UpdateDomain(context.Context, *org.UpdateDomainRequest) (*org.UpdateDomainResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.org.DomainService.UpdateDomain is not implemented")
 }
 
-func (UnimplementedDomainServiceHandler) DeleteDomain(context.Context, *connect.Request[org.DeleteDomainRequest]) (*connect.Response[org.DeleteDomainResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("flyteidl2.org.DomainService.DeleteDomain is not implemented"))
+func (UnimplementedDomainServiceHandler) DeleteDomain(context.Context, *org.DeleteDomainRequest) (*org.DeleteDomainResponse, error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, "flyteidl2.org.DomainService.DeleteDomain is not implemented")
+}
+
+type domainServiceClient struct {
+	client *connect.Client
+}
+
+func (c *domainServiceClient) ListDomains(ctx context.Context, req *org.ListDomainsRequest) (*org.ListDomainsResponse, error) {
+	var res org.ListDomainsResponse
+	if err := c.client.CallUnary(ctx, domainServiceListDomainsSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *domainServiceClient) CreateDomain(ctx context.Context, req *org.CreateDomainRequest) (*org.CreateDomainResponse, error) {
+	var res org.CreateDomainResponse
+	if err := c.client.CallUnary(ctx, domainServiceCreateDomainSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *domainServiceClient) GetDomain(ctx context.Context, req *org.GetDomainRequest) (*org.GetDomainResponse, error) {
+	var res org.GetDomainResponse
+	if err := c.client.CallUnary(ctx, domainServiceGetDomainSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *domainServiceClient) UpdateDomain(ctx context.Context, req *org.UpdateDomainRequest) (*org.UpdateDomainResponse, error) {
+	var res org.UpdateDomainResponse
+	if err := c.client.CallUnary(ctx, domainServiceUpdateDomainSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+func (c *domainServiceClient) DeleteDomain(ctx context.Context, req *org.DeleteDomainRequest) (*org.DeleteDomainResponse, error) {
+	var res org.DeleteDomainResponse
+	if err := c.client.CallUnary(ctx, domainServiceDeleteDomainSpec(), req, &res); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}
+
+type domainServiceHandler struct{ svc DomainServiceHandler }
+
+func (h domainServiceHandler) listDomains(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req org.ListDomainsRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.ListDomains(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h domainServiceHandler) createDomain(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req org.CreateDomainRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.CreateDomain(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h domainServiceHandler) getDomain(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req org.GetDomainRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.GetDomain(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h domainServiceHandler) updateDomain(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req org.UpdateDomainRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.UpdateDomain(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
+}
+
+func (h domainServiceHandler) deleteDomain(ctx context.Context, _ connect.Spec, stream connect.ServerStream) error {
+	var req org.DeleteDomainRequest
+	if err := stream.Receive(&req); err != nil {
+		return err
+	}
+	res, err := h.svc.DeleteDomain(ctx, &req)
+	if err != nil {
+		return err
+	}
+	return stream.Send(res)
 }

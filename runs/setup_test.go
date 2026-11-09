@@ -2,12 +2,13 @@ package runs
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"connectrpc.com/connect"
+	"connectrpc.com/connect/v2"
+	"connectrpc.com/connect/v2/connecthttp"
+	"connectrpc.com/connect/v2/connectinprocess"
 	"github.com/getsentry/sentry-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -22,25 +23,26 @@ type stubTaskService struct {
 	err error
 }
 
-func (s *stubTaskService) DeployTask(context.Context, *connect.Request[taskpb.DeployTaskRequest]) (*connect.Response[taskpb.DeployTaskResponse], error) {
+func (s *stubTaskService) DeployTask(context.Context, *taskpb.DeployTaskRequest) (*taskpb.DeployTaskResponse, error) {
 	if s.err != nil {
 		return nil, s.err
 	}
-	return connect.NewResponse(&taskpb.DeployTaskResponse{}), nil
+	return &taskpb.DeployTaskResponse{}, nil
 }
 
 // newTestClient serves svc behind the same interceptor chain Setup installs.
 func newTestClient(t *testing.T, svc taskconnect.TaskServiceHandler) taskconnect.TaskServiceClient {
 	t.Helper()
 	mux := http.NewServeMux()
-	path, handler := taskconnect.NewTaskServiceHandler(svc, connect.WithInterceptors(
+	handler := connect.NewServer(
 		sentryutils.Interceptor(sentryOperations),
 		deployTriggerInterceptor(),
-	))
-	mux.Handle(path, handler)
+	)
+	taskconnect.RegisterTaskServiceHandler(handler, svc)
+	connecthttp.Mount(mux, handler, connecthttp.WithReadMaxBytes(0))
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
-	return taskconnect.NewTaskServiceClient(srv.Client(), srv.URL)
+	return taskconnect.NewTaskServiceClient(connect.NewClient(connecthttp.NewTransport(srv.Client(), srv.URL, connecthttp.WithReadMaxBytes(0))))
 }
 
 // bindMockTransport swaps in a Sentry client whose events the test can read.
@@ -64,9 +66,9 @@ func TestDeployTaskInterceptorsArePassThrough(t *testing.T) {
 	bindMockTransport(t)
 	client := newTestClient(t, &stubTaskService{})
 
-	resp, err := client.DeployTask(context.Background(), connect.NewRequest(&taskpb.DeployTaskRequest{
+	resp, err := client.DeployTask(context.Background(), &taskpb.DeployTaskRequest{
 		Triggers: []*taskpb.TaskTrigger{{Name: "nightly"}, {Name: "on-merge"}},
-	}))
+	})
 	require.NoError(t, err)
 	assert.NotNil(t, resp)
 }
@@ -85,10 +87,10 @@ func TestDeployTaskReportsOnlyServerSideFailures(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			transport := bindMockTransport(t)
 			client := newTestClient(t, &stubTaskService{
-				err: connect.NewError(tc.code, errors.New("boom")),
+				err: connect.NewError(tc.code, "boom"),
 			})
 
-			_, err := client.DeployTask(context.Background(), connect.NewRequest(&taskpb.DeployTaskRequest{}))
+			_, err := client.DeployTask(context.Background(), &taskpb.DeployTaskRequest{})
 			require.Error(t, err)
 			assert.Len(t, transport.Events(), tc.wantEvents)
 		})
@@ -103,4 +105,49 @@ func TestSentryOperationNamesMatchSDK(t *testing.T) {
 		"/flyteidl2.task.TaskService/DeployTask":          "deploy_task",
 		"/flyteidl2.trigger.TriggerService/DeployTrigger": "deploy_trigger",
 	}, sentryOperations)
+}
+
+// The v2 interceptor observes Receive; count only after a successful handler call.
+func TestDeployTriggerInterceptorCountsSuccessfulDeploys(t *testing.T) {
+	for _, tc := range []struct {
+		name        string
+		triggers    int
+		err         error
+		wantMetrics int
+	}{
+		{name: "two triggers", triggers: 2, wantMetrics: 1},
+		{name: "no triggers"},
+		{name: "failed deploy", triggers: 2, err: connect.NewError(connect.CodeInternal, "failed")},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var metrics []*sentry.Metric
+			sentryClient, err := sentry.NewClient(sentry.ClientOptions{
+				Dsn:              "https://key@example.invalid/1",
+				Transport:        &sentry.MockTransport{},
+				BeforeSendMetric: func(m *sentry.Metric) *sentry.Metric { metrics = append(metrics, m); return nil },
+			})
+			require.NoError(t, err)
+			ctx := sentry.SetHubOnContext(context.Background(), sentry.NewHub(sentryClient, sentry.NewScope()))
+			server := connect.NewServer(deployTriggerInterceptor())
+			taskconnect.RegisterTaskServiceHandler(server, &stubTaskService{err: tc.err})
+			client := taskconnect.NewTaskServiceClient(connect.NewClient(connectinprocess.New(server)))
+			req := &taskpb.DeployTaskRequest{}
+			for range tc.triggers {
+				req.Triggers = append(req.Triggers, &taskpb.TaskTrigger{Name: "trigger"})
+			}
+			_, err = client.DeployTask(ctx, req)
+			if tc.err != nil {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+			require.Len(t, metrics, tc.wantMetrics)
+			if tc.wantMetrics > 0 {
+				assert.Equal(t, "flyte.operation", metrics[0].Name)
+				value, ok := metrics[0].Value.Int64()
+				require.True(t, ok)
+				assert.Equal(t, int64(tc.triggers), value)
+			}
+		})
+	}
 }
