@@ -46,7 +46,8 @@ var (
 
 // EventsProxyServiceClient is a client for the flyteidl2.workflow.EventsProxyService service.
 type EventsProxyServiceClient interface {
-	// record the events for an action.
+	// record the events for an action. Work already running reports its progress through
+	// it, so it is allowed while the org is restricted to read-only.
 	Record(context.Context, *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error)
 }
 
@@ -82,7 +83,8 @@ func (c *eventsProxyServiceClient) Record(ctx context.Context, req *connect.Requ
 // EventsProxyServiceHandler is an implementation of the flyteidl2.workflow.EventsProxyService
 // service.
 type EventsProxyServiceHandler interface {
-	// record the events for an action.
+	// record the events for an action. Work already running reports its progress through
+	// it, so it is allowed while the org is restricted to read-only.
 	Record(context.Context, *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error)
 }
 

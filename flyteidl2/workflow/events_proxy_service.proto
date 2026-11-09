@@ -3,14 +3,18 @@ syntax = "proto3";
 package flyteidl2.workflow;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/common/rpc_options.proto";
 import "flyteidl2/workflow/run_definition.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow";
 
 // EventsProxyService provides an interface for forwarding the events to Run Service or Redis stream.
 service EventsProxyService {
-  // record the events for an action.
-  rpc Record(RecordRequest) returns (RecordResponse) {}
+  // record the events for an action. Work already running reports its progress through
+  // it, so it is allowed while the org is restricted to read-only.
+  rpc Record(RecordRequest) returns (RecordResponse) {
+    option (flyteidl2.common.allowed_when_restricted) = true;
+  }
 }
 
 // ============================================================================

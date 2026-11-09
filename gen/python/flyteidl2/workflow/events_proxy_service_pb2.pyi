@@ -1,4 +1,5 @@
 from buf.validate import validate_pb2 as _validate_pb2
+from flyteidl2.common import rpc_options_pb2 as _rpc_options_pb2
 from flyteidl2.workflow import run_definition_pb2 as _run_definition_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor

@@ -27,7 +27,8 @@ class EventsProxyServiceServicer(object):
     """
 
     def Record(self, request, context):
-        """record the events for an action.
+        """record the events for an action. Work already running reports its progress through
+        it, so it is allowed while the org is restricted to read-only.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')

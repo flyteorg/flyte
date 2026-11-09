@@ -12,10 +12,11 @@ _sym_db = _symbol_database.Default()
 
 
 from buf.validate import validate_pb2 as buf_dot_validate_dot_validate__pb2
+from flyteidl2.common import rpc_options_pb2 as flyteidl2_dot_common_dot_rpc__options__pb2
 from flyteidl2.workflow import run_definition_pb2 as flyteidl2_dot_workflow_dot_run__definition__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n-flyteidl2/workflow/events_proxy_service.proto\x12\x12\x66lyteidl2.workflow\x1a\x1b\x62uf/validate/validate.proto\x1a\'flyteidl2/workflow/run_definition.proto\"R\n\rRecordRequest\x12\x41\n\x06\x65vents\x18\x01 \x03(\x0b\x32\x1f.flyteidl2.workflow.ActionEventB\x08\xbaH\x05\x92\x01\x02\x08\x01R\x06\x65vents\"\x10\n\x0eRecordResponse2g\n\x12\x45ventsProxyService\x12Q\n\x06Record\x12!.flyteidl2.workflow.RecordRequest\x1a\".flyteidl2.workflow.RecordResponse\"\x00\x42\xd4\x01\n\x16\x63om.flyteidl2.workflowB\x17\x45ventsProxyServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n-flyteidl2/workflow/events_proxy_service.proto\x12\x12\x66lyteidl2.workflow\x1a\x1b\x62uf/validate/validate.proto\x1a\"flyteidl2/common/rpc_options.proto\x1a\'flyteidl2/workflow/run_definition.proto\"R\n\rRecordRequest\x12\x41\n\x06\x65vents\x18\x01 \x03(\x0b\x32\x1f.flyteidl2.workflow.ActionEventB\x08\xbaH\x05\x92\x01\x02\x08\x01R\x06\x65vents\"\x10\n\x0eRecordResponse2k\n\x12\x45ventsProxyService\x12U\n\x06Record\x12!.flyteidl2.workflow.RecordRequest\x1a\".flyteidl2.workflow.RecordResponse\"\x04\xa8\xbb\x18\x01\x42\xd4\x01\n\x16\x63om.flyteidl2.workflowB\x17\x45ventsProxyServiceProtoH\x02P\x01Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\xa2\x02\x03\x46WX\xaa\x02\x12\x46lyteidl2.Workflow\xca\x02\x12\x46lyteidl2\\Workflow\xe2\x02\x1e\x46lyteidl2\\Workflow\\GPBMetadata\xea\x02\x13\x46lyteidl2::Workflowb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -25,10 +26,12 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._serialized_options = b'\n\026com.flyteidl2.workflowB\027EventsProxyServiceProtoH\002P\001Z6github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow\242\002\003FWX\252\002\022Flyteidl2.Workflow\312\002\022Flyteidl2\\Workflow\342\002\036Flyteidl2\\Workflow\\GPBMetadata\352\002\023Flyteidl2::Workflow'
   _RECORDREQUEST.fields_by_name['events']._options = None
   _RECORDREQUEST.fields_by_name['events']._serialized_options = b'\272H\005\222\001\002\010\001'
-  _globals['_RECORDREQUEST']._serialized_start=139
-  _globals['_RECORDREQUEST']._serialized_end=221
-  _globals['_RECORDRESPONSE']._serialized_start=223
-  _globals['_RECORDRESPONSE']._serialized_end=239
-  _globals['_EVENTSPROXYSERVICE']._serialized_start=241
-  _globals['_EVENTSPROXYSERVICE']._serialized_end=344
+  _EVENTSPROXYSERVICE.methods_by_name['Record']._options = None
+  _EVENTSPROXYSERVICE.methods_by_name['Record']._serialized_options = b'\250\273\030\001'
+  _globals['_RECORDREQUEST']._serialized_start=175
+  _globals['_RECORDREQUEST']._serialized_end=257
+  _globals['_RECORDRESPONSE']._serialized_start=259
+  _globals['_RECORDRESPONSE']._serialized_end=275
+  _globals['_EVENTSPROXYSERVICE']._serialized_start=277
+  _globals['_EVENTSPROXYSERVICE']._serialized_end=384
 # @@protoc_insertion_point(module_scope)

@@ -5,6 +5,7 @@
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv1";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
+import { file_flyteidl2_common_rpc_options } from "../common/rpc_options_pb.ts";
 import type { ActionEvent } from "./run_definition_pb.ts";
 import { file_flyteidl2_workflow_run_definition } from "./run_definition_pb.ts";
 import type { Message } from "@bufbuild/protobuf";
@@ -13,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/workflow/events_proxy_service.proto.
  */
 export const file_flyteidl2_workflow_events_proxy_service: GenFile = /*@__PURE__*/
-  fileDesc("Ci1mbHl0ZWlkbDIvd29ya2Zsb3cvZXZlbnRzX3Byb3h5X3NlcnZpY2UucHJvdG8SEmZseXRlaWRsMi53b3JrZmxvdyJKCg1SZWNvcmRSZXF1ZXN0EjkKBmV2ZW50cxgBIAMoCzIfLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25FdmVudEIIukgFkgECCAEiEAoOUmVjb3JkUmVzcG9uc2UyZwoSRXZlbnRzUHJveHlTZXJ2aWNlElEKBlJlY29yZBIhLmZseXRlaWRsMi53b3JrZmxvdy5SZWNvcmRSZXF1ZXN0GiIuZmx5dGVpZGwyLndvcmtmbG93LlJlY29yZFJlc3BvbnNlIgBC1AEKFmNvbS5mbHl0ZWlkbDIud29ya2Zsb3dCF0V2ZW50c1Byb3h5U2VydmljZVByb3RvSAJQAVo2Z2l0aHViLmNvbS9mbHl0ZW9yZy9mbHl0ZS92Mi9nZW4vZ28vZmx5dGVpZGwyL3dvcmtmbG93ogIDRldYqgISRmx5dGVpZGwyLldvcmtmbG93ygISRmx5dGVpZGwyXFdvcmtmbG934gIeRmx5dGVpZGwyXFdvcmtmbG93XEdQQk1ldGFkYXRh6gITRmx5dGVpZGwyOjpXb3JrZmxvd2IGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_workflow_run_definition]);
+  fileDesc("Ci1mbHl0ZWlkbDIvd29ya2Zsb3cvZXZlbnRzX3Byb3h5X3NlcnZpY2UucHJvdG8SEmZseXRlaWRsMi53b3JrZmxvdyJKCg1SZWNvcmRSZXF1ZXN0EjkKBmV2ZW50cxgBIAMoCzIfLmZseXRlaWRsMi53b3JrZmxvdy5BY3Rpb25FdmVudEIIukgFkgECCAEiEAoOUmVjb3JkUmVzcG9uc2UyawoSRXZlbnRzUHJveHlTZXJ2aWNlElUKBlJlY29yZBIhLmZseXRlaWRsMi53b3JrZmxvdy5SZWNvcmRSZXF1ZXN0GiIuZmx5dGVpZGwyLndvcmtmbG93LlJlY29yZFJlc3BvbnNlIgSouxgBQtQBChZjb20uZmx5dGVpZGwyLndvcmtmbG93QhdFdmVudHNQcm94eVNlcnZpY2VQcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi93b3JrZmxvd6ICA0ZXWKoCEkZseXRlaWRsMi5Xb3JrZmxvd8oCEkZseXRlaWRsMlxXb3JrZmxvd+ICHkZseXRlaWRsMlxXb3JrZmxvd1xHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6V29ya2Zsb3diBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_common_rpc_options, file_flyteidl2_workflow_run_definition]);
 
 /**
  * RecordRequest is the request message for recording the events for the actions.
@@ -58,7 +59,8 @@ export const RecordResponseSchema: GenMessage<RecordResponse> = /*@__PURE__*/
  */
 export const EventsProxyService: GenService<{
   /**
-   * record the events for an action.
+   * record the events for an action. Work already running reports its progress through
+   * it, so it is allowed while the org is restricted to read-only.
    *
    * @generated from rpc flyteidl2.workflow.EventsProxyService.Record
    */

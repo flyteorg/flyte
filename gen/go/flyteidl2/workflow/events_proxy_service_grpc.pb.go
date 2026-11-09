@@ -26,7 +26,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type EventsProxyServiceClient interface {
-	// record the events for an action.
+	// record the events for an action. Work already running reports its progress through
+	// it, so it is allowed while the org is restricted to read-only.
 	Record(ctx context.Context, in *RecordRequest, opts ...grpc.CallOption) (*RecordResponse, error)
 }
 
@@ -51,7 +52,8 @@ func (c *eventsProxyServiceClient) Record(ctx context.Context, in *RecordRequest
 // All implementations should embed UnimplementedEventsProxyServiceServer
 // for forward compatibility
 type EventsProxyServiceServer interface {
-	// record the events for an action.
+	// record the events for an action. Work already running reports its progress through
+	// it, so it is allowed while the org is restricted to read-only.
 	Record(context.Context, *RecordRequest) (*RecordResponse, error)
 }
 
