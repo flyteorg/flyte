@@ -4,6 +4,7 @@ package serviceclient
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -17,8 +18,11 @@ import (
 
 const (
 	oauthAuthorizationServerMetadataPath = "/.well-known/oauth-authorization-server"
+	openIDConfigurationPath              = "/.well-known/openid-configuration"
 	defaultDiscoveryTimeout              = 10 * time.Second
 )
+
+var errMetadataNotFound = errors.New("service client oauth2: metadata endpoint returned status 404")
 
 // ServiceConfig describes a downstream service and how to authenticate to it.
 type ServiceConfig struct {
@@ -161,11 +165,23 @@ func discoverTokenURL(ctx context.Context, httpClient *http.Client, issuerURL st
 	if err != nil || issuer.Scheme == "" || issuer.Host == "" {
 		return "", fmt.Errorf("service client oauth2: invalid issuerUrl %q", issuerURL)
 	}
-	issuer.Path = strings.TrimRight(issuer.Path, "/") + oauthAuthorizationServerMetadataPath
 	issuer.RawQuery = ""
 	issuer.Fragment = ""
+	issuerPath := strings.TrimRight(issuer.Path, "/")
 
-	req, err := http.NewRequestWithContext(discoveryCtx, http.MethodGet, issuer.String(), nil)
+	issuer.Path = issuerPath + oauthAuthorizationServerMetadataPath
+	tokenEndpoint, err := fetchTokenEndpoint(discoveryCtx, httpClient, issuer.String())
+	if errors.Is(err, errMetadataNotFound) {
+		// RFC 8414 section 5 lets clients fall back to OpenID Connect discovery. Some servers, such as
+		// Microsoft Entra ID, serve only that.
+		issuer.Path = issuerPath + openIDConfigurationPath
+		tokenEndpoint, err = fetchTokenEndpoint(discoveryCtx, httpClient, issuer.String())
+	}
+	return tokenEndpoint, err
+}
+
+func fetchTokenEndpoint(ctx context.Context, httpClient *http.Client, metadataURL string) (string, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, metadataURL, nil)
 	if err != nil {
 		return "", fmt.Errorf("service client oauth2: create metadata request: %w", err)
 	}
@@ -174,6 +190,9 @@ func discoverTokenURL(ctx context.Context, httpClient *http.Client, issuerURL st
 		return "", fmt.Errorf("service client oauth2: discover token endpoint: %w", err)
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return "", errMetadataNotFound
+	}
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
 		return "", fmt.Errorf("service client oauth2: metadata endpoint returned status %d", resp.StatusCode)
 	}
