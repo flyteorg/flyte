@@ -599,11 +599,11 @@ func (m *Recover) validate(all bool) error {
 	var errors []error
 
 	if all {
-		switch v := interface{}(m.GetActionInputOverrides()).(type) {
+		switch v := interface{}(m.GetActionOverrides()).(type) {
 		case interface{ ValidateAll() error }:
 			if err := v.ValidateAll(); err != nil {
 				errors = append(errors, RecoverValidationError{
-					field:  "ActionInputOverrides",
+					field:  "ActionOverrides",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
@@ -611,16 +611,16 @@ func (m *Recover) validate(all bool) error {
 		case interface{ Validate() error }:
 			if err := v.Validate(); err != nil {
 				errors = append(errors, RecoverValidationError{
-					field:  "ActionInputOverrides",
+					field:  "ActionOverrides",
 					reason: "embedded message failed validation",
 					cause:  err,
 				})
 			}
 		}
-	} else if v, ok := interface{}(m.GetActionInputOverrides()).(interface{ Validate() error }); ok {
+	} else if v, ok := interface{}(m.GetActionOverrides()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return RecoverValidationError{
-				field:  "ActionInputOverrides",
+				field:  "ActionOverrides",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -706,22 +706,22 @@ var _ interface {
 	ErrorName() string
 } = RecoverValidationError{}
 
-// Validate checks the field values on ActionInputOverrides with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the first error encountered is returned, or nil if there are no violations.
-func (m *ActionInputOverrides) Validate() error {
+// Validate checks the field values on ActionOverrides with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ActionOverrides) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on ActionInputOverrides with the rules
+// ValidateAll checks the field values on ActionOverrides with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// ActionInputOverridesMultiError, or nil if none found.
-func (m *ActionInputOverrides) ValidateAll() error {
+// ActionOverridesMultiError, or nil if none found.
+func (m *ActionOverrides) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *ActionInputOverrides) validate(all bool) error {
+func (m *ActionOverrides) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -731,19 +731,19 @@ func (m *ActionInputOverrides) validate(all bool) error {
 	// no validation rules for Uri
 
 	if len(errors) > 0 {
-		return ActionInputOverridesMultiError(errors)
+		return ActionOverridesMultiError(errors)
 	}
 
 	return nil
 }
 
-// ActionInputOverridesMultiError is an error wrapping multiple validation
-// errors returned by ActionInputOverrides.ValidateAll() if the designated
-// constraints aren't met.
-type ActionInputOverridesMultiError []error
+// ActionOverridesMultiError is an error wrapping multiple validation errors
+// returned by ActionOverrides.ValidateAll() if the designated constraints
+// aren't met.
+type ActionOverridesMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m ActionInputOverridesMultiError) Error() string {
+func (m ActionOverridesMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -752,11 +752,11 @@ func (m ActionInputOverridesMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m ActionInputOverridesMultiError) AllErrors() []error { return m }
+func (m ActionOverridesMultiError) AllErrors() []error { return m }
 
-// ActionInputOverridesValidationError is the validation error returned by
-// ActionInputOverrides.Validate if the designated constraints aren't met.
-type ActionInputOverridesValidationError struct {
+// ActionOverridesValidationError is the validation error returned by
+// ActionOverrides.Validate if the designated constraints aren't met.
+type ActionOverridesValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -764,24 +764,22 @@ type ActionInputOverridesValidationError struct {
 }
 
 // Field function returns field value.
-func (e ActionInputOverridesValidationError) Field() string { return e.field }
+func (e ActionOverridesValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e ActionInputOverridesValidationError) Reason() string { return e.reason }
+func (e ActionOverridesValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e ActionInputOverridesValidationError) Cause() error { return e.cause }
+func (e ActionOverridesValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e ActionInputOverridesValidationError) Key() bool { return e.key }
+func (e ActionOverridesValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e ActionInputOverridesValidationError) ErrorName() string {
-	return "ActionInputOverridesValidationError"
-}
+func (e ActionOverridesValidationError) ErrorName() string { return "ActionOverridesValidationError" }
 
 // Error satisfies the builtin error interface
-func (e ActionInputOverridesValidationError) Error() string {
+func (e ActionOverridesValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -793,14 +791,14 @@ func (e ActionInputOverridesValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sActionInputOverrides.%s: %s%s",
+		"invalid %sActionOverrides.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = ActionInputOverridesValidationError{}
+var _ error = ActionOverridesValidationError{}
 
 var _ interface {
 	Field() string
@@ -808,7 +806,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = ActionInputOverridesValidationError{}
+} = ActionOverridesValidationError{}
 
 // Validate checks the field values on RunSpec with the rules defined in the
 // proto definition for this message. If any rules are violated, the first

@@ -42,13 +42,13 @@ message RunDetails {
   // Detailed information about the root action.
   ActionDetails action = 2;
 
-  // Status of each action input override in RunSpec.recover.action_input_overrides,
+  // Status of each action override in RunSpec.recover.action_overrides,
   // derived when read. Empty when the run has no overrides.
-  repeated ActionInputOverrideStatus action_input_override_status = 3;
+  repeated ActionOverrideStatus action_override_status = 3;
 }
 
-// ActionInputOverrideStatus reports whether one action input override took effect.
-message ActionInputOverrideStatus {
+// ActionOverrideStatus reports whether one action override took effect.
+message ActionOverrideStatus {
   enum State {
     STATE_UNSPECIFIED = 0;
     // The run is active and the action has not been enqueued yet.
@@ -235,8 +235,8 @@ message ActionMetadata {
   common.ActionIdentifier recovered_from = 18;
 
   // Set when this action's inputs were overridden from
-  // RunSpec.recover.action_input_overrides when it was enqueued.
-  bool input_override_applied = 19;
+  // RunSpec.recover.action_overrides when it was enqueued.
+  bool override_applied = 19;
 }
 
 enum ActionType {
