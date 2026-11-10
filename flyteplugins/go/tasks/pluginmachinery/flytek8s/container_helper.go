@@ -240,8 +240,9 @@ func ApplyResourceOverrides(resources, platformResources v1.ResourceRequirements
 
 	_, ephemeralStorageRequested := resources.Requests[v1.ResourceEphemeralStorage]
 	_, ephemeralStorageLimited := resources.Limits[v1.ResourceEphemeralStorage]
+	_, ephemeralStorageDefaulted := platformResources.Requests[v1.ResourceEphemeralStorage]
 
-	if ephemeralStorageRequested || ephemeralStorageLimited {
+	if ephemeralStorageRequested || ephemeralStorageLimited || (assignIfUnset && ephemeralStorageDefaulted) {
 		adjustResourceRequirement(v1.ResourceEphemeralStorage, resources, platformResources, assignIfUnset)
 	}
 
