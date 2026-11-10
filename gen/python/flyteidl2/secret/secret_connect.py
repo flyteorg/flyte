@@ -64,7 +64,7 @@ class SecretServiceASGIApplication(ConnectASGIApplication[SecretService]):
                         service_name="flyteidl2.secret.SecretService",
                         input=flyteidl2_dot_secret_dot_payload__pb2.GetSecretRequest,
                         output=flyteidl2_dot_secret_dot_payload__pb2.GetSecretResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.get_secret,
                 ),
@@ -147,6 +147,7 @@ class SecretServiceClient(ConnectClient):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_secret_dot_payload__pb2.GetSecretResponse:
         return await self.execute_unary(
             request=request,
@@ -155,10 +156,11 @@ class SecretServiceClient(ConnectClient):
                 service_name="flyteidl2.secret.SecretService",
                 input=flyteidl2_dot_secret_dot_payload__pb2.GetSecretRequest,
                 output=flyteidl2_dot_secret_dot_payload__pb2.GetSecretResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     async def delete_secret(
@@ -247,7 +249,7 @@ class SecretServiceWSGIApplication(ConnectWSGIApplication):
                         service_name="flyteidl2.secret.SecretService",
                         input=flyteidl2_dot_secret_dot_payload__pb2.GetSecretRequest,
                         output=flyteidl2_dot_secret_dot_payload__pb2.GetSecretResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.get_secret,
                 ),
@@ -330,6 +332,7 @@ class SecretServiceClientSync(ConnectClientSync):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_secret_dot_payload__pb2.GetSecretResponse:
         return self.execute_unary(
             request=request,
@@ -338,10 +341,11 @@ class SecretServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.secret.SecretService",
                 input=flyteidl2_dot_secret_dot_payload__pb2.GetSecretRequest,
                 output=flyteidl2_dot_secret_dot_payload__pb2.GetSecretResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     def delete_secret(

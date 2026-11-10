@@ -37,6 +37,28 @@ func TestBasicFilter_Contains(t *testing.T) {
 	assert.Equal(t, []interface{}{"%test%"}, expr.Args)
 }
 
+func TestBasicFilter_EscapesLikeWildcards(t *testing.T) {
+	tests := []struct {
+		expression interfaces.FilterExpression
+		want       string
+	}{
+		{interfaces.FilterExpressionContains, `%my\_task\%\\%`},
+		{interfaces.FilterExpressionContainsCaseInsensitive, `%my\_task\%\\%`},
+		{interfaces.FilterExpressionEndsWith, `%my\_task\%\\`},
+		{interfaces.FilterExpressionNotEndsWith, `%my\_task\%\\`},
+	}
+	for _, tt := range tests {
+		filter := &basicFilter{field: "name", expression: tt.expression, value: `my_task%\`}
+
+		// Building the expression twice must not escape the value twice.
+		for i := 0; i < 2; i++ {
+			expr, err := filter.QueryExpression("")
+			require.NoError(t, err)
+			assert.Equal(t, []interface{}{tt.want}, expr.Args)
+		}
+	}
+}
+
 func TestBasicFilter_ValueIn(t *testing.T) {
 	filter := &basicFilter{
 		field:      "status",

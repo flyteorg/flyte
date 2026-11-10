@@ -667,9 +667,6 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 	if !found {
 		return // object already gone; a delete event (if any) handles the terminal state
 	}
-	if c.shouldSkipTaskAction(latest) {
-		return
-	}
 	c.handleTaskActionEvent(ctx, latest, event.Type)
 }
 
@@ -691,7 +688,11 @@ func (c *ActionsClient) handleTaskActionEvent(ctx context.Context, taskAction *e
 		return
 	}
 
+	// Notify before the skip: subscribers still need the update when another replica recorded it.
 	c.notifySubscribers(ctx, update)
+	if c.shouldSkipTaskAction(taskAction) {
+		return
+	}
 	c.notifyRunService(ctx, taskAction, update, eventType)
 }
 

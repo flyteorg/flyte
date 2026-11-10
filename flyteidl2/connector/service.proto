@@ -18,6 +18,7 @@ service AsyncConnectorService {
 
   // Get job status.
   rpc GetTask(flyteidl2.connector.GetTaskRequest) returns (flyteidl2.connector.GetTaskResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
     option (google.api.http) = {get: "/api/v1/connector/task/{task_category.name}/{task_category.version}/{resource_meta}"};
   }
 
@@ -32,11 +33,13 @@ service AsyncConnectorService {
   //  * OutOfRange if metrics are not available for the specified task time range
   //  * various other errors
   rpc GetTaskMetrics(flyteidl2.connector.GetTaskMetricsRequest) returns (flyteidl2.connector.GetTaskMetricsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
     option (google.api.http) = {get: "/api/v1/connector/task/metrics/{task_category.name}/{task_category.version}/{resource_meta}"};
   }
 
   // GetTaskLogs returns task execution logs, if available.
   rpc GetTaskLogs(flyteidl2.connector.GetTaskLogsRequest) returns (stream flyteidl2.connector.GetTaskLogsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
     option (google.api.http) = {get: "/api/v1/connector/task/logs/{task_category.name}/{task_category.version}/{resource_meta}"};
   }
 }
@@ -46,11 +49,13 @@ service AsyncConnectorService {
 service ConnectorMetadataService {
   // Fetch a :ref:`ref_flyteidl2.plugins.Connector` definition.
   rpc GetConnector(flyteidl2.connector.GetConnectorRequest) returns (flyteidl2.connector.GetConnectorResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
     option (google.api.http) = {get: "/api/v1/connector/{name}"};
   }
 
   // Fetch a list of :ref:`ref_flyteidl2.plugins.Connector` definitions.
   rpc ListConnectors(flyteidl2.connector.ListConnectorsRequest) returns (flyteidl2.connector.ListConnectorsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
     option (google.api.http) = {get: "/api/v1/connectors"};
   }
 }
