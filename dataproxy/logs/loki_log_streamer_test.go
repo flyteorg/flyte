@@ -178,7 +178,7 @@ func TestLokiLogStreamer_UsesLookbackWhenNoStartTime(t *testing.T) {
 	before := time.Now()
 	lines, err := collectLines(t, streamer, newLokiLogContext(nil, nil))
 	after := time.Now()
-	require.NoError(t, err)
+	assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
 	assert.Empty(t, lines)
 
 	startNs, err := strconv.ParseInt(q["start"][0], 10, 64)
@@ -188,6 +188,22 @@ func TestLokiLogStreamer_UsesLookbackWhenNoStartTime(t *testing.T) {
 	assert.True(t, startNs >= before.Add(-2*time.Hour).UnixNano(), "start should be ~now-lookback")
 	assert.True(t, startNs <= after.Add(-2*time.Hour).UnixNano(), "start should be ~now-lookback")
 	assert.True(t, endNs >= before.UnixNano() && endNs <= after.UnixNano(), "end should be ~now")
+}
+
+func TestLokiLogStreamer_EmptyResultTriesNextStreamer(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = w.Write(lokiResponse(nil))
+	}))
+	defer server.Close()
+
+	loki, err := NewLokiLogStreamer(newLokiTestConfig(server.URL))
+	require.NoError(t, err)
+	next := &fakeLogStreamer{}
+
+	err = NewFallbackLogStreamer(loki, next).TailLogs(context.Background(), newLokiLogContext(nil, nil), nil)
+
+	require.NoError(t, err)
+	assert.Equal(t, 1, next.calls)
 }
 
 func TestLokiLogStreamer_ServerErrorIsUnavailable(t *testing.T) {

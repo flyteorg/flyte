@@ -28,10 +28,8 @@ var defaultConfig = &DataProxyConfig{
 	},
 	RunService: serviceclient.ServiceConfig{URL: "http://localhost:8090"},
 	Logs: LogsConfig{
-		Persisted: PersistedLogsConfig{
-			Type: PersistedLogsTypeNone,
-			Loki: DefaultLokiConfig(),
-		},
+		Streamers: []string{LogStreamerK8s},
+		Loki:      DefaultLokiConfig(),
 	},
 }
 
@@ -54,21 +52,14 @@ type DataProxyConfig struct {
 	Logs LogsConfig `json:"logs"`
 }
 
-type LogsConfig struct {
-	// Persisted is consulted once the Kubernetes pod no longer exists.
-	Persisted PersistedLogsConfig `json:"persisted"`
-}
-
-type PersistedLogsType string
-
 const (
-	PersistedLogsTypeNone PersistedLogsType = ""
-	PersistedLogsTypeLoki PersistedLogsType = "loki"
+	LogStreamerK8s  = "k8s"
+	LogStreamerLoki = "loki"
 )
 
-type PersistedLogsConfig struct {
-	Type PersistedLogsType `json:"type" pflag:",Persisted log backend type: '' (disabled) or 'loki'."`
-	Loki LokiConfig        `json:"loki"`
+type LogsConfig struct {
+	Streamers []string   `json:"streamers" pflag:",Ordered log backends tried by TailLogs; the next is used when one reports the logs as not found. Supported: 'k8s', 'loki'."`
+	Loki      LokiConfig `json:"loki"`
 }
 
 type LokiConfig struct {

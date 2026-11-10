@@ -18,7 +18,7 @@ data:
         {{- tpl (toYaml .Values.configuration.kubernetes) . | nindent 8 }}
     {{- /* Loki credentials are rendered into the configuration Secret instead. */}}
     {{- $dataproxy := deepCopy .Values.configuration.dataproxy }}
-    {{- $loki := dig "logs" "persisted" "loki" dict $dataproxy }}
+    {{- $loki := dig "logs" "loki" dict $dataproxy }}
     {{- if $loki }}
     {{- $_ := unset $loki "basicAuth" }}
     {{- $_ := unset $loki "bearerToken" }}

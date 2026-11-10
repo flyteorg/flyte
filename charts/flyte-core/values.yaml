@@ -621,37 +621,36 @@ configuration:
       storagePrefix: uploads
     download:
       maxExpiresIn: 1h
-    # -- Task log backend used once the Kubernetes pod is gone.
     logs:
-      persisted:
-        # -- "" (disabled) or "loki".
-        type: ""
-        loki:
-          url: ""
-          # -- Sent as X-Scope-OrgID.
-          tenantId: ""
-          # -- LogQL selector (fields .Namespace, .PodName, .ContainerName). Empty uses the
-          # binary default (Promtail/Alloy labels). Rendered through tpl, so escape braces:
-          # '{k8s_pod_name="{{ "{{" }} .PodName {{ "}}" }}"}'
-          queryTemplate: ""
-          # -- Rendered into the configuration Secret. passwordPath names a mounted file instead; mutually exclusive with password.
-          basicAuth:
-            username: ""
-            password: ""
-            passwordPath: ""
-          # -- Rendered into the configuration Secret.
-          bearerToken: ""
-          # -- File holding the bearer token; mutually exclusive with bearerToken.
-          bearerTokenPath: ""
-          timeout: 30s
-          # -- Keep at or below Loki's max_entries_limit_per_query.
-          pageSize: 1000
-          # -- 0 for unlimited.
-          maxLines: 0
-          # -- Widens the query window around the recorded container start/end.
-          timePadding: 1m
-          # -- Window queried when no container start time was recorded.
-          lookback: 168h
+      # -- Tried in order; the next is used when one reports the logs as not found. Supported: k8s, loki.
+      streamers:
+        - k8s
+      loki:
+        url: ""
+        # -- Sent as X-Scope-OrgID.
+        tenantId: ""
+        # -- LogQL selector (fields .Namespace, .PodName, .ContainerName). Empty uses the
+        # binary default (Promtail/Alloy labels). Rendered through tpl, so escape braces:
+        # '{k8s_pod_name="{{ "{{" }} .PodName {{ "}}" }}"}'
+        queryTemplate: ""
+        # -- Rendered into the configuration Secret. passwordPath names a mounted file instead; mutually exclusive with password.
+        basicAuth:
+          username: ""
+          password: ""
+          passwordPath: ""
+        # -- Rendered into the configuration Secret.
+        bearerToken: ""
+        # -- File holding the bearer token; mutually exclusive with bearerToken.
+        bearerTokenPath: ""
+        timeout: 30s
+        # -- Keep at or below Loki's max_entries_limit_per_query.
+        pageSize: 1000
+        # -- 0 for unlimited.
+        maxLines: 0
+        # -- Widens the query window around the recorded container start/end.
+        timePadding: 1m
+        # -- Window queried when no container start time was recorded.
+        lookback: 168h
 
   secret:
     # -- Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service.

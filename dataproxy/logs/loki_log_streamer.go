@@ -121,6 +121,14 @@ func (s *LokiLogStreamer) fetch(ctx context.Context, logContext *core.LogContext
 	// message (with multiplicity), since Loki does not order tied entries
 	// consistently across queries.
 	sent := 0
+	// An empty result is NotFound so that the next streamer is tried.
+	done := func() error {
+		if sent == 0 {
+			return connect.NewError(connect.CodeNotFound, fmt.Errorf("loki: no logs for pod %s/%s container %s",
+				pod.GetNamespace(), pod.GetPodName(), container.GetContainerName()))
+		}
+		return nil
+	}
 	var lastTS time.Time
 	seen := map[string]int{}
 	seenTotal := 0
@@ -130,7 +138,7 @@ func (s *LokiLogStreamer) fetch(ctx context.Context, logContext *core.LogContext
 			remaining = s.cfg.PageSize
 		}
 		if remaining <= 0 {
-			return nil
+			return done()
 		}
 		limit := min(s.cfg.PageSize, remaining+seenTotal)
 
@@ -167,7 +175,7 @@ func (s *LokiLogStreamer) fetch(ctx context.Context, logContext *core.LogContext
 			}
 		}
 		if !full {
-			return nil
+			return done()
 		}
 
 		// A page's worth of lines at one timestamp cannot be paged through
@@ -179,7 +187,7 @@ func (s *LokiLogStreamer) fetch(ctx context.Context, logContext *core.LogContext
 			clear(seen)
 			seenTotal = 0
 			if !start.Before(end) {
-				return nil
+				return done()
 			}
 			continue
 		}

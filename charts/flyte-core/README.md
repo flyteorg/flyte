@@ -421,17 +421,18 @@ Distributed Flyte 2 core services
 | configuration.database.postgres.readReplicaHost | string | `""` |  |
 | configuration.database.postgres.username | string | `"postgres"` |  |
 | configuration.dataproxy.download.maxExpiresIn | string | `"1h"` |  |
-| configuration.dataproxy.logs | object | `{"persisted":{"loki":{"basicAuth":{"password":"","passwordPath":"","username":""},"bearerToken":"","bearerTokenPath":"","lookback":"168h","maxLines":0,"pageSize":1000,"queryTemplate":"","tenantId":"","timePadding":"1m","timeout":"30s","url":""},"type":""}}` | Task log backend used once the Kubernetes pod is gone. |
-| configuration.dataproxy.logs.persisted.loki.basicAuth | object | `{"password":"","passwordPath":"","username":""}` | Rendered into the configuration Secret. passwordPath names a mounted file instead; mutually exclusive with password. |
-| configuration.dataproxy.logs.persisted.loki.bearerToken | string | `""` | Rendered into the configuration Secret. |
-| configuration.dataproxy.logs.persisted.loki.bearerTokenPath | string | `""` | File holding the bearer token; mutually exclusive with bearerToken. |
-| configuration.dataproxy.logs.persisted.loki.lookback | string | `"168h"` | Window queried when no container start time was recorded. |
-| configuration.dataproxy.logs.persisted.loki.maxLines | int | `0` | 0 for unlimited. |
-| configuration.dataproxy.logs.persisted.loki.pageSize | int | `1000` | Keep at or below Loki's max_entries_limit_per_query. |
-| configuration.dataproxy.logs.persisted.loki.queryTemplate | string | `""` | LogQL selector (fields .Namespace, .PodName, .ContainerName). Empty uses the binary default (Promtail/Alloy labels). Rendered through tpl, so escape braces: '{k8s_pod_name="{{ "{{" }} .PodName {{ "}}" }}"}' |
-| configuration.dataproxy.logs.persisted.loki.tenantId | string | `""` | Sent as X-Scope-OrgID. |
-| configuration.dataproxy.logs.persisted.loki.timePadding | string | `"1m"` | Widens the query window around the recorded container start/end. |
-| configuration.dataproxy.logs.persisted.type | string | `""` | "" (disabled) or "loki". |
+| configuration.dataproxy.logs.loki.basicAuth | object | `{"password":"","passwordPath":"","username":""}` | Rendered into the configuration Secret. passwordPath names a mounted file instead; mutually exclusive with password. |
+| configuration.dataproxy.logs.loki.bearerToken | string | `""` | Rendered into the configuration Secret. |
+| configuration.dataproxy.logs.loki.bearerTokenPath | string | `""` | File holding the bearer token; mutually exclusive with bearerToken. |
+| configuration.dataproxy.logs.loki.lookback | string | `"168h"` | Window queried when no container start time was recorded. |
+| configuration.dataproxy.logs.loki.maxLines | int | `0` | 0 for unlimited. |
+| configuration.dataproxy.logs.loki.pageSize | int | `1000` | Keep at or below Loki's max_entries_limit_per_query. |
+| configuration.dataproxy.logs.loki.queryTemplate | string | `""` | LogQL selector (fields .Namespace, .PodName, .ContainerName). Empty uses the binary default (Promtail/Alloy labels). Rendered through tpl, so escape braces: '{k8s_pod_name="{{ "{{" }} .PodName {{ "}}" }}"}' |
+| configuration.dataproxy.logs.loki.tenantId | string | `""` | Sent as X-Scope-OrgID. |
+| configuration.dataproxy.logs.loki.timePadding | string | `"1m"` | Widens the query window around the recorded container start/end. |
+| configuration.dataproxy.logs.loki.timeout | string | `"30s"` |  |
+| configuration.dataproxy.logs.loki.url | string | `""` |  |
+| configuration.dataproxy.logs.streamers | list | `["k8s"]` | Tried in order; the next is used when one reports the logs as not found. Supported: k8s, loki. |
 | configuration.dataproxy.pprofPort | int | `0` | Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service. |
 | configuration.dataproxy.runService.url | string | `"{{ include \"flyte-core.componentServiceURL\" (dict \"root\" . \"component\" \"runs\") }}"` |  |
 | configuration.dataproxy.server.host | string | `"0.0.0.0"` |  |

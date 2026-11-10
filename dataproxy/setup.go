@@ -58,21 +58,19 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	projectClient := projectconnect.NewProjectServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
 	settingsClient := settingsconnect.NewSettingsServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
 
-	var liveStreamer logs.LogStreamer
+	var k8sLogStreamer logs.LogStreamer
 	if sc.K8sConfig != nil {
 		k8sStreamer, err := logs.NewK8sLogStreamer(sc.K8sConfig)
 		if err != nil {
 			return fmt.Errorf("failed to create k8s log streamer: %w", err)
 		}
-		liveStreamer = k8sStreamer
+		k8sLogStreamer = k8sStreamer
 	}
-	logStreamer, err := logs.NewLogStreamerFromConfig(cfg.Logs, liveStreamer)
+	logStreamer, err := logs.NewLogStreamerFromConfig(ctx, cfg.Logs, k8sLogStreamer)
 	if err != nil {
 		return fmt.Errorf("failed to configure log streamer: %w", err)
 	}
-	if cfg.Logs.Persisted.Type != "" {
-		logger.Infof(ctx, "TailLogs persisted log backend enabled: %s", cfg.Logs.Persisted.Type)
-	}
+	logger.Infof(ctx, "TailLogs log streamers, in order: %v", cfg.Logs.Streamers)
 
 	svc := service.NewService(*cfg, sc.DataStore, taskClient, triggerClient, runClient, projectClient, settingsClient, logStreamer)
 

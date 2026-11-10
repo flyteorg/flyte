@@ -37,7 +37,7 @@ data:
           namespace: {{ .Release.Namespace }}
 {{- /* Loki credentials are rendered into the configuration Secret instead. */}}
 {{- $core := deepCopy ( index .Values "flyte-core-components" ) }}
-{{- $loki := dig "dataproxy" "logs" "persisted" "loki" dict $core }}
+{{- $loki := dig "dataproxy" "logs" "loki" dict $core }}
 {{- if $loki }}
 {{- $_ := unset $loki "basicAuth" }}
 {{- $_ := unset $loki "bearerToken" }}

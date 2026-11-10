@@ -598,7 +598,7 @@ func (s *Service) TailLogs(ctx context.Context, req *connect.Request[dataproxy.T
 	}
 
 	if s.logStreamer == nil {
-		return connect.NewError(connect.CodeUnimplemented, fmt.Errorf("no log backend configured: dataproxy has neither Kubernetes access nor a persisted log backend"))
+		return connect.NewError(connect.CodeUnimplemented, fmt.Errorf("no log streamer available: check dataproxy.logs.streamers"))
 	}
 
 	return s.logStreamer.TailLogs(ctx, logContext, stream)

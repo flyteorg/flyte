@@ -26,23 +26,23 @@ dataproxy:
     maxExpiresIn: 1h
 
   logs:
-    # Backend consulted once the task pod has been deleted: "" (disabled) or "loki".
-    persisted:
-      type: ""
-      loki:
-        url: "http://loki-gateway.monitoring.svc:80"
-        # Adapt the label names to your collector.
-        queryTemplate: '{namespace="{{ .Namespace }}", pod="{{ .PodName }}", container="{{ .ContainerName }}"}'
-        tenantId: ""
-        # bearerTokenPath: /etc/secrets/loki/token
-        # basicAuth:
-        #   username: flyte
-        #   passwordPath: /etc/secrets/loki/password
-        timeout: 30s
-        pageSize: 1000
-        maxLines: 0
-        timePadding: 1m
-        lookback: 168h
+    # Tried in order; the next is used when one reports the logs as not found. Supported: k8s, loki.
+    streamers:
+      - k8s
+    loki:
+      url: "http://loki-gateway.monitoring.svc:80"
+      # Adapt the label names to your collector.
+      queryTemplate: '{namespace="{{ .Namespace }}", pod="{{ .PodName }}", container="{{ .ContainerName }}"}'
+      tenantId: ""
+      # bearerTokenPath: /etc/secrets/loki/token
+      # basicAuth:
+      #   username: flyte
+      #   passwordPath: /etc/secrets/loki/password
+      timeout: 30s
+      pageSize: 1000
+      maxLines: 0
+      timePadding: 1m
+      lookback: 168h
 
 # Storage Configuration
 storage:

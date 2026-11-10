@@ -24,96 +24,124 @@ func (f *fakeLogStreamer) TailLogs(_ context.Context, _ *core.LogContext, _ *con
 	return f.err
 }
 
-func TestFallbackLogStreamer_LiveSucceeds(t *testing.T) {
-	live := &fakeLogStreamer{}
-	persisted := &fakeLogStreamer{}
-	streamer := NewFallbackLogStreamer(live, persisted)
+func notFound() error {
+	return connect.NewError(connect.CodeNotFound, errors.New("pod gone"))
+}
+
+func TestFallbackLogStreamer_NotFoundTriesNextInOrder(t *testing.T) {
+	first := &fakeLogStreamer{err: notFound()}
+	second := &fakeLogStreamer{err: notFound()}
+	third := &fakeLogStreamer{}
+	fourth := &fakeLogStreamer{}
+	streamer := NewFallbackLogStreamer(first, second, third, fourth)
 
 	err := streamer.TailLogs(context.Background(), &core.LogContext{}, nil)
 
 	require.NoError(t, err)
-	assert.Equal(t, 1, live.calls)
-	assert.Equal(t, 0, persisted.calls)
+	assert.Equal(t, 1, first.calls)
+	assert.Equal(t, 1, second.calls)
+	assert.Equal(t, 1, third.calls)
+	assert.Equal(t, 0, fourth.calls)
 }
 
-func TestFallbackLogStreamer_LiveNotFound(t *testing.T) {
-	live := &fakeLogStreamer{err: connect.NewError(connect.CodeNotFound, errors.New("pod gone"))}
-	persisted := &fakeLogStreamer{}
-	streamer := NewFallbackLogStreamer(live, persisted)
-
-	err := streamer.TailLogs(context.Background(), &core.LogContext{}, nil)
-
-	require.NoError(t, err)
-	assert.Equal(t, 1, live.calls)
-	assert.Equal(t, 1, persisted.calls)
-}
-
-func TestFallbackLogStreamer_OtherError(t *testing.T) {
+func TestFallbackLogStreamer_OtherErrorStops(t *testing.T) {
 	wantErr := errors.New("boom")
-	live := &fakeLogStreamer{err: wantErr}
-	persisted := &fakeLogStreamer{}
-	streamer := NewFallbackLogStreamer(live, persisted)
+	first := &fakeLogStreamer{err: wantErr}
+	second := &fakeLogStreamer{}
+	streamer := NewFallbackLogStreamer(first, second)
 
 	err := streamer.TailLogs(context.Background(), &core.LogContext{}, nil)
 
 	assert.ErrorIs(t, err, wantErr)
-	assert.Equal(t, 1, live.calls)
-	assert.Equal(t, 0, persisted.calls)
+	assert.Equal(t, 1, first.calls)
+	assert.Equal(t, 0, second.calls)
 }
 
-func TestFallbackLogStreamer_NoPersistedBackend(t *testing.T) {
-	live := &fakeLogStreamer{err: connect.NewError(connect.CodeNotFound, errors.New("pod gone"))}
-	streamer := NewFallbackLogStreamer(live, nil)
+func TestFallbackLogStreamer_AllNotFound(t *testing.T) {
+	first := &fakeLogStreamer{err: notFound()}
+	second := &fakeLogStreamer{err: notFound()}
+	streamer := NewFallbackLogStreamer(first, second)
 
 	err := streamer.TailLogs(context.Background(), &core.LogContext{}, nil)
 
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
-	assert.Equal(t, 1, live.calls)
+	assert.Equal(t, 1, first.calls)
+	assert.Equal(t, 1, second.calls)
 }
 
 func TestNewLogStreamerFromConfig(t *testing.T) {
-	live := &fakeLogStreamer{}
+	ctx := context.Background()
+	k8s := &fakeLogStreamer{}
+	newCfg := func(streamers ...string) config.LogsConfig {
+		cfg := config.LogsConfig{Streamers: streamers, Loki: config.DefaultLokiConfig()}
+		cfg.Loki.URL = "http://loki:3100"
+		return cfg
+	}
 
-	t.Run("no persisted backend returns live as-is", func(t *testing.T) {
-		got, err := NewLogStreamerFromConfig(config.LogsConfig{}, live)
+	t.Run("k8s alone is returned as-is", func(t *testing.T) {
+		got, err := NewLogStreamerFromConfig(ctx, newCfg(config.LogStreamerK8s), k8s)
 		require.NoError(t, err)
-		assert.Same(t, live, got)
+		assert.Same(t, k8s, got)
 	})
 
-	t.Run("loki wraps live in a fallback", func(t *testing.T) {
-		cfg := config.LogsConfig{Persisted: config.PersistedLogsConfig{Type: config.PersistedLogsTypeLoki, Loki: config.DefaultLokiConfig()}}
-		cfg.Persisted.Loki.URL = "http://loki:3100"
-		got, err := NewLogStreamerFromConfig(cfg, live)
-		require.NoError(t, err)
-		fb, ok := got.(*FallbackLogStreamer)
-		require.True(t, ok, "expected *FallbackLogStreamer, got %T", got)
-		assert.Same(t, live, fb.live)
-		assert.IsType(t, &LokiLogStreamer{}, fb.persisted)
-	})
-
-	t.Run("loki without live uses loki alone", func(t *testing.T) {
-		cfg := config.LogsConfig{Persisted: config.PersistedLogsConfig{Type: config.PersistedLogsTypeLoki, Loki: config.DefaultLokiConfig()}}
-		cfg.Persisted.Loki.URL = "http://loki:3100"
-		got, err := NewLogStreamerFromConfig(cfg, nil)
+	t.Run("loki alone ignores k8s", func(t *testing.T) {
+		got, err := NewLogStreamerFromConfig(ctx, newCfg(config.LogStreamerLoki), k8s)
 		require.NoError(t, err)
 		assert.IsType(t, &LokiLogStreamer{}, got)
 	})
 
+	t.Run("several streamers keep the configured order", func(t *testing.T) {
+		got, err := NewLogStreamerFromConfig(ctx, newCfg(config.LogStreamerK8s, config.LogStreamerLoki), k8s)
+		require.NoError(t, err)
+		fb, ok := got.(*FallbackLogStreamer)
+		require.True(t, ok, "expected *FallbackLogStreamer, got %T", got)
+		require.Len(t, fb.streamers, 2)
+		assert.Same(t, k8s, fb.streamers[0])
+		assert.IsType(t, &LokiLogStreamer{}, fb.streamers[1])
+
+		got, err = NewLogStreamerFromConfig(ctx, newCfg(config.LogStreamerLoki, config.LogStreamerK8s), k8s)
+		require.NoError(t, err)
+		fb, ok = got.(*FallbackLogStreamer)
+		require.True(t, ok, "expected *FallbackLogStreamer, got %T", got)
+		require.Len(t, fb.streamers, 2)
+		assert.IsType(t, &LokiLogStreamer{}, fb.streamers[0])
+		assert.Same(t, k8s, fb.streamers[1])
+	})
+
+	t.Run("k8s is skipped without Kubernetes access", func(t *testing.T) {
+		got, err := NewLogStreamerFromConfig(ctx, newCfg(config.LogStreamerK8s, config.LogStreamerLoki), nil)
+		require.NoError(t, err)
+		assert.IsType(t, &LokiLogStreamer{}, got)
+	})
+
+	t.Run("loki is not validated unless listed", func(t *testing.T) {
+		got, err := NewLogStreamerFromConfig(ctx, config.LogsConfig{Streamers: []string{config.LogStreamerK8s}}, k8s)
+		require.NoError(t, err)
+		assert.Same(t, k8s, got)
+	})
+
 	t.Run("invalid loki config errors", func(t *testing.T) {
-		cfg := config.LogsConfig{Persisted: config.PersistedLogsConfig{Type: config.PersistedLogsTypeLoki}}
-		_, err := NewLogStreamerFromConfig(cfg, live)
+		_, err := NewLogStreamerFromConfig(ctx, config.LogsConfig{Streamers: []string{config.LogStreamerLoki}}, k8s)
 		assert.Error(t, err)
 	})
 
-	t.Run("unknown type errors", func(t *testing.T) {
-		cfg := config.LogsConfig{Persisted: config.PersistedLogsConfig{Type: "elastic"}}
-		_, err := NewLogStreamerFromConfig(cfg, live)
-		assert.Error(t, err)
+	t.Run("unknown streamer errors", func(t *testing.T) {
+		_, err := NewLogStreamerFromConfig(ctx, newCfg("elastic"), k8s)
+		assert.ErrorContains(t, err, "elastic")
 	})
 
-	t.Run("nothing configured returns nil", func(t *testing.T) {
-		got, err := NewLogStreamerFromConfig(config.LogsConfig{}, nil)
+	t.Run("duplicate streamer errors", func(t *testing.T) {
+		_, err := NewLogStreamerFromConfig(ctx, newCfg(config.LogStreamerLoki, config.LogStreamerLoki), k8s)
+		assert.ErrorContains(t, err, "more than once")
+	})
+
+	t.Run("nothing available returns nil", func(t *testing.T) {
+		got, err := NewLogStreamerFromConfig(ctx, newCfg(), k8s)
+		require.NoError(t, err)
+		assert.Nil(t, got)
+
+		got, err = NewLogStreamerFromConfig(ctx, newCfg(config.LogStreamerK8s), nil)
 		require.NoError(t, err)
 		assert.Nil(t, got)
 	})

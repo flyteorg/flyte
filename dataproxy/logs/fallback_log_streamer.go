@@ -7,60 +7,67 @@ import (
 	"connectrpc.com/connect"
 
 	"github.com/flyteorg/flyte/v2/dataproxy/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy"
 )
 
-// FallbackLogStreamer uses persisted when live reports the pod is gone.
 type FallbackLogStreamer struct {
-	live      LogStreamer
-	persisted LogStreamer
+	streamers []LogStreamer
 }
 
 var _ LogStreamer = (*FallbackLogStreamer)(nil)
 
-func NewFallbackLogStreamer(live, persisted LogStreamer) *FallbackLogStreamer {
-	return &FallbackLogStreamer{live: live, persisted: persisted}
+func NewFallbackLogStreamer(streamers ...LogStreamer) *FallbackLogStreamer {
+	return &FallbackLogStreamer{streamers: streamers}
 }
 
 func (s *FallbackLogStreamer) TailLogs(ctx context.Context, logContext *core.LogContext, stream *connect.ServerStream[dataproxy.TailLogsResponse]) error {
-	err := s.live.TailLogs(ctx, logContext, stream)
-
-	if err == nil {
-		return nil
+	var err error
+	for _, streamer := range s.streamers {
+		err = streamer.TailLogs(ctx, logContext, stream)
+		if err == nil || connect.CodeOf(err) != connect.CodeNotFound {
+			return err
+		}
 	}
-
-	if connect.CodeOf(err) != connect.CodeNotFound || s.persisted == nil {
-		return err
-	}
-
-	return s.persisted.TailLogs(ctx, logContext, stream)
+	return err
 }
 
-// NewLogStreamerFromConfig returns nil when neither a live nor a persisted
-// backend is available.
-func NewLogStreamerFromConfig(cfg config.LogsConfig, live LogStreamer) (LogStreamer, error) {
-	var persisted LogStreamer
-	switch cfg.Persisted.Type {
-	case config.PersistedLogsTypeNone:
-	case config.PersistedLogsTypeLoki:
-		loki, err := NewLokiLogStreamer(cfg.Persisted.Loki)
-		if err != nil {
-			return nil, fmt.Errorf("configuring persisted log backend: %w", err)
+// NewLogStreamerFromConfig returns nil when no streamer is available. k8s is nil
+// when the dataproxy has no Kubernetes access.
+func NewLogStreamerFromConfig(ctx context.Context, cfg config.LogsConfig, k8s LogStreamer) (LogStreamer, error) {
+	streamers := make([]LogStreamer, 0, len(cfg.Streamers))
+	seen := make(map[string]bool, len(cfg.Streamers))
+	for _, name := range cfg.Streamers {
+		if seen[name] {
+			return nil, fmt.Errorf("log streamer %q is listed more than once", name)
 		}
-		persisted = loki
-	default:
-		return nil, fmt.Errorf("unknown persisted log backend type %q (supported: %q)", cfg.Persisted.Type, config.PersistedLogsTypeLoki)
+		seen[name] = true
+
+		switch name {
+		case config.LogStreamerK8s:
+			if k8s == nil {
+				logger.Warnf(ctx, "log streamer %q skipped: dataproxy has no Kubernetes access", name)
+				continue
+			}
+			streamers = append(streamers, k8s)
+		case config.LogStreamerLoki:
+			loki, err := NewLokiLogStreamer(cfg.Loki)
+			if err != nil {
+				return nil, fmt.Errorf("configuring log streamer %q: %w", name, err)
+			}
+			streamers = append(streamers, loki)
+		default:
+			return nil, fmt.Errorf("unknown log streamer %q (supported: %q, %q)", name, config.LogStreamerK8s, config.LogStreamerLoki)
+		}
 	}
 
-	switch {
-	case live == nil && persisted == nil:
+	switch len(streamers) {
+	case 0:
 		return nil, nil
-	case persisted == nil:
-		return live, nil
-	case live == nil:
-		return persisted, nil
+	case 1:
+		return streamers[0], nil
 	default:
-		return NewFallbackLogStreamer(live, persisted), nil
+		return NewFallbackLogStreamer(streamers...), nil
 	}
 }
