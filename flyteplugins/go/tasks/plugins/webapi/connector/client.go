@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -37,6 +38,7 @@ type Connector struct {
 
 // ClientSet contains the clients exposed to communicate with various connector services.
 type ClientSet struct {
+	tracerProvider           trace.TracerProvider
 	mu                       sync.RWMutex
 	asyncConnectorClients    map[string]connector.AsyncConnectorServiceClient    // map[endpoint] => AsyncConnectorServiceClient
 	connectorMetadataClients map[string]connector.ConnectorMetadataServiceClient // map[endpoint] => ConnectorMetadataServiceClient
@@ -59,7 +61,7 @@ func (cs *ClientSet) getOrDialAsyncClient(ctx context.Context, deployment *Deplo
 		return client, nil
 	}
 
-	conn, err := getGrpcConnection(ctx, deployment)
+	conn, err := cs.getGrpcConnection(ctx, deployment)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +82,7 @@ func (cs *ClientSet) getOrDialMetadataClient(ctx context.Context, deployment *De
 	if client, ok := cs.connectorMetadataClients[deployment.Endpoint]; ok {
 		return client, nil
 	}
-	conn, err := getGrpcConnection(ctx, deployment)
+	conn, err := cs.getGrpcConnection(ctx, deployment)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +99,7 @@ func (cs *ClientSet) metadataClient(endpoint string) (connector.ConnectorMetadat
 	return client, ok
 }
 
-func getGrpcConnection(ctx context.Context, connector *Deployment) (*grpc.ClientConn, error) {
+func (cs *ClientSet) getGrpcConnection(ctx context.Context, connector *Deployment) (*grpc.ClientConn, error) {
 	var opts []grpc.DialOption
 
 	if connector.Insecure {
@@ -118,7 +120,10 @@ func getGrpcConnection(ctx context.Context, connector *Deployment) (*grpc.Client
 
 	clientMetrics := grpcutils.GrpcClientMetrics()
 	opts = append(opts,
-		grpc.WithStatsHandler(otelgrpc.NewClientHandler(otelgrpc.WithPropagators(otelutils.RPCPropagator()))),
+		grpc.WithStatsHandler(otelgrpc.NewClientHandler(
+			otelgrpc.WithTracerProvider(cs.tracerProvider),
+			otelgrpc.WithPropagators(otelutils.RPCPropagator()),
+		)),
 		grpc.WithChainUnaryInterceptor(clientMetrics.UnaryClientInterceptor()),
 		grpc.WithChainStreamInterceptor(clientMetrics.StreamClientInterceptor()),
 		// Keepalive lets gRPC notice a dead/half-open transport within seconds
@@ -284,8 +289,9 @@ func allConnectorDeployments(cfg *Config) []*Deployment {
 	return connectorDeployments
 }
 
-func getConnectorClientSets(ctx context.Context) *ClientSet {
+func getConnectorClientSets(ctx context.Context, tracerProvider trace.TracerProvider) *ClientSet {
 	clientSet := &ClientSet{
+		tracerProvider:           tracerProvider,
 		asyncConnectorClients:    make(map[string]connector.AsyncConnectorServiceClient),
 		connectorMetadataClients: make(map[string]connector.ConnectorMetadataServiceClient),
 	}
@@ -295,7 +301,7 @@ func getConnectorClientSets(ctx context.Context) *ClientSet {
 			logger.Infof(ctx, "Connector client already initialized for [%v]", connectorDeployment.Endpoint)
 			continue
 		}
-		conn, err := getGrpcConnection(ctx, connectorDeployment)
+		conn, err := clientSet.getGrpcConnection(ctx, connectorDeployment)
 		if err != nil {
 			logger.Errorf(ctx, "failed to create connection to connector: [%v] with error: [%v]", connectorDeployment, err)
 			continue

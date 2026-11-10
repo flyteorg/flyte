@@ -89,10 +89,16 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		utilruntime.Must(reg.AddToScheme(scheme))
 	}
 
+	otelCfg := otelutils.GetConfig()
+	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
+		return fmt.Errorf("registering otel providers: %w", err)
+	}
+	tracerProvider := otelutils.GetTracerProvider(otelServiceName)
+
 	// Register the connector (webapi) backend plugin so task types backed by an external connector
 	// service are routed to it. This must run before plugin.NewRegistry below, which snapshots the
 	// core plugins once.
-	connectorplugin.RegisterConnectorPlugin(&connectorplugin.ConnectorService{})
+	connectorplugin.RegisterConnectorPlugin(&connectorplugin.ConnectorService{TracerProvider: tracerProvider})
 
 	var tlsOpts []func(*tls.Config)
 	if !cfg.EnableHTTP2 {
@@ -211,12 +217,8 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("executor: failed to initialize plugin registry: %w", err)
 	}
 
-	otelCfg := otelutils.GetConfig()
-	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
-		return fmt.Errorf("registering otel providers: %w", err)
-	}
 	otelInterceptor, err := otelutils.NewConnectInterceptor(
-		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
+		otelconnect.WithTracerProvider(tracerProvider),
 		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
 	)
 	if err != nil {
