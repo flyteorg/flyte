@@ -13,8 +13,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/sentryutils"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	taskpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
+	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 )
 
 type stubTaskService struct {
@@ -103,4 +105,48 @@ func TestSentryOperationNamesMatchSDK(t *testing.T) {
 		"/flyteidl2.task.TaskService/DeployTask":          "deploy_task",
 		"/flyteidl2.trigger.TriggerService/DeployTrigger": "deploy_trigger",
 	}, sentryOperations)
+}
+
+func TestActiveGauges(t *testing.T) {
+	key := func(phase common.ActionPhase, isRoot bool) interfaces.PhaseKey {
+		return interfaces.PhaseKey{Phase: int32(phase), IsRoot: isRoot}
+	}
+
+	for _, tc := range []struct {
+		desc   string
+		counts map[interfaces.PhaseKey]int64
+		want   map[string]float64
+	}{
+		{
+			desc: "runs are root actions, actions are all of them",
+			counts: map[interfaces.PhaseKey]int64{
+				key(common.ActionPhase_ACTION_PHASE_RUNNING, true):  2,
+				key(common.ActionPhase_ACTION_PHASE_PAUSED, true):   1,
+				key(common.ActionPhase_ACTION_PHASE_QUEUED, false):  3,
+				key(common.ActionPhase_ACTION_PHASE_RUNNING, false): 4,
+			},
+			want: map[string]float64{activeRunsGauge: 3, activeActionsGauge: 10},
+		},
+		{
+			desc: "only child actions",
+			counts: map[interfaces.PhaseKey]int64{
+				key(common.ActionPhase_ACTION_PHASE_QUEUED, false): 5,
+			},
+			want: map[string]float64{activeRunsGauge: 0, activeActionsGauge: 5},
+		},
+		{
+			desc:   "empty counts report explicit zeros",
+			counts: map[interfaces.PhaseKey]int64{},
+			want:   map[string]float64{activeRunsGauge: 0, activeActionsGauge: 0},
+		},
+		{
+			desc:   "nil counts report explicit zeros",
+			counts: nil,
+			want:   map[string]float64{activeRunsGauge: 0, activeActionsGauge: 0},
+		},
+	} {
+		t.Run(tc.desc, func(t *testing.T) {
+			assert.Equal(t, tc.want, activeGauges(tc.counts))
+		})
+	}
 }

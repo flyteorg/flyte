@@ -77,6 +77,35 @@ func Gauge(ctx context.Context, name string, value float64) {
 	sentry.NewMeter(ctx).Gauge(name, value)
 }
 
+// SampleGauges calls sample every interval and emits each value it returns as
+// a gauge. Each call to sample must finish within interval. A failed sample is
+// logged and nothing is emitted for that tick. SampleGauges returns nil when
+// ctx is done.
+func SampleGauges(ctx context.Context, interval time.Duration,
+	sample func(context.Context) (map[string]float64, error)) error {
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		case <-ticker.C:
+			ctxWithTimeout, cancel := context.WithTimeout(ctx, interval)
+			metrics, err := sample(ctxWithTimeout)
+			cancel()
+			if err != nil {
+				logger.Errorf(ctx, "failed to sample gauges: %v", err)
+				continue
+			}
+
+			for name, value := range metrics {
+				Gauge(ctx, name, value)
+			}
+		}
+	}
+}
+
 // Interceptor counts one operation per call for each procedure in operations
 // (keyed by procedure, valued by operation name) and reports server-side
 // failures as exceptions. Client-caused errors (invalid argument, not found,
