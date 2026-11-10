@@ -3,9 +3,12 @@ package service
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
+
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
-	"github.com/stretchr/testify/assert"
 )
 
 func runSettings(queue *settings.StringSetting, concurrency *settings.Int64Setting) *settings.Settings {
@@ -155,6 +158,104 @@ func TestApplyRunSettings(t *testing.T) {
 			assert.Equal(t, tt.wantPodTemplate, tt.spec.GetDefaultSettings().GetPodTemplateName())
 			assert.Equal(t, tt.wantRunBaseDir, tt.spec.GetRunBaseDir())
 			assert.Equal(t, tt.wantRawDataPrefix, tt.spec.GetRawDataStorage().GetRawDataPrefix())
+		})
+	}
+}
+
+func TestApplyRunSettingsTaskResourceDefaults(t *testing.T) {
+	tests := []struct {
+		name     string
+		spec     *task.RunSpec
+		resolved *settings.Settings
+		want     *task.TaskResourceDefaults
+	}{
+		{
+			name:     "Get nil when setting is empty",
+			spec:     &task.RunSpec{},
+			resolved: &settings.Settings{},
+			want:     nil,
+		},
+		{
+			name: "set requests and max values from setting",
+			spec: &task.RunSpec{},
+			resolved: &settings.Settings{TaskResource: &settings.TaskResourceSettings{
+				Min: &settings.TaskResourceDefaults{Memory: quantity(stateValue, "256Mi"), Storage: quantity(stateValue, "1Gi")},
+				Max: &settings.TaskResourceDefaults{Cpu: quantity(stateValue, "1"), Gpu: quantity(stateValue, "2")},
+			}},
+			want: &task.TaskResourceDefaults{
+				Requests: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_MEMORY, Value: "256Mi"},
+					{Name: core.Resources_EPHEMERAL_STORAGE, Value: "1Gi"},
+				},
+				Max: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "1"},
+					{Name: core.Resources_GPU, Value: "2"},
+				},
+			},
+		},
+		{
+			name: "set request with max value when min value is greater than max value",
+			spec: &task.RunSpec{},
+			resolved: &settings.Settings{TaskResource: &settings.TaskResourceSettings{
+				Min: &settings.TaskResourceDefaults{Cpu: quantity(stateValue, "2000m")},
+				Max: &settings.TaskResourceDefaults{Cpu: quantity(stateValue, "1")},
+			}},
+			want: &task.TaskResourceDefaults{
+				Requests: []*core.Resources_ResourceEntry{{Name: core.Resources_CPU, Value: "1"}},
+				Max:      []*core.Resources_ResourceEntry{{Name: core.Resources_CPU, Value: "1"}},
+			},
+		},
+		{
+			name: "INHERIT and UNSET dimensions is ignored",
+			spec: &task.RunSpec{},
+			resolved: &settings.Settings{TaskResource: &settings.TaskResourceSettings{
+				Min: &settings.TaskResourceDefaults{Cpu: &settings.QuantitySetting{State: stateInherit, QuantityValue: "1"}},
+				Max: &settings.TaskResourceDefaults{Cpu: &settings.QuantitySetting{State: stateUnset, QuantityValue: "2"}},
+			}},
+			want: nil,
+		},
+		{
+			name: "default accelerator is carried over",
+			spec: &task.RunSpec{},
+			resolved: &settings.Settings{TaskResource: &settings.TaskResourceSettings{
+				DefaultAccelerator: &settings.AcceleratorSetting{State: stateValue, AcceleratorValue: &core.GPUAccelerator{Device: "nvidia-a100-80gb"}},
+			}},
+			want: &task.TaskResourceDefaults{DefaultAccelerator: &core.GPUAccelerator{Device: "nvidia-a100-80gb"}},
+		},
+		{
+			name: "a caller-supplied value is overwritten",
+			spec: &task.RunSpec{DefaultSettings: &task.DefaultSettings{
+				PodTemplateName: "user-template",
+				TaskResourceDefaults: &task.TaskResourceDefaults{
+					Max: []*core.Resources_ResourceEntry{{Name: core.Resources_CPU, Value: "64"}},
+				},
+			}},
+			resolved: &settings.Settings{TaskResource: &settings.TaskResourceSettings{
+				Max: &settings.TaskResourceDefaults{Cpu: quantity(stateValue, "1")},
+			}},
+			want: &task.TaskResourceDefaults{
+				Max: []*core.Resources_ResourceEntry{{Name: core.Resources_CPU, Value: "1"}},
+			},
+		},
+		{
+			name: "a caller-supplied value is left as is when no scope sets task_resource",
+			spec: &task.RunSpec{DefaultSettings: &task.DefaultSettings{
+				TaskResourceDefaults: &task.TaskResourceDefaults{
+					Max: []*core.Resources_ResourceEntry{{Name: core.Resources_CPU, Value: "64"}},
+				},
+			}},
+			resolved: &settings.Settings{},
+			want: &task.TaskResourceDefaults{
+				Max: []*core.Resources_ResourceEntry{{Name: core.Resources_CPU, Value: "64"}},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			applyRunSettings(tt.spec, tt.resolved)
+			got := tt.spec.GetDefaultSettings().GetTaskResourceDefaults()
+			assert.True(t, proto.Equal(tt.want, got), "got %v, want %v", got, tt.want)
 		})
 	}
 }
