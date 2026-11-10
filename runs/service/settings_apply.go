@@ -95,8 +95,9 @@ func applyEnvSettings(spec *task.RunSpec, envs map[string]string) {
 	if len(envs) == 0 {
 		return
 	}
-	present := make(map[string]struct{}, len(spec.GetEnvs().GetValues()))
-	for _, kv := range spec.GetEnvs().GetValues() {
+	specEnvs := spec.GetEnvs().GetValues()
+	present := make(map[string]struct{}, len(specEnvs))
+	for _, kv := range specEnvs {
 		present[kv.GetKey()] = struct{}{}
 	}
 	for _, k := range slices.Sorted(maps.Keys(envs)) {

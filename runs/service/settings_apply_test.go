@@ -163,18 +163,6 @@ func TestApplyRunSettings(t *testing.T) {
 	}
 }
 
-func mapSetting(state settings.SettingState, entries map[string]string) *settings.StringMapSetting {
-	return &settings.StringMapSetting{State: state, MapValue: &settings.StringMap{Entries: entries}}
-}
-
-func mapSettings(state settings.SettingState, entries map[string]string) *settings.Settings {
-	return &settings.Settings{
-		Labels:               mapSetting(state, entries),
-		Annotations:          mapSetting(state, entries),
-		EnvironmentVariables: mapSetting(state, entries),
-	}
-}
-
 func envs(kvs ...string) *task.Envs {
 	e := &task.Envs{}
 	for i := 0; i < len(kvs); i += 2 {
@@ -184,6 +172,17 @@ func envs(kvs ...string) *task.Envs {
 }
 
 func TestApplyRunSettings_Maps(t *testing.T) {
+	mapSetting := func(state settings.SettingState, entries map[string]string) *settings.StringMapSetting {
+		return &settings.StringMapSetting{State: state, MapValue: &settings.StringMap{Entries: entries}}
+	}
+	mapSettings := func(state settings.SettingState, entries map[string]string) *settings.Settings {
+		return &settings.Settings{
+			Labels:               mapSetting(state, entries),
+			Annotations:          mapSetting(state, entries),
+			EnvironmentVariables: mapSetting(state, entries),
+		}
+	}
+
 	tests := []struct {
 		name     string
 		spec     *task.RunSpec
