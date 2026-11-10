@@ -620,3 +620,15 @@ func TestPartitionResourceNames(t *testing.T) {
 		assert.False(t, ok)
 	})
 }
+
+func TestRequestsGPU(t *testing.T) {
+	gpu := func(value string) []*core.Resources_ResourceEntry {
+		return []*core.Resources_ResourceEntry{{Name: core.Resources_GPU, Value: value}}
+	}
+
+	assert.True(t, RequestsGPU(&core.Resources{Requests: gpu("1")}))
+	assert.True(t, RequestsGPU(&core.Resources{Limits: gpu("1")}))
+	assert.False(t, RequestsGPU(&core.Resources{Requests: gpu("0")}))
+	assert.False(t, RequestsGPU(&core.Resources{Requests: []*core.Resources_ResourceEntry{{Name: core.Resources_CPU, Value: "1"}}}))
+	assert.False(t, RequestsGPU(nil))
+}

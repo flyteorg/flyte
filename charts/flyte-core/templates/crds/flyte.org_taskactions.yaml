@@ -154,6 +154,11 @@ spec:
                   task
                 maxLength: 63
                 type: string
+              taskResourceDefaults:
+                description: TaskResourceDefaults is the proto-serialized task.TaskResourceDefaults
+                  projected from RunSpec.DefaultSettings.
+                format: byte
+                type: string
               taskTemplate:
                 description: |-
                   TaskTemplate is the proto-serialized core.TaskTemplate stored inline in etcd.

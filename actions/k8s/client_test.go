@@ -334,7 +334,10 @@ func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
 		Spec: executorv1.TaskActionSpec{},
 	}
 
-	applyRunSpecToTaskAction(taskAction, &task.RunSpec{
+	defaults := &task.TaskResourceDefaults{
+		Max: []*core.Resources_ResourceEntry{{Name: core.Resources_CPU, Value: "1"}},
+	}
+	err := applyRunSpecToTaskAction(taskAction, &task.RunSpec{
 		Envs: &task.Envs{
 			Values: []*core.KeyValuePair{
 				{Key: "TRACE_ID", Value: "abc123"},
@@ -354,9 +357,11 @@ func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
 			},
 		},
 		DefaultSettings: &task.DefaultSettings{
-			PodTemplateName: "gpu-template",
+			PodTemplateName:      "gpu-template",
+			TaskResourceDefaults: defaults,
 		},
 	})
+	require.NoError(t, err)
 
 	require.NotNil(t, taskAction.Spec.Interruptible)
 	assert.True(t, *taskAction.Spec.Interruptible)
@@ -367,6 +372,9 @@ func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
 	assert.Equal(t, "platform", taskAction.Labels["team"])
 	assert.Equal(t, "sdk", taskAction.Annotations["owner"])
 	assert.Equal(t, "gpu-template", taskAction.Spec.PodTemplateName)
+	got := &task.TaskResourceDefaults{}
+	require.NoError(t, proto.Unmarshal(taskAction.Spec.TaskResourceDefaults, got))
+	assert.True(t, proto.Equal(defaults, got))
 }
 
 func TestApplyRunSpecToTaskAction_RawDataPrefix(t *testing.T) {
@@ -385,6 +393,10 @@ func TestApplyRunSpecToTaskAction_RawDataPrefix(t *testing.T) {
 
 func TestInheritRunContextFromParentTaskAction(t *testing.T) {
 	interruptible := true
+	defaults, err := proto.Marshal(&task.TaskResourceDefaults{
+		Max: []*core.Resources_ResourceEntry{{Name: core.Resources_CPU, Value: "1"}},
+	})
+	require.NoError(t, err)
 	parent := &executorv1.TaskAction{
 		ObjectMeta: metav1.ObjectMeta{
 			Labels: map[string]string{
@@ -399,9 +411,10 @@ func TestInheritRunContextFromParentTaskAction(t *testing.T) {
 				"TRACE_ID": "abc123",
 				"TEAM":     "platform",
 			},
-			Interruptible:   &interruptible,
-			PodTemplateName: "gpu-template",
-			RawDataPrefix:   "s3://raw-bucket/prefix",
+			Interruptible:        &interruptible,
+			PodTemplateName:      "gpu-template",
+			RawDataPrefix:        "s3://raw-bucket/prefix",
+			TaskResourceDefaults: defaults,
 		},
 	}
 
@@ -424,10 +437,12 @@ func TestInheritRunContextFromParentTaskAction(t *testing.T) {
 	assert.Equal(t, "run1", child.Labels["flyte.org/run"])
 	assert.Equal(t, "sdk", child.Annotations["owner"])
 	assert.Equal(t, "gpu-template", child.Spec.PodTemplateName)
+	assert.Equal(t, parent.Spec.TaskResourceDefaults, child.Spec.TaskResourceDefaults)
 
 	// Verify deep copy (child mutation must not mutate parent map).
 	child.Spec.EnvVars["TRACE_ID"] = "mutated"
 	assert.Equal(t, "abc123", parent.Spec.EnvVars["TRACE_ID"])
+	assert.NotSame(t, &parent.Spec.TaskResourceDefaults[0], &child.Spec.TaskResourceDefaults[0])
 	child.Annotations["owner"] = "mutated"
 	assert.Equal(t, "sdk", parent.Annotations["owner"])
 }

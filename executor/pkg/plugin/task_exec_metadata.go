@@ -19,6 +19,7 @@ import (
 	pluginsUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 )
 
 var _ pluginsCore.TaskExecutionMetadata = &taskExecutionMetadata{}
@@ -58,18 +59,19 @@ func (t *taskExecutionID) GetUniqueNodeID() string {
 }
 
 type taskExecutionMetadata struct {
-	ownerID         types.NamespacedName
-	taskExecutionID pluginsCore.TaskExecutionID
-	namespace       string
-	ownerReference  metav1.OwnerReference
-	labels          map[string]string
-	annotations     map[string]string
-	maxAttempts     uint32
-	overrides       pluginsCore.TaskOverrides
-	envVars         map[string]string
-	interruptible   bool
-	securityContext *core.SecurityContext
-	serviceAccount  string
+	ownerID           types.NamespacedName
+	taskExecutionID   pluginsCore.TaskExecutionID
+	namespace         string
+	ownerReference    metav1.OwnerReference
+	labels            map[string]string
+	annotations       map[string]string
+	maxAttempts       uint32
+	overrides         pluginsCore.TaskOverrides
+	envVars           map[string]string
+	interruptible     bool
+	securityContext   *core.SecurityContext
+	serviceAccount    string
+	platformResources *v1.ResourceRequirements
 }
 
 func resolveServiceAccount(securityContext *core.SecurityContext, defaultSA string) string {
@@ -83,9 +85,12 @@ func resolveServiceAccount(securityContext *core.SecurityContext, defaultSA stri
 func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecutionMetadata, error) {
 	// Extract resource requirements from the inline task template
 	overrides := buildOverridesFromTaskTemplate(ta.Spec.TaskTemplate)
+	platformResources, err := applyTaskResourceDefaults(ta, overrides)
+	if err != nil {
+		return nil, err
+	}
 
 	// Handling secrets
-	var err error
 	securityContext := extractSecurityContextFromTaskTemplate(ta.Spec.TaskTemplate)
 	secretsMap := make(map[string]string)
 	injectLabels := map[string]string{
@@ -167,15 +172,54 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 			UID:        ta.UID,
 			Controller: ptr.To(true),
 		},
-		labels:          pluginsUtils.UnionMaps(ta.Labels, injectLabels),
-		annotations:     pluginsUtils.UnionMaps(ta.Annotations, secretsMap),
-		maxAttempts:     maxAttempts,
-		overrides:       overrides,
-		envVars:         envVars,
-		interruptible:   interruptible != nil && *interruptible,
-		securityContext: securityContext,
-		serviceAccount:  resolveServiceAccount(securityContext, executorconfig.GetConfig().DefaultK8sServiceAccount),
+		labels:            pluginsUtils.UnionMaps(ta.Labels, injectLabels),
+		annotations:       pluginsUtils.UnionMaps(ta.Annotations, secretsMap),
+		maxAttempts:       maxAttempts,
+		overrides:         overrides,
+		envVars:           envVars,
+		interruptible:     interruptible != nil && *interruptible,
+		securityContext:   securityContext,
+		serviceAccount:    resolveServiceAccount(securityContext, executorconfig.GetConfig().DefaultK8sServiceAccount),
+		platformResources: platformResources,
 	}, nil
+}
+
+// applyTaskResourceDefaults turns the run's task resource defaults into platform resources: requests fill the
+// dimensions a task leaves unset and limits cap the task's requests and limits. A task that requests GPUs but
+// names no accelerator gets the default accelerator through the overrides.
+func applyTaskResourceDefaults(ta *flyteorgv1.TaskAction, overrides *taskOverrides) (*v1.ResourceRequirements, error) {
+	platformResources := &v1.ResourceRequirements{}
+	if len(ta.Spec.TaskResourceDefaults) == 0 {
+		return platformResources, nil
+	}
+
+	defaults := &task.TaskResourceDefaults{}
+	if err := proto.Unmarshal(ta.Spec.TaskResourceDefaults, defaults); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal task resource defaults: %w", err)
+	}
+	requests, err := flytek8s.ToK8sResourceList(defaults.GetRequests())
+	if err != nil {
+		return nil, fmt.Errorf("invalid task resource default requests: %w", err)
+	}
+	limits, err := flytek8s.ToK8sResourceList(defaults.GetMax())
+	if err != nil {
+		return nil, fmt.Errorf("invalid task resource default max: %w", err)
+	}
+	platformResources.Requests = requests
+	platformResources.Limits = limits
+
+	tmpl := &core.TaskTemplate{}
+	if err := proto.Unmarshal(ta.Spec.TaskTemplate, tmpl); err != nil {
+		tmpl = &core.TaskTemplate{}
+	}
+	accelerator := tmpl.GetExtendedResources().GetGpuAccelerator()
+	if accelerator == nil && defaults.GetDefaultAccelerator() != nil && flytek8s.RequestsGPU(tmpl.GetContainer().GetResources()) {
+		accelerator = defaults.GetDefaultAccelerator()
+		overrides.extendedResources = &core.ExtendedResources{GpuAccelerator: accelerator}
+	}
+	// Task resources name GPUs after the accelerator by the time platform resources are applied.
+	flytek8s.SanitizeGPUResourceRequirements(platformResources, accelerator)
+	return platformResources, nil
 }
 
 // setSanitizedLabel stamps a label only when the value survives sanitization, so pods
@@ -310,7 +354,7 @@ func (m *taskExecutionMetadata) GetSecurityContext() *core.SecurityContext {
 }
 
 func (m *taskExecutionMetadata) GetPlatformResources() *v1.ResourceRequirements {
-	return &v1.ResourceRequirements{}
+	return m.platformResources
 }
 
 func (m *taskExecutionMetadata) GetExternalResourceAttributes() pluginsCore.ExternalResourceAttributes {
@@ -319,11 +363,12 @@ func (m *taskExecutionMetadata) GetExternalResourceAttributes() pluginsCore.Exte
 
 // taskOverrides provides resource overrides extracted from the task template.
 type taskOverrides struct {
-	resources *v1.ResourceRequirements
+	resources         *v1.ResourceRequirements
+	extendedResources *core.ExtendedResources
 }
 
 func (t *taskOverrides) GetResources() *v1.ResourceRequirements        { return t.resources }
-func (t *taskOverrides) GetExtendedResources() *core.ExtendedResources { return nil }
+func (t *taskOverrides) GetExtendedResources() *core.ExtendedResources { return t.extendedResources }
 func (t *taskOverrides) GetContainerImage() string                     { return "" }
 func (t *taskOverrides) GetConfigMap() *v1.ConfigMap                   { return nil }
 func (t *taskOverrides) GetPodTemplate() *core.K8SPod                  { return nil }

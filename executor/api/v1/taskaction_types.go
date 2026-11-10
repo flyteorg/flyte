@@ -200,6 +200,10 @@ type TaskActionSpec struct {
 	// +optional
 	RawDataPrefix string `json:"rawDataPrefix,omitempty"`
 
+	// TaskResourceDefaults is the proto-serialized task.TaskResourceDefaults projected from RunSpec.DefaultSettings.
+	// +optional
+	TaskResourceDefaults []byte `json:"taskResourceDefaults,omitempty"`
+
 	// Group is the group this action belongs to, if applicable.
 	// +optional
 	// +kubebuilder:validation:MaxLength=256
