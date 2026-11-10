@@ -1301,22 +1301,22 @@ var _ interface {
 	ErrorName() string
 } = InputsValidationError{}
 
-// Validate checks the field values on ActionInputOverridesData with the rules
+// Validate checks the field values on ActionOverridesData with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *ActionInputOverridesData) Validate() error {
+func (m *ActionOverridesData) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on ActionInputOverridesData with the
-// rules defined in the proto definition for this message. If any rules are
+// ValidateAll checks the field values on ActionOverridesData with the rules
+// defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// ActionInputOverridesDataMultiError, or nil if none found.
-func (m *ActionInputOverridesData) ValidateAll() error {
+// ActionOverridesDataMultiError, or nil if none found.
+func (m *ActionOverridesData) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *ActionInputOverridesData) validate(all bool) error {
+func (m *ActionOverridesData) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -1343,7 +1343,7 @@ func (m *ActionInputOverridesData) validate(all bool) error {
 				switch v := interface{}(val).(type) {
 				case interface{ ValidateAll() error }:
 					if err := v.ValidateAll(); err != nil {
-						errors = append(errors, ActionInputOverridesDataValidationError{
+						errors = append(errors, ActionOverridesDataValidationError{
 							field:  fmt.Sprintf("CodeBundles[%v]", key),
 							reason: "embedded message failed validation",
 							cause:  err,
@@ -1351,7 +1351,7 @@ func (m *ActionInputOverridesData) validate(all bool) error {
 					}
 				case interface{ Validate() error }:
 					if err := v.Validate(); err != nil {
-						errors = append(errors, ActionInputOverridesDataValidationError{
+						errors = append(errors, ActionOverridesDataValidationError{
 							field:  fmt.Sprintf("CodeBundles[%v]", key),
 							reason: "embedded message failed validation",
 							cause:  err,
@@ -1360,7 +1360,7 @@ func (m *ActionInputOverridesData) validate(all bool) error {
 				}
 			} else if v, ok := interface{}(val).(interface{ Validate() error }); ok {
 				if err := v.Validate(); err != nil {
-					return ActionInputOverridesDataValidationError{
+					return ActionOverridesDataValidationError{
 						field:  fmt.Sprintf("CodeBundles[%v]", key),
 						reason: "embedded message failed validation",
 						cause:  err,
@@ -1372,19 +1372,19 @@ func (m *ActionInputOverridesData) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return ActionInputOverridesDataMultiError(errors)
+		return ActionOverridesDataMultiError(errors)
 	}
 
 	return nil
 }
 
-// ActionInputOverridesDataMultiError is an error wrapping multiple validation
-// errors returned by ActionInputOverridesData.ValidateAll() if the designated
+// ActionOverridesDataMultiError is an error wrapping multiple validation
+// errors returned by ActionOverridesData.ValidateAll() if the designated
 // constraints aren't met.
-type ActionInputOverridesDataMultiError []error
+type ActionOverridesDataMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m ActionInputOverridesDataMultiError) Error() string {
+func (m ActionOverridesDataMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1393,11 +1393,11 @@ func (m ActionInputOverridesDataMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m ActionInputOverridesDataMultiError) AllErrors() []error { return m }
+func (m ActionOverridesDataMultiError) AllErrors() []error { return m }
 
-// ActionInputOverridesDataValidationError is the validation error returned by
-// ActionInputOverridesData.Validate if the designated constraints aren't met.
-type ActionInputOverridesDataValidationError struct {
+// ActionOverridesDataValidationError is the validation error returned by
+// ActionOverridesData.Validate if the designated constraints aren't met.
+type ActionOverridesDataValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1405,24 +1405,24 @@ type ActionInputOverridesDataValidationError struct {
 }
 
 // Field function returns field value.
-func (e ActionInputOverridesDataValidationError) Field() string { return e.field }
+func (e ActionOverridesDataValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e ActionInputOverridesDataValidationError) Reason() string { return e.reason }
+func (e ActionOverridesDataValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e ActionInputOverridesDataValidationError) Cause() error { return e.cause }
+func (e ActionOverridesDataValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e ActionInputOverridesDataValidationError) Key() bool { return e.key }
+func (e ActionOverridesDataValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e ActionInputOverridesDataValidationError) ErrorName() string {
-	return "ActionInputOverridesDataValidationError"
+func (e ActionOverridesDataValidationError) ErrorName() string {
+	return "ActionOverridesDataValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e ActionInputOverridesDataValidationError) Error() string {
+func (e ActionOverridesDataValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1434,14 +1434,14 @@ func (e ActionInputOverridesDataValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sActionInputOverridesData.%s: %s%s",
+		"invalid %sActionOverridesData.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = ActionInputOverridesDataValidationError{}
+var _ error = ActionOverridesDataValidationError{}
 
 var _ interface {
 	Field() string
@@ -1449,7 +1449,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = ActionInputOverridesDataValidationError{}
+} = ActionOverridesDataValidationError{}
 
 // Validate checks the field values on ActionCodeBundle with the rules defined
 // in the proto definition for this message. If any rules are violated, the

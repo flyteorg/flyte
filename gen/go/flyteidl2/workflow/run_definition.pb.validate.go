@@ -252,7 +252,7 @@ func (m *RunDetails) validate(all bool) error {
 		}
 	}
 
-	for idx, item := range m.GetActionInputOverrideStatus() {
+	for idx, item := range m.GetActionOverrideStatus() {
 		_, _ = idx, item
 
 		if all {
@@ -260,7 +260,7 @@ func (m *RunDetails) validate(all bool) error {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, RunDetailsValidationError{
-						field:  fmt.Sprintf("ActionInputOverrideStatus[%v]", idx),
+						field:  fmt.Sprintf("ActionOverrideStatus[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -268,7 +268,7 @@ func (m *RunDetails) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, RunDetailsValidationError{
-						field:  fmt.Sprintf("ActionInputOverrideStatus[%v]", idx),
+						field:  fmt.Sprintf("ActionOverrideStatus[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -277,7 +277,7 @@ func (m *RunDetails) validate(all bool) error {
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return RunDetailsValidationError{
-					field:  fmt.Sprintf("ActionInputOverrideStatus[%v]", idx),
+					field:  fmt.Sprintf("ActionOverrideStatus[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -363,22 +363,22 @@ var _ interface {
 	ErrorName() string
 } = RunDetailsValidationError{}
 
-// Validate checks the field values on ActionInputOverrideStatus with the rules
+// Validate checks the field values on ActionOverrideStatus with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.
-func (m *ActionInputOverrideStatus) Validate() error {
+func (m *ActionOverrideStatus) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on ActionInputOverrideStatus with the
-// rules defined in the proto definition for this message. If any rules are
+// ValidateAll checks the field values on ActionOverrideStatus with the rules
+// defined in the proto definition for this message. If any rules are
 // violated, the result is a list of violation errors wrapped in
-// ActionInputOverrideStatusMultiError, or nil if none found.
-func (m *ActionInputOverrideStatus) ValidateAll() error {
+// ActionOverrideStatusMultiError, or nil if none found.
+func (m *ActionOverrideStatus) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *ActionInputOverrideStatus) validate(all bool) error {
+func (m *ActionOverrideStatus) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -390,19 +390,19 @@ func (m *ActionInputOverrideStatus) validate(all bool) error {
 	// no validation rules for State
 
 	if len(errors) > 0 {
-		return ActionInputOverrideStatusMultiError(errors)
+		return ActionOverrideStatusMultiError(errors)
 	}
 
 	return nil
 }
 
-// ActionInputOverrideStatusMultiError is an error wrapping multiple validation
-// errors returned by ActionInputOverrideStatus.ValidateAll() if the
-// designated constraints aren't met.
-type ActionInputOverrideStatusMultiError []error
+// ActionOverrideStatusMultiError is an error wrapping multiple validation
+// errors returned by ActionOverrideStatus.ValidateAll() if the designated
+// constraints aren't met.
+type ActionOverrideStatusMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m ActionInputOverrideStatusMultiError) Error() string {
+func (m ActionOverrideStatusMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -411,11 +411,11 @@ func (m ActionInputOverrideStatusMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m ActionInputOverrideStatusMultiError) AllErrors() []error { return m }
+func (m ActionOverrideStatusMultiError) AllErrors() []error { return m }
 
-// ActionInputOverrideStatusValidationError is the validation error returned by
-// ActionInputOverrideStatus.Validate if the designated constraints aren't met.
-type ActionInputOverrideStatusValidationError struct {
+// ActionOverrideStatusValidationError is the validation error returned by
+// ActionOverrideStatus.Validate if the designated constraints aren't met.
+type ActionOverrideStatusValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -423,24 +423,24 @@ type ActionInputOverrideStatusValidationError struct {
 }
 
 // Field function returns field value.
-func (e ActionInputOverrideStatusValidationError) Field() string { return e.field }
+func (e ActionOverrideStatusValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e ActionInputOverrideStatusValidationError) Reason() string { return e.reason }
+func (e ActionOverrideStatusValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e ActionInputOverrideStatusValidationError) Cause() error { return e.cause }
+func (e ActionOverrideStatusValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e ActionInputOverrideStatusValidationError) Key() bool { return e.key }
+func (e ActionOverrideStatusValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e ActionInputOverrideStatusValidationError) ErrorName() string {
-	return "ActionInputOverrideStatusValidationError"
+func (e ActionOverrideStatusValidationError) ErrorName() string {
+	return "ActionOverrideStatusValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e ActionInputOverrideStatusValidationError) Error() string {
+func (e ActionOverrideStatusValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -452,14 +452,14 @@ func (e ActionInputOverrideStatusValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sActionInputOverrideStatus.%s: %s%s",
+		"invalid %sActionOverrideStatus.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = ActionInputOverrideStatusValidationError{}
+var _ error = ActionOverrideStatusValidationError{}
 
 var _ interface {
 	Field() string
@@ -467,7 +467,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = ActionInputOverrideStatusValidationError{}
+} = ActionOverrideStatusValidationError{}
 
 // Validate checks the field values on TaskAction with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
@@ -1763,7 +1763,7 @@ func (m *ActionMetadata) validate(all bool) error {
 		}
 	}
 
-	// no validation rules for InputOverrideApplied
+	// no validation rules for OverrideApplied
 
 	switch v := m.Spec.(type) {
 	case *ActionMetadata_Task:

@@ -134,7 +134,7 @@ class Inputs(_message.Message):
     context: _containers.RepeatedCompositeFieldContainer[_literals_pb2.KeyValuePair]
     def __init__(self, literals: _Optional[_Iterable[_Union[NamedLiteral, _Mapping]]] = ..., context: _Optional[_Iterable[_Union[_literals_pb2.KeyValuePair, _Mapping]]] = ...) -> None: ...
 
-class ActionInputOverridesData(_message.Message):
+class ActionOverridesData(_message.Message):
     __slots__ = ["input_uris", "code_bundles"]
     class InputUrisEntry(_message.Message):
         __slots__ = ["key", "value"]
