@@ -72,21 +72,23 @@ type PersistedLogsConfig struct {
 }
 
 type LokiConfig struct {
-	URL           string              `json:"url" pflag:",Loki base URL."`
-	QueryTemplate string              `json:"queryTemplate" pflag:",Go template for the LogQL query; fields .Namespace .PodName .ContainerName."`
-	TenantID      string              `json:"tenantId" pflag:",Loki tenant (X-Scope-OrgID header); empty for single-tenant."`
-	BasicAuth     LokiBasicAuthConfig `json:"basicAuth"`
-	BearerToken   string              `json:"bearerToken" pflag:",Bearer token sent in the Authorization header."`
-	Timeout       config.Duration     `json:"timeout" pflag:",Per-request timeout."`
-	PageSize      int                 `json:"pageSize" pflag:",Lines per Loki query_range request; must not exceed Loki's max_entries_limit_per_query."`
-	MaxLines      int                 `json:"maxLines" pflag:",Maximum lines returned per attempt; 0 for unlimited."`
-	TimePadding   config.Duration     `json:"timePadding" pflag:",Padding added around the container start/end window."`
-	Lookback      config.Duration     `json:"lookback" pflag:",Window queried when no container start time is recorded."`
+	URL             string              `json:"url" pflag:",Loki base URL."`
+	QueryTemplate   string              `json:"queryTemplate" pflag:",Go template for the LogQL query; fields .Namespace .PodName .ContainerName."`
+	TenantID        string              `json:"tenantId" pflag:",Loki tenant (X-Scope-OrgID header); empty for single-tenant."`
+	BasicAuth       LokiBasicAuthConfig `json:"basicAuth"`
+	BearerToken     string              `json:"bearerToken" pflag:",Bearer token sent in the Authorization header."`
+	BearerTokenPath string              `json:"bearerTokenPath" pflag:",Path to a file containing the bearer token; mutually exclusive with bearerToken."`
+	Timeout         config.Duration     `json:"timeout" pflag:",Per-request timeout."`
+	PageSize        int                 `json:"pageSize" pflag:",Lines per Loki query_range request; must not exceed Loki's max_entries_limit_per_query."`
+	MaxLines        int                 `json:"maxLines" pflag:",Maximum lines returned per attempt; 0 for unlimited."`
+	TimePadding     config.Duration     `json:"timePadding" pflag:",Padding added around the container start/end window."`
+	Lookback        config.Duration     `json:"lookback" pflag:",Window queried when no container start time is recorded."`
 }
 
 type LokiBasicAuthConfig struct {
-	Username string `json:"username" pflag:",Basic auth username."`
-	Password string `json:"password" pflag:",Basic auth password."`
+	Username     string `json:"username" pflag:",Basic auth username."`
+	Password     string `json:"password" pflag:",Basic auth password."`
+	PasswordPath string `json:"passwordPath" pflag:",Path to a file containing the basic auth password; mutually exclusive with password."`
 }
 
 // DefaultLokiConfig matches the labels Promtail and Alloy attach to pod logs.

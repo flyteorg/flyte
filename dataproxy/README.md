@@ -48,7 +48,9 @@ a persisted backend. Currently Grafana Loki is supported.
 | `dataproxy.logs.persisted.loki.queryTemplate` | Go template for the LogQL selector. Fields: `.Namespace`, `.PodName`, `.ContainerName` | `{namespace="{{ .Namespace }}", pod="{{ .PodName }}", container="{{ .ContainerName }}"}` |
 | `dataproxy.logs.persisted.loki.tenantId` | Sent as `X-Scope-OrgID` for multi-tenant Loki | `""` |
 | `dataproxy.logs.persisted.loki.basicAuth.username` / `.password` | HTTP basic auth credentials | |
+| `dataproxy.logs.persisted.loki.basicAuth.passwordPath` | File holding the basic auth password; mutually exclusive with `password` | |
 | `dataproxy.logs.persisted.loki.bearerToken` | Bearer token for the `Authorization` header | |
+| `dataproxy.logs.persisted.loki.bearerTokenPath` | File holding the bearer token; mutually exclusive with `bearerToken` | |
 | `dataproxy.logs.persisted.loki.timeout` | Per-request timeout | `30s` |
 | `dataproxy.logs.persisted.loki.pageSize` | Lines per `query_range` call; keep at or below Loki's `max_entries_limit_per_query` | `1000` |
 | `dataproxy.logs.persisted.loki.maxLines` | Cap on lines returned per attempt; `0` for unlimited | `0` |

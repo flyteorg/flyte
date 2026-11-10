@@ -288,6 +288,20 @@ func TestDataProxyConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_logs.persisted.loki.basicAuth.passwordPath", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.persisted.loki.basicAuth.passwordPath", testValue)
+			if vString, err := cmdFlags.GetString("logs.persisted.loki.basicAuth.passwordPath"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.Logs.Persisted.Loki.BasicAuth.PasswordPath)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_logs.persisted.loki.bearerToken", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -296,6 +310,20 @@ func TestDataProxyConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("logs.persisted.loki.bearerToken", testValue)
 			if vString, err := cmdFlags.GetString("logs.persisted.loki.bearerToken"); err == nil {
 				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.Logs.Persisted.Loki.BearerToken)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.persisted.loki.bearerTokenPath", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.persisted.loki.bearerTokenPath", testValue)
+			if vString, err := cmdFlags.GetString("logs.persisted.loki.bearerTokenPath"); err == nil {
+				testDecodeJson_DataProxyConfig(t, fmt.Sprintf("%v", vString), &actual.Logs.Persisted.Loki.BearerTokenPath)
 
 			} else {
 				assert.FailNow(t, err.Error())

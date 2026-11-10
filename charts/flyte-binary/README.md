@@ -128,8 +128,10 @@ Chart for basic single Flyte executable deployment
 | flyte-core-components.actions.watchBufferSize | int | `100` |  |
 | flyte-core-components.dataproxy.download.maxExpiresIn | string | `"1h"` |  |
 | flyte-core-components.dataproxy.logs.persisted.loki.basicAuth.password | string | `""` |  |
+| flyte-core-components.dataproxy.logs.persisted.loki.basicAuth.passwordPath | string | `""` |  |
 | flyte-core-components.dataproxy.logs.persisted.loki.basicAuth.username | string | `""` |  |
 | flyte-core-components.dataproxy.logs.persisted.loki.bearerToken | string | `""` |  |
+| flyte-core-components.dataproxy.logs.persisted.loki.bearerTokenPath | string | `""` |  |
 | flyte-core-components.dataproxy.logs.persisted.loki.lookback | string | `"168h"` |  |
 | flyte-core-components.dataproxy.logs.persisted.loki.maxLines | int | `0` |  |
 | flyte-core-components.dataproxy.logs.persisted.loki.pageSize | int | `1000` |  |

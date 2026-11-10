@@ -634,12 +634,15 @@ configuration:
           # binary default (Promtail/Alloy labels). Rendered through tpl, so escape braces:
           # '{k8s_pod_name="{{ "{{" }} .PodName {{ "}}" }}"}'
           queryTemplate: ""
-          # -- Rendered into the configuration Secret.
+          # -- Rendered into the configuration Secret. passwordPath names a mounted file instead; mutually exclusive with password.
           basicAuth:
             username: ""
             password: ""
+            passwordPath: ""
           # -- Rendered into the configuration Secret.
           bearerToken: ""
+          # -- File holding the bearer token; mutually exclusive with bearerToken.
+          bearerTokenPath: ""
           timeout: 30s
           # -- Keep at or below Loki's max_entries_limit_per_query.
           pageSize: 1000

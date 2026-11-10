@@ -34,6 +34,10 @@ dataproxy:
         # Adapt the label names to your collector.
         queryTemplate: '{namespace="{{ .Namespace }}", pod="{{ .PodName }}", container="{{ .ContainerName }}"}'
         tenantId: ""
+        # bearerTokenPath: /etc/secrets/loki/token
+        # basicAuth:
+        #   username: flyte
+        #   passwordPath: /etc/secrets/loki/password
         timeout: 30s
         pageSize: 1000
         maxLines: 0

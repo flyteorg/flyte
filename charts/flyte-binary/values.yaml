@@ -54,10 +54,13 @@ flyte-core-components:
           # tpl, so escape braces: '{k8s_pod_name="{{ "{{" }} .PodName {{ "}}" }}"}'
           queryTemplate: ""
           # basicAuth / bearerToken are rendered into the configuration Secret.
+          # passwordPath / bearerTokenPath name a mounted file instead; mutually exclusive with the value.
           basicAuth:
             username: ""
             password: ""
+            passwordPath: ""
           bearerToken: ""
+          bearerTokenPath: ""
           timeout: 30s
           # pageSize Keep at or below Loki's max_entries_limit_per_query.
           pageSize: 1000

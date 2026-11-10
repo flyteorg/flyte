@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -64,12 +65,32 @@ func NewLokiLogStreamer(cfg config.LokiConfig) (*LokiLogStreamer, error) {
 	if cfg.PageSize <= 0 {
 		return nil, fmt.Errorf("loki: pageSize must be positive")
 	}
+	if cfg.BearerToken, err = resolveLokiSecret("bearerToken", cfg.BearerToken, cfg.BearerTokenPath); err != nil {
+		return nil, err
+	}
+	if cfg.BasicAuth.Password, err = resolveLokiSecret("basicAuth.password", cfg.BasicAuth.Password, cfg.BasicAuth.PasswordPath); err != nil {
+		return nil, err
+	}
 	return &LokiLogStreamer{
 		cfg:      cfg,
 		client:   &http.Client{Timeout: cfg.Timeout.Duration},
 		queryTpl: tpl,
 		baseURL:  baseURL,
 	}, nil
+}
+
+func resolveLokiSecret(name, value, path string) (string, error) {
+	if path == "" {
+		return value, nil
+	}
+	if value != "" {
+		return "", fmt.Errorf("loki: %s and %sPath are mutually exclusive", name, name)
+	}
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return "", fmt.Errorf("loki: reading %sPath: %w", name, err)
+	}
+	return strings.TrimSpace(string(raw)), nil
 }
 
 func (s *LokiLogStreamer) TailLogs(ctx context.Context, logContext *core.LogContext, stream *connect.ServerStream[dataproxy.TailLogsResponse]) error {

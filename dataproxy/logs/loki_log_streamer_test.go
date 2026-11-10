@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strconv"
 	"testing"
 	"time"
@@ -213,6 +215,55 @@ func TestNewLokiLogStreamer_RejectsBadConfig(t *testing.T) {
 	cfg.QueryTemplate = "{{ .Unclosed "
 	_, err = NewLokiLogStreamer(cfg)
 	assert.Error(t, err, "bad template")
+}
+
+func TestNewLokiLogStreamer_ReadsCredentialsFromFiles(t *testing.T) {
+	dir := t.TempDir()
+	tokenPath := filepath.Join(dir, "token")
+	passwordPath := filepath.Join(dir, "password")
+	require.NoError(t, os.WriteFile(tokenPath, []byte("file-token\n"), 0o600))
+	require.NoError(t, os.WriteFile(passwordPath, []byte("file-pass\n"), 0o600))
+
+	t.Run("bearer token", func(t *testing.T) {
+		cfg := newLokiTestConfig("http://loki:3100")
+		cfg.BearerTokenPath = tokenPath
+		streamer, err := NewLokiLogStreamer(cfg)
+		require.NoError(t, err)
+
+		req := httptest.NewRequest(http.MethodGet, "http://loki:3100", nil)
+		streamer.setAuth(req)
+		assert.Equal(t, "Bearer file-token", req.Header.Get("Authorization"))
+	})
+
+	t.Run("basic auth password", func(t *testing.T) {
+		cfg := newLokiTestConfig("http://loki:3100")
+		cfg.BasicAuth.Username = "user"
+		cfg.BasicAuth.PasswordPath = passwordPath
+		streamer, err := NewLokiLogStreamer(cfg)
+		require.NoError(t, err)
+
+		req := httptest.NewRequest(http.MethodGet, "http://loki:3100", nil)
+		streamer.setAuth(req)
+		user, pass, ok := req.BasicAuth()
+		assert.True(t, ok)
+		assert.Equal(t, "user", user)
+		assert.Equal(t, "file-pass", pass)
+	})
+
+	t.Run("value and path together are rejected", func(t *testing.T) {
+		cfg := newLokiTestConfig("http://loki:3100")
+		cfg.BearerToken = "inline"
+		cfg.BearerTokenPath = tokenPath
+		_, err := NewLokiLogStreamer(cfg)
+		assert.ErrorContains(t, err, "mutually exclusive")
+	})
+
+	t.Run("missing file is rejected", func(t *testing.T) {
+		cfg := newLokiTestConfig("http://loki:3100")
+		cfg.BasicAuth.PasswordPath = filepath.Join(dir, "absent")
+		_, err := NewLokiLogStreamer(cfg)
+		assert.ErrorContains(t, err, "basicAuth.passwordPath")
+	})
 }
 
 func TestLokiLogStreamer_MissingPrimaryPodIsNotFound(t *testing.T) {
