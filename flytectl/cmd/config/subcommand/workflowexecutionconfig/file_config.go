@@ -14,6 +14,8 @@ type FileConfig struct {
 	*admin.WorkflowExecutionConfig
 }
 
+var DefaultFileConfig = &FileConfig{}
+
 // Decorate decorator over WorkflowExecutionConfig.
 func (t FileConfig) Decorate() *admin.MatchingAttributes {
 	return &admin.MatchingAttributes{
