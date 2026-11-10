@@ -121,7 +121,7 @@ func InitializeAuthMetadataClient(ctx context.Context, cfg *Config, proxyCredent
 		return nil, fmt.Errorf("failed to initialized admin connection. Error: %w", err)
 	}
 
-	return service.NewAuthMetadataServiceClient(authMetadataConnection), nil
+	return NewCachedMetadataClient(service.NewAuthMetadataServiceClient(authMetadataConnection)), nil
 }
 
 func NewAdminConnection(ctx context.Context, cfg *Config, proxyCredentialsFuture *PerRPCCredentialsFuture, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
