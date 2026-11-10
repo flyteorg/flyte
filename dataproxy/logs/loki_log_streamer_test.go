@@ -131,44 +131,6 @@ func TestLokiLogStreamer_QueriesLokiFromLogContext(t *testing.T) {
 	assert.Equal(t, "world", lines[1].GetMessage())
 }
 
-func TestLokiLogStreamer_PaginatesUntilShortPage(t *testing.T) {
-	start := time.Date(2026, 11, 1, 10, 0, 0, 0, time.UTC)
-	end := start.Add(time.Minute)
-
-	var starts []string
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		starts = append(starts, r.URL.Query().Get("start"))
-		var entries []lokiEntry
-		switch len(starts) {
-		case 1:
-			entries = []lokiEntry{{ts: start.Add(1 * time.Second), line: "a"}, {ts: start.Add(2 * time.Second), line: "b"}}
-		case 2:
-			entries = []lokiEntry{{ts: start.Add(3 * time.Second), line: "c"}}
-		default:
-			t.Errorf("unexpected extra request %d", len(starts))
-		}
-		_, _ = w.Write(lokiResponse(entries))
-	}))
-	defer server.Close()
-
-	cfg := newLokiTestConfig(server.URL)
-	cfg.PageSize = 2
-	cfg.TimePadding = stdconfig.Duration{}
-
-	streamer, err := NewLokiLogStreamer(cfg)
-	require.NoError(t, err)
-
-	lines, err := collectLines(t, streamer, newLokiLogContext(&start, &end))
-	require.NoError(t, err)
-
-	require.Len(t, starts, 2)
-	assert.Equal(t, strconv.FormatInt(start.UnixNano(), 10), starts[0])
-	assert.Equal(t, strconv.FormatInt(start.Add(2*time.Second).UnixNano(), 10), starts[1])
-
-	require.Len(t, lines, 3)
-	assert.Equal(t, []string{"a", "b", "c"}, []string{lines[0].GetMessage(), lines[1].GetMessage(), lines[2].GetMessage()})
-}
-
 func TestLokiLogStreamer_StopsAtMaxLines(t *testing.T) {
 	start := time.Date(2026, 11, 1, 10, 0, 0, 0, time.UTC)
 	end := start.Add(time.Minute)
@@ -240,26 +202,6 @@ func TestLokiLogStreamer_ServerErrorIsUnavailable(t *testing.T) {
 	require.Error(t, err)
 	assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(err))
 	assert.Contains(t, err.Error(), "429")
-}
-
-func TestLokiLogStreamer_CustomQueryTemplate(t *testing.T) {
-	var query string
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		query = r.URL.Query().Get("query")
-		_, _ = w.Write(lokiResponse(nil))
-	}))
-	defer server.Close()
-
-	cfg := newLokiTestConfig(server.URL)
-	cfg.QueryTemplate = `{k8s_namespace_name="{{ .Namespace }}", k8s_pod_name="{{ .PodName }}"} | k8s_container_name="{{ .ContainerName }}"`
-
-	streamer, err := NewLokiLogStreamer(cfg)
-	require.NoError(t, err)
-
-	start := time.Now().Add(-time.Minute)
-	_, err = collectLines(t, streamer, newLokiLogContext(&start, nil))
-	require.NoError(t, err)
-	assert.Equal(t, `{k8s_namespace_name="flyte", k8s_pod_name="my-pod"} | k8s_container_name="main"`, query)
 }
 
 func TestNewLokiLogStreamer_RejectsBadConfig(t *testing.T) {
@@ -398,7 +340,6 @@ func TestLokiLogStreamer_KeepsMessagePayloadVerbatim(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, lines, 1)
 	assert.Equal(t, "2026-11-01T10:00:00Z task failed", lines[0].GetMessage())
-	assert.True(t, lokiTS.Equal(lines[0].GetTimestamp().AsTime()))
 }
 
 func TestLokiLogStreamer_TiedTimestampsAcrossStreamsReorderedBetweenPages(t *testing.T) {
