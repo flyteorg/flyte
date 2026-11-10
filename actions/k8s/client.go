@@ -1,6 +1,7 @@
 package k8s
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"hash/fnv"
@@ -153,7 +154,9 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 			inheritRunContextFromParentTaskAction(taskAction, parentTaskAction)
 		} else {
 			// For root action, apply the RunSpec to TaskAction
-			applyRunSpecToTaskAction(taskAction, runSpec)
+			if err := applyRunSpecToTaskAction(taskAction, runSpec); err != nil {
+				return err
+			}
 		}
 
 		// Build and set the ActionSpec for the executor.
@@ -1116,18 +1119,27 @@ func buildActionSpec(action *actions.Action, runSpec *task.RunSpec) *workflow.Ac
 	return actionSpec
 }
 
-func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.RunSpec) {
+func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.RunSpec) error {
 	if runSpec == nil {
 		taskAction.Spec.EnvVars = nil
 		taskAction.Spec.Interruptible = nil
 		taskAction.Spec.PodTemplateName = ""
 		taskAction.Spec.RawDataPrefix = ""
-		return
+		taskAction.Spec.TaskResourceDefaults = nil
+		return nil
 	}
 
+	runDefaultSettings := runSpec.GetDefaultSettings()
 	taskAction.Spec.EnvVars = keyValuePairsToMap(runSpec.GetEnvs().GetValues())
-	taskAction.Spec.PodTemplateName = runSpec.GetDefaultSettings().GetPodTemplateName()
+	taskAction.Spec.PodTemplateName = runDefaultSettings.GetPodTemplateName()
 	taskAction.Spec.RawDataPrefix = runSpec.GetRawDataStorage().GetRawDataPrefix()
+	if defaults := runDefaultSettings.GetTaskResourceDefaults(); defaults != nil {
+		data, err := proto.Marshal(defaults)
+		if err != nil {
+			return fmt.Errorf("failed to marshal task resource defaults: %w", err)
+		}
+		taskAction.Spec.TaskResourceDefaults = data
+	}
 	if runSpec.GetInterruptible() != nil {
 		value := runSpec.GetInterruptible().GetValue()
 		taskAction.Spec.Interruptible = &value
@@ -1149,6 +1161,7 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 			taskAction.Annotations[key] = value
 		}
 	}
+	return nil
 }
 
 func inheritRunContextFromParentTaskAction(taskAction *executorv1.TaskAction, parentTaskAction *executorv1.TaskAction) {
@@ -1158,6 +1171,7 @@ func inheritRunContextFromParentTaskAction(taskAction *executorv1.TaskAction, pa
 	taskAction.Spec.EnvVars = cloneStringMap(parentTaskAction.Spec.EnvVars)
 	taskAction.Spec.PodTemplateName = parentTaskAction.Spec.PodTemplateName
 	taskAction.Spec.RawDataPrefix = parentTaskAction.Spec.RawDataPrefix
+	taskAction.Spec.TaskResourceDefaults = bytes.Clone(parentTaskAction.Spec.TaskResourceDefaults)
 	if len(parentTaskAction.Annotations) > 0 {
 		if taskAction.Annotations == nil {
 			taskAction.Annotations = map[string]string{}
