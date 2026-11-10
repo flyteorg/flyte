@@ -111,6 +111,7 @@ type Option func(*mutatorOptions)
 
 type mutatorOptions struct {
 	limitNamespace string
+	secretFetchers []SecretFetcher
 }
 
 // WithLimitNamespace confines the embedded secret manager's Secret informer to the namespace task
@@ -119,6 +120,17 @@ type mutatorOptions struct {
 func WithLimitNamespace(namespace string) Option {
 	return func(o *mutatorOptions) {
 		o.limitNamespace = namespace
+	}
+}
+
+// WithSecretFetchers gives the embedded secret manager additional fetchers, consulted in order
+// before the one its configuration selects. A fetcher reports a secret it does not hold with
+// ErrCodeSecretNotFound, so the next fetcher (and finally the configured store) is tried; any other
+// error fails the lookup. This lets a deployment resolve secrets from its own source (for example a
+// control-plane secret service) without copying them into the configured store first.
+func WithSecretFetchers(fetchers ...SecretFetcher) Option {
+	return func(o *mutatorOptions) {
+		o.secretFetchers = append(o.secretFetchers, fetchers...)
 	}
 }
 
@@ -150,7 +162,7 @@ func NewSecretsMutatorWithOptions(
 	globalSecretManagerConfig := secretmanager.GetConfig()
 	for _, secretManagerType := range enabledSecretManagerTypes {
 		injector, err := newSecretsInjector(ctx, secretManagerType, cfg, globalSecretManagerConfig, podNamespace,
-			o.limitNamespace, scope.NewSubScope("secret_injector"))
+			o.limitNamespace, o.secretFetchers, scope.NewSubScope("secret_injector"))
 		if err != nil {
 			return nil, err
 		}
