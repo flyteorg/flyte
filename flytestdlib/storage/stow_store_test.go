@@ -630,9 +630,13 @@ func Test_newStowRawStore(t *testing.T) {
 			InitContainer: "flyte",
 			Stow: StowConfig{
 				Kind: s3.Kind,
+				// An endpoint and region keep stow from asking AWS for the bucket's
+				// region and location, so the test makes no network call.
 				Config: map[string]string{
 					s3.ConfigAccessKeyID: "my-access-key-id",
 					ConfigSecretKeyPath:  path,
+					s3.ConfigEndpoint:    "http://localhost:9000",
+					s3.ConfigRegion:      "us-east-1",
 				},
 			},
 		}}, false},
