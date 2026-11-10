@@ -207,6 +207,23 @@ func TestApplyResourceOverrides_OverrideEphemeralStorage(t *testing.T) {
 	assert.EqualValues(t, ephemeralStorageLimit, overrides.Requests[v1.ResourceEphemeralStorage])
 }
 
+func TestApplyResourceOverrides_PlatformEphemeralStorageDefault(t *testing.T) {
+	platformRequest := resource.MustParse("1Gi")
+	platformResources := v1.ResourceRequirements{
+		Requests: v1.ResourceList{v1.ResourceEphemeralStorage: platformRequest},
+	}
+
+	// assignIfUnset (true): the container of a container task and the primary container of a pod task take the default.
+	got := ApplyResourceOverrides(v1.ResourceRequirements{}, platformResources, assignIfUnset)
+	assert.EqualValues(t, got.Requests[v1.ResourceEphemeralStorage], platformRequest)
+	assert.EqualValues(t, got.Limits[v1.ResourceEphemeralStorage], platformRequest)
+
+	// !assignIfUnset (false): sidecars and init containers of a pod task are only kept in range and do not take the default.
+	got = ApplyResourceOverrides(v1.ResourceRequirements{}, platformResources, !assignIfUnset)
+	assert.NotContains(t, got.Requests, v1.ResourceEphemeralStorage)
+	assert.NotContains(t, got.Limits, v1.ResourceEphemeralStorage)
+}
+
 func TestApplyResourceOverrides_RemoveStorage(t *testing.T) {
 	requestedResourceQuantity := resource.MustParse("1")
 	overrides := ApplyResourceOverrides(v1.ResourceRequirements{

@@ -70,6 +70,21 @@ func ToK8sResourceRequirements(resources *core.Resources) (*v1.ResourceRequireme
 	return res, nil
 }
 
+// RequestsGPU reports whether the resources request or limit a non-zero number of GPUs.
+func RequestsGPU(resources *core.Resources) bool {
+	for _, entries := range [][]*core.Resources_ResourceEntry{resources.GetRequests(), resources.GetLimits()} {
+		for _, entry := range entries {
+			if entry.GetName() != core.Resources_GPU {
+				continue
+			}
+			if q, err := resource.ParseQuantity(entry.GetValue()); err == nil && !q.IsZero() {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // ApplyK8sResourceOverrides ensures that both resource requests and limits are set.
 // This is required because we run user executions in namespaces bound with a project quota and the Kubernetes scheduler will reject requests omitting these.
 // This function is called by plugins that don't necessarily construct a default flyte container (container and k8s pod tasks)
