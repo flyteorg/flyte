@@ -117,8 +117,8 @@ type TaskActionReconciler struct {
 	RequeueDuration time.Duration
 	Clock           clock.Clock
 	metrics         *taskActionMetrics
-	// K8sEventLevel selects which recorded action events are also emitted as Kubernetes Events.
-	K8sEventLevel     EventLevel
+	// K8sEventMode selects which recorded action events are also emitted as Kubernetes Events.
+	K8sEventMode      K8sEventMode
 	reportingInstance string
 }
 
@@ -129,7 +129,7 @@ type TaskActionReconciler struct {
 // identical to a direct Record (on error the reconcile requeues and re-emits,
 // deduped server-side by ON CONFLICT DO NOTHING). Falls back to a direct Record
 // when no batcher is set (unit tests). Once persisted, the event is also emitted
-// as a Kubernetes Event on taskAction, filtered by K8sEventLevel.
+// as a Kubernetes Event on taskAction, filtered by K8sEventMode.
 func (r *TaskActionReconciler) recordEvent(
 	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
@@ -408,34 +408,26 @@ func getPhaseLastTransitionTime(
 	return time.Time{}, false
 }
 
-// emitK8sEvent emits event as Kubernetes Event on taskAction when its level is
-// enabled. Terminal and info events carry the payload in annotation, so they are
-// created directly and bypass the recorder's aggregation. Debug events go through
-// the recorder. Failures are only logged.
+// emitK8sEvent emits event as Kubernetes Event on taskAction when K8sEventMode
+// selects it. The event carries the action context in annotations, so it is created
+// directly and bypasses the recorder's aggregation. Failures are only logged.
 func (r *TaskActionReconciler) emitK8sEvent(
 	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
 	event *workflow.ActionEvent,
 	prevPhase common.ActionPhase,
 ) {
-	level := eventLevelOf(event, prevPhase)
-	if r.K8sEventLevel == EventLevelOff || level > r.K8sEventLevel {
+	if !shouldEmitK8sEvent(r.K8sEventMode, event, prevPhase) {
 		return
 	}
-	if level <= EventLevelInfo {
-		logger := log.FromContext(ctx).WithValues("action", event.GetId().GetName())
-		ev, buildErr := buildActionEventK8s(taskAction, event, r.reportingInstance)
-		if buildErr != nil {
-			logger.Error(buildErr, "failed to build action k8s event")
-			return
-		}
-		if createErr := r.Create(ctx, ev); createErr != nil {
-			logger.Error(createErr, "failed to create action k8s event")
-		}
+	logger := log.FromContext(ctx).WithValues("action", event.GetId().GetName())
+	ev, err := buildActionEventK8s(taskAction, event, r.reportingInstance)
+	if err != nil {
+		logger.Error(err, "failed to build action k8s event")
 		return
 	}
-	if r.Recorder != nil {
-		r.Recorder.Eventf(taskAction, nil, eventType(event), eventReason(event), "Reconciling", "%s", humanSummary(event))
+	if err := r.Create(ctx, ev); err != nil {
+		logger.Error(err, "failed to create action k8s event")
 	}
 }
 

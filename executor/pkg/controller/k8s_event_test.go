@@ -207,29 +207,50 @@ func testActionEvent(phase common.ActionPhase, version uint32) *workflow.ActionE
 	}
 }
 
-func TestEventLevelOf(t *testing.T) {
+func TestShouldEmitK8sEvent(t *testing.T) {
+	const (
+		queued      = common.ActionPhase_ACTION_PHASE_QUEUED
+		running     = common.ActionPhase_ACTION_PHASE_RUNNING
+		succeeded   = common.ActionPhase_ACTION_PHASE_SUCCEEDED
+		failed      = common.ActionPhase_ACTION_PHASE_FAILED
+		aborted     = common.ActionPhase_ACTION_PHASE_ABORTED
+		timedOut    = common.ActionPhase_ACTION_PHASE_TIMED_OUT
+		unspecified = common.ActionPhase_ACTION_PHASE_UNSPECIFIED
+	)
 	tests := []struct {
 		name      string
+		mode      K8sEventMode
 		phase     common.ActionPhase
 		version   uint32
 		prevPhase common.ActionPhase
-		expected  EventLevel
+		want      bool
 	}{
-		{"succeeded", common.ActionPhase_ACTION_PHASE_SUCCEEDED, 0, common.ActionPhase_ACTION_PHASE_RUNNING, EventLevelTerminal},
-		{"failed", common.ActionPhase_ACTION_PHASE_FAILED, 0, common.ActionPhase_ACTION_PHASE_RUNNING, EventLevelTerminal},
-		{"aborted", common.ActionPhase_ACTION_PHASE_ABORTED, 0, common.ActionPhase_ACTION_PHASE_RUNNING, EventLevelTerminal},
-		{"timed out", common.ActionPhase_ACTION_PHASE_TIMED_OUT, 0, common.ActionPhase_ACTION_PHASE_RUNNING, EventLevelTerminal},
-		{"system retry", common.ActionPhase_ACTION_PHASE_QUEUED, systemRetryEventVersionBase, common.ActionPhase_ACTION_PHASE_RUNNING, EventLevelTerminal},
-		{"just below system retry range", common.ActionPhase_ACTION_PHASE_QUEUED, systemRetryEventVersionBase - 1, common.ActionPhase_ACTION_PHASE_QUEUED, EventLevelDebug},
-		{"first event", common.ActionPhase_ACTION_PHASE_QUEUED, 0, common.ActionPhase_ACTION_PHASE_UNSPECIFIED, EventLevelInfo},
-		{"phase change", common.ActionPhase_ACTION_PHASE_RUNNING, 0, common.ActionPhase_ACTION_PHASE_QUEUED, EventLevelInfo},
-		{"same phase, higher version", common.ActionPhase_ACTION_PHASE_RUNNING, 2, common.ActionPhase_ACTION_PHASE_RUNNING, EventLevelDebug},
+		// off emits nothing, not even terminal phases.
+		{"off: succeeded", K8sEventOff, succeeded, 0, running, false},
+		{"off: phase change", K8sEventOff, running, 0, queued, false},
+
+		// terminal emits terminal phases and system retries only.
+		{"terminal: succeeded", K8sEventTerminal, succeeded, 0, running, true},
+		{"terminal: failed", K8sEventTerminal, failed, 0, running, true},
+		{"terminal: aborted", K8sEventTerminal, aborted, 0, running, true},
+		{"terminal: timed out", K8sEventTerminal, timedOut, 0, running, true},
+		{"terminal: system retry", K8sEventTerminal, queued, systemRetryEventVersionBase, running, true},
+		{"terminal: just below system retry range", K8sEventTerminal, queued, systemRetryEventVersionBase - 1, queued, false},
+		{"terminal: first event", K8sEventTerminal, queued, 0, unspecified, false},
+		{"terminal: phase change", K8sEventTerminal, running, 0, queued, false},
+
+		// all emits every phase change, but never a version bump within the same phase.
+		{"all: succeeded", K8sEventAll, succeeded, 0, running, true},
+		{"all: system retry", K8sEventAll, queued, systemRetryEventVersionBase, running, true},
+		{"all: first event", K8sEventAll, queued, 0, unspecified, true},
+		{"all: phase change", K8sEventAll, running, 0, queued, true},
+		{"all: same phase, higher version", K8sEventAll, running, 2, running, false},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := eventLevelOf(testActionEvent(tt.phase, tt.version), tt.prevPhase)
-			assert.Equal(t, tt.expected, got)
+			got := shouldEmitK8sEvent(tt.mode, testActionEvent(tt.phase, tt.version), tt.prevPhase)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -309,38 +330,42 @@ func TestHumanSummary(t *testing.T) {
 func TestEmitK8sEvent(t *testing.T) {
 	tests := []struct {
 		name          string
-		level         EventLevel
+		mode          K8sEventMode
 		phase         common.ActionPhase
 		prevPhase     common.ActionPhase
 		createdReason string
-		recorded      string
 	}{
 		{
 			name:          "terminal event is created through the client",
-			level:         EventLevelTerminal,
+			mode:          K8sEventTerminal,
 			phase:         common.ActionPhase_ACTION_PHASE_SUCCEEDED,
 			prevPhase:     common.ActionPhase_ACTION_PHASE_RUNNING,
 			createdReason: string(ReasonActionSucceeded),
 		},
 		{
-			name:          "phase change at info is created through the client",
-			level:         EventLevelInfo,
+			name:          "phase change at all is created through the client",
+			mode:          K8sEventAll,
 			phase:         common.ActionPhase_ACTION_PHASE_RUNNING,
 			prevPhase:     common.ActionPhase_ACTION_PHASE_QUEUED,
 			createdReason: string(ReasonActionRunning),
 		},
 		{
-			name:      "version bump at debug goes through the recorder",
-			level:     EventLevelDebug,
+			name:      "version bump at all is filtered",
+			mode:      K8sEventAll,
 			phase:     common.ActionPhase_ACTION_PHASE_RUNNING,
 			prevPhase: common.ActionPhase_ACTION_PHASE_RUNNING,
-			recorded:  "Normal ActionRunning action a0 attempt 1 running",
 		},
 		{
 			name:      "phase change at terminal is filtered",
-			level:     EventLevelTerminal,
+			mode:      K8sEventTerminal,
 			phase:     common.ActionPhase_ACTION_PHASE_RUNNING,
 			prevPhase: common.ActionPhase_ACTION_PHASE_QUEUED,
+		},
+		{
+			name:      "terminal event at off is filtered",
+			mode:      K8sEventOff,
+			phase:     common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+			prevPhase: common.ActionPhase_ACTION_PHASE_RUNNING,
 		},
 	}
 
@@ -352,7 +377,7 @@ func TestEmitK8sEvent(t *testing.T) {
 			reconciler := &TaskActionReconciler{
 				Client:            k8sClient,
 				Recorder:          recorder,
-				K8sEventLevel:     tt.level,
+				K8sEventMode:      tt.mode,
 				reportingInstance: "taskaction-controller-host1",
 			}
 
@@ -368,11 +393,11 @@ func TestEmitK8sEvent(t *testing.T) {
 				assert.Equal(t, "taskaction-controller-host1", created.Items[0].ReportingInstance)
 			}
 
+			// Nothing goes through the recorder any more: every emitted event is created directly.
 			select {
 			case got := <-recorder.Events:
-				assert.Equal(t, tt.recorded, got)
+				t.Fatalf("unexpected recorder event %q", got)
 			default:
-				assert.Empty(t, tt.recorded)
 			}
 		})
 	}

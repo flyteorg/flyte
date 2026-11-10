@@ -17,31 +17,28 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 )
 
-// EventLevel controls which action events are also emitted as Kubernetes Events.
-// Levels are ordered: an event is emitted when its level is at or below the
-// configured level.
-type EventLevel uint8
+// K8sEventMode selects which action events are also emitted as Kubernetes Events.
+// Off emits none. Terminal emits terminal phases and system retries. All emits
+// every phase change.
+type K8sEventMode uint8
 
 const (
-	EventLevelOff EventLevel = iota
-	EventLevelTerminal
-	EventLevelInfo
-	EventLevelDebug
+	K8sEventOff K8sEventMode = iota
+	K8sEventTerminal
+	K8sEventAll
 )
 
-// ParseEventLevel parses the executor's k8sEventLevel config value.
-func ParseEventLevel(s string) (EventLevel, error) {
+// ParseK8sEventMode parses the executor's K8sEventMode config value.
+func ParseK8sEventMode(s string) (K8sEventMode, error) {
 	switch strings.ToLower(strings.TrimSpace(s)) {
 	case "off":
-		return EventLevelOff, nil
+		return K8sEventOff, nil
 	case "terminal":
-		return EventLevelTerminal, nil
-	case "info":
-		return EventLevelInfo, nil
-	case "debug":
-		return EventLevelDebug, nil
+		return K8sEventTerminal, nil
+	case "all":
+		return K8sEventAll, nil
 	default:
-		return EventLevelOff, fmt.Errorf("unknown k8s event level %q, want off, terminal, info or debug", s)
+		return K8sEventOff, fmt.Errorf("unknown k8s event mode %q, want off, terminal or all", s)
 	}
 }
 
@@ -231,16 +228,16 @@ func humanSummary(event *workflow.ActionEvent) string {
 	return truncateUTF8(summary, noteLimit)
 }
 
-// eventLevelOf classifies an action event. Terminal phases and system retries are what an
-// external consumer acts on; a version bump is detail.
-func eventLevelOf(event *workflow.ActionEvent, prevPhase common.ActionPhase) EventLevel {
-	switch {
-	case actionsk8s.IsTerminalPhase(event.GetPhase()), isSystemRetryEvent(event):
-		return EventLevelTerminal
-	case event.GetPhase() != prevPhase:
-		return EventLevelInfo
+// shouldEmitK8sEvent reports whether event is emitted as a Kubernetes Event under mode.
+// Terminal phases and system retries are what an external consumer act on.
+func shouldEmitK8sEvent(mode K8sEventMode, event *workflow.ActionEvent, prevPhase common.ActionPhase) bool {
+	switch mode {
+	case K8sEventTerminal:
+		return actionsk8s.IsTerminalPhase(event.GetPhase()) || isSystemRetryEvent(event)
+	case K8sEventAll:
+		return event.GetPhase() != prevPhase
 	default:
-		return EventLevelDebug
+		return false
 	}
 }
 
