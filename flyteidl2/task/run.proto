@@ -99,20 +99,23 @@ message Recover {
   // Marks this recovery run as a fork: it reuses the run being recovered but runs
   // changed code or inputs, rather than retrying it unchanged. Set by the client
   // that creates the fork (for example a code-only fork); the server also sets it
-  // whenever action_input_overrides is present, and clears it on a run that is not
-  // a recovery. Informational: it does not change how the run is recovered.
+  // whenever action_input_overrides is present. Informational: it does not change
+  // how the run is recovered.
   bool fork = 4;
 }
 
 // ActionInputOverrides names the task actions whose inputs or code a recovery run
 // overrides and where the overrides are stored.
 message ActionInputOverrides {
-  // Names of task actions in the run being recovered. Must not include the root
-  // action a0: root input changes are carried as the run's own inputs.
-  repeated string action_names = 1 [(buf.validate.field).repeated.items.string.min_len = 1];
+  // Names of task actions in the run being recovered, at most 100. Must not include
+  // the root action a0: root input changes are carried as the run's own inputs.
+  repeated string action_names = 1 [
+    (buf.validate.field).repeated.max_items = 100,
+    (buf.validate.field).repeated.items.string.min_len = 1
+  ];
 
   // Location of a serialized ActionInputOverridesData in the data plane.
-  string uri = 2;
+  string uri = 2 [(buf.validate.field).string.min_len = 1];
 }
 
 // TaskSpecSource records how a run's task spec was provided at creation time, so
