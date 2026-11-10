@@ -126,6 +126,14 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		actionsServiceCfg.URL,
 		connect.WithInterceptors(otelInterceptor),
 	)
+	// Multi-cluster: send each run's calls to the actions service of the cluster its queue runs on.
+	if mc := config.GetMultiClusterConfig(); len(mc.QueueClusterMap) > 0 {
+		actionsClient, err = service.NewActionsRouter(ctx, mc, actionsClient, repo.ActionRepo(),
+			connect.WithInterceptors(otelInterceptor))
+		if err != nil {
+			return fmt.Errorf("runs: configure actions router: %w", err)
+		}
+	}
 
 	runsServiceURL := fmt.Sprintf("http://localhost:%d", cfg.Server.Port)
 	projectClient := projectconnect.NewProjectServiceClient(
