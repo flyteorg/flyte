@@ -161,6 +161,9 @@ func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 		objectMeta.GetLabels(),
 		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()),
 		customPodMeta.GetLabels(),
+		// Applied last: a custom pod label must not take the pod out of the executor's pod
+		// cache or overwrite the identity the pod is looked up and attributed by.
+		flytek8s.PreservedPodLabels(taskCtx.TaskExecutionMetadata()),
 	)
 
 	sparkEnv := make([]v1.EnvVar, 0)

@@ -426,6 +426,10 @@ func dummySparkTaskTemplatePod(id string, sparkConf map[string]string, podSpec *
 }
 
 func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) pluginsCore.TaskExecutionContext {
+	return dummySparkTaskContextWithLabels(taskTemplate, interruptible, map[string]string{"label-1": "val1"})
+}
+
+func dummySparkTaskContextWithLabels(taskTemplate *core.TaskTemplate, interruptible bool, labels map[string]string) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
@@ -470,7 +474,7 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
 	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
 	taskExecutionMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
-	taskExecutionMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetLabels().Return(labels)
 	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
@@ -1126,6 +1130,51 @@ func TestBuildResourceDefaultPodTemplateMetadata(t *testing.T) {
 		assert.Equal(t, expectedAnnotations, sparkApp.Spec.Executor.Annotations)
 		assert.Equal(t, strPtr("user-executor"), sparkApp.Spec.Executor.PriorityClassName)
 	}
+}
+
+// TestBuildResourcePreservedLabelsNotOverridable verifies that a custom driver/executor pod
+// label can't take the pods out of the executor's pod cache or overwrite the identity they
+// are looked up and attributed by, while other custom labels still apply.
+func TestBuildResourcePreservedLabelsNotOverridable(t *testing.T) {
+	require.NoError(t, config.SetK8sPluginConfig(defaultPluginConfig()))
+
+	executionLabels := map[string]string{
+		"label-1":                "val1",
+		flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue,
+		flytek8s.RunLabel:        "run-1",
+		flytek8s.ActionLabel:     "action-1",
+		flytek8s.AttemptLabel:    "0",
+		flytek8s.TaskNameLabel:   "task-1",
+	}
+	customPod := &core.K8SPod{Metadata: &core.K8SObjectMetadata{Labels: map[string]string{
+		"user-label":             "val",
+		flytek8s.ManagedLabelKey: "false",
+		flytek8s.RunLabel:        "other-run",
+		flytek8s.ActionLabel:     "other-action",
+		flytek8s.AttemptLabel:    "9",
+		flytek8s.TaskNameLabel:   "other-task",
+	}}}
+	sparkJob := dummySparkCustomObj(dummySparkConf)
+	sparkJob.DriverPod = customPod
+	sparkJob.ExecutorPod = customPod
+	sparkJobJSON, err := utils.MarshalToString(sparkJob)
+	require.NoError(t, err)
+	structObj := structpb.Struct{}
+	require.NoError(t, stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj))
+	taskTemplate := &core.TaskTemplate{
+		Id:     &core.Identifier{Name: "spark-preserved-labels"},
+		Type:   "container",
+		Target: &core.TaskTemplate_Container{Container: &core.Container{Image: testImage, Args: testArgs, Env: dummyEnvVars}},
+		Custom: &structObj,
+	}
+
+	res, err := sparkResourceHandler{}.BuildResource(context.TODO(), dummySparkTaskContextWithLabels(taskTemplate, false, executionLabels))
+	require.NoError(t, err)
+	sparkApp := res.(*sj.SparkApplication)
+
+	expected := utils.UnionMaps(defaultPluginConfig().DefaultLabels, executionLabels, map[string]string{"user-label": "val"})
+	assert.Equal(t, expected, sparkApp.Spec.Driver.Labels)
+	assert.Equal(t, expected, sparkApp.Spec.Executor.Labels)
 }
 
 func TestGetPropertiesSpark(t *testing.T) {
