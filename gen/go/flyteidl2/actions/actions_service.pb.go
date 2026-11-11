@@ -55,9 +55,8 @@ type Action struct {
 	// identifies the source action (source run id + action name) whose result was reused.
 	// never set by clients on enqueue.
 	RecoveredFrom *common.ActionIdentifier `protobuf:"bytes,10,opt,name=recovered_from,json=recoveredFrom,proto3" json:"recovered_from,omitempty"`
-	// set by the parent's controller when this action's inputs were overridden from
-	// RunSpec.recover.action_overrides. The server rejects an enqueue of an
-	// overridden action name without this flag (a runtime that cannot apply overrides).
+	// set by the parent's controller when this action's inputs or code were overridden
+	// from the run's overrides file (see flyteidl2.task.ActionOverridesData).
 	OverrideApplied bool `protobuf:"varint,11,opt,name=override_applied,json=overrideApplied,proto3" json:"override_applied,omitempty"`
 }
 

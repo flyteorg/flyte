@@ -83,9 +83,8 @@ message Action {
   // never set by clients on enqueue.
   flyteidl2.common.ActionIdentifier recovered_from = 10;
 
-  // set by the parent's controller when this action's inputs were overridden from
-  // RunSpec.recover.action_overrides. The server rejects an enqueue of an
-  // overridden action name without this flag (a runtime that cannot apply overrides).
+  // set by the parent's controller when this action's inputs or code were overridden
+  // from the run's overrides file (see flyteidl2.task.ActionOverridesData).
   bool override_applied = 11;
 }
 

@@ -41,29 +41,6 @@ message RunDetails {
 
   // Detailed information about the root action.
   ActionDetails action = 2;
-
-  // Status of each action override in RunSpec.recover.action_overrides,
-  // derived when read. Empty when the run has no overrides.
-  repeated ActionOverrideStatus action_override_status = 3;
-}
-
-// ActionOverrideStatus reports whether one action override took effect.
-message ActionOverrideStatus {
-  enum State {
-    STATE_UNSPECIFIED = 0;
-    // The run is active and the action has not been enqueued yet.
-    STATE_PENDING = 1;
-    // The action was enqueued with the override applied.
-    STATE_APPLIED = 2;
-    // The run is terminal and the action was never enqueued, e.g. a code change or
-    // an upstream override renamed it or an ancestor.
-    STATE_UNAPPLIED = 3;
-  }
-
-  // Action name the override targets.
-  string action_name = 1;
-
-  State state = 2;
 }
 
 message TaskAction {
@@ -234,8 +211,8 @@ message ActionMetadata {
   // here: the source action (source run id + action name) whose result was reused.
   common.ActionIdentifier recovered_from = 18;
 
-  // Set when this action's inputs were overridden from
-  // RunSpec.recover.action_overrides when it was enqueued.
+  // Set when this action was enqueued with inputs or code overridden from the
+  // run's overrides file (see flyteidl2.task.ActionOverridesData).
   bool override_applied = 19;
 }
 

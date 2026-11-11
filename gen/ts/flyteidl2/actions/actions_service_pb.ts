@@ -116,9 +116,8 @@ export type Action = Message<"flyteidl2.actions.Action"> & {
   recoveredFrom?: ActionIdentifier;
 
   /**
-   * set by the parent's controller when this action's inputs were overridden from
-   * RunSpec.recover.action_overrides. The server rejects an enqueue of an
-   * overridden action name without this flag (a runtime that cannot apply overrides).
+   * set by the parent's controller when this action's inputs or code were overridden
+   * from the run's overrides file (see flyteidl2.task.ActionOverridesData).
    *
    * @generated from field: bool override_applied = 11;
    */
