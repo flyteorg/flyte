@@ -253,6 +253,7 @@ func TestMergeSettingsHandlesEveryField(t *testing.T) {
 		"environment_variables": true,
 		"app":                   true,
 		"pod_template_name":     true,
+		"observability":         true,
 	}
 
 	fields := (&settings.Settings{}).ProtoReflect().Descriptor().Fields()
@@ -393,4 +394,24 @@ func TestMergeSettings_KubernetesNamespace(t *testing.T) {
 
 	onlyNamespace := mergeSettings([]*settings.Settings{org})
 	assert.NotNil(t, onlyNamespace.GetSecurity(), "a group holding only the namespace still resolves")
+}
+
+func TestMergeObservabilitySettings(t *testing.T) {
+	days := func(state settings.SettingState, v int64) *settings.ObservabilitySettings {
+		return &settings.ObservabilitySettings{LogRetentionDays: &settings.Int64Setting{State: state, IntValue: v}}
+	}
+
+	t.Run("the most specific level that set it wins", func(t *testing.T) {
+		got := mergeSettings([]*settings.Settings{
+			{Observability: days(stateValue, 30)},
+			nil,
+			{Observability: days(stateValue, 7)},
+		})
+		assert.Equal(t, int64(7), got.GetObservability().GetLogRetentionDays().GetIntValue())
+		assert.Equal(t, levelProject, got.GetObservability().GetLogRetentionDays().GetScopeLevel())
+	})
+
+	t.Run("nothing stored resolves to nil", func(t *testing.T) {
+		assert.Nil(t, mergeSettings([]*settings.Settings{nil, nil, nil}).GetObservability())
+	})
 }

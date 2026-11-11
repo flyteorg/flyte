@@ -209,6 +209,17 @@ func validateMaxActionConcurrency(setting *settings.Int64Setting) error {
 	return nil
 }
 
+// validateLogRetentionDays rejects a negative log retention. 0 leaves it to the server.
+func validateLogRetentionDays(setting *settings.Int64Setting) error {
+	if setting.GetState() != settings.SettingState_SETTING_STATE_VALUE {
+		return nil
+	}
+	if v := setting.GetIntValue(); v < 0 {
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid observability.log_retention_days %d: must not be negative", v))
+	}
+	return nil
+}
+
 // validateQuantity checks that a quantity leaf holds a value Kubernetes can parse.
 // name is the dot-path used in the error message, e.g. "task_resource.max.memory".
 func validateQuantity(name string, setting *settings.QuantitySetting) error {
@@ -285,6 +296,9 @@ func validateDefaultAccelerator(setting *settings.AcceleratorSetting) error {
 
 func validateSettings(s *settings.Settings) error {
 	if err := validateMaxActionConcurrency(s.GetRun().GetMaxActionConcurrency()); err != nil {
+		return err
+	}
+	if err := validateLogRetentionDays(s.GetObservability().GetLogRetentionDays()); err != nil {
 		return err
 	}
 	if err := validateStoragePath("run.run_base_dir", s.GetRun().GetRunBaseDir()); err != nil {
