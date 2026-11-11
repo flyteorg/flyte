@@ -74,32 +74,12 @@ class Run(_message.Message):
     def __init__(self, action: _Optional[_Union[Action, _Mapping]] = ..., labels: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class RunDetails(_message.Message):
-    __slots__ = ["run_spec", "action", "action_override_status"]
+    __slots__ = ["run_spec", "action"]
     RUN_SPEC_FIELD_NUMBER: _ClassVar[int]
     ACTION_FIELD_NUMBER: _ClassVar[int]
-    ACTION_OVERRIDE_STATUS_FIELD_NUMBER: _ClassVar[int]
     run_spec: _run_pb2_1.RunSpec
     action: ActionDetails
-    action_override_status: _containers.RepeatedCompositeFieldContainer[ActionOverrideStatus]
-    def __init__(self, run_spec: _Optional[_Union[_run_pb2_1.RunSpec, _Mapping]] = ..., action: _Optional[_Union[ActionDetails, _Mapping]] = ..., action_override_status: _Optional[_Iterable[_Union[ActionOverrideStatus, _Mapping]]] = ...) -> None: ...
-
-class ActionOverrideStatus(_message.Message):
-    __slots__ = ["action_name", "state"]
-    class State(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = []
-        STATE_UNSPECIFIED: _ClassVar[ActionOverrideStatus.State]
-        STATE_PENDING: _ClassVar[ActionOverrideStatus.State]
-        STATE_APPLIED: _ClassVar[ActionOverrideStatus.State]
-        STATE_UNAPPLIED: _ClassVar[ActionOverrideStatus.State]
-    STATE_UNSPECIFIED: ActionOverrideStatus.State
-    STATE_PENDING: ActionOverrideStatus.State
-    STATE_APPLIED: ActionOverrideStatus.State
-    STATE_UNAPPLIED: ActionOverrideStatus.State
-    ACTION_NAME_FIELD_NUMBER: _ClassVar[int]
-    STATE_FIELD_NUMBER: _ClassVar[int]
-    action_name: str
-    state: ActionOverrideStatus.State
-    def __init__(self, action_name: _Optional[str] = ..., state: _Optional[_Union[ActionOverrideStatus.State, str]] = ...) -> None: ...
+    def __init__(self, run_spec: _Optional[_Union[_run_pb2_1.RunSpec, _Mapping]] = ..., action: _Optional[_Union[ActionDetails, _Mapping]] = ...) -> None: ...
 
 class TaskAction(_message.Message):
     __slots__ = ["id", "spec", "cache_key", "queue"]

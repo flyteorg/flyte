@@ -135,7 +135,7 @@ class Inputs(_message.Message):
     def __init__(self, literals: _Optional[_Iterable[_Union[NamedLiteral, _Mapping]]] = ..., context: _Optional[_Iterable[_Union[_literals_pb2.KeyValuePair, _Mapping]]] = ...) -> None: ...
 
 class ActionOverridesData(_message.Message):
-    __slots__ = ["input_uris", "code_bundles"]
+    __slots__ = ["input_uris", "code_bundles", "ancestor_actions"]
     class InputUrisEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -152,9 +152,11 @@ class ActionOverridesData(_message.Message):
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[ActionCodeBundle, _Mapping]] = ...) -> None: ...
     INPUT_URIS_FIELD_NUMBER: _ClassVar[int]
     CODE_BUNDLES_FIELD_NUMBER: _ClassVar[int]
+    ANCESTOR_ACTIONS_FIELD_NUMBER: _ClassVar[int]
     input_uris: _containers.ScalarMap[str, str]
     code_bundles: _containers.MessageMap[str, ActionCodeBundle]
-    def __init__(self, input_uris: _Optional[_Mapping[str, str]] = ..., code_bundles: _Optional[_Mapping[str, ActionCodeBundle]] = ...) -> None: ...
+    ancestor_actions: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, input_uris: _Optional[_Mapping[str, str]] = ..., code_bundles: _Optional[_Mapping[str, ActionCodeBundle]] = ..., ancestor_actions: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class ActionCodeBundle(_message.Message):
     __slots__ = ["tgz", "version"]
