@@ -951,7 +951,10 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	podSpec.Tolerations = append(podSpec.Tolerations, extraToleration)
 	podSpec.NodeSelector = map[string]string{"x/custom": "foo"}
 	taskTemplate := dummySparkTaskTemplatePod("blah-1", dummySparkConf, podSpec)
-	taskTemplate.GetK8SPod()
+	taskTemplate.GetK8SPod().Metadata = &core.K8SObjectMetadata{
+		Annotations: map[string]string{"annotation-2": "val2"},
+		Labels:      map[string]string{"label-2": "val2"},
+	}
 	sparkResourceHandler := sparkResourceHandler{}
 
 	taskCtx := dummySparkTaskContext(taskTemplate, true)
@@ -981,8 +984,9 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, sparkApplicationFile, *sparkApp.Spec.MainApplicationFile)
 
 	// Driver
-	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultAnnotations, map[string]string{"annotation-1": "val1"}), sparkApp.Spec.Driver.Annotations)
-	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultLabels, map[string]string{"label-1": "val1"}), sparkApp.Spec.Driver.Labels)
+	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultAnnotations, map[string]string{"annotation-1": "val1", "annotation-2": "val2"}), sparkApp.Spec.Driver.Annotations)
+	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultLabels, map[string]string{"label-1": "val1", "label-2": "val2"}), sparkApp.Spec.Driver.Labels)
+	assert.Nil(t, sparkApp.Spec.Driver.PriorityClassName)
 	assert.Equal(t, len(findEnvVarByName(sparkApp.Spec.Driver.Env, "FLYTE_MAX_ATTEMPTS").Value), 1)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Driver.Env, "foo").Value)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Driver.Env, "fooEnv").Value)
@@ -1019,8 +1023,9 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, dummySparkConf["spark.driver.memory"], *sparkApp.Spec.Driver.Memory)
 
 	// Executor
-	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultAnnotations, map[string]string{"annotation-1": "val1"}), sparkApp.Spec.Executor.Annotations)
-	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultLabels, map[string]string{"label-1": "val1"}), sparkApp.Spec.Executor.Labels)
+	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultAnnotations, map[string]string{"annotation-1": "val1", "annotation-2": "val2"}), sparkApp.Spec.Executor.Annotations)
+	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultLabels, map[string]string{"label-1": "val1", "label-2": "val2"}), sparkApp.Spec.Executor.Labels)
+	assert.Nil(t, sparkApp.Spec.Executor.PriorityClassName)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Executor.Env, "foo").Value)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Executor.Env, "fooEnv").Value)
 	assert.Equal(t, findEnvVarByName(dummyEnvVarsWithSecretRef, "SECRET"), findEnvVarByName(sparkApp.Spec.Executor.Env, "SECRET"))
@@ -1057,6 +1062,70 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, intPtr(int32(instances)), sparkApp.Spec.Executor.Instances)
 	assert.Equal(t, intPtr(int32(cores)), sparkApp.Spec.Executor.Cores)
 	assert.Equal(t, dummySparkConf["spark.executor.memory"], *sparkApp.Spec.Executor.Memory)
+}
+
+// TestBuildResourceDefaultPodTemplateMetadata checks that the labels, annotations and priority
+// class from the default pod template and the task's executor pod reach the explicit
+// SparkPodSpec fields, with or without the pod template pass-through.
+func TestBuildResourceDefaultPodTemplateMetadata(t *testing.T) {
+	require.NoError(t, setSparkConfig(&Config{EnablePodTemplate: true}))
+	k8sConfig := defaultPluginConfig()
+	k8sConfig.DefaultPodTemplateName = "spark-default"
+	require.NoError(t, config.SetK8sPluginConfig(k8sConfig))
+
+	podTemplate := &corev1.PodTemplate{
+		ObjectMeta: v1.ObjectMeta{Name: "spark-default", Namespace: "test-namespace"},
+		Template: corev1.PodTemplateSpec{
+			ObjectMeta: v1.ObjectMeta{
+				Labels:      map[string]string{"azure.workload.identity/use": "true"},
+				Annotations: map[string]string{"template-annotation": "val"},
+			},
+			Spec: corev1.PodSpec{PriorityClassName: "platform-default"},
+		},
+	}
+	flytek8s.DefaultPodTemplateStore.Store(podTemplate)
+	t.Cleanup(func() { flytek8s.DefaultPodTemplateStore.Delete(podTemplate) })
+
+	executorPodSpecPb, err := utils.MarshalObjToStruct(&corev1.PodSpec{
+		PriorityClassName: "user-executor",
+		Containers:        []corev1.Container{{Name: "primary"}},
+	})
+	require.NoError(t, err)
+	sparkJob := dummySparkCustomObj(dummySparkConf)
+	sparkJob.ExecutorPod = &core.K8SPod{
+		Metadata:             &core.K8SObjectMetadata{Labels: map[string]string{"executor-label": "val"}},
+		PodSpec:              executorPodSpecPb,
+		PrimaryContainerName: "primary",
+	}
+	sparkJobJSON, err := utils.MarshalToString(sparkJob)
+	require.NoError(t, err)
+	structObj := structpb.Struct{}
+	require.NoError(t, stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj))
+	taskTemplate := &core.TaskTemplate{
+		Id:     &core.Identifier{Name: "spark-default-pod-template"},
+		Type:   "container",
+		Target: &core.TaskTemplate_Container{Container: &core.Container{Image: testImage, Args: testArgs, Env: dummyEnvVars}},
+		Custom: &structObj,
+	}
+
+	expectedLabels := utils.UnionMaps(k8sConfig.DefaultLabels, map[string]string{"azure.workload.identity/use": "true", "label-1": "val1"})
+	expectedAnnotations := utils.UnionMaps(k8sConfig.DefaultAnnotations, map[string]string{"template-annotation": "val", "annotation-1": "val1"})
+
+	defer setPodTemplateSupportedForTest(true)
+	for _, templateSupported := range []bool{true, false} {
+		setPodTemplateSupportedForTest(templateSupported)
+		res, err := sparkResourceHandler{}.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
+		require.NoError(t, err)
+		sparkApp := res.(*sj.SparkApplication)
+
+		assert.Equal(t, expectedLabels, sparkApp.Spec.Driver.Labels)
+		assert.Equal(t, expectedAnnotations, sparkApp.Spec.Driver.Annotations)
+		assert.Equal(t, strPtr("platform-default"), sparkApp.Spec.Driver.PriorityClassName)
+
+		assert.Equal(t, utils.UnionMaps(expectedLabels, map[string]string{"executor-label": "val"}), sparkApp.Spec.Executor.Labels)
+		assert.Equal(t, expectedAnnotations, sparkApp.Spec.Executor.Annotations)
+		assert.Equal(t, strPtr("user-executor"), sparkApp.Spec.Executor.PriorityClassName)
+	}
 }
 
 func TestGetPropertiesSpark(t *testing.T) {
