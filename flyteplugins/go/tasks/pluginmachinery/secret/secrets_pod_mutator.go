@@ -49,6 +49,9 @@ func (s *SecretsPodMutator) Mutate(ctx context.Context, pod *corev1.Pod) (newP *
 		return pod, false, &admissionError
 	}
 
+	initialInitContainerCount := len(pod.Spec.InitContainers)
+	securityContext := primaryContainerSecurityContext(pod)
+
 	for _, secret := range secrets {
 		mutatedPod, injected, err := s.injectSecret(ctx, secret, pod)
 		if !injected {
@@ -64,7 +67,38 @@ func (s *SecretsPodMutator) Mutate(ctx context.Context, pod *corev1.Pod) (newP *
 		pod = mutatedPod
 	}
 
+	if securityContext != nil {
+		for idx := initialInitContainerCount; idx < len(pod.Spec.InitContainers); idx++ {
+			if pod.Spec.InitContainers[idx].SecurityContext == nil {
+				pod.Spec.InitContainers[idx].SecurityContext = securityContext.DeepCopy()
+			}
+		}
+	}
+
 	return pod, len(secrets) > 0, nil
+}
+
+func primaryContainerSecurityContext(pod *corev1.Pod) *corev1.SecurityContext {
+	for _, key := range []string{"primary_container_name", "kubectl.kubernetes.io/default-container"} {
+		if name := pod.Annotations[key]; name != "" {
+			for idx := range pod.Spec.Containers {
+				if pod.Spec.Containers[idx].Name == name {
+					return pod.Spec.Containers[idx].SecurityContext
+				}
+			}
+			return nil
+		}
+	}
+
+	for idx := range pod.Spec.Containers {
+		if pod.Spec.Containers[idx].Name == pod.Name {
+			return pod.Spec.Containers[idx].SecurityContext
+		}
+	}
+	if len(pod.Spec.Containers) > 0 {
+		return pod.Spec.Containers[0].SecurityContext
+	}
+	return nil
 }
 
 // InvalidateCache asks every enabled injector to drop its copy of the named secret, so a
