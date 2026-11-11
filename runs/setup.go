@@ -100,7 +100,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
 	meterProvider := otelutils.GetMeterProvider(ServiceName)
-	otelInterceptor, err := otelconnect.NewInterceptor(
+	otelInterceptor, err := otelutils.NewConnectInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(ServiceName)),
 		otelconnect.WithMeterProvider(meterProvider),
 	)
