@@ -382,6 +382,8 @@ func (m *UploadInputsRequest) validate(all bool) error {
 
 	// no validation rules for Queue
 
+	// no validation rules for ForTrigger
+
 	switch v := m.Id.(type) {
 	case *UploadInputsRequest_RunId:
 		if v == nil {
