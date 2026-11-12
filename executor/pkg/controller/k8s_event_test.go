@@ -9,8 +9,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/proto"
 	corev1 "k8s.io/api/core/v1"
 	eventsv1 "k8s.io/api/events/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -130,16 +128,15 @@ func TestBuildActionEventK8s(t *testing.T) {
 		assert.Equal(t, "container", ev.Annotations[annTaskType])
 	})
 
-	t.Run("info annotation decodes to the original event", func(t *testing.T) {
+	t.Run("no payload annotation, the note carries the error", func(t *testing.T) {
 		event := testActionEvent(common.ActionPhase_ACTION_PHASE_FAILED, 3)
-		event.ErrorInfo = &workflow.ErrorInfo{Kind: workflow.ErrorInfo_KIND_SYSTEM, Code: "Evicted"}
+		event.ErrorInfo = &workflow.ErrorInfo{Kind: workflow.ErrorInfo_KIND_SYSTEM, Code: "Evicted", Message: "node pressure"}
 
 		ev, err := buildActionEventK8s(taskAction, event, "taskaction-controller-host1")
 		assert.NoError(t, err)
 
-		decoded := &workflow.ActionEvent{}
-		assert.NoError(t, protojson.Unmarshal([]byte(ev.Annotations[annInfo]), decoded))
-		assert.True(t, proto.Equal(event, decoded))
+		assert.NotContains(t, ev.Annotations, annPrefix+"info")
+		assert.Contains(t, ev.Note, "node pressure")
 	})
 }
 

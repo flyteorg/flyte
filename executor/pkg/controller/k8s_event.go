@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"google.golang.org/protobuf/encoding/protojson"
 	corev1 "k8s.io/api/core/v1"
 	eventsv1 "k8s.io/api/events/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -53,7 +52,6 @@ const (
 	annVersion    = annPrefix + "version"
 	annErrorKind  = annPrefix + "error-kind"
 	annErrorCode  = annPrefix + "error-code"
-	annInfo       = annPrefix + "info" // ActionEvent as protojson, default options
 	annCluster    = annPrefix + "cluster"
 
 	// Control plane context: what the runs service wrote on the TaskAction and the
@@ -87,11 +85,6 @@ func buildActionEventK8s(
 	event *workflow.ActionEvent,
 	instance string,
 ) (*eventsv1.Event, error) {
-	info, err := protojson.Marshal(event)
-	if err != nil {
-		return nil, err
-	}
-
 	ann := map[string]string{
 		annProject:    event.GetId().GetRun().GetProject(),
 		annDomain:     event.GetId().GetRun().GetDomain(),
@@ -101,9 +94,6 @@ func buildActionEventK8s(
 		annPhase:      event.GetPhase().String(),
 		annVersion:    strconv.FormatUint(uint64(event.GetVersion()), 10),
 		annCluster:    event.GetCluster(),
-		// TODO: should we limit the size of this? apiserver limits all annotations
-		// on one object to 256 kiB.
-		annInfo: string(info),
 	}
 	if e := event.GetErrorInfo(); e != nil {
 		ann[annErrorKind] = e.GetKind().String()
