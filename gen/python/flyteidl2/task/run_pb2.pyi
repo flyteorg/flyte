@@ -82,10 +82,12 @@ class CacheConfig(_message.Message):
     def __init__(self, overwrite_cache: bool = ..., cache_lookup_scope: _Optional[_Union[CacheLookupScope, str]] = ...) -> None: ...
 
 class Recover(_message.Message):
-    __slots__ = ["force_rerun_actions"]
+    __slots__ = ["force_rerun_actions", "fork"]
     FORCE_RERUN_ACTIONS_FIELD_NUMBER: _ClassVar[int]
+    FORK_FIELD_NUMBER: _ClassVar[int]
     force_rerun_actions: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, force_rerun_actions: _Optional[_Iterable[str]] = ...) -> None: ...
+    fork: bool
+    def __init__(self, force_rerun_actions: _Optional[_Iterable[str]] = ..., fork: bool = ...) -> None: ...
 
 class RunSpec(_message.Message):
     __slots__ = ["labels", "annotations", "envs", "interruptible", "overwrite_cache", "queue", "raw_data_storage", "security_context", "cache_config", "notification_rule_name", "notification_rules", "run_start_time", "max_action_concurrency", "run_base_dir", "related_to", "cluster_pool", "task_spec_source", "relation", "recover", "default_settings", "k8s_metadata"]
