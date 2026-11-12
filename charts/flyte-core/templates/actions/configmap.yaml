@@ -17,6 +17,11 @@ data:
       kubernetes:
         {{- tpl (toYaml .Values.configuration.kubernetes) . | nindent 8 }}
       {{- tpl (toYaml .Values.configuration.actions) . | nindent 6 }}
+    {{- /* Not passed through tpl: the template's {{ project }} placeholders are Flyte's, not Helm's. */}}
+    {{- with .Values.configuration.namespaceMapping }}
+    namespaceMapping:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
   {{- with .Values.configuration.inline }}
   100-inline.yaml: |
     {{- tpl (toYaml .) $ | nindent 4 }}

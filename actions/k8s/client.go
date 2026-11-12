@@ -11,6 +11,7 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -26,6 +27,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
 	k8sutil "github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/namespaceutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -63,10 +65,14 @@ const (
 type ActionsClient struct {
 	k8sClient   client.WithWatch
 	sharedCache ctrlcache.Cache
-	// namespace is the single Kubernetes namespace used for all Flyte resources.
-	namespace  string
-	bufferSize int
-	runClient  workflowconnect.InternalRunServiceClient
+	// namespace holds unmapped runs, and runs started before namespaceTemplate was set.
+	namespace                 string
+	namespaceTemplate         string
+	requireExistingNamespaces bool
+	// knownNamespaces caches namespaces seen to exist, saving an API call per enqueue.
+	knownNamespaces sync.Map
+	bufferSize      int
+	runClient       workflowconnect.InternalRunServiceClient
 	// recordedFilter deduplicates RecordAction calls across watch reconnects.
 	recordedFilter fastcheck.Filter
 
@@ -92,11 +98,11 @@ type ActionsClient struct {
 	dispatchedActionsMu sync.Mutex
 
 	// getLatest reads the current TaskAction from the shared cache. Overridable in tests.
-	getLatest func(ctx context.Context, name string) (*executorv1.TaskAction, bool, error)
+	getLatest func(ctx context.Context, key client.ObjectKey) (*executorv1.TaskAction, bool, error)
 }
 
 // NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) (*ActionsClient, error) {
+func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope, namespaceTemplate string, createNamespaces bool) (*ActionsClient, error) {
 	if numWorkers <= 0 {
 		numWorkers = 1
 	}
@@ -108,13 +114,15 @@ func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, n
 		return nil, fmt.Errorf("actions: metrics scope is required")
 	}
 	c := &ActionsClient{
-		k8sClient:   k8sClient,
-		sharedCache: sharedCache,
-		namespace:   namespace,
-		bufferSize:  bufferSize,
-		numWorkers:  numWorkers,
-		runClient:   runClient,
-		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
+		k8sClient:                 k8sClient,
+		sharedCache:               sharedCache,
+		namespace:                 namespace,
+		namespaceTemplate:         namespaceTemplate,
+		requireExistingNamespaces: !createNamespaces,
+		bufferSize:                bufferSize,
+		numWorkers:                numWorkers,
+		runClient:                 runClient,
+		subscribers:               make(map[string]map[chan *ActionUpdate]struct{}),
 	}
 
 	// The dedup filter is mandatory: notifyRunService records on every event type
@@ -139,9 +147,6 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 
 	switch action.GetSpec().(type) {
 	case *actions.Action_Task:
-		if err := k8sutil.EnsureNamespaceExists(ctx, c.k8sClient, c.namespace); err != nil {
-			return fmt.Errorf("failed to ensure namespace %s: %w", c.namespace, err)
-		}
 		taskAction := c.newTaskActionCR(actionID, executorv1.ActionTypeTask, isRoot)
 		// Set OwnerReference to parent so K8s cascades deletion to children.
 		if !isRoot {
@@ -152,6 +157,9 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 			// For child actions, inherit parent's run context
 			inheritRunContextFromParentTaskAction(taskAction, parentTaskAction)
 		} else {
+			if err := c.placeRootAction(ctx, taskAction, actionID); err != nil {
+				return err
+			}
 			// For root action, apply the RunSpec to TaskAction
 			applyRunSpecToTaskAction(taskAction, runSpec)
 		}
@@ -175,6 +183,9 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 				return connect.NewError(connect.CodeAlreadyExists,
 					fmt.Errorf("TaskAction CR %s already exists: %w", taskAction.Name, err))
 			}
+			if apierrors.IsNotFound(err) {
+				return c.rejectMissingNamespace(taskAction, err)
+			}
 			return fmt.Errorf("failed to create TaskAction CR %s: %w", taskAction.Name, err)
 		}
 
@@ -186,14 +197,13 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 		if err := validateConditionDeclaredType(cond); err != nil {
 			return connect.NewError(connect.CodeInvalidArgument, err)
 		}
-		if err := k8sutil.EnsureNamespaceExists(ctx, c.k8sClient, c.namespace); err != nil {
-			return fmt.Errorf("failed to ensure namespace %s: %w", c.namespace, err)
-		}
 		taskAction := c.newTaskActionCR(actionID, executorv1.ActionTypeCondition, isRoot)
 		if !isRoot {
 			if _, err := c.setParentOwnership(ctx, taskAction, actionID.Run, *action.ParentActionName); err != nil {
 				return err
 			}
+		} else if err := c.placeRootAction(ctx, taskAction, actionID); err != nil {
+			return err
 		}
 
 		actionSpec := buildActionSpec(action, runSpec)
@@ -214,6 +224,9 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 			if apierrors.IsAlreadyExists(err) {
 				return connect.NewError(connect.CodeAlreadyExists,
 					fmt.Errorf("condition TaskAction CR %s already exists: %w", taskAction.Name, err))
+			}
+			if apierrors.IsNotFound(err) {
+				return c.rejectMissingNamespace(taskAction, err)
 			}
 			return fmt.Errorf("failed to create condition TaskAction CR %s: %w", taskAction.Name, err)
 		}
@@ -256,7 +269,7 @@ func (c *ActionsClient) AbortAction(ctx context.Context, actionID *common.Action
 	logger.Infof(ctx, "Aborting action %s (reason: %v)", taskActionName, reason)
 
 	taskAction := &executorv1.TaskAction{}
-	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: taskActionName, Namespace: c.namespace}, taskAction); err != nil {
+	if err := c.getTaskAction(ctx, actionID, taskAction); err != nil {
 		return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
 
@@ -280,10 +293,7 @@ func (c *ActionsClient) PutStatus(ctx context.Context, actionID *common.ActionId
 
 	// Get current TaskAction
 	taskAction := &executorv1.TaskAction{}
-	if err := c.k8sClient.Get(ctx, client.ObjectKey{
-		Name:      taskActionName,
-		Namespace: c.namespace,
-	}, taskAction); err != nil {
+	if err := c.getTaskAction(ctx, actionID, taskAction); err != nil {
 		return fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
 
@@ -338,7 +348,7 @@ func (c *ActionsClient) Signal(ctx context.Context, actionID *common.ActionIdent
 
 	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		taskAction := &executorv1.TaskAction{}
-		if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: taskActionName, Namespace: c.namespace}, taskAction); err != nil {
+		if err := c.getTaskAction(ctx, actionID, taskAction); err != nil {
 			if apierrors.IsNotFound(err) {
 				return connect.NewError(connect.CodeNotFound, fmt.Errorf("condition action %s not found", taskActionName))
 			}
@@ -400,23 +410,14 @@ func literalPrimitiveKind(value *core.Literal) (core.SimpleType, bool) {
 
 // ListRunActions lists all TaskActions belonging to a run.
 func (c *ActionsClient) ListRunActions(ctx context.Context, runID *common.RunIdentifier) ([]*executorv1.TaskAction, error) {
-	taskActionList := &executorv1.TaskActionList{}
-	listOpts := []client.ListOption{
-		client.InNamespace(c.namespace),
-		client.MatchingLabels{
-			"flyte.org/project": runID.Project,
-			"flyte.org/domain":  runID.Domain,
-			"flyte.org/run":     runID.Name,
-		},
-	}
-
-	if err := c.k8sClient.List(ctx, taskActionList, listOpts...); err != nil {
+	items, err := c.listRunTaskActions(ctx, runID)
+	if err != nil {
 		return nil, fmt.Errorf("failed to list TaskActions for run: %w", err)
 	}
 
-	result := make([]*executorv1.TaskAction, len(taskActionList.Items))
-	for i := range taskActionList.Items {
-		result[i] = &taskActionList.Items[i]
+	result := make([]*executorv1.TaskAction, len(items))
+	for i := range items {
+		result[i] = &items[i]
 	}
 	return result, nil
 }
@@ -424,27 +425,34 @@ func (c *ActionsClient) ListRunActions(ctx context.Context, runID *common.RunIde
 // ListChildActions lists the parent and its direct children from the shared
 // informer cache. Cache reads wait for initial sync but may lag subsequent writes.
 func (c *ActionsClient) ListChildActions(ctx context.Context, parentActionID *common.ActionIdentifier) ([]*executorv1.TaskAction, error) {
-	items := &executorv1.TaskActionList{}
 	key := parentActionIndexKey(parentActionID.Run.Project, parentActionID.Run.Domain,
 		parentActionID.Run.Name, parentActionID.Name)
-	if err := c.sharedCache.List(ctx, items, client.InNamespace(c.namespace),
-		client.MatchingFields{parentActionIndex: key}); err != nil {
-		return nil, fmt.Errorf("failed to list cached child TaskActions: %w", err)
-	}
+	parentName := buildTaskActionName(parentActionID)
 
 	var result []*executorv1.TaskAction
-	parent := &executorv1.TaskAction{}
-	parentName := buildTaskActionName(parentActionID)
-	err := c.sharedCache.Get(ctx, client.ObjectKey{Namespace: c.namespace, Name: parentName}, parent)
-	if err != nil && !apierrors.IsNotFound(err) {
-		return nil, fmt.Errorf("failed to get cached parent TaskAction: %w", err)
-	}
-	if err == nil {
-		result = append(result, parent)
-	}
-	for i := range items.Items {
-		if items.Items[i].Name != parentName {
-			result = append(result, &items.Items[i])
+	for i, namespace := range c.lookupNamespaces(parentActionID.Run) {
+		items := &executorv1.TaskActionList{}
+		if err := c.sharedCache.List(ctx, items, client.InNamespace(namespace),
+			client.MatchingFields{parentActionIndex: key}); err != nil {
+			return nil, fmt.Errorf("failed to list cached child TaskActions: %w", err)
+		}
+
+		parent := &executorv1.TaskAction{}
+		err := c.sharedCache.Get(ctx, client.ObjectKey{Namespace: namespace, Name: parentName}, parent)
+		if err != nil && !apierrors.IsNotFound(err) {
+			return nil, fmt.Errorf("failed to get cached parent TaskAction: %w", err)
+		}
+		// As in getLegacyTaskAction, the fallback namespace is shared by all projects and the
+		// name holds only the run name.
+		labels := parent.GetLabels()
+		ownRun := i == 0 || (labels["flyte.org/project"] == parentActionID.Run.Project && labels["flyte.org/domain"] == parentActionID.Run.Domain)
+		if err == nil && ownRun {
+			result = append(result, parent)
+		}
+		for i := range items.Items {
+			if items.Items[i].Name != parentName {
+				result = append(result, &items.Items[i])
+			}
 		}
 	}
 	return result, nil
@@ -455,10 +463,7 @@ func (c *ActionsClient) GetTaskAction(ctx context.Context, actionID *common.Acti
 	taskActionName := buildTaskActionName(actionID)
 
 	taskAction := &executorv1.TaskAction{}
-	if err := c.k8sClient.Get(ctx, client.ObjectKey{
-		Name:      taskActionName,
-		Namespace: c.namespace,
-	}, taskAction); err != nil {
+	if err := c.getTaskAction(ctx, actionID, taskAction); err != nil {
 		return nil, fmt.Errorf("failed to get TaskAction %s: %w", taskActionName, err)
 	}
 
@@ -471,15 +476,16 @@ func (c *ActionsClient) GetTaskAction(ctx context.Context, actionID *common.Acti
 // action is named "a0" -- so keying on it alone broadcasts each run's child
 // updates to every other run's watch stream. Same-named children then collide
 // in the SDK informer cache and clobber each other's phase, wedging the parent.
-func subscriberKey(runName, parentActionName string) string {
-	return runName + "/" + parentActionName
+// Run names are only unique within a project and domain, so those are part of the key too.
+func subscriberKey(runID *common.RunIdentifier, parentActionName string) string {
+	return runID.GetProject() + "/" + runID.GetDomain() + "/" + runID.GetName() + "/" + parentActionName
 }
 
-func (c *ActionsClient) Subscribe(runName, parentActionName string) chan *ActionUpdate {
+func (c *ActionsClient) Subscribe(runID *common.RunIdentifier, parentActionName string) chan *ActionUpdate {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	key := subscriberKey(runName, parentActionName)
+	key := subscriberKey(runID, parentActionName)
 	ch := make(chan *ActionUpdate, c.bufferSize)
 	if c.subscribers[key] == nil {
 		c.subscribers[key] = make(map[chan *ActionUpdate]struct{})
@@ -489,11 +495,11 @@ func (c *ActionsClient) Subscribe(runName, parentActionName string) chan *Action
 }
 
 // Unsubscribe removes the given channel from the subscription list for the (run, parent action)
-func (c *ActionsClient) Unsubscribe(runName, parentActionName string, ch chan *ActionUpdate) {
+func (c *ActionsClient) Unsubscribe(runID *common.RunIdentifier, parentActionName string, ch chan *ActionUpdate) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	key := subscriberKey(runName, parentActionName)
+	key := subscriberKey(runID, parentActionName)
 	if channels, ok := c.subscribers[key]; ok {
 		delete(channels, ch)
 		close(ch)
@@ -525,7 +531,7 @@ func (c *ActionsClient) StartWatching(ctx context.Context) error {
 	}
 	c.mu.Unlock()
 
-	logger.Infof(ctx, "Starting TaskAction watcher for namespace: %s (workers: %d)", c.namespace, c.numWorkers)
+	logger.Infof(ctx, "Starting TaskAction watcher (workers: %d)", c.numWorkers)
 
 	return c.setupInformer(ctx)
 }
@@ -613,14 +619,16 @@ func (c *ActionsClient) worker(ctx context.Context, ch <-chan watch.Event, stopC
 }
 
 // dispatchEvent routes an informer event to the worker responsible for the
-// TaskAction, using FNV-32a hashing for consistent sharding.
+// TaskAction, using FNV-32a hashing for consistent sharding. TaskActions are keyed
+// by namespace and name, since the same name can exist in two namespaces.
 func (c *ActionsClient) dispatchEvent(taskAction *executorv1.TaskAction, eventType watch.EventType) {
 	if taskAction == nil {
 		return
 	}
 
+	key := client.ObjectKeyFromObject(taskAction).String()
 	h := fnv.New32a()
-	_, _ = h.Write([]byte(taskAction.Name)) // FNV Write never returns an error
+	_, _ = h.Write([]byte(key)) // FNV Write never returns an error
 	shard := h.Sum32() % uint32(c.numWorkers)
 
 	if eventType == watch.Deleted {
@@ -629,11 +637,11 @@ func (c *ActionsClient) dispatchEvent(taskAction *executorv1.TaskAction, eventTy
 	}
 
 	c.dispatchedActionsMu.Lock()
-	if _, already := c.dispatchedActions[taskAction.Name]; already {
+	if _, already := c.dispatchedActions[key]; already {
 		c.dispatchedActionsMu.Unlock()
 		return
 	}
-	c.dispatchedActions[taskAction.Name] = struct{}{}
+	c.dispatchedActions[key] = struct{}{}
 	c.dispatchedActionsMu.Unlock()
 
 	c.workerChs[shard] <- watch.Event{Type: eventType, Object: taskAction.DeepCopy()}
@@ -646,20 +654,22 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 		return
 	}
 
+	key := client.ObjectKeyFromObject(taskAction)
+
 	// Deletes carry the tombstone (the object is gone from the cache); process it directly.
 	if event.Type == watch.Deleted {
 		c.dispatchedActionsMu.Lock()
-		delete(c.dispatchedActions, taskAction.Name)
+		delete(c.dispatchedActions, key.String())
 		c.dispatchedActionsMu.Unlock()
 		c.handleTaskActionEvent(ctx, taskAction, watch.Deleted)
 		return
 	}
 
 	c.dispatchedActionsMu.Lock()
-	delete(c.dispatchedActions, taskAction.Name)
+	delete(c.dispatchedActions, key.String())
 	c.dispatchedActionsMu.Unlock()
 
-	latest, found, err := c.getLatest(ctx, taskAction.Name)
+	latest, found, err := c.getLatest(ctx, key)
 	if err != nil {
 		logger.Warnf(ctx, "coalesced watch: failed to read latest TaskAction %s: %v", taskAction.Name, err)
 		return
@@ -671,9 +681,9 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 }
 
 // getLatestFromCache reads the current TaskAction from the shared informer cache.
-func (c *ActionsClient) getLatestFromCache(ctx context.Context, name string) (*executorv1.TaskAction, bool, error) {
+func (c *ActionsClient) getLatestFromCache(ctx context.Context, key client.ObjectKey) (*executorv1.TaskAction, bool, error) {
 	ta := &executorv1.TaskAction{}
-	if err := c.sharedCache.Get(ctx, client.ObjectKey{Name: name, Namespace: c.namespace}, ta); err != nil {
+	if err := c.sharedCache.Get(ctx, key, ta); err != nil {
 		if apierrors.IsNotFound(err) {
 			return nil, false, nil
 		}
@@ -817,7 +827,7 @@ func (c *ActionsClient) notifySubscribers(ctx context.Context, update *ActionUpd
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
-	key := subscriberKey(update.ActionID.GetRun().GetName(), update.ParentActionName)
+	key := subscriberKey(update.ActionID.GetRun(), update.ParentActionName)
 	for ch := range c.subscribers[key] {
 		select {
 		case ch <- update:
@@ -834,7 +844,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 	if c.runClient == nil {
 		return
 	}
-	actionKey := []byte(buildTaskActionName(update.ActionID))
+	actionKey := recordedFilterKey(taskAction)
 	isDuplicate := c.recordedFilter.Contains(ctx, actionKey)
 	if isDuplicate {
 		logger.Debugf(ctx, "Skipping duplicate RecordAction for %s", update.ActionID.Name)
@@ -1000,13 +1010,12 @@ func (c *ActionsClient) markTerminalStatusRecorded(ctx context.Context, taskActi
 	return nil
 }
 
-// newTaskActionCR builds the CR skeleton (name, namespace, labels) shared by
-// all action types.
+// newTaskActionCR builds the CR skeleton (name, labels) shared by all action
+// types. Its namespace is set by placeRootAction or setParentOwnership.
 func (c *ActionsClient) newTaskActionCR(actionID *common.ActionIdentifier, actionType string, isRoot bool) *executorv1.TaskAction {
 	return &executorv1.TaskAction{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      buildTaskActionName(actionID),
-			Namespace: c.namespace,
+			Name: buildTaskActionName(actionID),
 			Labels: map[string]string{
 				"flyte.org/project":     actionID.Run.Project,
 				"flyte.org/domain":      actionID.Run.Domain,
@@ -1021,7 +1030,8 @@ func (c *ActionsClient) newTaskActionCR(actionID *common.ActionIdentifier, actio
 }
 
 // setParentOwnership resolves the parent TaskAction and wires an OwnerReference
-// on the child so K8s cascades deletion. Returns the parent CR.
+// on the child so K8s cascades deletion. The child is created in its parent's
+// namespace, since an OwnerReference cannot cross namespaces. Returns the parent CR.
 func (c *ActionsClient) setParentOwnership(ctx context.Context, child *executorv1.TaskAction, runID *common.RunIdentifier, parentActionName string) (*executorv1.TaskAction, error) {
 	parentID := &common.ActionIdentifier{
 		Run:  runID,
@@ -1030,10 +1040,11 @@ func (c *ActionsClient) setParentOwnership(ctx context.Context, child *executorv
 	parentName := buildTaskActionName(parentID)
 
 	parent := &executorv1.TaskAction{}
-	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: parentName, Namespace: c.namespace}, parent); err != nil {
+	if err := c.getTaskAction(ctx, parentID, parent); err != nil {
 		return nil, fmt.Errorf("failed to get parent TaskAction %s: %w", parentName, err)
 	}
 
+	child.Namespace = parent.Namespace
 	blockOwnerDeletion := true
 	child.OwnerReferences = []metav1.OwnerReference{
 		{
@@ -1045,6 +1056,117 @@ func (c *ActionsClient) setParentOwnership(ctx context.Context, child *executorv
 		},
 	}
 	return parent, nil
+}
+
+// recordedFilterKey includes the namespace, since the same run and action names can exist in two.
+func recordedFilterKey(taskAction *executorv1.TaskAction) []byte {
+	return []byte(client.ObjectKeyFromObject(taskAction).String())
+}
+
+func (c *ActionsClient) placeRootAction(ctx context.Context, taskAction *executorv1.TaskAction, actionID *common.ActionIdentifier) error {
+	runID := actionID.GetRun()
+	namespace, err := namespaceutils.MappedNamespace(c.namespaceTemplate, c.namespace, runID.GetOrg(), runID.GetProject(), runID.GetDomain())
+	if err != nil {
+		return connect.NewError(connect.CodeInvalidArgument, err)
+	}
+	// A run is resubmitted by name (the scheduler fires a run again), so a run
+	// started before the template was set may already have its root in the
+	// default namespace. Report it as launched rather than start a second root.
+	if namespace != c.namespace {
+		err := c.getLegacyTaskAction(ctx, actionID, &executorv1.TaskAction{})
+		if err == nil {
+			return connect.NewError(connect.CodeAlreadyExists,
+				fmt.Errorf("TaskAction CR %s already exists in namespace %s", taskAction.Name, c.namespace))
+		}
+		if !apierrors.IsNotFound(err) {
+			return fmt.Errorf("failed to check for TaskAction CR %s in namespace %s: %w", taskAction.Name, c.namespace, err)
+		}
+	}
+	if err := c.ensureNamespace(ctx, namespace); err != nil {
+		return err
+	}
+	taskAction.Namespace = namespace
+	return nil
+}
+
+func (c *ActionsClient) ensureNamespace(ctx context.Context, namespace string) error {
+	if _, ok := c.knownNamespaces.Load(namespace); ok {
+		return nil
+	}
+	if c.requireExistingNamespaces {
+		err := c.k8sClient.Get(ctx, client.ObjectKey{Name: namespace}, &corev1.Namespace{})
+		if apierrors.IsNotFound(err) {
+			return connect.NewError(connect.CodeFailedPrecondition,
+				fmt.Errorf("namespace %q does not exist; create it before running in this project and domain", namespace))
+		}
+		if err != nil {
+			return fmt.Errorf("failed to check namespace %s: %w", namespace, err)
+		}
+	} else if err := k8sutil.EnsureNamespaceExists(ctx, c.k8sClient, namespace); err != nil {
+		return fmt.Errorf("failed to ensure namespace %s: %w", namespace, err)
+	}
+	c.knownNamespaces.Store(namespace, struct{}{})
+	return nil
+}
+
+// rejectMissingNamespace forgets a namespace deleted after it was cached, and returns
+// FailedPrecondition so CreateRun fails the run instead of leaving it queued.
+func (c *ActionsClient) rejectMissingNamespace(taskAction *executorv1.TaskAction, err error) error {
+	c.knownNamespaces.Delete(taskAction.Namespace)
+	return connect.NewError(connect.CodeFailedPrecondition,
+		fmt.Errorf("failed to create TaskAction CR %s: %w", taskAction.Name, err))
+}
+
+// lookupNamespaces also returns the client's namespace, which holds runs started before
+// the template was set.
+func (c *ActionsClient) lookupNamespaces(runID *common.RunIdentifier) []string {
+	namespace, err := namespaceutils.MappedNamespace(c.namespaceTemplate, c.namespace, runID.GetOrg(), runID.GetProject(), runID.GetDomain())
+	if err != nil || namespace == c.namespace {
+		return []string{c.namespace}
+	}
+	return []string{namespace, c.namespace}
+}
+
+func (c *ActionsClient) getTaskAction(ctx context.Context, actionID *common.ActionIdentifier, taskAction *executorv1.TaskAction) error {
+	namespaces := c.lookupNamespaces(actionID.GetRun())
+	err := c.k8sClient.Get(ctx, client.ObjectKey{Name: buildTaskActionName(actionID), Namespace: namespaces[0]}, taskAction)
+	if len(namespaces) == 1 || !apierrors.IsNotFound(err) {
+		return err
+	}
+	return c.getLegacyTaskAction(ctx, actionID, taskAction)
+}
+
+// getLegacyTaskAction reads from the client's namespace. All projects share it and a
+// TaskAction name holds only the run name, so another project's or domain's is NotFound.
+func (c *ActionsClient) getLegacyTaskAction(ctx context.Context, actionID *common.ActionIdentifier, taskAction *executorv1.TaskAction) error {
+	name := buildTaskActionName(actionID)
+	if err := c.k8sClient.Get(ctx, client.ObjectKey{Name: name, Namespace: c.namespace}, taskAction); err != nil {
+		return err
+	}
+	labels := taskAction.GetLabels()
+	if labels["flyte.org/project"] != actionID.GetRun().GetProject() || labels["flyte.org/domain"] != actionID.GetRun().GetDomain() {
+		return apierrors.NewNotFound(executorv1.GroupVersion.WithResource("taskactions").GroupResource(), name)
+	}
+	return nil
+}
+
+func (c *ActionsClient) listRunTaskActions(ctx context.Context, runID *common.RunIdentifier) ([]executorv1.TaskAction, error) {
+	var items []executorv1.TaskAction
+	for _, namespace := range c.lookupNamespaces(runID) {
+		taskActionList := &executorv1.TaskActionList{}
+		if err := c.k8sClient.List(ctx, taskActionList,
+			client.InNamespace(namespace),
+			client.MatchingLabels{
+				"flyte.org/project": runID.Project,
+				"flyte.org/domain":  runID.Domain,
+				"flyte.org/run":     runID.Name,
+			},
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, taskActionList.Items...)
+	}
+	return items, nil
 }
 
 // validateConditionDeclaredType enforces that a condition's declared type is a
