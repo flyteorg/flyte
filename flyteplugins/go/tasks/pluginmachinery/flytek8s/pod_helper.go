@@ -27,6 +27,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -2039,7 +2040,12 @@ func makeContainerContexts(statuses []v1.ContainerStatus) []*core.ContainerConte
 }
 
 func BuildPodLogContext(pod *v1.Pod) *core.PodLogContext {
+	return BuildPodLogContextWithContext(context.Background(), pod)
+}
+
+func BuildPodLogContextWithContext(ctx context.Context, pod *v1.Pod) *core.PodLogContext {
 	return &core.PodLogContext{
+		Cluster:              contextutils.ClusterName(ctx),
 		Namespace:            pod.Namespace,
 		PodName:              pod.Name,
 		PrimaryContainerName: GetPrimaryContainerName(pod),

@@ -235,6 +235,9 @@ message PodLogContext {
   string primary_container_name = 4;
 
   repeated ContainerContext init_containers = 5;
+
+  // Cluster configured on the executor that reported this pod.
+  string cluster = 6;
 }
 
 // Contains metadata required to identify logs produces by a single container
