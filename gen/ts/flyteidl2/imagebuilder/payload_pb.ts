@@ -15,7 +15,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/imagebuilder/payload.proto.
  */
 export const file_flyteidl2_imagebuilder_payload: GenFile = /*@__PURE__*/
-  fileDesc("CiRmbHl0ZWlkbDIvaW1hZ2VidWlsZGVyL3BheWxvYWQucHJvdG8SFmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIioQEKD0dldEltYWdlUmVxdWVzdBI7CgJpZBgBIAEoCzInLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIuSW1hZ2VJZGVudGlmaWVyQga6SAPIAQESGAoMb3JnYW5pemF0aW9uGAIgASgJQgIYARI3Cgpwcm9qZWN0X2lkGAMgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllciJAChBHZXRJbWFnZVJlc3BvbnNlEiwKBWltYWdlGAEgASgLMh0uZmx5dGVpZGwyLmltYWdlYnVpbGRlci5JbWFnZULhAQoaY29tLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXJCDFBheWxvYWRQcm90b0gCUAFaOmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9pbWFnZWJ1aWxkZXKiAgNGSViqAhZGbHl0ZWlkbDIuSW1hZ2VidWlsZGVyygIWRmx5dGVpZGwyXEltYWdlYnVpbGRlcuICIkZseXRlaWRsMlxJbWFnZWJ1aWxkZXJcR1BCTWV0YWRhdGHqAhdGbHl0ZWlkbDI6OkltYWdlYnVpbGRlcmIGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_imagebuilder_definition]);
+  fileDesc("CiRmbHl0ZWlkbDIvaW1hZ2VidWlsZGVyL3BheWxvYWQucHJvdG8SFmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIisAEKD0dldEltYWdlUmVxdWVzdBI7CgJpZBgBIAEoCzInLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXIuSW1hZ2VJZGVudGlmaWVyQga6SAPIAQESGAoMb3JnYW5pemF0aW9uGAIgASgJQgIYARI3Cgpwcm9qZWN0X2lkGAMgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllchINCgVxdWV1ZRgEIAEoCSJAChBHZXRJbWFnZVJlc3BvbnNlEiwKBWltYWdlGAEgASgLMh0uZmx5dGVpZGwyLmltYWdlYnVpbGRlci5JbWFnZULhAQoaY29tLmZseXRlaWRsMi5pbWFnZWJ1aWxkZXJCDFBheWxvYWRQcm90b0gCUAFaOmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9pbWFnZWJ1aWxkZXKiAgNGSViqAhZGbHl0ZWlkbDIuSW1hZ2VidWlsZGVyygIWRmx5dGVpZGwyXEltYWdlYnVpbGRlcuICIkZseXRlaWRsMlxJbWFnZWJ1aWxkZXJcR1BCTWV0YWRhdGHqAhdGbHl0ZWlkbDI6OkltYWdlYnVpbGRlcmIGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_common_identifier, file_flyteidl2_imagebuilder_definition]);
 
 /**
  * @generated from message flyteidl2.imagebuilder.GetImageRequest
@@ -45,6 +45,15 @@ export type GetImageRequest = Message<"flyteidl2.imagebuilder.GetImageRequest"> 
    * @generated from field: flyteidl2.common.ProjectIdentifier project_id = 3;
    */
   projectId?: ProjectIdentifier;
+
+  /**
+   * Optional queue the image is built for. A queue served by another organization's cluster
+   * (e.g. a shared queue) is looked up in that cluster's registry, where an image built for it
+   * lives, rather than in the project-domain's default cluster.
+   *
+   * @generated from field: string queue = 4;
+   */
+  queue: string;
 };
 
 /**

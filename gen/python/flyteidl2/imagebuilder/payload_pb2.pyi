@@ -8,14 +8,16 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class GetImageRequest(_message.Message):
-    __slots__ = ["id", "organization", "project_id"]
+    __slots__ = ["id", "organization", "project_id", "queue"]
     ID_FIELD_NUMBER: _ClassVar[int]
     ORGANIZATION_FIELD_NUMBER: _ClassVar[int]
     PROJECT_ID_FIELD_NUMBER: _ClassVar[int]
+    QUEUE_FIELD_NUMBER: _ClassVar[int]
     id: _definition_pb2.ImageIdentifier
     organization: str
     project_id: _identifier_pb2.ProjectIdentifier
-    def __init__(self, id: _Optional[_Union[_definition_pb2.ImageIdentifier, _Mapping]] = ..., organization: _Optional[str] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ...) -> None: ...
+    queue: str
+    def __init__(self, id: _Optional[_Union[_definition_pb2.ImageIdentifier, _Mapping]] = ..., organization: _Optional[str] = ..., project_id: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., queue: _Optional[str] = ...) -> None: ...
 
 class GetImageResponse(_message.Message):
     __slots__ = ["image"]

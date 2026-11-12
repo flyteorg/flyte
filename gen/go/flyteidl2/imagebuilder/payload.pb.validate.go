@@ -117,6 +117,8 @@ func (m *GetImageRequest) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for Queue
+
 	if len(errors) > 0 {
 		return GetImageRequestMultiError(errors)
 	}
