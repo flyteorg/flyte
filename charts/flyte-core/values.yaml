@@ -541,6 +541,8 @@ configuration:
         configUploadConcurrency: 4
 
   runs:
+    # -- Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service.
+    pprofPort: 0
     actionsService:
       url: '{{ include "flyte-core.componentServiceURL" (dict "root" . "component" "actions") }}'
     server:
@@ -575,6 +577,8 @@ configuration:
     authMetadata: {}
 
   actions:
+    # -- Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service.
+    pprofPort: 0
     runService:
       url: '{{ include "flyte-core.componentServiceURL" (dict "root" . "component" "runs") }}'
     server:
@@ -587,11 +591,15 @@ configuration:
   events:
     runService:
       url: '{{ include "flyte-core.componentServiceURL" (dict "root" . "component" "runs") }}'
+    # -- Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service.
+    pprofPort: 0
     server:
       host: 0.0.0.0
       port: 8080
 
   cache:
+    # -- Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service.
+    pprofPort: 0
     server:
       host: 0.0.0.0
       port: 8080
@@ -599,6 +607,8 @@ configuration:
     maxReservationHeartbeat: 10s
 
   dataproxy:
+    # -- Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service.
+    pprofPort: 0
     runService:
       url: '{{ include "flyte-core.componentServiceURL" (dict "root" . "component" "runs") }}'
     server:
@@ -613,6 +623,8 @@ configuration:
       maxExpiresIn: 1h
 
   secret:
+    # -- Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service.
+    pprofPort: 0
     server:
       host: 0.0.0.0
       port: 8080
@@ -625,6 +637,8 @@ configuration:
     cacheService:
       url: '{{ include "flyte-core.componentServiceURL" (dict "root" . "component" "cache") }}'
     metricsPort: 10254
+    # -- Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service.
+    pprofPort: 0
     healthProbePort: 8081
     leaderElect: false
     metricsSecure: false
@@ -638,6 +652,8 @@ configuration:
       maxTTL: 1h
 
   app:
+    # -- Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service.
+    pprofPort: 0
     internalAppService:
       url: '{{ include "flyte-core.componentServiceURL" (dict "root" . "component" "app") }}'
     server:

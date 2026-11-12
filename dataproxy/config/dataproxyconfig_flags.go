@@ -50,6 +50,7 @@ func (DataProxyConfig) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg DataProxyConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("DataProxyConfig", pflag.ExitOnError)
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "pprofPort"), defaultConfig.PprofPort, "Port the pprof endpoint binds to; 0 disables profiling")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "server.port"), defaultConfig.Server.Port, "Port to bind the HTTP server")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "server.host"), defaultConfig.Server.Host, "Host to bind the HTTP server")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "upload.maxSize"), defaultConfig.Upload.MaxSize.String(), "Maximum allowed upload size.")
@@ -65,5 +66,6 @@ func (cfg DataProxyConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.clientSecretFile"), defaultConfig.RunService.Auth.ClientSecretFile, "File containing the Runs service OAuth 2.0 client secret")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "runService.auth.scopes"), defaultConfig.RunService.Auth.Scopes, "Runs service OAuth 2.0 scopes")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.audience"), defaultConfig.RunService.Auth.Audience, "Runs service OAuth 2.0 token audience")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "runService.http.maxIdleConnsPerHost"), defaultConfig.RunService.HTTP.MaxIdleConnsPerHost, "Runs service idle connections kept per host; 0 uses Go's default of 2")
 	return cmdFlags
 }

@@ -23,7 +23,8 @@ var defaultConfig = &Config{
 	NotifyRetryMaxBackoff:   config.Duration{Duration: 5 * time.Second},
 	NotifyBatchSize:         100,
 	ActionsService: serviceclient.ServiceConfig{
-		URL: "http://localhost:8090",
+		URL:  "http://localhost:8090",
+		HTTP: serviceclient.HTTPConfig{MaxIdleConnsPerHost: 512},
 	},
 	StoragePrefix: "file:///tmp/flyte/data",
 	SeedProjects:  []string{"flytesnacks"},
@@ -58,6 +59,9 @@ var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
 type Config struct {
 	// HTTP server configuration
 	Server ServerConfig `json:"server"`
+
+	// PprofPort is the port the pprof endpoint binds to. 0 disables profiling.
+	PprofPort int `json:"pprofPort" pflag:",Port the pprof endpoint binds to; 0 disables profiling"`
 
 	// Database configuration
 	Database database.DbConfig `json:"database"`
