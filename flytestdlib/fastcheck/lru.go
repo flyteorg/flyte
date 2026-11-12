@@ -33,6 +33,10 @@ func (l LRUCacheFilter) Add(_ context.Context, id []byte) bool {
 	return l.lru.Add(string(id), nil)
 }
 
+func (l LRUCacheFilter) Remove(_ context.Context, id []byte) bool {
+	return l.lru.Remove(string(id))
+}
+
 // Create a new fastcheck.Filter using an LRU cache of type cache.Cache with a fixed size
 func NewLRUCacheFilter(size int, scope promutils.Scope) (*LRUCacheFilter, error) {
 	c, err := cache.New(size)

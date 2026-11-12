@@ -905,6 +905,7 @@ func TestHandleWatchEvent_CreateThenDeleteStillRecords(t *testing.T) {
 	})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
 
 	c.handleWatchEvent(ctx, watch.Event{Type: watch.Deleted, Object: runningTaskAction("d1")})
+	assert.False(t, filter.Contains(ctx, []byte(buildTaskActionName(buildActionUpdate(ctx, runningTaskAction("d1"), watch.Deleted).ActionID))))
 
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
@@ -935,9 +936,22 @@ func TestHandleWatchEvent_DeleteAfterRecordDoesNotDoubleRecord(t *testing.T) {
 		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
 
 	c.handleTaskActionEvent(ctx, runningTaskAction("d2"), watch.Deleted)
+	assert.False(t, filter.Contains(ctx, []byte(buildTaskActionName(buildActionUpdate(ctx, runningTaskAction("d2"), watch.Deleted).ActionID))))
 
 	mockClient.AssertNotCalled(t, "RecordAction")
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+}
+
+func TestHandleWatchEvent_LabelledDeleteRemovesFilterEntry(t *testing.T) {
+	ctx := context.Background()
+	filter := testFilter()
+	ta := runningTaskAction("deleted")
+	ta.Labels = map[string]string{labelTerminalStatusRecorded: "true"}
+	key := []byte(buildTaskActionName(buildActionUpdate(ctx, ta, watch.Deleted).ActionID))
+	filter.Add(ctx, key)
+	c := &ActionsClient{recordedFilter: filter}
+	c.handleWatchEvent(ctx, watch.Event{Type: watch.Deleted, Object: ta})
+	assert.False(t, filter.Contains(ctx, key))
 }
 
 // With several actions replicas, another replica can record the terminal status and

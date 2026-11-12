@@ -580,7 +580,7 @@ func (c *ActionsClient) setupInformer(ctx context.Context) error {
 				obj = tombstone.Obj
 			}
 			taskAction, ok := obj.(*executorv1.TaskAction)
-			if !ok || c.shouldSkipTaskAction(taskAction) {
+			if !ok {
 				return
 			}
 			c.dispatchEvent(taskAction, watch.Deleted)
@@ -686,6 +686,11 @@ func (c *ActionsClient) handleTaskActionEvent(ctx context.Context, taskAction *e
 	update := buildActionUpdate(ctx, taskAction, eventType)
 	if update == nil {
 		return
+	}
+	if eventType == watch.Deleted && c.recordedFilter != nil {
+		// Preserve deduplication through the final update, then forget the action,
+		// including when its terminal status has already been recorded.
+		defer c.recordedFilter.Remove(ctx, []byte(buildTaskActionName(update.ActionID)))
 	}
 
 	// Notify before the skip: subscribers still need the update when another replica recorded it.

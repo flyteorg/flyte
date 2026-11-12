@@ -5,8 +5,9 @@
 // This code is liberally copied from the original implementation at https://github.com/jmhodges/opposite_of_a_bloom_filter/blob/master/go/oppobloom/oppobloom.go
 // Package oppobloom implements a filter data structure that may report false negatives but no false positives.
 
-// the fastcheck.OppoBloomFilter provides two methods instead of one, a contains and an add. This makes it possible to
-// check and then optionally add the value. It is possible that two threads may race and add it multiple times
+// The fastcheck.OppoBloomFilter provides separate Contains, Add, and Remove methods.
+// This makes it possible to check and then optionally add the value. It is possible
+// that two threads may race and add it multiple times.
 package fastcheck
 
 import (
@@ -63,6 +64,21 @@ func (f *OppoBloomFilter) getIndex(id []byte) int32 {
 func (f *OppoBloomFilter) Add(_ context.Context, id []byte) bool {
 	oldID := getAndSet(f.array, f.getIndex(id), id)
 	return !bytes.Equal(oldID, id)
+}
+
+func (f *OppoBloomFilter) Remove(_ context.Context, id []byte) bool {
+	index := f.getIndex(id)
+	indexPtr := (*unsafe.Pointer)(unsafe.Pointer(&f.array[index]))
+	for {
+		curr := get(f.array, index)
+		if curr == nil || !bytes.Equal(id, *curr) {
+			return false
+		}
+		// Only clear the value we checked; a concurrent Add may replace it.
+		if atomic.CompareAndSwapPointer(indexPtr, unsafe.Pointer(curr), nil) {
+			return true
+		}
+	}
 }
 
 func (f *OppoBloomFilter) Contains(_ context.Context, id []byte) bool {

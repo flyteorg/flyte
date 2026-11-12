@@ -21,6 +21,9 @@ type Filter interface {
 
 	// Adds the element id to the Filter and returns if a previous object was evicted in the process
 	Add(ctx context.Context, id []byte) (evicted bool)
+
+	// Remove removes id from the Filter and returns whether it was present.
+	Remove(ctx context.Context, id []byte) (removed bool)
 }
 
 // Every implementation of the Filter Interface provides these metrics

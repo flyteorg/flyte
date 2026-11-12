@@ -58,6 +58,30 @@ func TestFilter(t *testing.T) {
 
 }
 
+func TestFilterRemove(t *testing.T) {
+	ctx := context.Background()
+	lru, err := NewLRUCacheFilter(2, promutils.NewTestScope())
+	assert.NoError(t, err)
+	oppo, err := NewOppoBloomFilter(1, promutils.NewTestScope())
+	assert.NoError(t, err)
+	for name, filter := range map[string]Filter{"lru": lru, "oppo": oppo} {
+		t.Run(name, func(t *testing.T) {
+			id, other := []byte("id"), []byte("other")
+			assert.False(t, filter.Remove(ctx, id))
+			filter.Add(ctx, id)
+			assert.True(t, filter.Remove(ctx, id))
+			assert.False(t, filter.Contains(ctx, id))
+			assert.False(t, filter.Remove(ctx, id))
+			filter.Add(ctx, other)
+			assert.False(t, filter.Remove(ctx, id))
+			assert.True(t, filter.Contains(ctx, other), "removing a missing ID must preserve a colliding ID")
+			filter.Add(ctx, id)
+			assert.True(t, filter.Contains(ctx, id))
+			assert.True(t, filter.Remove(ctx, id))
+		})
+	}
+}
+
 func TestSizeRounding(t *testing.T) {
 	f, _ := NewOppoBloomFilter(3, promutils.NewTestScope())
 	if len(f.array) != 4 {
