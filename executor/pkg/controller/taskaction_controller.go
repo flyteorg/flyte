@@ -815,11 +815,15 @@ func (r *TaskActionReconciler) recordSystemError(
 	}
 
 	if taskActionStatusChanged(original.Status, taskAction.Status) {
-		start := time.Now()
-		updErr := r.Status().Update(ctx, taskAction)
-		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
-		if updErr != nil {
-			logger.Error(updErr, "failed to persist SystemFailures counter")
+		// A lost increment keeps the count below the limit, and the task retries forever.
+		if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
+			latest.Status.SystemFailures = taskAction.Status.SystemFailures
+			latest.Status.SystemRetries = taskAction.Status.SystemRetries
+			latest.Status.PluginState = taskAction.Status.PluginState
+			latest.Status.PluginStateVersion = taskAction.Status.PluginStateVersion
+		}); err != nil {
+			logger.Error(err, "failed to persist SystemFailures counter")
+			return ctrl.Result{}, err
 		}
 	}
 	return r.timeoutAwareRequeue(taskAction, timeouts), nil
