@@ -942,16 +942,28 @@ func TestHandleWatchEvent_DeleteAfterRecordDoesNotDoubleRecord(t *testing.T) {
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
 }
 
-func TestHandleWatchEvent_LabelledDeleteRemovesFilterEntry(t *testing.T) {
+func TestHandleWatchEvent_LabelledDeleteOnlyRemovesFilterEntry(t *testing.T) {
 	ctx := context.Background()
+	mockClient := runmocks.NewInternalRunServiceClient(t)
 	filter := testFilter()
 	ta := runningTaskAction("deleted")
+	parent := "a0"
+	ta.Spec.ParentActionName = &parent
 	ta.Labels = map[string]string{labelTerminalStatusRecorded: "true"}
 	key := []byte(buildTaskActionName(buildActionUpdate(ctx, ta, watch.Deleted).ActionID))
 	filter.Add(ctx, key)
-	c := &ActionsClient{recordedFilter: filter}
+	c := &ActionsClient{
+		runClient:      mockClient,
+		recordedFilter: filter,
+		bufferSize:     10,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+	ch := c.Subscribe("run1", parent)
 	c.handleWatchEvent(ctx, watch.Event{Type: watch.Deleted, Object: ta})
 	assert.False(t, filter.Contains(ctx, key))
+	assert.Empty(t, ch, "already-recorded deletions must not notify subscribers")
+	mockClient.AssertNotCalled(t, "RecordAction")
+	mockClient.AssertNotCalled(t, "UpdateActionStatus")
 }
 
 // With several actions replicas, another replica can record the terminal status and

@@ -674,10 +674,14 @@ func (c *ActionsClient) handleTaskActionEvent(ctx context.Context, taskAction *e
 	if update == nil {
 		return
 	}
-	if eventType == watch.Deleted && c.recordedFilter != nil {
+	if eventType == watch.Deleted {
 		// Preserve deduplication through the final update, then forget the action,
 		// including when its terminal status has already been recorded.
 		defer c.recordedFilter.Remove(ctx, []byte(buildTaskActionName(update.ActionID)))
+		// Already-recorded deletions only need filter cleanup, not notifications.
+		if c.shouldSkipTaskAction(taskAction) {
+			return
+		}
 	}
 
 	// Notify before the skip: subscribers still need the update when another replica recorded it.
