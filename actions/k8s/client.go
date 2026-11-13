@@ -26,7 +26,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
 	k8sutil "github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
-	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -95,37 +94,25 @@ type ActionsClient struct {
 	getLatest func(ctx context.Context, name string) (*executorv1.TaskAction, bool, error)
 }
 
-// NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) (*ActionsClient, error) {
+// NewActionsClient creates a new Kubernetes-based actions client. recordedFilter
+// is required to deduplicate RecordAction calls across watch reconnects.
+func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordedFilter fastcheck.Filter) (*ActionsClient, error) {
 	if numWorkers <= 0 {
 		numWorkers = 1
 	}
-	// The dedup filter is mandatory, so its size must be a positive value.
-	if recordFilterSize <= 0 {
-		return nil, fmt.Errorf("actions: recordFilterSize must be positive, got %d", recordFilterSize)
+	if recordedFilter == nil {
+		return nil, fmt.Errorf("actions: RecordAction dedup filter is required")
 	}
-	if scope == nil {
-		return nil, fmt.Errorf("actions: metrics scope is required")
-	}
-	c := &ActionsClient{
-		k8sClient:   k8sClient,
-		sharedCache: sharedCache,
-		namespace:   namespace,
-		bufferSize:  bufferSize,
-		numWorkers:  numWorkers,
-		runClient:   runClient,
-		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
-	}
-
-	// The dedup filter is mandatory: notifyRunService records on every event type
-	// and relies on the filter to keep RecordAction idempotent.
-	filter, err := fastcheck.NewOppoBloomFilter(recordFilterSize, scope.NewSubScope("actions_filter"))
-	if err != nil {
-		return nil, fmt.Errorf("actions: failed to create RecordAction dedup filter (size=%d): %w", recordFilterSize, err)
-	}
-	c.recordedFilter = filter
-
-	return c, nil
+	return &ActionsClient{
+		k8sClient:      k8sClient,
+		sharedCache:    sharedCache,
+		namespace:      namespace,
+		bufferSize:     bufferSize,
+		numWorkers:     numWorkers,
+		runClient:      runClient,
+		recordedFilter: recordedFilter,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+	}, nil
 }
 
 // Enqueue creates a TaskAction CR in etcd (via the K8s API).

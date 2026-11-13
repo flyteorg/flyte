@@ -11,6 +11,7 @@ import (
 	actionsk8s "github.com/flyteorg/flyte/v2/actions/k8s"
 	"github.com/flyteorg/flyte/v2/actions/service"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
@@ -57,6 +58,15 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 	runClient := workflowconnect.NewInternalRunServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
 
+	recordedFilter, err := fastcheck.NewOppoBloomFilter(
+		cfg.RecordFilterSize,
+		"actions_filter",
+		otelutils.GetMeterProvider(otelServiceName),
+	)
+	if err != nil {
+		return fmt.Errorf("actions: failed to create RecordAction dedup filter (size=%d): %w", cfg.RecordFilterSize, err)
+	}
+
 	actionsClient, err := actionsk8s.NewActionsClient(
 		sc.K8sClient,
 		sc.K8sCache,
@@ -64,8 +74,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		cfg.WatchBufferSize,
 		cfg.WatchWorkers,
 		runClient,
-		cfg.RecordFilterSize,
-		sc.Scope,
+		recordedFilter,
 	)
 	if err != nil {
 		return fmt.Errorf("actions: failed to create actions client: %w", err)

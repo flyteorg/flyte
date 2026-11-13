@@ -20,7 +20,7 @@ import (
 	"sync/atomic"
 	"unsafe"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"go.opentelemetry.io/otel/metric"
 )
 
 var ErrSizeTooLarge = errors.New("oppobloom: size given too large to round to a power of 2")
@@ -81,15 +81,15 @@ func (f *OppoBloomFilter) Remove(_ context.Context, id []byte) bool {
 	}
 }
 
-func (f *OppoBloomFilter) Contains(_ context.Context, id []byte) bool {
+func (f *OppoBloomFilter) Contains(ctx context.Context, id []byte) bool {
 	curr := get(f.array, f.getIndex(id))
 	if curr != nil {
 		if bytes.Equal(id, *curr) {
-			f.metrics.Hit.Inc()
+			f.metrics.Hit.Add(ctx, 1, f.metrics.attributes)
 			return true
 		}
 	}
-	f.metrics.Miss.Inc()
+	f.metrics.Miss.Add(ctx, 1, f.metrics.attributes)
 	return false
 }
 
@@ -121,8 +121,9 @@ func getAndSet(arr []*[]byte, index int32, id []byte) []byte {
 }
 
 // NewOppoBloomFilter creates a new Opposite of Bloom filter proposed in https://github.com/jmhodges/opposite_of_a_bloom_filter/ and
-// the related blog https://www.somethingsimilar.com/2012/05/21/the-opposite-of-a-bloom-filter/
-func NewOppoBloomFilter(size int, scope promutils.Scope) (*OppoBloomFilter, error) {
+// the related blog https://www.somethingsimilar.com/2012/05/21/the-opposite-of-a-bloom-filter/.
+// Scope identifies the filter in OTEL metrics. A nil provider disables metrics.
+func NewOppoBloomFilter(size int, scope string, provider metric.MeterProvider) (*OppoBloomFilter, error) {
 	if size > MaxFilterSize {
 		return nil, ErrSizeTooLarge
 	}
@@ -133,5 +134,24 @@ func NewOppoBloomFilter(size int, scope promutils.Scope) (*OppoBloomFilter, erro
 	size = int(math.Pow(2, math.Ceil(math.Log2(float64(size)))))
 	slice := make([]*[]byte, size)
 	sizeMask := uint32(size - 1) // #nosec G115
-	return &OppoBloomFilter{slice, sizeMask, newMetrics(scope)}, nil
+	f := &OppoBloomFilter{array: slice, sizeMask: sizeMask}
+	metrics, err := newMetrics(scope, "oppobloom", f.size, provider)
+	if err != nil {
+		return nil, err
+	}
+	f.metrics = metrics
+	return f, nil
+}
+
+// size counts occupied slots at collection time without slowing down mutations.
+// Atomic reads keep collection safe during concurrent Add and Remove operations;
+// like Contains, the observation can change while operations are in flight.
+func (f *OppoBloomFilter) size() int64 {
+	var count int64
+	for i := range f.array {
+		if get(f.array, int32(i)) != nil { // #nosec G115 -- capacity is bounded by MaxFilterSize.
+			count++
+		}
+	}
+	return count
 }

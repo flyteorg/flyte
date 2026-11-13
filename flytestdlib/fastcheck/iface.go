@@ -3,9 +3,9 @@ package fastcheck
 import (
 	"context"
 
-	"github.com/prometheus/client_golang/prometheus"
-
-	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/metric/noop"
 )
 
 // Filter provides an interface to check if a Key of type []byte was ever seen.
@@ -26,17 +26,40 @@ type Filter interface {
 	Remove(ctx context.Context, id []byte) (removed bool)
 }
 
-// Every implementation of the Filter Interface provides these metrics
+// Metrics contains the OTEL instruments shared by filter implementations.
 type Metrics struct {
-	// Indicates if the item was found in the cache
-	Hit prometheus.Counter
-	// Indicates if the item was not found in the cache
-	Miss prometheus.Counter
+	Hit  metric.Int64Counter
+	Miss metric.Int64Counter
+	// Size reports entries currently stored, not capacity.
+	Size       metric.Int64ObservableGauge
+	attributes metric.MeasurementOption
 }
 
-func newMetrics(scope promutils.Scope) Metrics {
-	return Metrics{
-		Hit:  scope.MustNewCounter("cache_hit", "Indicates that the item was found in the cache"),
-		Miss: scope.MustNewCounter("cache_miss", "Indicates that the item was found in the cache"),
+func newMetrics(scope, implementation string, size func() int64, provider metric.MeterProvider) (Metrics, error) {
+	if provider == nil {
+		provider = noop.NewMeterProvider()
 	}
+	meter := provider.Meter("github.com/flyteorg/flyte/v2/flytestdlib/fastcheck")
+	attributes := metric.WithAttributes(attribute.String("scope", scope), attribute.String("implementation", implementation))
+	hit, err := meter.Int64Counter("fastcheck.cache_hit", metric.WithDescription("Number of filter lookups that found the ID"), metric.WithUnit("{lookup}"))
+	if err != nil {
+		return Metrics{}, err
+	}
+	miss, err := meter.Int64Counter("fastcheck.cache_miss", metric.WithDescription("Number of filter lookups that did not find the ID"), metric.WithUnit("{lookup}"))
+	if err != nil {
+		return Metrics{}, err
+	}
+	sizeGauge, err := meter.Int64ObservableGauge(
+		"fastcheck.size",
+		metric.WithDescription("Number of entries currently stored in the filter"),
+		metric.WithUnit("{entry}"),
+		metric.WithInt64Callback(func(_ context.Context, observer metric.Int64Observer) error {
+			observer.Observe(size(), attributes)
+			return nil
+		}),
+	)
+	if err != nil {
+		return Metrics{}, err
+	}
+	return Metrics{Hit: hit, Miss: miss, Size: sizeGauge, attributes: attributes}, nil
 }
