@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -218,6 +219,38 @@ func humanSummary(event *workflow.ActionEvent) string {
 	return truncateUTF8(summary, noteLimit)
 }
 
+// pendingK8sEvents collects the action events one reconcile recorded, so they are
+// emitted as Kubernetes Event only once the reconcile has persisted its status.
+type pendingK8sEvents struct {
+	items     []pendingK8sEvent
+	committed int
+}
+
+type pendingK8sEvent struct {
+	taskAction *flyteorgv1.TaskAction
+	event      *workflow.ActionEvent
+	prevPhase  common.ActionPhase
+}
+
+type pendingK8sEventsKey struct{}
+
+func withPendingK8sEvents(ctx context.Context, p *pendingK8sEvents) context.Context {
+	return context.WithValue(ctx, pendingK8sEventsKey{}, p)
+}
+
+func pendingK8sEventsFrom(ctx context.Context) *pendingK8sEvents {
+	p, _ := ctx.Value(pendingK8sEventsKey{}).(*pendingK8sEvents)
+	return p
+}
+
+func (p *pendingK8sEvents) commit() {
+	p.committed = len(p.items)
+}
+
+func (p *pendingK8sEvents) add(taskAction *flyteorgv1.TaskAction, event *workflow.ActionEvent, prevPhase common.ActionPhase) {
+	p.items = append(p.items, pendingK8sEvent{taskAction: taskAction, event: event, prevPhase: prevPhase})
+}
+
 // shouldEmitK8sEvent reports whether event is emitted as a Kubernetes Event under mode.
 // Terminal phases and system retries are what an external consumer act on.
 func shouldEmitK8sEvent(mode K8sEventMode, event *workflow.ActionEvent, prevPhase common.ActionPhase) bool {
@@ -245,4 +278,11 @@ func truncateUTF8(s string, limit int) string {
 		s = s[:limit]
 	}
 	return strings.ToValidUTF8(s, "")
+}
+
+// commitPendingK8sEvent marks the reconcile's queued events as emittable.
+func commitPendingK8sEvent(ctx context.Context) {
+	if p := pendingK8sEventsFrom(ctx); p != nil {
+		p.commit()
+	}
 }

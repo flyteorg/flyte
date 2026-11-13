@@ -399,3 +399,24 @@ func TestEmitK8sEvent(t *testing.T) {
 		})
 	}
 }
+
+func TestRecordEventQueueK8sEvent(t *testing.T) {
+	ctx := context.Background()
+	k8sClient := fake.NewClientBuilder().Build()
+	reconciler := &TaskActionReconciler{
+		Client:       k8sClient,
+		eventsClient: &fakeEventsClient{},
+		K8sEventMode: K8sEventAll,
+	}
+	taskAction := testTaskAction()
+	event := testActionEvent(common.ActionPhase_ACTION_PHASE_RUNNING, 0)
+
+	pending := &pendingK8sEvents{}
+	require.NoError(t, reconciler.recordEvent(withPendingK8sEvents(ctx, pending), taskAction, event, common.ActionPhase_ACTION_PHASE_QUEUED))
+
+	created := &eventsv1.EventList{}
+	require.NoError(t, k8sClient.List(ctx, created))
+	assert.Empty(t, created.Items, "recordEvent must not create the k8s Event itself")
+	require.Len(t, pending.items, 1)
+	assert.Same(t, event, pending.items[0].event)
+}

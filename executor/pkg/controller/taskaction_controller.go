@@ -128,8 +128,7 @@ type TaskActionReconciler struct {
 // callers still block until their batch commits, so at-least-once semantics are
 // identical to a direct Record (on error the reconcile requeues and re-emits,
 // deduped server-side by ON CONFLICT DO NOTHING). Falls back to a direct Record
-// when no batcher is set (unit tests). Once persisted, the event is also emitted
-// as a Kubernetes Event on taskAction, filtered by K8sEventMode.
+// when no batcher is set (unit tests). Once persisted, the event is queued for emission as a Kubernetes Event; Reconcile emits it after the status write succeeds.
 func (r *TaskActionReconciler) recordEvent(
 	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
@@ -150,7 +149,9 @@ func (r *TaskActionReconciler) recordEvent(
 	if err != nil {
 		return err
 	}
-	r.emitK8sEvent(ctx, taskAction, event, prevPhase)
+	if p := pendingK8sEventsFrom(ctx); p != nil {
+		p.add(taskAction, event, prevPhase)
+	}
 	return nil
 }
 
@@ -773,6 +774,8 @@ func (r *TaskActionReconciler) recordSystemError(
 		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
 		if updErr != nil {
 			logger.Error(updErr, "failed to persist SystemFailures counter")
+		} else {
+			commitPendingK8sEvent(ctx)
 		}
 	}
 	return r.timeoutAwareRequeue(taskAction, maxRuntime), nil
@@ -841,9 +844,20 @@ func NewTaskActionReconciler(
 // +kubebuilder:rbac:groups=flyte.org,resources=taskactions/finalizers,verbs=update
 // +kubebuilder:rbac:groups="",resources=pods,verbs=get;list;watch;create;update;patch;delete
 
-// Reconcile is part of the main kubernetes reconciliation loop which aims to
-// move the current state of the cluster closer to the desired state.
+// Reconcile runs one pass over a TaskAction and, once that pass has persisted its
+// status, emits the action event it recorded as Kubernetes Events.
 func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+	pending := &pendingK8sEvents{}
+	res, err := r.reconcile(withPendingK8sEvents(ctx, pending), req)
+	for _, p := range pending.items[:pending.committed] {
+		r.emitK8sEvent(ctx, p.taskAction, p.event, p.prevPhase)
+	}
+	return res, err
+}
+
+// reconcile is part of the main kubernetes reconciliation loop which aims to
+// move the current state of the cluster closer to the desired state.
+func (r *TaskActionReconciler) reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	// Fetch the TaskAction instance
 	taskAction := &flyteorgv1.TaskAction{}
 	start := time.Now()
@@ -1237,6 +1251,7 @@ func (r *TaskActionReconciler) removeFinalizer(ctx context.Context, taskAction *
 	if err != nil {
 		return ctrl.Result{}, err
 	}
+	commitPendingK8sEvent(ctx)
 	return ctrl.Result{}, nil
 }
 
@@ -1275,7 +1290,7 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 		logger.Error(err, "Error updating status", "name", oldTaskAction.Name, "error", err, "TaskAction", newTaskAction)
 		return err
 	}
-
+	commitPendingK8sEvent(ctx)
 	return nil
 }
 

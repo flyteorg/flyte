@@ -28,12 +28,14 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	eventsv1 "k8s.io/api/events/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/events"
 	testingclock "k8s.io/utils/clock/testing"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
@@ -1957,6 +1959,87 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(isTerminal(getTaskAction(nn))).To(BeTrue())
 			Expect(fake.abortCalls).To(BeZero())
+		})
+
+		Context("k8s events follow the status write", func() {
+			startedAt := time.Date(2026, time.August, 25, 0, 0, 0, 0, time.UTC)
+
+			// interceptor.NewClient needs a WithWatch; wrap the envtest config in one.
+			watchClient := func() client.WithWatch {
+				c, err := client.NewWithWatch(cfg, client.Options{Scheme: k8sClient.Scheme()})
+				Expect(err).NotTo(HaveOccurred())
+				return c
+			}
+
+			k8sEventsFor := func(nn types.NamespacedName) []eventsv1.Event {
+				list := &eventsv1.EventList{}
+				Expect(k8sClient.List(ctx, list, client.InNamespace(nn.Namespace))).To(Succeed())
+				var out []eventsv1.Event
+				for _, e := range list.Items {
+					if e.Regarding.Name == nn.Name {
+						out = append(out, e)
+					}
+				}
+				return out
+			}
+
+			It("waits for the reconcile whose status write succeeds, then emits once", func() {
+				// Fail only the write that carries the Running phase, and only once.
+				// Earlier writes in the same reconcile (AttemptStartedAt) must succeed
+				// so the reconcile reaches recordEvent.
+				failures := 1
+				flaky := interceptor.NewClient(watchClient(), interceptor.Funcs{
+					SubResourceUpdate: func(ctx context.Context, c client.Client, sub string, obj client.Object, opts ...client.SubResourceUpdateOption) error {
+						ta, ok := obj.(*flyteorgv1.TaskAction)
+						if ok && failures > 0 && ta.Status.PluginPhase == pluginsCore.PhaseRunning.String() {
+							failures--
+							return stderrors.New("injected status write failure")
+						}
+						return c.SubResource(sub).Update(ctx, obj, opts...)
+					},
+				})
+				fake := &fakePlugin{id: "timeout-plugin", transitions: []pluginsCore.Transition{runningTransition(startedAt)}}
+				recorded := &recordingEventsClient{}
+				r := newReconciler(fake, testingclock.NewFakeClock(startedAt), recorded, flaky)
+				r.K8sEventMode = K8sEventAll
+				r.reportingInstance = "taskaction-controller-test"
+				nn := createTaskAction("k8s-event-retry", buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", 0, 0))
+				request := reconcile.Request{NamespacedName: nn}
+
+				_, err := r.Reconcile(ctx, request)
+				Expect(err).To(MatchError(ContainSubstring("injected")))
+				Expect(recorded.RecordedEvents()).To(HaveLen(1), "events service was called")
+				Expect(k8sEventsFor(nn)).To(BeEmpty(), "status not persisted: no k8s Event")
+
+				_, err = r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(recorded.RecordedEvents()).To(HaveLen(2), "re-recorded; the events DB dedups this")
+				k8sEvents := k8sEventsFor(nn)
+				Expect(k8sEvents).To(HaveLen(1))
+				Expect(k8sEvents[0].Reason).To(Equal(string(ReasonActionRunning)))
+			})
+
+			It("keeps the terminal event when a step after the status write fails", func() {
+				noPatch := interceptor.NewClient(watchClient(), interceptor.Funcs{
+					Patch: func(context.Context, client.WithWatch, client.Object, client.Patch, ...client.PatchOption) error {
+						return stderrors.New("injected label patch failure")
+					},
+				})
+				fake := &fakePlugin{id: "timeout-plugin", transitions: []pluginsCore.Transition{
+					pluginsCore.DoTransition(pluginsCore.PhaseInfoSuccess(&pluginsCore.TaskInfo{OccurredAt: &startedAt})),
+				}}
+				r := newReconciler(fake, testingclock.NewFakeClock(startedAt), &recordingEventsClient{}, noPatch)
+				r.K8sEventMode = K8sEventTerminal
+				r.reportingInstance = "taskaction-controller-test"
+				nn := createTaskAction("k8s-event-terminal", buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", 0, 0))
+
+				_, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+				Expect(err).To(MatchError(ContainSubstring("injected")))
+				Expect(isTerminal(getTaskAction(nn))).To(BeTrue(), "status was persisted before the patch failed")
+				k8sEvents := k8sEventsFor(nn)
+				Expect(k8sEvents).To(HaveLen(1))
+				Expect(k8sEvents[0].Reason).To(Equal(string(ReasonActionSucceeded)))
+			})
 		})
 	})
 
