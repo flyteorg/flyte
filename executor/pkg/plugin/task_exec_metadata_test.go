@@ -317,3 +317,53 @@ func TestNewTaskExecutionMetadata_CRDLabelsDoNotClobberIdentifyingLabels(t *test
 	require.Equal(t, "run-name", labels[RunLabel])
 	require.Equal(t, "data", labels["team"])
 }
+
+func TestNewTaskExecutionMetadata_TraceEnvironmentVariables(t *testing.T) {
+	const traceparent = "00-0123456789abcdef0123456789abcdef-0123456789abcdef-01"
+	for _, tc := range []struct {
+		name        string
+		annotations map[string]string
+		userEnv     map[string]string
+		want        map[string]string
+	}{
+		{
+			name:        "all trace annotations override user environment",
+			annotations: map[string]string{"traceparent": traceparent, "tracestate": "vendor=value", "baggage": "tenant=example", "owner": "sdk"},
+			userEnv:     map[string]string{"TRACEPARENT": "old", "TRACESTATE": "old", "BAGGAGE": "old", "USER_VAR": "kept"},
+			want:        map[string]string{"TRACEPARENT": traceparent, "TRACESTATE": "vendor=value", "BAGGAGE": "tenant=example", "USER_VAR": "kept"},
+		},
+		{
+			name:        "traceparent only",
+			annotations: map[string]string{"traceparent": traceparent},
+			want:        map[string]string{"TRACEPARENT": traceparent},
+		},
+		{
+			name:        "baggage only",
+			annotations: map[string]string{"baggage": "tenant=example"},
+			want:        map[string]string{"BAGGAGE": "tenant=example"},
+		},
+		{name: "no annotations"},
+		{name: "empty annotations", annotations: map[string]string{"traceparent": "", "tracestate": "", "baggage": ""}},
+		{
+			name:    "absent annotations preserve user environment",
+			userEnv: map[string]string{"TRACEPARENT": traceparent, "USER_VAR": "kept"},
+			want:    map[string]string{"TRACEPARENT": traceparent, "USER_VAR": "kept"},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			ta := &flyteorgv1.TaskAction{
+				ObjectMeta: metav1.ObjectMeta{Annotations: tc.annotations},
+				Spec:       flyteorgv1.TaskActionSpec{EnvVars: tc.userEnv},
+			}
+			original := ta.DeepCopy()
+			meta, err := NewTaskExecutionMetadata(ta)
+			require.NoError(t, err)
+			expected := map[string]string{"ACTION_NAME": "", "RUN_NAME": "", "_U_RUN_BASE": "", "_U_ORG_NAME": "local"}
+			for k, v := range tc.want {
+				expected[k] = v
+			}
+			require.Equal(t, expected, meta.GetEnvironmentVariables())
+			require.Equal(t, original, ta, "building metadata must not mutate the TaskAction")
+		})
+	}
+}

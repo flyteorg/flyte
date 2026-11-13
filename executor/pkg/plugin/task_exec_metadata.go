@@ -117,6 +117,17 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		"_U_RUN_BASE": ta.Spec.RunOutputBase,
 		"_U_ORG_NAME": "local",
 	}
+	// Carry the enqueue trace context into the task process. Set these before
+	// merging user environment variables so the action's trace context wins.
+	for annotation, envName := range map[string]string{
+		"traceparent": "TRACEPARENT",
+		"tracestate":  "TRACESTATE",
+		"baggage":     "BAGGAGE",
+	} {
+		if value := ta.Annotations[annotation]; value != "" {
+			envVars[envName] = value
+		}
+	}
 	for key, value := range ta.Spec.EnvVars {
 		if _, exists := envVars[key]; !exists {
 			envVars[key] = value
