@@ -717,3 +717,29 @@ func TestCanonicalAcceleratorNamesCoversEveryModel(t *testing.T) {
 	// Every value but UNSPECIFIED carries a name.
 	assert.Len(t, canonicalAcceleratorNames, values.Len()-1)
 }
+
+func TestValidateLogRetentionDays(t *testing.T) {
+	tests := []struct {
+		name    string
+		setting *settings.Int64Setting
+		wantErr bool
+	}{
+		{"nil leaf", nil, false},
+		{"unset ignores its value", concurrency(stateUnset, -1), false},
+		{"zero defers to the server", concurrency(stateValue, 0), false},
+		{"positive is allowed", concurrency(stateValue, 30), false},
+		{"negative is rejected", concurrency(stateValue, -1), true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateLogRetentionDays(tt.setting)
+			if tt.wantErr {
+				require.Error(t, err)
+				assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+				return
+			}
+			assert.NoError(t, err)
+		})
+	}
+}
