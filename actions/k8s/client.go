@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -26,6 +27,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
 	k8sutil "github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -168,6 +170,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 			return fmt.Errorf("failed to embed task template: %w", err)
 		}
 
+		injectTraceAnnotations(ctx, taskAction)
 		if err := c.k8sClient.Create(ctx, taskAction); err != nil {
 			// Surface AlreadyExists so callers can treat a re-enqueue (e.g. from
 			// a restarted parent) as already launched.
@@ -210,6 +213,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 		// carries the ConditionSpec and stays pending until an external signal
 		// resolves it. So no TaskTemplate or CacheKey is needed here.
 
+		injectTraceAnnotations(ctx, taskAction)
 		if err := c.k8sClient.Create(ctx, taskAction); err != nil {
 			if apierrors.IsAlreadyExists(err) {
 				return connect.NewError(connect.CodeAlreadyExists,
@@ -998,6 +1002,22 @@ func (c *ActionsClient) markTerminalStatusRecorded(ctx context.Context, taskActi
 		return err
 	}
 	return nil
+}
+
+// injectTraceAnnotations replaces inherited trace data with the enqueue context.
+func injectTraceAnnotations(ctx context.Context, taskAction *executorv1.TaskAction) {
+	propagator := otelutils.RPCPropagator()
+	for _, key := range propagator.Fields() {
+		delete(taskAction.Annotations, key)
+	}
+	carrier := propagation.MapCarrier{}
+	propagator.Inject(ctx, carrier)
+	if len(carrier) > 0 && taskAction.Annotations == nil {
+		taskAction.Annotations = make(map[string]string, len(carrier))
+	}
+	for key, value := range carrier {
+		taskAction.Annotations[key] = value
+	}
 }
 
 // newTaskActionCR builds the CR skeleton (name, namespace, labels) shared by
