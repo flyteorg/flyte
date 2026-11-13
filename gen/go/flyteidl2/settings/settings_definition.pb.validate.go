@@ -1267,6 +1267,35 @@ func (m *SecuritySettings) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetKubernetesNamespace()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SecuritySettingsValidationError{
+					field:  "KubernetesNamespace",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SecuritySettingsValidationError{
+					field:  "KubernetesNamespace",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetKubernetesNamespace()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SecuritySettingsValidationError{
+				field:  "KubernetesNamespace",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return SecuritySettingsMultiError(errors)
 	}
@@ -2067,6 +2096,137 @@ var _ interface {
 	ErrorName() string
 } = AppSettingsValidationError{}
 
+// Validate checks the field values on ObservabilitySettings with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ObservabilitySettings) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ObservabilitySettings with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ObservabilitySettingsMultiError, or nil if none found.
+func (m *ObservabilitySettings) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ObservabilitySettings) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetLogRetentionDays()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ObservabilitySettingsValidationError{
+					field:  "LogRetentionDays",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ObservabilitySettingsValidationError{
+					field:  "LogRetentionDays",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetLogRetentionDays()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ObservabilitySettingsValidationError{
+				field:  "LogRetentionDays",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ObservabilitySettingsMultiError(errors)
+	}
+
+	return nil
+}
+
+// ObservabilitySettingsMultiError is an error wrapping multiple validation
+// errors returned by ObservabilitySettings.ValidateAll() if the designated
+// constraints aren't met.
+type ObservabilitySettingsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ObservabilitySettingsMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ObservabilitySettingsMultiError) AllErrors() []error { return m }
+
+// ObservabilitySettingsValidationError is the validation error returned by
+// ObservabilitySettings.Validate if the designated constraints aren't met.
+type ObservabilitySettingsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ObservabilitySettingsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ObservabilitySettingsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ObservabilitySettingsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ObservabilitySettingsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ObservabilitySettingsValidationError) ErrorName() string {
+	return "ObservabilitySettingsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ObservabilitySettingsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sObservabilitySettings.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ObservabilitySettingsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ObservabilitySettingsValidationError{}
+
 // Validate checks the field values on Settings with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -2344,6 +2504,35 @@ func (m *Settings) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return SettingsValidationError{
 				field:  "PodTemplateName",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetObservability()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SettingsValidationError{
+					field:  "Observability",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SettingsValidationError{
+					field:  "Observability",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetObservability()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SettingsValidationError{
+				field:  "Observability",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

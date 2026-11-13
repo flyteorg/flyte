@@ -503,6 +503,8 @@ func (m *ClusterFailurePolicy) validate(all bool) error {
 
 	// no validation rules for RestartOnHostMaintenance
 
+	// no validation rules for ResumeAfterPreemption
+
 	if len(errors) > 0 {
 		return ClusterFailurePolicyMultiError(errors)
 	}

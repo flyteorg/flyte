@@ -6,19 +6,16 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
+	"go.opentelemetry.io/otel/metric/noop"
 )
 
 func TestFilter(t *testing.T) {
 	ctx := context.TODO()
 
-	lru, err := NewLRUCacheFilter(2, promutils.NewTestScope())
+	lru, err := NewLRUCacheFilter(2, "test", noop.NewMeterProvider())
 	assert.NoError(t, err)
 	assert.NotNil(t, lru)
-	oppo, err := NewOppoBloomFilter(2, promutils.NewTestScope())
+	oppo, err := NewOppoBloomFilter(2, "test", noop.NewMeterProvider())
 	assert.NoError(t, err)
 	assert.NotNil(t, oppo)
 
@@ -58,16 +55,40 @@ func TestFilter(t *testing.T) {
 
 }
 
+func TestFilterRemove(t *testing.T) {
+	ctx := context.Background()
+	lru, err := NewLRUCacheFilter(2, "test", noop.NewMeterProvider())
+	assert.NoError(t, err)
+	oppo, err := NewOppoBloomFilter(1, "test", noop.NewMeterProvider())
+	assert.NoError(t, err)
+	for name, filter := range map[string]Filter{"lru": lru, "oppo": oppo} {
+		t.Run(name, func(t *testing.T) {
+			id, other := []byte("id"), []byte("other")
+			assert.False(t, filter.Remove(ctx, id))
+			filter.Add(ctx, id)
+			assert.True(t, filter.Remove(ctx, id))
+			assert.False(t, filter.Contains(ctx, id))
+			assert.False(t, filter.Remove(ctx, id))
+			filter.Add(ctx, other)
+			assert.False(t, filter.Remove(ctx, id))
+			assert.True(t, filter.Contains(ctx, other), "removing a missing ID must preserve a colliding ID")
+			filter.Add(ctx, id)
+			assert.True(t, filter.Contains(ctx, id))
+			assert.True(t, filter.Remove(ctx, id))
+		})
+	}
+}
+
 func TestSizeRounding(t *testing.T) {
-	f, _ := NewOppoBloomFilter(3, promutils.NewTestScope())
+	f, _ := NewOppoBloomFilter(3, "test", noop.NewMeterProvider())
 	if len(f.array) != 4 {
 		t.Errorf("3 should round to 4")
 	}
-	f, _ = NewOppoBloomFilter(4, promutils.NewTestScope())
+	f, _ = NewOppoBloomFilter(4, "test", noop.NewMeterProvider())
 	if len(f.array) != 4 {
 		t.Errorf("4 should round to 4")
 	}
-	f, _ = NewOppoBloomFilter(129, promutils.NewTestScope())
+	f, _ = NewOppoBloomFilter(129, "test", noop.NewMeterProvider())
 	if len(f.array) != 256 {
 		t.Errorf("129 should round to 256")
 	}
@@ -75,7 +96,7 @@ func TestSizeRounding(t *testing.T) {
 
 func TestTooLargeSize(t *testing.T) {
 	size := (1 << 30) + 1
-	f, err := NewOppoBloomFilter(size, promutils.NewTestScope())
+	f, err := NewOppoBloomFilter(size, "test", noop.NewMeterProvider())
 	if err != ErrSizeTooLarge {
 		t.Errorf("did not error out on a too-large filter size")
 	}
@@ -85,7 +106,7 @@ func TestTooLargeSize(t *testing.T) {
 }
 
 func TestTooSmallSize(t *testing.T) {
-	f, err := NewOppoBloomFilter(0, promutils.NewTestScope())
+	f, err := NewOppoBloomFilter(0, "test", noop.NewMeterProvider())
 	if err != ErrSizeTooSmall {
 		t.Errorf("did not error out on a too small filter size")
 	}
@@ -146,9 +167,9 @@ func BenchmarkFilter(b *testing.B) {
 	parallelism := 10
 	cacheSize := 5000
 
-	bf, err := NewOppoBloomFilter(cacheSize, promutils.NewTestScope())
+	bf, err := NewOppoBloomFilter(cacheSize, "test", noop.NewMeterProvider())
 	assert.NoError(b, err)
-	lf, err := NewLRUCacheFilter(cacheSize, promutils.NewTestScope())
+	lf, err := NewLRUCacheFilter(cacheSize, "test", noop.NewMeterProvider())
 	assert.NoError(b, err)
 	ids := RandBytesSliceGenerator(100, 100000)
 
@@ -167,8 +188,4 @@ func BenchmarkFilter(b *testing.B) {
 	b.Run("lruCacheAddBenchmark", func(b *testing.B) {
 		benchmarkFilter(b, ids, lf.Add, parallelism)
 	})
-}
-
-func init() {
-	labeled.SetMetricKeys(contextutils.MetricKeysFromStrings([]string{"test"})...)
 }

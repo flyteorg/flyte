@@ -167,6 +167,8 @@ message RunSettings {
 // SecuritySettings controls security-related configuration.
 message SecuritySettings {
   StringSetting service_account = 1 [(flyteidl2.settings.desc) = "Kubernetes service account for task pods"];
+  // A server may restrict which values are allowed, and who may set this.
+  StringSetting kubernetes_namespace = 2 [(flyteidl2.settings.desc) = "Kubernetes namespace that task pods and apps run in"];
 }
 
 // StorageSettings controls data storage configuration.
@@ -212,6 +214,13 @@ message AppSettings {
   StringSetting app_dns_strategy = 2 [(flyteidl2.settings.desc) = "App public-URL DNS strategy: 'shared' (default) or 'dataplane_specific'"];
 }
 
+// ObservabilitySettings controls how long observability data stays visible.
+message ObservabilitySettings {
+  // How many days after an action attempt ends its logs stay visible. 0 or unset leaves it
+  // to the server, which may also cap how high it can be set.
+  Int64Setting log_retention_days = 1 [(flyteidl2.settings.desc) = "Days task logs stay visible after an attempt ends. 0 or unset leaves it to the server."];
+}
+
 // Settings holds all configurable settings for a scope.
 message Settings {
   RunSettings run = 1;
@@ -223,4 +232,5 @@ message Settings {
   StringMapSetting environment_variables = 7 [(flyteidl2.settings.desc) = "Environment variables injected into task pods. Child overrides parent on key conflict."];
   AppSettings app = 8 [(flyteidl2.settings.desc) = "Union Apps auth policy"];
   StringSetting pod_template_name = 9 [(flyteidl2.settings.desc) = "Name of the Kubernetes PodTemplate used as the base for task pods"];
+  ObservabilitySettings observability = 10 [(flyteidl2.settings.desc) = "Log and observability retention"];
 }

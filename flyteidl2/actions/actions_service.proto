@@ -22,7 +22,9 @@ service ActionsService {
 
   // WatchForUpdates watches for updates to the state of actions.
   // This API guarantees at-least-once delivery semantics.
-  rpc WatchForUpdates(WatchForUpdatesRequest) returns (stream WatchForUpdatesResponse) {}
+  rpc WatchForUpdates(WatchForUpdatesRequest) returns (stream WatchForUpdatesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Update updates the status of an action and saves serialized NodeStatus.
   // This deprecates Put in the current StateService.
@@ -58,7 +60,7 @@ message Action {
   string run_output_base = 4 [(buf.validate.field).string.min_len = 1];
 
   // group this action belongs to, if applicable.
-  string group = 5;
+  string group = 5 [(buf.validate.field).string.max_len = 255];
 
   // subject that created the run, if known.
   string subject = 6;
@@ -80,6 +82,10 @@ message Action {
   // identifies the source action (source run id + action name) whose result was reused.
   // never set by clients on enqueue.
   flyteidl2.common.ActionIdentifier recovered_from = 10;
+
+  // set by the parent's controller when this action's inputs or code were overridden
+  // from the run's overrides file (see flyteidl2.task.ActionOverridesData).
+  bool override_applied = 11;
 }
 
 // ============================================================================
@@ -88,7 +94,16 @@ message Action {
 
 // EnqueueRequest is a request message for queuing an action.
 message EnqueueRequest {
-  Action action = 1 [(buf.validate.field).required = true];
+  // The action's name must not contain '/' or ':', which separate the parts of an action's key.
+  // Only checked here, so that existing actions stay readable.
+  Action action = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      id: "action.action_id.name.no_separators"
+      message: "Action name must not contain '/' or ':'"
+      expression: "!this.action_id.name.matches('[/:]')"
+    }
+  ];
 
   // Optional run spec passed in by the root action to be utilized by all downstream actions in the run.
   flyteidl2.task.RunSpec run_spec = 2;

@@ -114,6 +114,11 @@ spec:
             {{- tpl (toYaml .) $ | nindent 12 }}
           {{- end }}
           ports:
+            {{- if $.Values.configuration.dataproxy.pprofPort }}
+            - name: pprof
+              containerPort: {{ $.Values.configuration.dataproxy.pprofPort }}
+              protocol: TCP
+            {{- end }}
             - name: http
               containerPort: {{ include "flyte-core.componentPort" (dict "root" $ "component" $name) }}
               protocol: TCP

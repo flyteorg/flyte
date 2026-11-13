@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
@@ -9,6 +10,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/profutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 )
@@ -73,6 +75,21 @@ type SetupContext struct {
 // server. The worker should block until ctx is cancelled.
 func (sc *SetupContext) AddWorker(name string, fn WorkerFunc) {
 	sc.workers = append(sc.workers, namedWorker{name: name, fn: fn})
+}
+
+// AddProfilingServer registers a profiling worker. A nonpositive port disables it.
+// Services sharing a process must use distinct profiling ports.
+func (sc *SetupContext) AddProfilingServer(name string, port int) {
+	if port <= 0 {
+		return
+	}
+	sc.AddWorker(name+"-pprof", func(ctx context.Context) error {
+		err := profutils.StartProfilingServer(ctx, port)
+		if errors.Is(err, http.ErrServerClosed) {
+			return nil
+		}
+		return err
+	})
 }
 
 // AddReadyCheck registers a readiness check invoked on /readyz.

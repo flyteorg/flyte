@@ -51,6 +51,7 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "metricsBindAddress"), defaultConfig.MetricsBindAddress, "Address the metrics endpoint binds to")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "pprofBindAddress"), defaultConfig.PprofBindAddress, "Address the pprof endpoint binds to; empty or 0 disables profiling")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "healthProbeBindAddress"), defaultConfig.HealthProbeBindAddress, "Address the probe endpoint binds to")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "leaderElect"), defaultConfig.LeaderElect, "Enable leader election for controller manager")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "metricsSecure"), defaultConfig.MetricsSecure, "Serve metrics endpoint via HTTPS")
@@ -69,6 +70,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "eventsService.auth.clientSecretFile"), defaultConfig.EventsService.Auth.ClientSecretFile, "File containing the event service OAuth 2.0 client secret")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "eventsService.auth.scopes"), defaultConfig.EventsService.Auth.Scopes, "Event service OAuth 2.0 scopes")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "eventsService.auth.audience"), defaultConfig.EventsService.Auth.Audience, "Event service OAuth 2.0 token audience")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "eventsService.http.maxIdleConnsPerHost"), defaultConfig.EventsService.HTTP.MaxIdleConnsPerHost, "Event service idle connections kept per host; 0 uses Go's default of 2")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cacheService.url"), defaultConfig.CacheService.URL, "Cache service base URL")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cacheService.auth.type"), string(defaultConfig.CacheService.Auth.Type), "Cache service authentication type")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cacheService.auth.issuerUrl"), defaultConfig.CacheService.Auth.IssuerURL, "Cache service OAuth 2.0 issuer URL")
@@ -77,6 +79,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cacheService.auth.clientSecretFile"), defaultConfig.CacheService.Auth.ClientSecretFile, "File containing the cache service OAuth 2.0 client secret")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "cacheService.auth.scopes"), defaultConfig.CacheService.Auth.Scopes, "Cache service OAuth 2.0 scopes")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cacheService.auth.audience"), defaultConfig.CacheService.Auth.Audience, "Cache service OAuth 2.0 token audience")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "cacheService.http.maxIdleConnsPerHost"), defaultConfig.CacheService.HTTP.MaxIdleConnsPerHost, "Cache service idle connections kept per host; 0 uses Go's default of 2")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cluster"), defaultConfig.Cluster, "Cluster identifier for action events")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "defaultK8sServiceAccount"), defaultConfig.DefaultK8sServiceAccount, "Default Kubernetes service account for task pods when the task does not set one")
 	cmdFlags.Int32(fmt.Sprintf("%v%v", prefix, "maxSystemFailures"), defaultConfig.MaxSystemFailures, "Max system-level failures per attempt before forcing permanent failure")

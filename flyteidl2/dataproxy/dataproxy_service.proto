@@ -40,7 +40,9 @@ service DataProxyService {
   }
 
   // Stream logs for an action attempt.
-  rpc TailLogs(TailLogsRequest) returns (stream TailLogsResponse) {}
+  rpc TailLogs(TailLogsRequest) returns (stream TailLogsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 // CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.
@@ -153,6 +155,12 @@ message UploadInputsRequest {
   // the object store of that queue's cluster pool; when empty, the project/domain
   // default queue's pool is used. Single-cluster deployments may ignore it.
   string queue = 8;
+
+  // Set when the inputs are registered with a trigger rather than used by a
+  // single run. Every run the trigger creates reads them, so the server may
+  // store them separately from per-run data and keep them for as long as the
+  // trigger exists.
+  bool for_trigger = 9;
 }
 
 message UploadInputsResponse {
