@@ -1275,6 +1275,7 @@ k8s (`config.K8sPluginConfig`_)
   default-security-context: null
   default-tolerations: null
   delete-resource-on-finalize: false
+  delete-resource-on-finalize-excluded-plugins: []
   enable-distributed-error-aggregation: false
   enable-host-networking-pod: null
   gpu-device-node-label: k8s.amazonaws.com/accelerator
@@ -2483,6 +2484,18 @@ Instructs the system to delete the resource upon successful execution of a k8s p
 .. code-block:: yaml
 
   "false"
+  
+
+delete-resource-on-finalize-excluded-plugins ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+List of k8s plugin IDs whose resources should not be deleted on finalize even when delete-resource-on-finalize is enabled.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
   
 
 create-container-error-grace-period (`config.Duration`_)

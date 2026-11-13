@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -563,7 +564,8 @@ func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecu
 	}
 
 	// If we should delete the resource when finalize is called, do a best effort delete.
-	if cfg.DeleteResourceOnFinalize && !e.plugin.GetProperties().DisableDeleteResourceOnFinalize {
+	if cfg.DeleteResourceOnFinalize && !e.plugin.GetProperties().DisableDeleteResourceOnFinalize &&
+		!slices.Contains(cfg.DeleteResourceOnFinalizeExcludedPlugins, e.id) {
 		// Attempt to delete resource, if not found, return success.
 		if err := e.kubeClient.GetClient().Delete(ctx, o); err != nil {
 			if isK8sObjectNotExists(err) {

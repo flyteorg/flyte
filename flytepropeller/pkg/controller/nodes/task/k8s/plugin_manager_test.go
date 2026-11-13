@@ -1262,6 +1262,49 @@ func TestFinalize(t *testing.T) {
 		}, actualO))
 	})
 
+	for _, tc := range []struct {
+		name            string
+		pluginID        string
+		excludedPlugins []string
+		expectDeleted   bool
+	}{
+		{name: "PluginExcluded", pluginID: "ray", excludedPlugins: []string{"spark", "ray"}, expectDeleted: false},
+		{name: "PluginNotExcluded", pluginID: "pytorch", excludedPlugins: []string{"spark", "ray"}, expectDeleted: true},
+	} {
+		t.Run("DeleteResourceOnFinalizeExcludedPlugins="+tc.name, func(t *testing.T) {
+			ctx := context.Background()
+			fakeKubeClient := mocks.NewFakeKubeClient()
+
+			assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+				DeleteResourceOnFinalize:                true,
+				DeleteResourceOnFinalizeExcludedPlugins: tc.excludedPlugins,
+			}))
+			p := pluginsk8sMock.Plugin{}
+			p.EXPECT().GetProperties().Return(k8s.PluginProperties{DisableInjectFinalizer: true})
+			tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
+			o := &v1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      tctx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
+					Namespace: tctx.TaskExecutionMetadata().GetNamespace(),
+				},
+			}
+			assert.NoError(t, fakeKubeClient.GetClient().Create(ctx, o))
+
+			p.EXPECT().BuildIdentityResource(ctx, tctx.TaskExecutionMetadata()).Return(o, nil)
+			pluginManager := PluginManager{id: tc.pluginID, plugin: &p, kubeClient: fakeKubeClient, updateBackoffRetries: 5}
+			assert.NoError(t, pluginManager.Finalize(ctx, tctx))
+
+			err := fakeKubeClient.GetClient().Get(ctx, k8stypes.NamespacedName{
+				Name:      o.Name,
+				Namespace: o.Namespace,
+			}, &v1.Pod{})
+			if tc.expectDeleted {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
 }
 
 func init() {
