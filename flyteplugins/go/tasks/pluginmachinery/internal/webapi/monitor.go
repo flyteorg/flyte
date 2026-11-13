@@ -2,7 +2,6 @@ package webapi
 
 import (
 	"context"
-	"time"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
@@ -40,7 +39,7 @@ func monitor(ctx context.Context, tCtx core.TaskExecutionContext, p Client, cach
 			}
 			return state, core.PhaseInfoFailure(errors.CacheFailed, cacheItem.ErrorMessage, nil), nil
 		}
-		return state, core.PhaseInfoQueued(time.Now(), cacheItem.PhaseVersion, "job submitted"), nil
+		return state, core.PhaseInfoUndefined, nil
 	}
 
 	newPhase, err := p.Status(ctx, newPluginContext(cacheItem.ResourceMeta, cacheItem.Resource, "", tCtx))
