@@ -63,9 +63,9 @@ func newActionsRouter(ctx context.Context, cfg *config.MultiClusterConfig,
 		members:  map[string][]string{},
 		runs:     runs,
 	}
-	for queue, entities := range cfg.QueueClusterMap {
-		entries := make([]random.Entry, 0, len(entities))
-		for _, e := range entities {
+	for queue, clusters := range cfg.QueueClusterMap {
+		entries := make([]random.Entry, 0, len(clusters))
+		for _, e := range clusters {
 			if _, ok := clients[e.ID]; !ok {
 				return nil, fmt.Errorf("queue %q: unknown cluster %q", queue, e.ID)
 			}
@@ -81,70 +81,13 @@ func newActionsRouter(ctx context.Context, cfg *config.MultiClusterConfig,
 	return r, nil
 }
 
-// clusterName lets cluster names go in a random.WeightedRandomList, which needs a stable order.
-type clusterName string
-
-func (c clusterName) Compare(to random.Comparable) bool { return c < to.(clusterName) }
-
-// placement returns the clusters a run may be on, the one it was placed on first. The others are
-// the queue's remaining clusters, for runs started before the queue's clusters or weights changed.
-func (r *ActionsRouter) placement(runName string, spec *task.RunSpec) ([]string, error) {
-	queue := spec.GetQueue()
-	if queue == "" {
-		return []string{r.home}, nil
-	}
-	list, ok := r.queues[queue]
-	if !ok {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unknown queue %q", queue))
-	}
-	// Seeded by the run name, as v1 seeds by execution name, so every call for a run picks the same cluster.
-	h := fnv.New64a()
-	_, _ = h.Write([]byte(runName))
-	picked, err := list.GetWithSeed(rand.NewSource(int64(h.Sum64()))) // #nosec G115
-	if err != nil {
-		return nil, err
-	}
-	clusters := []string{string(picked.(clusterName))}
-	for _, c := range r.members[queue] {
-		if c != clusters[0] {
-			clusters = append(clusters, c)
-		}
-	}
-	return clusters, nil
-}
-
-// runPlacement is the placement of a started run, read from its stored run spec.
-func (r *ActionsRouter) runPlacement(ctx context.Context, runID *common.RunIdentifier) ([]string, error) {
-	run, err := r.runs.GetRun(ctx, runID)
-	if err != nil {
-		return nil, fmt.Errorf("load run %s: %w", runID.GetName(), err)
-	}
-	return r.placement(runID.GetName(), extractRunSpecFromActionModel(ctx, run))
-}
-
-// tryEach calls the run's cluster first, then the queue's other clusters while the action is
-// not found, which the actions service reports as isAlreadyTerminated recognizes.
-func (r *ActionsRouter) tryEach(ctx context.Context, runID *common.RunIdentifier,
-	call func(actionsconnect.ActionsServiceClient) error) error {
-	clusters, err := r.runPlacement(ctx, runID)
-	if err != nil {
-		return err
-	}
-	for _, c := range clusters {
-		if err = call(r.clusters[c]); err == nil || !isAlreadyTerminated(err) {
-			return err
-		}
-	}
-	return err
-}
-
 func (r *ActionsRouter) Enqueue(ctx context.Context, req *connect.Request[actions.EnqueueRequest]) (
 	*connect.Response[actions.EnqueueResponse], error) {
-	clusters, err := r.placement(req.Msg.GetAction().GetActionId().GetRun().GetName(), req.Msg.GetRunSpec())
+	cluster, err := r.pickCluster(req.Msg.GetAction().GetActionId().GetRun().GetName(), req.Msg.GetRunSpec())
 	if err != nil {
 		return nil, err
 	}
-	return r.clusters[clusters[0]].Enqueue(ctx, req)
+	return r.clusters[cluster].Enqueue(ctx, req)
 }
 
 func (r *ActionsRouter) Abort(ctx context.Context, req *connect.Request[actions.AbortRequest]) (
@@ -170,18 +113,99 @@ func (r *ActionsRouter) Signal(ctx context.Context, req *connect.Request[actions
 
 func (r *ActionsRouter) Update(ctx context.Context, req *connect.Request[actions.UpdateRequest]) (
 	*connect.Response[actions.UpdateResponse], error) {
-	clusters, err := r.runPlacement(ctx, req.Msg.GetActionId().GetRun())
+	cluster, err := r.runCluster(ctx, req.Msg.GetActionId().GetRun())
 	if err != nil {
 		return nil, err
 	}
-	return r.clusters[clusters[0]].Update(ctx, req)
+	return r.clusters[cluster].Update(ctx, req)
 }
 
 func (r *ActionsRouter) WatchForUpdates(ctx context.Context, req *connect.Request[actions.WatchForUpdatesRequest]) (
 	*connect.ServerStreamForClient[actions.WatchForUpdatesResponse], error) {
-	clusters, err := r.runPlacement(ctx, req.Msg.GetParentActionId().GetRun())
+	cluster, err := r.runCluster(ctx, req.Msg.GetParentActionId().GetRun())
 	if err != nil {
 		return nil, err
 	}
-	return r.clusters[clusters[0]].WatchForUpdates(ctx, req)
+	return r.clusters[cluster].WatchForUpdates(ctx, req)
+}
+
+// clusterName lets cluster names go in a random.WeightedRandomList, which needs a stable order.
+type clusterName string
+
+func (c clusterName) Compare(to random.Comparable) bool { return c < to.(clusterName) }
+
+// pickCluster returns the cluster a run is placed on: the home cluster if it has no queue, else one
+// of the queue's clusters by weight.
+func (r *ActionsRouter) pickCluster(runName string, spec *task.RunSpec) (string, error) {
+	queue := spec.GetQueue()
+	if queue == "" {
+		return r.home, nil
+	}
+	list, ok := r.queues[queue]
+	if !ok {
+		return "", connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unknown queue %q", queue))
+	}
+	// Seeded by the run name, as v1 seeds by execution name, so every call for a run picks the same cluster.
+	h := fnv.New64a()
+	// FNV's Write never returns an error.
+	_, _ = h.Write([]byte(runName))
+	picked, err := list.GetWithSeed(rand.NewSource(int64(h.Sum64()))) // #nosec G115
+	if err != nil {
+		return "", err
+	}
+	return string(picked.(clusterName)), nil
+}
+
+// candidateClusters returns the clusters a run may be on, the picked one first. The others are the
+// queue's remaining clusters, for runs started before the queue's clusters or weights changed.
+func (r *ActionsRouter) candidateClusters(runName string, spec *task.RunSpec) ([]string, error) {
+	picked, err := r.pickCluster(runName, spec)
+	if err != nil {
+		return nil, err
+	}
+	clusters := []string{picked}
+	for _, c := range r.members[spec.GetQueue()] {
+		if c != picked {
+			clusters = append(clusters, c)
+		}
+	}
+	return clusters, nil
+}
+
+// runSpec reads a started run's stored run spec.
+func (r *ActionsRouter) runSpec(ctx context.Context, runID *common.RunIdentifier) (*task.RunSpec, error) {
+	run, err := r.runs.GetRun(ctx, runID)
+	if err != nil {
+		return nil, fmt.Errorf("load run %s: %w", runID.GetName(), err)
+	}
+	return extractRunSpecFromActionModel(ctx, run), nil
+}
+
+// runCluster is pickCluster for a started run.
+func (r *ActionsRouter) runCluster(ctx context.Context, runID *common.RunIdentifier) (string, error) {
+	spec, err := r.runSpec(ctx, runID)
+	if err != nil {
+		return "", err
+	}
+	return r.pickCluster(runID.GetName(), spec)
+}
+
+// tryEach calls the run's cluster first, then the queue's other clusters while the action is
+// not found, which the actions service reports as isAlreadyTerminated recognizes.
+func (r *ActionsRouter) tryEach(ctx context.Context, runID *common.RunIdentifier,
+	call func(actionsconnect.ActionsServiceClient) error) error {
+	spec, err := r.runSpec(ctx, runID)
+	if err != nil {
+		return err
+	}
+	clusters, err := r.candidateClusters(runID.GetName(), spec)
+	if err != nil {
+		return err
+	}
+	for _, c := range clusters {
+		if err = call(r.clusters[c]); err == nil || !isAlreadyTerminated(err) {
+			return err
+		}
+	}
+	return err
 }

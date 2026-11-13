@@ -114,9 +114,9 @@ func TestActionsRouterWeightedPick(t *testing.T) {
 	assert.Contains(t, *calls, "b")
 
 	// The same run always lands on the same cluster.
-	first, err := r.placement("run7", queued("ab"))
+	first, err := r.pickCluster("run7", queued("ab"))
 	require.NoError(t, err)
-	again, err := r.placement("run7", queued("ab"))
+	again, err := r.pickCluster("run7", queued("ab"))
 	require.NoError(t, err)
 	assert.Equal(t, first, again)
 }
@@ -132,7 +132,7 @@ func TestActionsRouterAbort(t *testing.T) {
 
 	t.Run("goes to the run's cluster", func(t *testing.T) {
 		r, _, calls := newTestRouter(t, runs)
-		placed, err := r.placement("run1", queued("ab"))
+		placed, err := r.candidateClusters("run1", queued("ab"))
 		require.NoError(t, err)
 		require.NoError(t, abort(r))
 		assert.Equal(t, placed[:1], *calls)
@@ -140,7 +140,7 @@ func TestActionsRouterAbort(t *testing.T) {
 
 	t.Run("tries the queue's other cluster when not found", func(t *testing.T) {
 		r, fakes, calls := newTestRouter(t, runs)
-		placed, err := r.placement("run1", queued("ab"))
+		placed, err := r.candidateClusters("run1", queued("ab"))
 		require.NoError(t, err)
 		fakes[placed[0]].abortErr = connect.NewError(connect.CodeInternal, errors.New("TaskAction not found"))
 		require.NoError(t, abort(r))
@@ -149,7 +149,7 @@ func TestActionsRouterAbort(t *testing.T) {
 
 	t.Run("returns other errors without trying further", func(t *testing.T) {
 		r, fakes, calls := newTestRouter(t, runs)
-		placed, err := r.placement("run1", queued("ab"))
+		placed, err := r.candidateClusters("run1", queued("ab"))
 		require.NoError(t, err)
 		fakes[placed[0]].abortErr = connect.NewError(connect.CodeUnavailable, errors.New("down"))
 		assert.Equal(t, connect.CodeUnavailable, connect.CodeOf(abort(r)))
