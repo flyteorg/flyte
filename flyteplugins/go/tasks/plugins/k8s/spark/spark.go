@@ -148,9 +148,23 @@ func serviceAccountName(metadata pluginsCore.TaskExecutionMetadata) string {
 	return name
 }
 
-func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, podSpec, customPodSpec *v1.PodSpec, container *v1.Container, sparkContainerName string) *sparkOp.SparkPodSpec {
-	annotations := utils.UnionMaps(config.GetK8sPluginConfig().DefaultAnnotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
-	labels := utils.UnionMaps(config.GetK8sPluginConfig().DefaultLabels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
+func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta,
+	customPodSpec *v1.PodSpec, customPodMeta *core.K8SObjectMetadata, container *v1.Container, sparkContainerName string) *sparkOp.SparkPodSpec {
+	annotations := utils.UnionMaps(
+		config.GetK8sPluginConfig().DefaultAnnotations,
+		objectMeta.GetAnnotations(),
+		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()),
+		customPodMeta.GetAnnotations(),
+	)
+	labels := utils.UnionMaps(
+		config.GetK8sPluginConfig().DefaultLabels,
+		objectMeta.GetLabels(),
+		utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()),
+		customPodMeta.GetLabels(),
+		// Applied last: a custom pod label must not take the pod out of the executor's pod
+		// cache or overwrite the identity the pod is looked up and attributed by.
+		flytek8s.PreservedPodLabels(taskCtx.TaskExecutionMetadata()),
+	)
 
 	sparkEnv := make([]v1.EnvVar, 0)
 	for _, envVar := range container.Env {
@@ -215,6 +229,15 @@ func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 	return &spec
 }
 
+// priorityClassName prefers a priority class set in the user's driver/executor pod spec: the
+// operator's webhook applies this field over whatever the pod template carries.
+func priorityClassName(podSpec, customPodSpec *v1.PodSpec) *string {
+	if customPodSpec != nil && customPodSpec.PriorityClassName != "" {
+		return strPtr(customPodSpec.PriorityClassName)
+	}
+	return strPtr(podSpec.PriorityClassName)
+}
+
 type driverSpec struct {
 	sparkSpec *sparkOp.DriverSpec
 }
@@ -222,7 +245,7 @@ type driverSpec struct {
 func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, sparkConfig map[string]string, sparkJob *plugins.SparkJob) (*driverSpec, error) {
 	// Spark driver pods should always run as non-interruptible
 	nonInterruptibleTaskCtx := flytek8s.NewPluginTaskExecutionContext(taskCtx, flytek8s.WithInterruptible(false))
-	podSpec, _, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, nonInterruptibleTaskCtx)
+	podSpec, objectMeta, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, nonInterruptibleTaskCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -248,7 +271,7 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 	if err != nil {
 		return nil, err
 	}
-	sparkPodSpec := createSparkPodSpec(ctx, nonInterruptibleTaskCtx, podSpec, customPodSpec, primaryContainer, defaultDriverPrimaryContainerName)
+	sparkPodSpec := createSparkPodSpec(ctx, nonInterruptibleTaskCtx, podSpec, objectMeta, customPodSpec, driverPod.GetMetadata(), primaryContainer, defaultDriverPrimaryContainerName)
 	if sparkPodSpec.Template != nil {
 		sparkConfig[sparkOpCommon.SparkKubernetesDriverPodTemplateContainerName] = defaultDriverPrimaryContainerName
 	}
@@ -256,7 +279,8 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 	sparkPodSpec.ServiceAccount = &serviceAccountName
 	spec := driverSpec{
 		&sparkOp.DriverSpec{
-			SparkPodSpec: *sparkPodSpec,
+			SparkPodSpec:      *sparkPodSpec,
+			PriorityClassName: priorityClassName(podSpec, customPodSpec),
 		},
 	}
 	if cores, err := strconv.ParseInt(sparkConfig["spark.driver.cores"], 10, 32); err == nil {
@@ -272,7 +296,7 @@ type executorSpec struct {
 }
 
 func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, sparkConfig map[string]string, sparkJob *plugins.SparkJob) (*executorSpec, error) {
-	podSpec, _, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
+	podSpec, objectMeta, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -298,14 +322,15 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 	if err != nil {
 		return nil, err
 	}
-	sparkPodSpec := createSparkPodSpec(ctx, taskCtx, podSpec, customPodSpec, primaryContainer, defaultExecutorPrimaryContainerName)
+	sparkPodSpec := createSparkPodSpec(ctx, taskCtx, podSpec, objectMeta, customPodSpec, executorPod.GetMetadata(), primaryContainer, defaultExecutorPrimaryContainerName)
 	if sparkPodSpec.Template != nil {
 		sparkConfig[sparkOpCommon.SparkKubernetesExecutorPodTemplateContainerName] = defaultExecutorPrimaryContainerName
 	}
 	spec := executorSpec{
 		primaryContainer,
 		&sparkOp.ExecutorSpec{
-			SparkPodSpec: *sparkPodSpec,
+			SparkPodSpec:      *sparkPodSpec,
+			PriorityClassName: priorityClassName(podSpec, customPodSpec),
 		},
 	}
 	if execCores, err := strconv.ParseInt(sparkConfig["spark.executor.cores"], 10, 32); err == nil {
