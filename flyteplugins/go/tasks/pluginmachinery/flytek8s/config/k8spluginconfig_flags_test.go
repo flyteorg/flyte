@@ -295,6 +295,20 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_delete-resource-on-finalize-excluded-plugins", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := join_K8sPluginConfig(defaultK8sConfig.DeleteResourceOnFinalizeExcludedPlugins, ",")
+
+			cmdFlags.Set("delete-resource-on-finalize-excluded-plugins", testValue)
+			if vStringSlice, err := cmdFlags.GetStringSlice("delete-resource-on-finalize-excluded-plugins"); err == nil {
+				testDecodeRaw_K8sPluginConfig(t, join_K8sPluginConfig(vStringSlice, ","), &actual.DeleteResourceOnFinalizeExcludedPlugins)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_default-pod-template-name", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
