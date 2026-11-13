@@ -151,7 +151,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 		taskAction.Spec.CacheKey = extractTaskCacheKey(action)
 
 		// Embed the inline TaskTemplate if present.
-		if err := embedTaskTemplate(action, taskAction, runSpec); err != nil {
+		if err := embedTaskTemplate(action, taskAction); err != nil {
 			return fmt.Errorf("failed to embed task template: %w", err)
 		}
 
@@ -1118,9 +1118,14 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 		taskAction.Spec.Interruptible = nil
 		taskAction.Spec.PodTemplateName = ""
 		taskAction.Spec.RawDataPrefix = ""
+		taskAction.Spec.RunStartTime = ""
 		return
 	}
 
+	taskAction.Spec.RunStartTime = ""
+	if ts := runSpec.GetRunStartTime(); ts != nil {
+		taskAction.Spec.RunStartTime = ts.AsTime().UTC().Format(time.RFC3339)
+	}
 	taskAction.Spec.EnvVars = keyValuePairsToMap(runSpec.GetEnvs().GetValues())
 	taskAction.Spec.PodTemplateName = runSpec.GetDefaultSettings().GetPodTemplateName()
 	taskAction.Spec.RawDataPrefix = runSpec.GetRawDataStorage().GetRawDataPrefix()
@@ -1154,6 +1159,7 @@ func inheritRunContextFromParentTaskAction(taskAction *executorv1.TaskAction, pa
 	taskAction.Spec.EnvVars = cloneStringMap(parentTaskAction.Spec.EnvVars)
 	taskAction.Spec.PodTemplateName = parentTaskAction.Spec.PodTemplateName
 	taskAction.Spec.RawDataPrefix = parentTaskAction.Spec.RawDataPrefix
+	taskAction.Spec.RunStartTime = parentTaskAction.Spec.RunStartTime
 	if len(parentTaskAction.Annotations) > 0 {
 		if taskAction.Annotations == nil {
 			taskAction.Annotations = map[string]string{}
@@ -1229,9 +1235,9 @@ func extractTaskCacheKey(action *actions.Action) string {
 const runStartTimeTemplateVar = "{{.runStartTime}}"
 
 // embedTaskTemplate serializes the inline TaskTemplate from the Action into the CR spec,
-// substituting the {{.runStartTime}} container-arg placeholder with runSpec.run_start_time when
+// substituting the {{.runStartTime}} container-arg placeholder with the TaskAction's inherited run start time when
 // set. Templates produced by older SDKs omit the placeholder, so the substitution is a no-op.
-func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction, runSpec *task.RunSpec) error {
+func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction) error {
 	taskSpec, ok := action.Spec.(*actions.Action_Task)
 	if !ok || taskSpec.Task == nil || taskSpec.Task.Spec == nil || taskSpec.Task.Spec.TaskTemplate == nil {
 		// Non-task actions do not carry an inline template.
@@ -1242,7 +1248,7 @@ func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction
 	taskAction.Spec.TaskType = tmpl.Type
 	taskAction.Spec.ShortName = taskSpec.Task.Spec.ShortName
 
-	tmpl = substituteRunStartTime(tmpl, runSpec.GetRunStartTime())
+	tmpl = substituteRunStartTime(tmpl, taskAction.Spec.RunStartTime)
 	tmpl = applyPodTemplateName(tmpl, taskAction.Spec.PodTemplateName)
 
 	data, err := proto.Marshal(tmpl)
@@ -1254,17 +1260,16 @@ func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction
 }
 
 // substituteRunStartTime returns a TaskTemplate whose container args have the {{.runStartTime}}
-// placeholder replaced with ts formatted as RFC3339 UTC. It returns the input unchanged when ts is
-// nil or the template has no container args. The template is cloned before mutation so the caller's
+// placeholder replaced with the RFC3339 UTC run start time. It returns the input unchanged when value is
+// empty or the template has no container args. The template is cloned before mutation so the caller's
 // proto — which may be persisted separately as the registered task spec — is not affected.
-func substituteRunStartTime(tmpl *core.TaskTemplate, ts *timestamppb.Timestamp) *core.TaskTemplate {
-	if ts == nil {
+func substituteRunStartTime(tmpl *core.TaskTemplate, value string) *core.TaskTemplate {
+	if value == "" {
 		return tmpl
 	}
 	if tmpl.GetContainer() == nil || len(tmpl.GetContainer().GetArgs()) == 0 {
 		return tmpl
 	}
-	value := ts.AsTime().UTC().Format(time.RFC3339)
 	cloned := proto.Clone(tmpl).(*core.TaskTemplate)
 	args := cloned.GetContainer().GetArgs()
 	for i, arg := range args {
