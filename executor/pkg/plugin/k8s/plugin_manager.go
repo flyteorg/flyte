@@ -97,10 +97,14 @@ func (pm *PluginManager) GetProperties() pluginsCore.PluginProperties {
 	}
 }
 
-func (pm *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) {
+func (pm *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig, taskTemplate *core.TaskTemplate) {
+	// Task-level metadata goes on the object itself (the pod, or the CR for CRD-backed tasks),
+	// while pod template metadata only reaches the CR's pods.
+	k8sMetadata := taskTemplate.GetMetadata().GetMetadata()
+
 	o.SetNamespace(taskCtx.GetNamespace())
-	o.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.GetAnnotations())))
-	o.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, o.GetLabels(), pluginsUtils.CopyMap(taskCtx.GetLabels())))
+	o.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), k8sMetadata.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.GetAnnotations())))
+	o.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, o.GetLabels(), k8sMetadata.GetLabels(), pluginsUtils.CopyMap(taskCtx.GetLabels())))
 	name := taskCtx.GetTaskExecutionID().GetGeneratedName()
 	if pm.plugin.GetProperties().GeneratedNameMaxLength != nil {
 		if truncatedName, err := taskCtx.GetTaskExecutionID().GetGeneratedNameWith(0, *pm.plugin.GetProperties().GeneratedNameMaxLength); err == nil {
@@ -129,7 +133,13 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 		return pluginsCore.UnknownTransition, err
 	}
 
-	pm.addObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to read task template. Error: %v", err)
+		return pluginsCore.UnknownTransition, err
+	}
+
+	pm.addObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig(), taskTemplate)
 	logger.Infof(ctx, "Creating Object: Type:[%v], Object:[%v/%v]", o.GetObjectKind().GroupVersionKind(), o.GetNamespace(), o.GetName())
 
 	err = pm.kubeClient.GetClient().Create(ctx, o)
@@ -211,7 +221,12 @@ func (pm *PluginManager) getResource(ctx context.Context, tCtx pluginsCore.TaskE
 			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)
 		return nil, err
 	}
-	pm.addObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to read task template. Error: %v", err)
+		return nil, err
+	}
+	pm.addObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig(), taskTemplate)
 	return o, nil
 }
 
