@@ -909,6 +909,10 @@ func (r *TaskActionReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	// Check terminal conditions -- short-circuit
 	if isTerminal(taskAction) {
+		result, err := r.reconcileTerminalCleanup(ctx, taskAction)
+		if err != nil || result.RequeueAfter > 0 {
+			return result, err
+		}
 		if err := r.ensureTerminalLabels(ctx, taskAction); err != nil {
 			return ctrl.Result{}, err
 		}
@@ -1136,17 +1140,14 @@ func (r *TaskActionReconciler) reconcileTask(
 			phaseInfo = transition.Info()
 		}
 	}
-	// A task that fails for good keeps its resource until the TaskAction is garbage collected.
-	// A plugin asks for cleanup when that resource would otherwise keep going: a gang an admission
-	// gate took back is re-admitted by the gate and would run again for a task that has already
-	// failed. Delete it now, as a retry above already does.
-	if !cacheShortCircuited && cleanupOnFailure && phaseInfo.Phase() == pluginsCore.PhasePermanentFailure {
-		if abortErr := p.Abort(ctx, tCtx); abortErr != nil {
-			logger.Error(abortErr, "failed to clean up the resource of a failed task")
-		}
-	}
-
+	// A pod still pulling its image or an evicted gang could start again after the task fails.
+	// Delete the resource after the failure is recorded when the plugin requests cleanup.
+	abortAfterFailure := !cacheShortCircuited && cleanupOnFailure && phaseInfo.Phase() == pluginsCore.PhasePermanentFailure
 	mapPhaseToConditions(taskAction, phaseInfo)
+	if abortAfterFailure {
+		setCondition(taskAction, flyteorgv1.ConditionTypeCleanupPending, metav1.ConditionTrue,
+			flyteorgv1.ConditionReasonPermanentFailure, "Plugin cleanup is pending.")
+	}
 
 	// Update StateJSON for observability
 	actionSpec, _ := taskAction.Spec.GetActionSpec()
@@ -1177,6 +1178,13 @@ func (r *TaskActionReconciler) reconcileTask(
 
 	if err := r.updateTaskActionStatus(ctx, originalTaskActionInstance, taskAction, phaseInfo); err != nil {
 		return ctrl.Result{}, err
+	}
+
+	if abortAfterFailure {
+		result, err := r.reconcileTerminalCleanup(ctx, taskAction)
+		if err != nil || result.RequeueAfter > 0 {
+			return result, err
+		}
 	}
 
 	// If the TaskAction just became terminal, stamp GC labels
@@ -1214,6 +1222,39 @@ func (r *TaskActionReconciler) ensureTerminalLabels(ctx context.Context, taskAct
 	return nil
 }
 
+func (r *TaskActionReconciler) reconcileTerminalCleanup(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+) (ctrl.Result, error) {
+	if !meta.IsStatusConditionTrue(taskAction.Status.Conditions, string(flyteorgv1.ConditionTypeCleanupPending)) {
+		return ctrl.Result{}, nil
+	}
+	p, err := r.PluginRegistry.ResolvePlugin(taskAction.Spec.TaskType)
+	if err != nil {
+		log.FromContext(ctx).Error(err, "cannot resolve terminal cleanup plugin; resources may need manual cleanup")
+		return ctrl.Result{}, nil
+	}
+	stateMgr := plugin.NewPluginStateManager(taskAction.Status.PluginState, taskAction.Status.PluginStateVersion)
+	tCtx, err := plugin.NewTaskExecutionContext(
+		taskAction, r.DataStore, stateMgr, r.SecretManager, r.ResourceManager, r.CatalogClient,
+	)
+	if err != nil {
+		log.FromContext(ctx).Error(err, "failed to build terminal cleanup context; resources may need manual cleanup")
+		return ctrl.Result{}, nil
+	}
+	if err := p.Abort(ctx, tCtx); err != nil {
+		log.FromContext(ctx).Error(err, "plugin cleanup failed, will retry")
+		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
+	}
+	if err := r.persistStatusWithRetry(ctx, taskAction, func(latest *flyteorgv1.TaskAction) {
+		meta.RemoveStatusCondition(&latest.Status.Conditions, string(flyteorgv1.ConditionTypeCleanupPending))
+	}); err != nil {
+		return ctrl.Result{}, err
+	}
+	meta.RemoveStatusCondition(&taskAction.Status.Conditions, string(flyteorgv1.ConditionTypeCleanupPending))
+	return ctrl.Result{}, nil
+}
+
 // handleAbortAndFinalize handles the deletion of a TaskAction by aborting and finalizing the plugin.
 func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskAction *flyteorgv1.TaskAction) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
@@ -1221,12 +1262,18 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
 		return ctrl.Result{}, nil
 	}
-	terminal := isTerminal(taskAction)
 
 	p, err := r.PluginRegistry.ResolvePlugin(taskAction.Spec.TaskType)
 	if err != nil {
 		logger.Info("Cannot resolve plugin for abort/finalize, removing finalizer", "error", err)
 		return r.removeFinalizer(ctx, taskAction)
+	}
+	terminal := isTerminal(taskAction)
+	if terminal {
+		result, err := r.reconcileTerminalCleanup(ctx, taskAction)
+		if err != nil || result.RequeueAfter > 0 {
+			return result, err
+		}
 	}
 
 	stateMgr := plugin.NewPluginStateManager(
@@ -1284,14 +1331,26 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 }
 
 func (r *TaskActionReconciler) removeFinalizer(ctx context.Context, taskAction *flyteorgv1.TaskAction) (ctrl.Result, error) {
-	controllerutil.RemoveFinalizer(taskAction, taskActionFinalizer)
-	start := time.Now()
-	err := r.Update(ctx, taskAction)
-	r.metrics.recordK8sOp(ctx, opUpdate, start, err)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-	return ctrl.Result{}, nil
+	err := retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		latest := &flyteorgv1.TaskAction{}
+		start := time.Now()
+		getErr := r.Get(ctx, client.ObjectKeyFromObject(taskAction), latest)
+		r.metrics.recordK8sOp(ctx, opGet, start, getErr)
+		if getErr != nil {
+			return client.IgnoreNotFound(getErr)
+		}
+		if latest.UID != taskAction.UID {
+			return nil
+		}
+		if !controllerutil.RemoveFinalizer(latest, taskActionFinalizer) {
+			return nil
+		}
+		start = time.Now()
+		updErr := r.Update(ctx, latest)
+		r.metrics.recordK8sOp(ctx, opUpdate, start, updErr)
+		return updErr
+	})
+	return ctrl.Result{}, err
 }
 
 // updateTaskActionStatus updates the TaskAction status only when the status has changed,
@@ -1364,6 +1423,9 @@ func (r *TaskActionReconciler) persistStatusWithRetry(
 		start = time.Now()
 		updErr := r.Status().Update(ctx, latest)
 		r.metrics.recordK8sOp(ctx, opStatusUpdate, start, updErr)
+		if updErr == nil {
+			taskAction.ResourceVersion = latest.ResourceVersion
+		}
 		return updErr
 	})
 }
