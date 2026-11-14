@@ -54,7 +54,7 @@ class AsyncConnectorServiceASGIApplication(ConnectASGIApplication[AsyncConnector
                         service_name="flyteidl2.connector.AsyncConnectorService",
                         input=flyteidl2_dot_connector_dot_connector__pb2.GetTaskRequest,
                         output=flyteidl2_dot_connector_dot_connector__pb2.GetTaskResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.get_task,
                 ),
@@ -74,7 +74,7 @@ class AsyncConnectorServiceASGIApplication(ConnectASGIApplication[AsyncConnector
                         service_name="flyteidl2.connector.AsyncConnectorService",
                         input=flyteidl2_dot_connector_dot_connector__pb2.GetTaskMetricsRequest,
                         output=flyteidl2_dot_connector_dot_connector__pb2.GetTaskMetricsResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.get_task_metrics,
                 ),
@@ -84,7 +84,7 @@ class AsyncConnectorServiceASGIApplication(ConnectASGIApplication[AsyncConnector
                         service_name="flyteidl2.connector.AsyncConnectorService",
                         input=flyteidl2_dot_connector_dot_connector__pb2.GetTaskLogsRequest,
                         output=flyteidl2_dot_connector_dot_connector__pb2.GetTaskLogsResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.get_task_logs,
                 ),
@@ -127,6 +127,7 @@ class AsyncConnectorServiceClient(ConnectClient):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_connector_dot_connector__pb2.GetTaskResponse:
         return await self.execute_unary(
             request=request,
@@ -135,10 +136,11 @@ class AsyncConnectorServiceClient(ConnectClient):
                 service_name="flyteidl2.connector.AsyncConnectorService",
                 input=flyteidl2_dot_connector_dot_connector__pb2.GetTaskRequest,
                 output=flyteidl2_dot_connector_dot_connector__pb2.GetTaskResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     async def delete_task(
@@ -167,6 +169,7 @@ class AsyncConnectorServiceClient(ConnectClient):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_connector_dot_connector__pb2.GetTaskMetricsResponse:
         return await self.execute_unary(
             request=request,
@@ -175,10 +178,11 @@ class AsyncConnectorServiceClient(ConnectClient):
                 service_name="flyteidl2.connector.AsyncConnectorService",
                 input=flyteidl2_dot_connector_dot_connector__pb2.GetTaskMetricsRequest,
                 output=flyteidl2_dot_connector_dot_connector__pb2.GetTaskMetricsResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     def get_task_logs(
@@ -195,7 +199,7 @@ class AsyncConnectorServiceClient(ConnectClient):
                 service_name="flyteidl2.connector.AsyncConnectorService",
                 input=flyteidl2_dot_connector_dot_connector__pb2.GetTaskLogsRequest,
                 output=flyteidl2_dot_connector_dot_connector__pb2.GetTaskLogsResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
@@ -222,7 +226,7 @@ class ConnectorMetadataServiceASGIApplication(ConnectASGIApplication[ConnectorMe
                         service_name="flyteidl2.connector.ConnectorMetadataService",
                         input=flyteidl2_dot_connector_dot_connector__pb2.GetConnectorRequest,
                         output=flyteidl2_dot_connector_dot_connector__pb2.GetConnectorResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.get_connector,
                 ),
@@ -232,7 +236,7 @@ class ConnectorMetadataServiceASGIApplication(ConnectASGIApplication[ConnectorMe
                         service_name="flyteidl2.connector.ConnectorMetadataService",
                         input=flyteidl2_dot_connector_dot_connector__pb2.ListConnectorsRequest,
                         output=flyteidl2_dot_connector_dot_connector__pb2.ListConnectorsResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.list_connectors,
                 ),
@@ -255,6 +259,7 @@ class ConnectorMetadataServiceClient(ConnectClient):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_connector_dot_connector__pb2.GetConnectorResponse:
         return await self.execute_unary(
             request=request,
@@ -263,10 +268,11 @@ class ConnectorMetadataServiceClient(ConnectClient):
                 service_name="flyteidl2.connector.ConnectorMetadataService",
                 input=flyteidl2_dot_connector_dot_connector__pb2.GetConnectorRequest,
                 output=flyteidl2_dot_connector_dot_connector__pb2.GetConnectorResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     async def list_connectors(
@@ -275,6 +281,7 @@ class ConnectorMetadataServiceClient(ConnectClient):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_connector_dot_connector__pb2.ListConnectorsResponse:
         return await self.execute_unary(
             request=request,
@@ -283,10 +290,11 @@ class ConnectorMetadataServiceClient(ConnectClient):
                 service_name="flyteidl2.connector.ConnectorMetadataService",
                 input=flyteidl2_dot_connector_dot_connector__pb2.ListConnectorsRequest,
                 output=flyteidl2_dot_connector_dot_connector__pb2.ListConnectorsResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
 
@@ -323,7 +331,7 @@ class AsyncConnectorServiceWSGIApplication(ConnectWSGIApplication):
                         service_name="flyteidl2.connector.AsyncConnectorService",
                         input=flyteidl2_dot_connector_dot_connector__pb2.GetTaskRequest,
                         output=flyteidl2_dot_connector_dot_connector__pb2.GetTaskResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.get_task,
                 ),
@@ -343,7 +351,7 @@ class AsyncConnectorServiceWSGIApplication(ConnectWSGIApplication):
                         service_name="flyteidl2.connector.AsyncConnectorService",
                         input=flyteidl2_dot_connector_dot_connector__pb2.GetTaskMetricsRequest,
                         output=flyteidl2_dot_connector_dot_connector__pb2.GetTaskMetricsResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.get_task_metrics,
                 ),
@@ -353,7 +361,7 @@ class AsyncConnectorServiceWSGIApplication(ConnectWSGIApplication):
                         service_name="flyteidl2.connector.AsyncConnectorService",
                         input=flyteidl2_dot_connector_dot_connector__pb2.GetTaskLogsRequest,
                         output=flyteidl2_dot_connector_dot_connector__pb2.GetTaskLogsResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.get_task_logs,
                 ),
@@ -396,6 +404,7 @@ class AsyncConnectorServiceClientSync(ConnectClientSync):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_connector_dot_connector__pb2.GetTaskResponse:
         return self.execute_unary(
             request=request,
@@ -404,10 +413,11 @@ class AsyncConnectorServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.connector.AsyncConnectorService",
                 input=flyteidl2_dot_connector_dot_connector__pb2.GetTaskRequest,
                 output=flyteidl2_dot_connector_dot_connector__pb2.GetTaskResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     def delete_task(
@@ -436,6 +446,7 @@ class AsyncConnectorServiceClientSync(ConnectClientSync):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_connector_dot_connector__pb2.GetTaskMetricsResponse:
         return self.execute_unary(
             request=request,
@@ -444,10 +455,11 @@ class AsyncConnectorServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.connector.AsyncConnectorService",
                 input=flyteidl2_dot_connector_dot_connector__pb2.GetTaskMetricsRequest,
                 output=flyteidl2_dot_connector_dot_connector__pb2.GetTaskMetricsResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     def get_task_logs(
@@ -464,7 +476,7 @@ class AsyncConnectorServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.connector.AsyncConnectorService",
                 input=flyteidl2_dot_connector_dot_connector__pb2.GetTaskLogsRequest,
                 output=flyteidl2_dot_connector_dot_connector__pb2.GetTaskLogsResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
@@ -487,7 +499,7 @@ class ConnectorMetadataServiceWSGIApplication(ConnectWSGIApplication):
                         service_name="flyteidl2.connector.ConnectorMetadataService",
                         input=flyteidl2_dot_connector_dot_connector__pb2.GetConnectorRequest,
                         output=flyteidl2_dot_connector_dot_connector__pb2.GetConnectorResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.get_connector,
                 ),
@@ -497,7 +509,7 @@ class ConnectorMetadataServiceWSGIApplication(ConnectWSGIApplication):
                         service_name="flyteidl2.connector.ConnectorMetadataService",
                         input=flyteidl2_dot_connector_dot_connector__pb2.ListConnectorsRequest,
                         output=flyteidl2_dot_connector_dot_connector__pb2.ListConnectorsResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.list_connectors,
                 ),
@@ -520,6 +532,7 @@ class ConnectorMetadataServiceClientSync(ConnectClientSync):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_connector_dot_connector__pb2.GetConnectorResponse:
         return self.execute_unary(
             request=request,
@@ -528,10 +541,11 @@ class ConnectorMetadataServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.connector.ConnectorMetadataService",
                 input=flyteidl2_dot_connector_dot_connector__pb2.GetConnectorRequest,
                 output=flyteidl2_dot_connector_dot_connector__pb2.GetConnectorResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     def list_connectors(
@@ -540,6 +554,7 @@ class ConnectorMetadataServiceClientSync(ConnectClientSync):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_connector_dot_connector__pb2.ListConnectorsResponse:
         return self.execute_unary(
             request=request,
@@ -548,8 +563,9 @@ class ConnectorMetadataServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.connector.ConnectorMetadataService",
                 input=flyteidl2_dot_connector_dot_connector__pb2.ListConnectorsRequest,
                 output=flyteidl2_dot_connector_dot_connector__pb2.ListConnectorsResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )

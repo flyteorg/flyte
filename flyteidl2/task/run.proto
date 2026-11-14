@@ -4,6 +4,7 @@ package flyteidl2.task;
 
 import "buf/validate/validate.proto";
 import "flyteidl2/common/identifier.proto";
+import "flyteidl2/common/kubernetes.proto";
 import "flyteidl2/common/phase.proto";
 import "flyteidl2/common/run.proto";
 import "flyteidl2/core/literals.proto";
@@ -84,6 +85,15 @@ message Recover {
   // subtree). A listed condition action re-pauses and waits for a new signal.
   // Unknown names are ignored.
   repeated string force_rerun_actions = 1 [(buf.validate.field).repeated.items.string.min_len = 1];
+
+  // Field numbers of the removed action_overrides and implied_rerun_actions.
+  reserved 2, 3;
+
+  // Marks this recovery run as a fork: it reuses the run being recovered but runs
+  // changed code or inputs, rather than retrying it unchanged. Set by the client
+  // that creates the fork. Informational: it does not change how the run is
+  // recovered.
+  bool fork = 4;
 }
 
 // TaskSpecSource records how a run's task spec was provided at creation time, so
@@ -185,6 +195,12 @@ message RunSpec {
   // Run-scoped defaults, projected onto every task in the run that does not
   // set the corresponding value itself. Set by the server from settings.
   DefaultSettings default_settings = 20;
+
+  // Kubernetes metadata the server sets for this run: the namespace its pods
+  // run in. It is set when the run is created, does not change afterwards, and
+  // applies to every action and finalizer. Absent: the run's pods use the
+  // namespace they use today.
+  flyteidl2.common.K8sMetadata k8s_metadata = 21;
 }
 
 // DefaultSettings holds run-scoped defaults applied to tasks in a run. Each field

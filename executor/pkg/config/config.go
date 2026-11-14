@@ -13,17 +13,24 @@ const configSectionKey = "executor"
 
 var (
 	defaultConfig = &Config{
-		MetricsBindAddress:      ":10254",
-		HealthProbeBindAddress:  ":8081",
-		LeaderElect:             false,
-		MetricsSecure:           true,
-		WebhookCertName:         "tls.crt",
-		WebhookCertKey:          "tls.key",
-		MetricsCertName:         "tls.crt",
-		MetricsCertKey:          "tls.key",
-		EnableHTTP2:             false,
-		EventsService:           serviceclient.ServiceConfig{URL: "http://localhost:8090"},
-		CacheService:            serviceclient.ServiceConfig{URL: "http://localhost:8094"},
+		MetricsBindAddress:     ":10254",
+		HealthProbeBindAddress: ":8081",
+		LeaderElect:            false,
+		MetricsSecure:          true,
+		WebhookCertName:        "tls.crt",
+		WebhookCertKey:         "tls.key",
+		MetricsCertName:        "tls.crt",
+		MetricsCertKey:         "tls.key",
+		EnableHTTP2:            false,
+		// An idle connection per concurrent reconcile (MaxConcurrentReconciles).
+		EventsService: serviceclient.ServiceConfig{
+			URL:  "http://localhost:8090",
+			HTTP: serviceclient.HTTPConfig{MaxIdleConnsPerHost: 512},
+		},
+		CacheService: serviceclient.ServiceConfig{
+			URL:  "http://localhost:8094",
+			HTTP: serviceclient.HTTPConfig{MaxIdleConnsPerHost: 512},
+		},
 		Cluster:                 "",
 		MaxSystemFailures:       3,
 		MaxConcurrentReconciles: 512,
@@ -43,6 +50,9 @@ type Config struct {
 	// MetricsBindAddress is the address the metrics endpoint binds to.
 	// Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable.
 	MetricsBindAddress string `json:"metricsBindAddress" pflag:",Address the metrics endpoint binds to"`
+
+	// PprofBindAddress is the address the pprof endpoint binds to. Empty or "0" disables profiling.
+	PprofBindAddress string `json:"pprofBindAddress" pflag:",Address the pprof endpoint binds to; empty or 0 disables profiling"`
 
 	// HealthProbeBindAddress is the address the probe endpoint binds to.
 	HealthProbeBindAddress string `json:"healthProbeBindAddress" pflag:",Address the probe endpoint binds to"`

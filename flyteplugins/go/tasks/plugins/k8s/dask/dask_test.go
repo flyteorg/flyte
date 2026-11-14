@@ -996,6 +996,41 @@ func TestGetTaskPhaseWithNamespaceInLogContext(t *testing.T) {
 	assert.Equal(t, defaultDaskJobRunnerPrimaryContainerName, podLogContext.PrimaryContainerName)
 }
 
+func TestSchedulerPodLookupIgnoresOtherDaskClusters(t *testing.T) {
+	ctx := context.TODO()
+	daskJobName := "dask-job-name"
+	schedulerPodName := daskJobName + "-scheduler-abc12"
+
+	mkSchedulerPod := func(clusterName, podName string, ready bool) *v1.Pod {
+		return &v1.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      podName,
+				Namespace: defaultNamespace,
+				Labels:    map[string]string{daskClusterNameLabelKey: clusterName},
+			},
+			Spec: v1.PodSpec{Containers: []v1.Container{{Name: "scheduler"}}},
+			Status: v1.PodStatus{
+				Phase:             v1.PodRunning,
+				ContainerStatuses: []v1.ContainerStatus{{Name: "scheduler", Ready: ready}},
+			},
+		}
+	}
+	// Another job's scheduler pod also starts with this job's name and contains "scheduler".
+	pCtx := &k8smocks.PluginContext{}
+	pCtx.EXPECT().K8sReader().Return(fake.NewFakeClient(
+		mkSchedulerPod(daskJobName, schedulerPodName, true),
+		mkSchedulerPod(daskJobName+"-2", daskJobName+"-2-scheduler-def34", false),
+	))
+
+	ready, err := isDaskSchedulerReady(ctx, daskJobName, pCtx)
+	assert.NoError(t, err)
+	assert.True(t, ready)
+
+	podName, err := getDaskSchedulerPodName(ctx, daskJobName, pCtx)
+	assert.NoError(t, err)
+	assert.Equal(t, schedulerPodName, podName)
+}
+
 func TestGetTaskPhaseWithFailedPod(t *testing.T) {
 	daskResourceHandler := daskResourceHandler{}
 	ctx := context.TODO()

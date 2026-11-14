@@ -63,6 +63,7 @@ func NewClusterServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			httpClient,
 			baseURL+ClusterServiceSelectClusterProcedure,
 			connect.WithSchema(clusterServiceSelectClusterMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -93,6 +94,7 @@ func NewClusterServiceHandler(svc ClusterServiceHandler, opts ...connect.Handler
 		ClusterServiceSelectClusterProcedure,
 		svc.SelectCluster,
 		connect.WithSchema(clusterServiceSelectClusterMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/flyteidl2.cluster.ClusterService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -20,6 +21,7 @@ import (
 	k8swatch "k8s.io/apimachinery/pkg/watch"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
+	"sigs.k8s.io/controller-runtime/pkg/cache/informertest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
@@ -535,6 +537,141 @@ func TestList(t *testing.T) {
 	require.Len(t, apps, 1)
 	assert.Equal(t, "proj", apps[0].Metadata.Id.Project)
 	assert.Equal(t, "app1", apps[0].Metadata.Id.Name)
+}
+
+// listCache is a ctrlcache.Cache whose List reads from a fake client, since
+// informertest.FakeInformers.List returns nothing. A non-nil err fails List.
+type listCache struct {
+	*informertest.FakeInformers
+	reader client.Reader
+	err    error
+}
+
+func (c *listCache) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
+	if c.err != nil {
+		return c.err
+	}
+	return c.reader.List(ctx, list, opts...)
+}
+
+// testReadyKService builds a managed KService in AppNamespace whose Ready
+// condition has the given status. An empty status leaves Ready unset.
+func testReadyKService(name string, ready corev1.ConditionStatus) *servingv1.Service {
+	ksvc := &servingv1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: AppNamespace,
+			Labels:    map[string]string{labelAppManaged: "true"},
+		},
+	}
+	if ready != "" {
+		ksvc.Status.Status = duckv1.Status{
+			Conditions: duckv1.Conditions{{Type: servingv1.ServiceConditionReady, Status: ready}},
+		}
+	}
+	return ksvc
+}
+
+func TestCountActiveApps(t *testing.T) {
+	stopped := func(ksvc *servingv1.Service) *servingv1.Service {
+		ksvc.Labels[labelAppStopped] = "true"
+		return ksvc
+	}
+	unmanaged := func(ksvc *servingv1.Service) *servingv1.Service {
+		delete(ksvc.Labels, labelAppManaged)
+		return ksvc
+	}
+	inNamespace := func(ns string, ksvc *servingv1.Service) *servingv1.Service {
+		ksvc.Namespace = ns
+		return ksvc
+	}
+
+	for _, tc := range []struct {
+		desc  string
+		ksvcs []client.Object
+		want  int64
+	}{
+		{
+			desc: "counts ready managed apps",
+			ksvcs: []client.Object{
+				testReadyKService("app1", corev1.ConditionTrue),
+				testReadyKService("app2", corev1.ConditionTrue),
+			},
+			want: 2,
+		},
+		{
+			desc: "counts only the active apps in a mixed set",
+			ksvcs: []client.Object{
+				testReadyKService("active", corev1.ConditionTrue),
+				stopped(testReadyKService("stopped", corev1.ConditionTrue)),
+				testReadyKService("failed", corev1.ConditionFalse),
+				testReadyKService("deploying", corev1.ConditionUnknown),
+				unmanaged(testReadyKService("unmanaged", corev1.ConditionTrue)),
+			},
+			want: 1,
+		},
+		{
+			desc:  "no apps",
+			ksvcs: nil,
+			want:  0,
+		},
+		{
+			desc:  "skips a stopped app",
+			ksvcs: []client.Object{stopped(testReadyKService("app1", corev1.ConditionTrue))},
+			want:  0,
+		},
+		{
+			desc:  "skips an app whose Ready is False",
+			ksvcs: []client.Object{testReadyKService("app1", corev1.ConditionFalse)},
+			want:  0,
+		},
+		{
+			desc:  "skips an app whose Ready is Unknown",
+			ksvcs: []client.Object{testReadyKService("app1", corev1.ConditionUnknown)},
+			want:  0,
+		},
+		{
+			desc:  "skips an app with no Ready condition",
+			ksvcs: []client.Object{testReadyKService("app1", "")},
+			want:  0,
+		},
+		{
+			desc:  "skips a service Flyte doesn't manage",
+			ksvcs: []client.Object{unmanaged(testReadyKService("app1", corev1.ConditionTrue))},
+			want:  0,
+		},
+		{
+			desc:  "skips an app in another namespace",
+			ksvcs: []client.Object{inNamespace("other", testReadyKService("app1", corev1.ConditionTrue))},
+			want:  0,
+		},
+	} {
+		t.Run(tc.desc, func(t *testing.T) {
+			fc := fake.NewClientBuilder().WithScheme(testScheme(t)).WithObjects(tc.ksvcs...).Build()
+			c := &AppK8sClient{
+				cache:     &listCache{FakeInformers: &informertest.FakeInformers{}, reader: fc},
+				namespace: AppNamespace,
+			}
+
+			n, err := c.CountActiveApps(context.Background())
+
+			require.NoError(t, err)
+			assert.Equal(t, tc.want, n)
+		})
+	}
+
+	t.Run("returns the cache error", func(t *testing.T) {
+		cacheErr := errors.New("cache not synced")
+		c := &AppK8sClient{
+			cache:     &listCache{FakeInformers: &informertest.FakeInformers{}, err: cacheErr},
+			namespace: AppNamespace,
+		}
+
+		n, err := c.CountActiveApps(context.Background())
+
+		require.ErrorIs(t, err, cacheErr)
+		assert.Zero(t, n)
+	})
 }
 
 func TestGetReplicas(t *testing.T) {

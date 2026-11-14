@@ -21,7 +21,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/task/common.proto.
  */
 export const file_flyteidl2_task_common: GenFile = /*@__PURE__*/
-  fileDesc("ChtmbHl0ZWlkbDIvdGFzay9jb21tb24ucHJvdG8SDmZseXRlaWRsMi50YXNrIkwKDk5hbWVkUGFyYW1ldGVyEgwKBG5hbWUYASABKAkSLAoJcGFyYW1ldGVyGAIgASgLMhkuZmx5dGVpZGwyLmNvcmUuUGFyYW1ldGVyIooBCglGaXhlZFJhdGUSFgoFdmFsdWUYASABKA1CB7pIBCoCIAASNQoEdW5pdBgCIAEoDjIdLmZseXRlaWRsMi50YXNrLkZpeGVkUmF0ZVVuaXRCCLpIBYIBAiAAEi4KCnN0YXJ0X3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIjUKBENyb24SGwoKZXhwcmVzc2lvbhgBIAEoCUIHukgEcgIQARIQCgh0aW1lem9uZRgCIAEoCSKvAQoIU2NoZWR1bGUSKQoEcmF0ZRgBIAEoCzIZLmZseXRlaWRsMi50YXNrLkZpeGVkUmF0ZUgAEh0KD2Nyb25fZXhwcmVzc2lvbhgCIAEoCUICGAFIABIkCgRjcm9uGAQgASgLMhQuZmx5dGVpZGwyLnRhc2suQ3JvbkgAEh4KFmtpY2tvZmZfdGltZV9pbnB1dF9hcmcYAyABKAlCEwoKZXhwcmVzc2lvbhIFukgCCAEi3wIKD0FydGlmYWN0VHJpZ2dlchIeCg1hcnRpZmFjdF9uYW1lGAEgASgJQge6SARyAhABEg8KB3ZlcnNpb24YAiABKAkSEQoJaW5wdXRfYXJnGAMgASgJEkMKCnBhcnRpdGlvbnMYBCADKAsyLy5mbHl0ZWlkbDIudGFzay5BcnRpZmFjdFRyaWdnZXIuUGFydGl0aW9uc0VudHJ5ElUKFHBhcnRpdGlvbl9pbnB1dF9hcmdzGAUgAygLMjcuZmx5dGVpZGwyLnRhc2suQXJ0aWZhY3RUcmlnZ2VyLlBhcnRpdGlvbklucHV0QXJnc0VudHJ5GjEKD1BhcnRpdGlvbnNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBGjkKF1BhcnRpdGlvbklucHV0QXJnc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiywEKFVRyaWdnZXJBdXRvbWF0aW9uU3BlYxJBCgR0eXBlGAEgASgOMikuZmx5dGVpZGwyLnRhc2suVHJpZ2dlckF1dG9tYXRpb25TcGVjVHlwZUIIukgFggECIAASLAoIc2NoZWR1bGUYAiABKAsyGC5mbHl0ZWlkbDIudGFzay5TY2hlZHVsZUgAEjMKCGFydGlmYWN0GAMgASgLMh8uZmx5dGVpZGwyLnRhc2suQXJ0aWZhY3RUcmlnZ2VySABCDAoKYXV0b21hdGlvbiJECgxOYW1lZExpdGVyYWwSDAoEbmFtZRgBIAEoCRImCgV2YWx1ZRgCIAEoCzIXLmZseXRlaWRsMi5jb3JlLkxpdGVyYWwiOgoQT3V0cHV0UmVmZXJlbmNlcxISCgpvdXRwdXRfdXJpGAEgASgJEhIKCnJlcG9ydF91cmkYAiABKAkiZwoGSW5wdXRzEi4KCGxpdGVyYWxzGAEgAygLMhwuZmx5dGVpZGwyLnRhc2suTmFtZWRMaXRlcmFsEi0KB2NvbnRleHQYAiADKAsyHC5mbHl0ZWlkbDIuY29yZS5LZXlWYWx1ZVBhaXIi2AIKEFByb2R1Y2VkQXJ0aWZhY3QSFwoGb3V0cHV0GAEgASgJQge6SARyAhABEhUKBG5hbWUYAiABKAlCB7pIBHICEAESDwoHdmVyc2lvbhgDIAEoCRIqCgRpbmZvGAQgASgLMhwuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RJbmZvEikKBHR5cGUYBSABKAsyGy5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsVHlwZRJFChBwYXJlbnRfYXJ0aWZhY3RzGAYgAygLMiEuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RWZXJzaW9uSWRCCLpIBZIBAhAgEi4KCnBhcnRpdGlvbnMYByABKAsyGi5mbHl0ZWlkbDIuY29yZS5QYXJ0aXRpb25zEjUKDnRpbWVfcGFydGl0aW9uGAggASgLMh0uZmx5dGVpZGwyLmNvcmUuVGltZVBhcnRpdGlvbiJ3CgdPdXRwdXRzEi4KCGxpdGVyYWxzGAEgAygLMhwuZmx5dGVpZGwyLnRhc2suTmFtZWRMaXRlcmFsEjwKEnByb2R1Y2VkX2FydGlmYWN0cxgDIAMoCzIgLmZseXRlaWRsMi50YXNrLlByb2R1Y2VkQXJ0aWZhY3QqfwoNRml4ZWRSYXRlVW5pdBIfChtGSVhFRF9SQVRFX1VOSVRfVU5TUEVDSUZJRUQQABIaChZGSVhFRF9SQVRFX1VOSVRfTUlOVVRFEAESGAoURklYRURfUkFURV9VTklUX0hPVVIQAhIXChNGSVhFRF9SQVRFX1VOSVRfREFZEAMqZgoZVHJpZ2dlckF1dG9tYXRpb25TcGVjVHlwZRIUChBUWVBFX1VOU1BFQ0lGSUVEEAASDQoJVFlQRV9OT05FEAESEQoNVFlQRV9TQ0hFRFVMRRACEhEKDVRZUEVfQVJUSUZBQ1QQA0KwAQoSY29tLmZseXRlaWRsMi50YXNrQgtDb21tb25Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi90YXNrogIDRlRYqgIORmx5dGVpZGwyLlRhc2vKAg5GbHl0ZWlkbDJcVGFza+ICGkZseXRlaWRsMlxUYXNrXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpUYXNrYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_core_artifact_id, file_flyteidl2_core_interface, file_flyteidl2_core_literals, file_flyteidl2_core_types, file_google_protobuf_timestamp]);
+  fileDesc("ChtmbHl0ZWlkbDIvdGFzay9jb21tb24ucHJvdG8SDmZseXRlaWRsMi50YXNrIkwKDk5hbWVkUGFyYW1ldGVyEgwKBG5hbWUYASABKAkSLAoJcGFyYW1ldGVyGAIgASgLMhkuZmx5dGVpZGwyLmNvcmUuUGFyYW1ldGVyIooBCglGaXhlZFJhdGUSFgoFdmFsdWUYASABKA1CB7pIBCoCIAASNQoEdW5pdBgCIAEoDjIdLmZseXRlaWRsMi50YXNrLkZpeGVkUmF0ZVVuaXRCCLpIBYIBAiAAEi4KCnN0YXJ0X3RpbWUYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIjUKBENyb24SGwoKZXhwcmVzc2lvbhgBIAEoCUIHukgEcgIQARIQCgh0aW1lem9uZRgCIAEoCSKvAQoIU2NoZWR1bGUSKQoEcmF0ZRgBIAEoCzIZLmZseXRlaWRsMi50YXNrLkZpeGVkUmF0ZUgAEh0KD2Nyb25fZXhwcmVzc2lvbhgCIAEoCUICGAFIABIkCgRjcm9uGAQgASgLMhQuZmx5dGVpZGwyLnRhc2suQ3JvbkgAEh4KFmtpY2tvZmZfdGltZV9pbnB1dF9hcmcYAyABKAlCEwoKZXhwcmVzc2lvbhIFukgCCAEi3wIKD0FydGlmYWN0VHJpZ2dlchIeCg1hcnRpZmFjdF9uYW1lGAEgASgJQge6SARyAhABEg8KB3ZlcnNpb24YAiABKAkSEQoJaW5wdXRfYXJnGAMgASgJEkMKCnBhcnRpdGlvbnMYBCADKAsyLy5mbHl0ZWlkbDIudGFzay5BcnRpZmFjdFRyaWdnZXIuUGFydGl0aW9uc0VudHJ5ElUKFHBhcnRpdGlvbl9pbnB1dF9hcmdzGAUgAygLMjcuZmx5dGVpZGwyLnRhc2suQXJ0aWZhY3RUcmlnZ2VyLlBhcnRpdGlvbklucHV0QXJnc0VudHJ5GjEKD1BhcnRpdGlvbnNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBGjkKF1BhcnRpdGlvbklucHV0QXJnc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiywEKFVRyaWdnZXJBdXRvbWF0aW9uU3BlYxJBCgR0eXBlGAEgASgOMikuZmx5dGVpZGwyLnRhc2suVHJpZ2dlckF1dG9tYXRpb25TcGVjVHlwZUIIukgFggECIAASLAoIc2NoZWR1bGUYAiABKAsyGC5mbHl0ZWlkbDIudGFzay5TY2hlZHVsZUgAEjMKCGFydGlmYWN0GAMgASgLMh8uZmx5dGVpZGwyLnRhc2suQXJ0aWZhY3RUcmlnZ2VySABCDAoKYXV0b21hdGlvbiJECgxOYW1lZExpdGVyYWwSDAoEbmFtZRgBIAEoCRImCgV2YWx1ZRgCIAEoCzIXLmZseXRlaWRsMi5jb3JlLkxpdGVyYWwiOgoQT3V0cHV0UmVmZXJlbmNlcxISCgpvdXRwdXRfdXJpGAEgASgJEhIKCnJlcG9ydF91cmkYAiABKAkiZwoGSW5wdXRzEi4KCGxpdGVyYWxzGAEgAygLMhwuZmx5dGVpZGwyLnRhc2suTmFtZWRMaXRlcmFsEi0KB2NvbnRleHQYAiADKAsyHC5mbHl0ZWlkbDIuY29yZS5LZXlWYWx1ZVBhaXIiywIKE0FjdGlvbk92ZXJyaWRlc0RhdGESRgoKaW5wdXRfdXJpcxgBIAMoCzIyLmZseXRlaWRsMi50YXNrLkFjdGlvbk92ZXJyaWRlc0RhdGEuSW5wdXRVcmlzRW50cnkSSgoMY29kZV9idW5kbGVzGAIgAygLMjQuZmx5dGVpZGwyLnRhc2suQWN0aW9uT3ZlcnJpZGVzRGF0YS5Db2RlQnVuZGxlc0VudHJ5EhgKEGFuY2VzdG9yX2FjdGlvbnMYAyADKAkaMAoOSW5wdXRVcmlzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ARpUChBDb2RlQnVuZGxlc0VudHJ5EgsKA2tleRgBIAEoCRIvCgV2YWx1ZRgCIAEoCzIgLmZseXRlaWRsMi50YXNrLkFjdGlvbkNvZGVCdW5kbGU6AjgBIjkKEEFjdGlvbkNvZGVCdW5kbGUSFAoDdGd6GAEgASgJQge6SARyAhABEg8KB3ZlcnNpb24YAiABKAki2AIKEFByb2R1Y2VkQXJ0aWZhY3QSFwoGb3V0cHV0GAEgASgJQge6SARyAhABEhUKBG5hbWUYAiABKAlCB7pIBHICEAESDwoHdmVyc2lvbhgDIAEoCRIqCgRpbmZvGAQgASgLMhwuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RJbmZvEikKBHR5cGUYBSABKAsyGy5mbHl0ZWlkbDIuY29yZS5MaXRlcmFsVHlwZRJFChBwYXJlbnRfYXJ0aWZhY3RzGAYgAygLMiEuZmx5dGVpZGwyLmNvcmUuQXJ0aWZhY3RWZXJzaW9uSWRCCLpIBZIBAhAgEi4KCnBhcnRpdGlvbnMYByABKAsyGi5mbHl0ZWlkbDIuY29yZS5QYXJ0aXRpb25zEjUKDnRpbWVfcGFydGl0aW9uGAggASgLMh0uZmx5dGVpZGwyLmNvcmUuVGltZVBhcnRpdGlvbiJ3CgdPdXRwdXRzEi4KCGxpdGVyYWxzGAEgAygLMhwuZmx5dGVpZGwyLnRhc2suTmFtZWRMaXRlcmFsEjwKEnByb2R1Y2VkX2FydGlmYWN0cxgDIAMoCzIgLmZseXRlaWRsMi50YXNrLlByb2R1Y2VkQXJ0aWZhY3QqfwoNRml4ZWRSYXRlVW5pdBIfChtGSVhFRF9SQVRFX1VOSVRfVU5TUEVDSUZJRUQQABIaChZGSVhFRF9SQVRFX1VOSVRfTUlOVVRFEAESGAoURklYRURfUkFURV9VTklUX0hPVVIQAhIXChNGSVhFRF9SQVRFX1VOSVRfREFZEAMqZgoZVHJpZ2dlckF1dG9tYXRpb25TcGVjVHlwZRIUChBUWVBFX1VOU1BFQ0lGSUVEEAASDQoJVFlQRV9OT05FEAESEQoNVFlQRV9TQ0hFRFVMRRACEhEKDVRZUEVfQVJUSUZBQ1QQA0KwAQoSY29tLmZseXRlaWRsMi50YXNrQgtDb21tb25Qcm90b0gCUAFaMmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi90YXNrogIDRlRYqgIORmx5dGVpZGwyLlRhc2vKAg5GbHl0ZWlkbDJcVGFza+ICGkZseXRlaWRsMlxUYXNrXEdQQk1ldGFkYXRh6gIPRmx5dGVpZGwyOjpUYXNrYgZwcm90bzM", [file_buf_validate_validate, file_flyteidl2_core_artifact_id, file_flyteidl2_core_interface, file_flyteidl2_core_literals, file_flyteidl2_core_types, file_google_protobuf_timestamp]);
 
 /**
  * @generated from message flyteidl2.task.NamedParameter
@@ -331,6 +331,87 @@ export const InputsSchema: GenMessage<Inputs> = /*@__PURE__*/
   messageDesc(file_flyteidl2_task_common, 8);
 
 /**
+ * ActionOverridesData is the file a fork's client writes to the data plane to
+ * override the inputs or code of task actions of the run being recovered. Its URI
+ * travels in the root action's Inputs.context under the reserved key
+ * "_u_action_overrides", which every action of the run inherits. The controller
+ * of each overridden action's parent reads that action's override inputs from
+ * their path, overlays them, by input name, on the inputs it computes for that
+ * action, and runs that action from its replacement code bundle, if any. The
+ * client also lists every overridden action and its ancestors in
+ * Recover.force_rerun_actions, so none of them is recovered.
+ *
+ * @generated from message flyteidl2.task.ActionOverridesData
+ */
+export type ActionOverridesData = Message<"flyteidl2.task.ActionOverridesData"> & {
+  /**
+   * Action name in the run being recovered -> URI of a serialized Inputs in the
+   * data plane holding the inputs that change (partial inputs). Like an action's
+   * input_uri, the values stay in the data plane and are only read by the parent
+   * that launches the action.
+   *
+   * @generated from field: map<string, string> input_uris = 1;
+   */
+  inputUris: { [key: string]: string };
+
+  /**
+   * Action name in the run being recovered -> the code bundle that action runs
+   * instead of the one its parent passes down. Only that action, and the actions
+   * it launches, run the replacement code; the rest of the run keeps its own.
+   *
+   * @generated from field: map<string, flyteidl2.task.ActionCodeBundle> code_bundles = 2;
+   */
+  codeBundles: { [key: string]: ActionCodeBundle };
+
+  /**
+   * Ancestors of the overridden actions, up to (excluding) the root action a0.
+   * Their inputs are unchanged, so a parent enqueues them without a cache key:
+   * a cache hit would skip the subtree that holds the override, and a write
+   * would store the new result under the old key.
+   *
+   * @generated from field: repeated string ancestor_actions = 3;
+   */
+  ancestorActions: string[];
+};
+
+/**
+ * Describes the message flyteidl2.task.ActionOverridesData.
+ * Use `create(ActionOverridesDataSchema)` to create a new message.
+ */
+export const ActionOverridesDataSchema: GenMessage<ActionOverridesData> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_common, 9);
+
+/**
+ * ActionCodeBundle is a code bundle archive (.tar.gz) in the data plane that one
+ * action of a fork runs in place of its parent's.
+ *
+ * @generated from message flyteidl2.task.ActionCodeBundle
+ */
+export type ActionCodeBundle = Message<"flyteidl2.task.ActionCodeBundle"> & {
+  /**
+   * URI of the archive.
+   *
+   * @generated from field: string tgz = 1;
+   */
+  tgz: string;
+
+  /**
+   * Version of the archive's contents (for example its MD5 digest), recorded as
+   * the action's code bundle version.
+   *
+   * @generated from field: string version = 2;
+   */
+  version: string;
+};
+
+/**
+ * Describes the message flyteidl2.task.ActionCodeBundle.
+ * Use `create(ActionCodeBundleSchema)` to create a new message.
+ */
+export const ActionCodeBundleSchema: GenMessage<ActionCodeBundle> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_task_common, 10);
+
+/**
  * Declares that a named output of the producing action is a new artifact
  * version. The output's literal (in Outputs.literals) is the artifact's value;
  * org/project/domain come from the producing action's scope at registration.
@@ -413,7 +494,7 @@ export type ProducedArtifact = Message<"flyteidl2.task.ProducedArtifact"> & {
  * Use `create(ProducedArtifactSchema)` to create a new message.
  */
 export const ProducedArtifactSchema: GenMessage<ProducedArtifact> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_common, 9);
+  messageDesc(file_flyteidl2_task_common, 11);
 
 /**
  * Output payload for an action.
@@ -444,7 +525,7 @@ export type Outputs = Message<"flyteidl2.task.Outputs"> & {
  * Use `create(OutputsSchema)` to create a new message.
  */
 export const OutputsSchema: GenMessage<Outputs> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_task_common, 10);
+  messageDesc(file_flyteidl2_task_common, 12);
 
 /**
  * Represents a frequency at which to run a schedule.

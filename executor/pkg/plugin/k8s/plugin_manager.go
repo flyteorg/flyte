@@ -27,6 +27,7 @@ import (
 	pluginsUtils "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 )
 
 const pluginStateVersion = 1
@@ -227,7 +228,12 @@ func (pm *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCor
 		return pluginsCore.UnknownTransition, err
 	}
 
-	pCtx := newPluginContext(tCtx, k8sPluginState, pm.kubeClient.GetClient())
+	reader := actionReader{
+		Reader:    pm.kubeClient.GetClient(),
+		namespace: o.GetNamespace(),
+		podLabels: flytek8s.AttemptIdentityLabels(tCtx.TaskExecutionMetadata()),
+	}
+	pCtx := newPluginContext(tCtx, k8sPluginState, reader)
 	p, err := pm.plugin.GetTaskPhase(ctx, pCtx, o)
 	if err != nil {
 		logger.Warnf(ctx, "failed to check status of resource in plugin [%s], with error: %s", pm.GetID(), err.Error())
@@ -271,6 +277,10 @@ func (pm *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCor
 		}
 
 		if err := tCtx.OutputWriter().Put(ctx, opReader); err != nil {
+			// Outputs over the download limit stay over it, so retrying can't help.
+			if storage.IsExceedsLimit(err) {
+				return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("OutputsTooLarge", err.Error(), p.Info())), nil
+			}
 			return pluginsCore.UnknownTransition, err
 		}
 		return pluginsCore.DoTransition(p), nil
@@ -792,7 +802,7 @@ func (pm *PluginManager) classifyExternalTermination(
 
 	switch phaseInfo.Err().GetCode() {
 	case codeUnexpectedObjectDeletion:
-		c := flytek8s.GetTerminationTarget(pod.Status)
+		c := flytek8s.GetTerminationTarget(pod.Status, flytek8s.GetPrimaryContainerName(pod))
 		if c == nil {
 			return phaseInfo
 		}

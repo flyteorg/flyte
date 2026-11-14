@@ -8,6 +8,7 @@ runs:
   notificationBufferLimit: 65000
   notifyRetryMinBackoff: 50ms
   notifyRetryMaxBackoff: 5s
+  notifyBatchSize: 100
   queueServiceUrl: "http://localhost:8089"
   storagePrefix: "s3://flyte-data"
   seedProjects:
@@ -40,7 +41,7 @@ logger:
 storage:
   type: minio
   container: "flyte-data"
-  enable-multicontainer: false
+  enable-multicontainer: true
   stow:
     kind: "s3"
     config:

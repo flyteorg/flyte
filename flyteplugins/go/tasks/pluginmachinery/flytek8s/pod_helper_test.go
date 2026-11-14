@@ -4724,6 +4724,28 @@ func TestDemystifyFailureExternalTermination(t *testing.T) {
 		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
 	})
 
+	t.Run("a scheduler preemption is reported the same way", func(t *testing.T) {
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Conditions: []v1.PodCondition{{
+				Type:    v1.DisruptionTarget,
+				Status:  v1.ConditionTrue,
+				Reason:  v1.PodReasonPreemptionByScheduler,
+				Message: "Pod flyte/p was preempted by higher priority workload flyte/q",
+			}},
+			ContainerStatuses: []v1.ContainerStatus{{
+				Name: "primary",
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{Reason: "Error", ExitCode: 143},
+				},
+			}},
+		}, pluginsCore.TaskInfo{}, "primary")
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
+		assert.Equal(t, v1.PodReasonPreemptionByScheduler, phaseInfo.Err().GetCode())
+		assert.Contains(t, phaseInfo.Err().GetMessage(), "preempted by higher priority workload flyte/q")
+	})
+
 	t.Run("a reasonless condition still names the condition", func(t *testing.T) {
 		bare := v1.PodCondition{Type: TerminationTargetCondition, Status: v1.ConditionTrue}
 		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
@@ -4734,24 +4756,57 @@ func TestDemystifyFailureExternalTermination(t *testing.T) {
 		assert.Equal(t, "Pod was terminated by an external controller", phaseInfo.Err().GetMessage())
 		assert.Equal(t, core.ExecutionError_SYSTEM, phaseInfo.Err().GetKind())
 	})
+
+	t.Run("a disruption stamped after the pod had failed keeps the exit-code verdict", func(t *testing.T) {
+		finishedAt := metav1.NewTime(time.Date(2026, 10, 13, 10, 0, 0, 0, time.UTC))
+		phaseInfo, err := DemystifyFailure(ctx, v1.PodStatus{
+			Conditions: []v1.PodCondition{{
+				Type:               v1.DisruptionTarget,
+				Status:             v1.ConditionTrue,
+				Reason:             "EvictionByEvictionAPI",
+				Message:            "Eviction API: evicting",
+				LastTransitionTime: metav1.NewTime(finishedAt.Add(time.Minute)),
+			}},
+			ContainerStatuses: []v1.ContainerStatus{{
+				Name: "primary",
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{Reason: "Error", ExitCode: 1, FinishedAt: finishedAt},
+				},
+			}},
+		}, pluginsCore.TaskInfo{}, "primary")
+		assert.NoError(t, err)
+		assert.Equal(t, core.ExecutionError_USER, phaseInfo.Err().GetKind())
+		assert.Equal(t, "Error", phaseInfo.Err().GetCode())
+	})
 }
 
 func TestGetTerminationTarget(t *testing.T) {
-	assert.Nil(t, GetTerminationTarget(v1.PodStatus{}))
+	assert.Nil(t, GetTerminationTarget(v1.PodStatus{}, "primary"))
 	assert.Nil(t, GetTerminationTarget(v1.PodStatus{Conditions: []v1.PodCondition{
 		{Type: v1.PodScheduled, Status: v1.ConditionTrue},
 		{Type: TerminationTargetCondition, Status: v1.ConditionFalse, Reason: "NotAdmitted"},
-	}}))
+	}}, "primary"))
 
 	got := GetTerminationTarget(v1.PodStatus{Conditions: []v1.PodCondition{
 		{Type: v1.PodReady, Status: v1.ConditionFalse},
 		{Type: TerminationTargetCondition, Status: v1.ConditionTrue, Reason: "StoppedByKueue", Message: "Workload is deleted"},
-	}})
+	}}, "primary")
 	if assert.NotNil(t, got) {
 		assert.Equal(t, "StoppedByKueue", got.Reason)
 		assert.Equal(t, "Workload is deleted", got.Message)
 	}
 	assert.Equal(t, "StoppedByKueue", ExternalTerminationCode(got))
+
+	preempted := GetTerminationTarget(v1.PodStatus{Conditions: []v1.PodCondition{
+		{Type: v1.DisruptionTarget, Status: v1.ConditionTrue, Reason: v1.PodReasonPreemptionByScheduler},
+	}}, "primary")
+	if assert.NotNil(t, preempted) {
+		assert.Equal(t, v1.PodReasonPreemptionByScheduler, ExternalTerminationCode(preempted))
+	}
+	// A node-pressure eviction can be the task's own doing, so it is not treated as one.
+	assert.Nil(t, GetTerminationTarget(v1.PodStatus{Conditions: []v1.PodCondition{
+		{Type: v1.DisruptionTarget, Status: v1.ConditionTrue, Reason: v1.PodReasonTerminationByKubelet},
+	}}, "primary"))
 	assert.Equal(t, "Pod was terminated by an external controller: Workload is deleted", ExternalTerminationMessage(got))
 	assert.Equal(t, "Pod was terminated by an external controller (NotAdmitted)",
 		ExternalTerminationMessage(&v1.PodCondition{Reason: "NotAdmitted"}))
@@ -4922,4 +4977,46 @@ func TestToK8sPodSpecMIGMixedStrategy(t *testing.T) {
 			})
 		}
 	}
+}
+
+// A DisruptionTarget only explains a failure the disruption caused: one stamped after the primary
+// container had already finished came too late to be the cause.
+func TestGetTerminationTargetDisruptionTiming(t *testing.T) {
+	finishedAt := time.Date(2026, 10, 13, 10, 0, 0, 0, time.UTC)
+	status := func(stampedAt time.Time, containers ...v1.ContainerStatus) v1.PodStatus {
+		return v1.PodStatus{
+			Conditions: []v1.PodCondition{{
+				Type:               v1.DisruptionTarget,
+				Status:             v1.ConditionTrue,
+				Reason:             "EvictionByEvictionAPI",
+				LastTransitionTime: metav1.NewTime(stampedAt),
+			}},
+			ContainerStatuses: containers,
+		}
+	}
+	finished := func(name string) v1.ContainerStatus {
+		return v1.ContainerStatus{Name: name, State: v1.ContainerState{
+			Terminated: &v1.ContainerStateTerminated{ExitCode: 1, FinishedAt: metav1.NewTime(finishedAt)},
+		}}
+	}
+	running := v1.ContainerStatus{Name: "primary", State: v1.ContainerState{Running: &v1.ContainerStateRunning{}}}
+	later := finishedAt.Add(time.Minute)
+
+	assert.Nil(t, GetTerminationTarget(status(later, finished("primary")), "primary"),
+		"stamped after the primary container finished")
+	assert.NotNil(t, GetTerminationTarget(status(finishedAt.Add(-time.Second), finished("primary")), "primary"),
+		"stamped before the primary container finished")
+	assert.NotNil(t, GetTerminationTarget(status(finishedAt, finished("primary")), "primary"),
+		"stamped within the same second: timestamps cannot tell them apart")
+	assert.NotNil(t, GetTerminationTarget(status(later, running), "primary"),
+		"the primary container is still running")
+	assert.NotNil(t, GetTerminationTarget(status(later, finished("sidecar")), "primary"),
+		"only the primary container's exit counts")
+	assert.NotNil(t, GetTerminationTarget(status(time.Time{}, finished("primary")), "primary"),
+		"no stamp time to compare")
+
+	// Kueue's TerminationTarget is not subject to the timing check.
+	kueue := status(later, finished("primary"))
+	kueue.Conditions[0].Type = TerminationTargetCondition
+	assert.NotNil(t, GetTerminationTarget(kueue, "primary"))
 }

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -594,7 +595,12 @@ func Test_newStowRawStore(t *testing.T) {
 	secretKey := "password"
 	path := filepath.Join(t.TempDir(), "secret-key-path")
 	err := os.WriteFile(path, []byte(secretKey), 0o600)
-	assert.NoError(t, err)
+	require.NoError(t, err)
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	t.Cleanup(server.Close)
 
 	type args struct {
 		cfg *Config
@@ -632,6 +638,7 @@ func Test_newStowRawStore(t *testing.T) {
 				Kind: s3.Kind,
 				Config: map[string]string{
 					s3.ConfigAccessKeyID: "my-access-key-id",
+					s3.ConfigEndpoint:    server.URL,
 					ConfigSecretKeyPath:  path,
 				},
 			},
@@ -643,6 +650,7 @@ func Test_newStowRawStore(t *testing.T) {
 				Kind: s3.Kind,
 				Config: map[string]string{
 					s3.ConfigAccessKeyID: "my-access-key-id",
+					s3.ConfigEndpoint:    server.URL,
 					ConfigSecretKeyPath:  filepath.Join(t.TempDir(), "wrong"),
 				},
 			},

@@ -11,6 +11,7 @@ import (
 	actionsk8s "github.com/flyteorg/flyte/v2/actions/k8s"
 	"github.com/flyteorg/flyte/v2/actions/service"
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
+	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/serviceclient"
@@ -21,15 +22,17 @@ import (
 const otelServiceName = "actions-service"
 
 // Setup registers the ActionsService handler on the SetupContext mux.
-// Requires sc.K8sClient and sc.Namespace to be set.
+// Requires sc.K8sClient, sc.K8sCache and sc.Namespace to be set. Call before
+// starting the shared cache so TaskAction indexes can be registered.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
+	sc.AddProfilingServer("actions", cfg.PprofPort)
 
 	otelCfg := otelutils.GetConfig()
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
-	otelInterceptor, err := otelconnect.NewInterceptor(
+	otelInterceptor, err := otelutils.NewConnectInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
 		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
 	)
@@ -39,6 +42,10 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 
 	if err := actionsk8s.InitScheme(); err != nil {
 		return fmt.Errorf("actions: failed to initialize scheme: %w", err)
+	}
+
+	if err := actionsk8s.RegisterTaskActionIndexes(ctx, sc.K8sCache); err != nil {
+		return err
 	}
 
 	runServiceCfg := cfg.RunService
@@ -51,6 +58,15 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 	runClient := workflowconnect.NewInternalRunServiceClient(runHTTPClient, runServiceCfg.URL, connect.WithInterceptors(otelInterceptor))
 
+	recordedFilter, err := fastcheck.NewOppoBloomFilter(
+		cfg.RecordFilterSize,
+		"actions_filter",
+		otelutils.GetMeterProvider(otelServiceName),
+	)
+	if err != nil {
+		return fmt.Errorf("actions: failed to create RecordAction dedup filter (size=%d): %w", cfg.RecordFilterSize, err)
+	}
+
 	actionsClient, err := actionsk8s.NewActionsClient(
 		sc.K8sClient,
 		sc.K8sCache,
@@ -58,8 +74,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		cfg.WatchBufferSize,
 		cfg.WatchWorkers,
 		runClient,
-		cfg.RecordFilterSize,
-		sc.Scope,
+		recordedFilter,
 	)
 	if err != nil {
 		return fmt.Errorf("actions: failed to create actions client: %w", err)

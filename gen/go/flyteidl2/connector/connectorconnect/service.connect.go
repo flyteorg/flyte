@@ -110,6 +110,7 @@ func NewAsyncConnectorServiceClient(httpClient connect.HTTPClient, baseURL strin
 			httpClient,
 			baseURL+AsyncConnectorServiceGetTaskProcedure,
 			connect.WithSchema(asyncConnectorServiceGetTaskMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		deleteTask: connect.NewClient[connector.DeleteTaskRequest, connector.DeleteTaskResponse](
@@ -122,12 +123,14 @@ func NewAsyncConnectorServiceClient(httpClient connect.HTTPClient, baseURL strin
 			httpClient,
 			baseURL+AsyncConnectorServiceGetTaskMetricsProcedure,
 			connect.WithSchema(asyncConnectorServiceGetTaskMetricsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		getTaskLogs: connect.NewClient[connector.GetTaskLogsRequest, connector.GetTaskLogsResponse](
 			httpClient,
 			baseURL+AsyncConnectorServiceGetTaskLogsProcedure,
 			connect.WithSchema(asyncConnectorServiceGetTaskLogsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -202,6 +205,7 @@ func NewAsyncConnectorServiceHandler(svc AsyncConnectorServiceHandler, opts ...c
 		AsyncConnectorServiceGetTaskProcedure,
 		svc.GetTask,
 		connect.WithSchema(asyncConnectorServiceGetTaskMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	asyncConnectorServiceDeleteTaskHandler := connect.NewUnaryHandler(
@@ -214,12 +218,14 @@ func NewAsyncConnectorServiceHandler(svc AsyncConnectorServiceHandler, opts ...c
 		AsyncConnectorServiceGetTaskMetricsProcedure,
 		svc.GetTaskMetrics,
 		connect.WithSchema(asyncConnectorServiceGetTaskMetricsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	asyncConnectorServiceGetTaskLogsHandler := connect.NewServerStreamHandler(
 		AsyncConnectorServiceGetTaskLogsProcedure,
 		svc.GetTaskLogs,
 		connect.WithSchema(asyncConnectorServiceGetTaskLogsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/flyteidl2.connector.AsyncConnectorService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -287,12 +293,14 @@ func NewConnectorMetadataServiceClient(httpClient connect.HTTPClient, baseURL st
 			httpClient,
 			baseURL+ConnectorMetadataServiceGetConnectorProcedure,
 			connect.WithSchema(connectorMetadataServiceGetConnectorMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		listConnectors: connect.NewClient[connector.ListConnectorsRequest, connector.ListConnectorsResponse](
 			httpClient,
 			baseURL+ConnectorMetadataServiceListConnectorsProcedure,
 			connect.WithSchema(connectorMetadataServiceListConnectorsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -333,12 +341,14 @@ func NewConnectorMetadataServiceHandler(svc ConnectorMetadataServiceHandler, opt
 		ConnectorMetadataServiceGetConnectorProcedure,
 		svc.GetConnector,
 		connect.WithSchema(connectorMetadataServiceGetConnectorMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	connectorMetadataServiceListConnectorsHandler := connect.NewUnaryHandler(
 		ConnectorMetadataServiceListConnectorsProcedure,
 		svc.ListConnectors,
 		connect.WithSchema(connectorMetadataServiceListConnectorsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/flyteidl2.connector.ConnectorMetadataService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
