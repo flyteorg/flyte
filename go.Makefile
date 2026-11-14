@@ -160,6 +160,18 @@ apple-silicon-config: ## Generate a config with the MLX bridge settings
 		echo "flyte-binary-http is already served inside flyte-devbox, run 'make devbox-run FLYTE_DEV=True APPLE_SILICON=True' first"; \
 		exit 1; \
 	fi; \
+	if ! grep -q '^  k8s:$$' config.yaml; then \
+		echo "Error: no '  k8s:' line in config.yaml to add apple-silicon-bridge under, failed to create $(APPLE_SILICON_CONFIG)"; \
+		exit 1; \
+	fi; \
+	if ! grep -q 'rustfs-svc\.flyte\.svc\.cluster\.local:9000' config.yaml; then \
+		echo "Error: no 'rustfs-svc.flyte.svc.cluster.local:9000' in config.yaml to replace, failed to create $(APPLE_SILICON_CONFIG)"; \
+		exit 1; \
+	fi; \
+	if ! grep '_U_EP_OVERRIDE' config.yaml | grep -q 'host\.docker\.internal:8090'; then \
+		echo "Error: no '_U_EP_OVERRIDE' with 'host.docker.internal:8090' in config.yaml to replace, failed to create $(APPLE_SILICON_CONFIG)"; \
+		exit 1; \
+	fi; \
 	umask 077; \
 	{ \
 		echo '    apple-silicon-bridge:'; \
