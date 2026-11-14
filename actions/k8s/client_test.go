@@ -280,7 +280,8 @@ func TestEmbedTaskTemplate_SubstitutesRunStartTime(t *testing.T) {
 
 	embedded := func(action *actions.Action) *core.TaskTemplate {
 		ta := &executorv1.TaskAction{Spec: executorv1.TaskActionSpec{}}
-		require.NoError(t, embedTaskTemplate(action, ta, &task.RunSpec{RunStartTime: timestamppb.New(startTime)}))
+		applyRunSpecToTaskAction(ta, &task.RunSpec{RunStartTime: timestamppb.New(startTime)})
+		require.NoError(t, embedTaskTemplate(action, ta))
 		out := &core.TaskTemplate{}
 		require.NoError(t, proto.Unmarshal(ta.Spec.TaskTemplate, out))
 		return out
@@ -299,7 +300,7 @@ func TestEmbedTaskTemplate_SubstitutesRunStartTime(t *testing.T) {
 
 	t.Run("no-op when run start time is unset", func(t *testing.T) {
 		ta := &executorv1.TaskAction{Spec: executorv1.TaskActionSpec{}}
-		require.NoError(t, embedTaskTemplate(newAction(), ta, &task.RunSpec{}))
+		require.NoError(t, embedTaskTemplate(newAction(), ta))
 		out := &core.TaskTemplate{}
 		require.NoError(t, proto.Unmarshal(ta.Spec.TaskTemplate, out))
 		assert.Equal(t, runStartTimeTemplateVar, out.GetContainer().GetArgs()[2])
@@ -542,7 +543,7 @@ func TestEmbedTaskTemplate_StampsPodTemplateName(t *testing.T) {
 
 	embedded := func(action *actions.Action, name string) *core.TaskTemplate {
 		ta := &executorv1.TaskAction{Spec: executorv1.TaskActionSpec{PodTemplateName: name}}
-		require.NoError(t, embedTaskTemplate(action, ta, &task.RunSpec{}))
+		require.NoError(t, embedTaskTemplate(action, ta))
 		out := &core.TaskTemplate{}
 		require.NoError(t, proto.Unmarshal(ta.Spec.TaskTemplate, out))
 		return out

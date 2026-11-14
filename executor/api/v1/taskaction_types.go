@@ -200,6 +200,10 @@ type TaskActionSpec struct {
 	// +optional
 	RawDataPrefix string `json:"rawDataPrefix,omitempty"`
 
+	// RunStartTime is the run-scoped start time in RFC3339 UTC, inherited by child tasks.
+	// +optional
+	RunStartTime string `json:"runStartTime,omitempty"`
+
 	// Group is the group this action belongs to, if applicable.
 	// +optional
 	// +kubebuilder:validation:MaxLength=256
