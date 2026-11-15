@@ -431,6 +431,31 @@ func TestDecorateEnvVars(t *testing.T) {
 	}
 }
 
+// TestDecorateEnvVars_SystemVarsWin verifies execution metadata env vars cannot override the
+// env vars the system sets, while non-system keys still pass through.
+func TestDecorateEnvVars_SystemVarsWin(t *testing.T) {
+	ctx := contextutils.WithWorkflowID(context.Background(), "fake_workflow")
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{}))
+
+	taskEnv := map[string]string{
+		"FLYTE_INTERNAL_EXECUTION_PROJECT":  "hijacked",
+		"FLYTE_ATTEMPT_NUMBER":              "99",
+		"FLYTE_INTERNAL_EXECUTION_WORKFLOW": "hijacked",
+		"LOG_LEVEL":                         "debug",
+	}
+	got, _ := DecorateEnvVars(ctx, nil, nil, taskEnv, mockTaskExecutionIdentifier{}, "")
+
+	values := make(map[string]string, len(got))
+	for _, e := range got {
+		values[e.Name] = e.Value
+	}
+	system := append(GetContextEnvVars(ctx), GetExecutionEnvVars(mockTaskExecutionIdentifier{}, "")...)
+	for _, e := range system {
+		assert.Equal(t, e.Value, values[e.Name], "system env var %s was overridden", e.Name)
+	}
+	assert.Equal(t, "debug", values["LOG_LEVEL"])
+}
+
 func TestGetPodTolerationsMIGPartitionResource(t *testing.T) {
 	migMixedConfig(t, "nvidia.com/mig-{partition}")
 	gpuTol := v12.Toleration{Key: "flyte/gpu", Value: "dedicated", Operator: v12.TolerationOpEqual, Effect: v12.TaintEffectNoSchedule}

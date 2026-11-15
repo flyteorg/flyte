@@ -113,6 +113,11 @@ func TestNewSecretsMutatorWithOptions(t *testing.T) {
 	o := mutatorOptions{}
 	WithLimitNamespace("tasks")(&o)
 	assert.Equal(t, "tasks", o.limitNamespace)
+
+	first, second := secretFetcherMock{}, secretFetcherMock{Secrets: map[string]SecretValue{"k": {}}}
+	WithSecretFetchers(first)(&o)
+	WithSecretFetchers(second)(&o)
+	assert.Equal(t, []SecretFetcher{first, second}, o.secretFetchers, "fetchers accumulate in order")
 }
 
 func TestNewSecretsMutatorFromInjectors(t *testing.T) {

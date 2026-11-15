@@ -349,8 +349,10 @@ func (i *EmbeddedSecretManagerInjector) Inject(
 	}
 
 	// A SecretKeyRef can only reference a Secret in the same namespace as the pod, so the pod
-	// must be running in the same namespace the Kubernetes-native secret manager stores into.
-	if (secret.MountRequirement == core.Secret_ANY || secret.MountRequirement == core.Secret_ENV_VAR) && pod.GetNamespace() != i.cfg.K8sConfig.Namespace {
+	// must be running in the same namespace the Kubernetes-native secret manager stores into,
+	// unless env vars may carry the value itself (EnvVarsFromValues).
+	envFromRef := pod.GetNamespace() == i.cfg.K8sConfig.Namespace
+	if (secret.MountRequirement == core.Secret_ANY || secret.MountRequirement == core.Secret_ENV_VAR) && !envFromRef && !i.cfg.EnvVarsFromValues {
 		return pod, false, fmt.Errorf(
 			"cannot mount secret [%s]: pod namespace [%s] does not match the Kubernetes secret manager namespace [%s]",
 			secret.Key, pod.GetNamespace(), i.cfg.K8sConfig.Namespace)
@@ -376,16 +378,24 @@ func (i *EmbeddedSecretManagerInjector) Inject(
 					"but has a binary value that is not a valid UTF-8 string; mount "+
 					"as a file instead", secret.Key)
 		}
-		if !resolved.isK8sSecret {
+		switch {
+		case resolved.isK8sSecret && envFromRef:
+			i.injectAsEnvVar(secret, &corev1.SecretKeySelector{
+				LocalObjectReference: corev1.LocalObjectReference{Name: EncodeK8sSecretName(resolved.secretID)},
+				Key:                  resolved.secretID,
+			}, pod)
+		case i.cfg.EnvVarsFromValues:
+			value := secretValue.StringValue
+			if value == "" {
+				value = string(secretValue.BinaryValue)
+			}
+
+			i.injectAsEnvVarValue(secret, value, pod)
+		default:
 			return pod, false, fmt.Errorf(
 				"secret %q cannot be mounted as an environment variable: "+
 					"it is not stored in a Kubernetes secret", secret.Key)
 		}
-
-		i.injectAsEnvVar(secret, &corev1.SecretKeySelector{
-			LocalObjectReference: corev1.LocalObjectReference{Name: EncodeK8sSecretName(resolved.secretID)},
-			Key:                  resolved.secretID,
-		}, pod)
 	case core.Secret_FILE:
 		secretBytes := secretValue.BinaryValue
 		if len(secretValue.StringValue) > 0 {
@@ -425,6 +435,21 @@ func (i *EmbeddedSecretManagerInjector) injectAsEnvVar(secret *core.Secret, secr
 				SecretKeyRef: secretRef,
 			},
 		},
+	}
+	pod.Spec.InitContainers = AppendEnvVars(pod.Spec.InitContainers, envVars...)
+	pod.Spec.Containers = AppendEnvVars(pod.Spec.Containers, envVars...)
+}
+
+// injectAsEnvVarValue sets the secret's environment variable to its value (EnvVarsFromValues).
+func (i *EmbeddedSecretManagerInjector) injectAsEnvVarValue(secret *core.Secret, value string, pod *corev1.Pod) {
+	valueEnvVarName := i.parentCfg.SecretEnvVarPrefix + strings.ToUpper(secret.GetKey())
+	if secret.GetEnvVar() != "" {
+		valueEnvVarName = secret.EnvVar
+	}
+
+	envVars := []corev1.EnvVar{
+		{Name: SecretEnvVarPrefix, Value: i.parentCfg.SecretEnvVarPrefix},
+		{Name: valueEnvVarName, Value: value},
 	}
 	pod.Spec.InitContainers = AppendEnvVars(pod.Spec.InitContainers, envVars...)
 	pod.Spec.Containers = AppendEnvVars(pod.Spec.Containers, envVars...)

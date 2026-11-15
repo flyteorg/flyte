@@ -40,6 +40,8 @@ const (
 	notificationSentMetricName                       = "runs.notification.sent"
 	notificationBufferAction      notificationBuffer = "action"
 	notificationBufferRun         notificationBuffer = "run"
+	activeRunsMetricName                             = "runs.active"
+	activeRunsQueryTimeout                           = 5 * time.Second
 )
 
 // Defaults for the pq.Listener behind LISTEN/NOTIFY.
@@ -125,6 +127,58 @@ func newNotificationMetrics(provider metric.MeterProvider) (*notificationMetrics
 		subscriberDroppedNotifyCount: subscriberDroppedNotifyCount,
 		notifySentCount:              notifySentCount,
 	}, nil
+}
+
+// phaseLabel turns ACTION_PHASE_RUNNING into RUNNING for the metric label.
+func phaseLabel(phase int32) string {
+	return strings.TrimPrefix(common.ActionPhase(phase).String(), "ACTION_PHASE_")
+}
+
+func registerActiveRunsGauge(
+	provider metric.MeterProvider,
+	countByPhase func(ctx context.Context) (map[interfaces.PhaseKey]int64, error),
+) error {
+	if provider == nil {
+		return nil
+	}
+	if _, ok := provider.(metricnoop.MeterProvider); ok {
+		return nil
+	}
+
+	meter := provider.Meter(notificationMeterName)
+
+	active, err := meter.Int64ObservableGauge(
+		activeRunsMetricName,
+		metric.WithDescription("Number of runs in each active phase"),
+	)
+	if err != nil {
+		return err
+	}
+
+	_, err = meter.RegisterCallback(func(ctx context.Context, o metric.Observer) error {
+		ctx, cancel := context.WithTimeout(ctx, activeRunsQueryTimeout)
+		defer cancel()
+
+		counts, err := countByPhase(ctx)
+		if err != nil {
+			// Returning an error makes the SDK skip exporting every runs-service
+			// metric for this interval, so log and skip only this observation.
+			logger.Warnf(ctx, "skipping %s observation: %v", activeRunsMetricName, err)
+			return nil
+		}
+		// Report every active phase, including zeros, so a phase that empties
+		// drops to 0 instead of disappearing.
+		for _, phase := range activePhases {
+			// UNSPECIFIED is a placeholder, not a phase a run sits in.
+			if phase == int32(common.ActionPhase_ACTION_PHASE_UNSPECIFIED) {
+				continue
+			}
+			n := counts[interfaces.PhaseKey{Phase: phase, IsRoot: true}]
+			o.ObserveInt64(active, n, metric.WithAttributes(attribute.String("phase", phaseLabel(phase))))
+		}
+		return nil
+	}, active)
+	return err
 }
 
 func (m *notificationMetrics) recordDeleted(ctx context.Context, bufferFrom notificationBuffer, count int64) {
@@ -238,6 +292,10 @@ func NewActionRepo(
 	repo.pendingRuns = make(map[string]struct{}, defaultNotificationBufferSize)
 	repo.pendingRunQueue = make([]string, 0, defaultNotificationBufferSize)
 	repo.pendingCh = make(chan struct{}, 1)
+
+	if err := registerActiveRunsGauge(meterProvider, repo.CountActiveActionsByPhase); err != nil {
+		return nil, fmt.Errorf("register active runs gauge: %w", err)
+	}
 
 	if err := repo.startPostgresListener(); err != nil {
 		return nil, fmt.Errorf("failed to start postgres listener: %w", err)

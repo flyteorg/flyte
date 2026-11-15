@@ -11,6 +11,7 @@ import (
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	k8sError "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -1145,4 +1146,104 @@ func TestEmbeddedSecretManagerInjector_InvalidateCache_ClusterScopedKey(t *testi
 
 	injector.InvalidateCache(ctx, org, domain, project, EagerSecretKey)
 	assert.ElementsMatch(t, wantKeys, deleted)
+}
+
+// fetcherFunc is a SecretFetcher from a function.
+type fetcherFunc func(ctx context.Context, secretID string) (*SecretValue, error)
+
+func (f fetcherFunc) GetSecretValue(ctx context.Context, secretID string) (*SecretValue, error) {
+	return f(ctx, secretID)
+}
+
+// Fetchers are consulted in order at each scope: a NotFound falls through to the next one, a value
+// or any other error ends the lookup. WithSecretFetchers relies on this to put a deployment's own
+// source ahead of the configured store.
+func TestEmbeddedSecretManagerInjector_FetcherOrder(t *testing.T) {
+	ctx := context.Background()
+	components := &SecretNameComponents{Org: "o-apple", Name: "secret1"}
+	holds := func(v string) SecretFetcher {
+		return fetcherFunc(func(context.Context, string) (*SecretValue, error) { return &SecretValue{StringValue: v}, nil })
+	}
+
+	notFound := fetcherFunc(func(_ context.Context, id string) (*SecretValue, error) {
+		return nil, stdlibErrors.Errorf(ErrCodeSecretNotFound, "secret %q not found", id)
+	})
+
+	failing := fetcherFunc(func(context.Context, string) (*SecretValue, error) {
+		return nil, fmt.Errorf("control plane unreachable")
+	})
+
+	lookUp := func(fetchers ...SecretFetcher) (*resolvedUserSecret, error) {
+		injector := NewEmbeddedSecretManagerInjector(config.EmbeddedSecretManagerConfig{Type: config.EmbeddedSecretManagerTypeAWS},
+			fetchers, nil, testReferenceNamespace, newAlwaysMissCache(t), &config.Config{})
+		resolved, _, err := injector.(*EmbeddedSecretManagerInjector).lookUpSecret(ctx, components)
+		return resolved, err
+	}
+
+	got, err := lookUp(holds("extra"), holds("configured"))
+	require.NoError(t, err)
+	assert.Equal(t, "extra", got.value.StringValue, "the first fetcher holding the secret wins")
+
+	got, err = lookUp(notFound, holds("configured"))
+	require.NoError(t, err)
+	assert.Equal(t, "configured", got.value.StringValue, "a NotFound falls through to the next fetcher")
+
+	_, err = lookUp(failing, holds("configured"))
+	assert.ErrorContains(t, err, "control plane unreachable", "any other error is not masked by a later fetcher")
+}
+
+// With EnvVarsFromValues, a secret no Kubernetes secret in the pod's namespace holds is injected as
+// its value when mounted as an environment variable: one a fetcher resolved, or a pod outside the
+// Kubernetes store's namespace. Off, such a mount still fails.
+func TestEmbeddedSecretManagerInjector_EnvVarsFromValues(t *testing.T) {
+	ctx := context.Background()
+	holds := fetcherFunc(func(context.Context, string) (*SecretValue, error) { return &SecretValue{StringValue: "s3cr3t"}, nil })
+	newPod := func(ns string) *corev1.Pod {
+		return &corev1.Pod{
+			ObjectMeta: metav1.ObjectMeta{Namespace: ns, Labels: map[string]string{"organization": "o-apple", "domain": "d", "project": "p"}},
+			Spec:       corev1.PodSpec{Containers: []corev1.Container{{Name: "main"}}},
+		}
+	}
+
+	envOf := func(pod *corev1.Pod, name string) *corev1.EnvVar {
+		for _, e := range pod.Spec.Containers[0].Env {
+			if e.Name == name {
+				e := e
+				return &e
+			}
+		}
+
+		return nil
+	}
+
+	cases := map[string]config.EmbeddedSecretManagerConfig{
+		"a fetcher's secret":                  {Type: config.EmbeddedSecretManagerTypeAWS, K8sConfig: config.K8sConfig{Namespace: "secrets-ns"}},
+		"a pod outside the store's namespace": {Type: config.EmbeddedSecretManagerTypeAWS, K8sConfig: config.K8sConfig{Namespace: "secrets-ns"}},
+	}
+
+	for name, cfg := range cases {
+		t.Run(name, func(t *testing.T) {
+			podNS := "secrets-ns"
+			if name == "a pod outside the store's namespace" {
+				podNS = "o-apple"
+			}
+
+			cfg.EnvVarsFromValues = true
+			injector := NewEmbeddedSecretManagerInjector(cfg, []SecretFetcher{holds}, nil, testReferenceNamespace, newAlwaysMissCache(t),
+				&config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
+			pod, injected, err := injector.Inject(ctx, &core.Secret{Key: "token", MountRequirement: core.Secret_ENV_VAR}, newPod(podNS))
+			require.NoError(t, err)
+			require.True(t, injected)
+			env := envOf(pod, config.DefaultSecretEnvVarPrefix+"TOKEN")
+			require.NotNil(t, env)
+			assert.Equal(t, "s3cr3t", env.Value)
+			assert.Nil(t, env.ValueFrom)
+
+			cfg.EnvVarsFromValues = false
+			injector = NewEmbeddedSecretManagerInjector(cfg, []SecretFetcher{holds}, nil, testReferenceNamespace, newAlwaysMissCache(t),
+				&config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
+			_, _, err = injector.Inject(ctx, &core.Secret{Key: "token", MountRequirement: core.Secret_ENV_VAR}, newPod(podNS))
+			assert.Error(t, err, "off: an env var only ever references a Kubernetes secret")
+		})
+	}
 }

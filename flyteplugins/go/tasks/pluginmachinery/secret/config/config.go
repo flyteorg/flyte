@@ -213,6 +213,11 @@ type EmbeddedSecretManagerConfig struct {
 	// cluster-qualified storage name, so that several clusters sharing one secret backend do not
 	// overwrite each other's copy. Empty keeps the unqualified (org-scoped) naming.
 	ClusterName string `json:"clusterName" pflag:",Name of this cluster; qualifies the storage name of per-cluster secrets so clusters that share a secret backend do not overwrite each other."` //nolint:lll
+	// EnvVarsFromValues injects a secret mounted as an environment variable as its value when no
+	// Kubernetes secret in the pod's namespace holds it (a secret a WithSecretFetchers fetcher
+	// resolved, or a pod outside K8sConfig.Namespace), as files are. The value is then part of the
+	// pod spec. Off, such a mount fails, so env vars only ever reference a Kubernetes secret.
+	EnvVarsFromValues bool `json:"envVarsFromValues" pflag:",Inject an env-var secret that no Kubernetes secret in the pod's namespace holds as its value"` //nolint:lll
 }
 
 type AWSConfig struct {

@@ -49,6 +49,9 @@ func (s *SecretsPodMutator) Mutate(ctx context.Context, pod *corev1.Pod) (newP *
 		return pod, false, &admissionError
 	}
 
+	initialInitContainerCount := len(pod.Spec.InitContainers)
+	securityContext := primaryContainerSecurityContext(pod)
+
 	for _, secret := range secrets {
 		mutatedPod, injected, err := s.injectSecret(ctx, secret, pod)
 		if !injected {
@@ -64,7 +67,38 @@ func (s *SecretsPodMutator) Mutate(ctx context.Context, pod *corev1.Pod) (newP *
 		pod = mutatedPod
 	}
 
+	if securityContext != nil {
+		for idx := initialInitContainerCount; idx < len(pod.Spec.InitContainers); idx++ {
+			if pod.Spec.InitContainers[idx].SecurityContext == nil {
+				pod.Spec.InitContainers[idx].SecurityContext = securityContext.DeepCopy()
+			}
+		}
+	}
+
 	return pod, len(secrets) > 0, nil
+}
+
+func primaryContainerSecurityContext(pod *corev1.Pod) *corev1.SecurityContext {
+	for _, key := range []string{"primary_container_name", "kubectl.kubernetes.io/default-container"} {
+		if name := pod.Annotations[key]; name != "" {
+			for idx := range pod.Spec.Containers {
+				if pod.Spec.Containers[idx].Name == name {
+					return pod.Spec.Containers[idx].SecurityContext
+				}
+			}
+			return nil
+		}
+	}
+
+	for idx := range pod.Spec.Containers {
+		if pod.Spec.Containers[idx].Name == pod.Name {
+			return pod.Spec.Containers[idx].SecurityContext
+		}
+	}
+	if len(pod.Spec.Containers) > 0 {
+		return pod.Spec.Containers[0].SecurityContext
+	}
+	return nil
 }
 
 // InvalidateCache asks every enabled injector to drop its copy of the named secret, so a
@@ -111,6 +145,7 @@ type Option func(*mutatorOptions)
 
 type mutatorOptions struct {
 	limitNamespace string
+	secretFetchers []SecretFetcher
 }
 
 // WithLimitNamespace confines the embedded secret manager's Secret informer to the namespace task
@@ -119,6 +154,17 @@ type mutatorOptions struct {
 func WithLimitNamespace(namespace string) Option {
 	return func(o *mutatorOptions) {
 		o.limitNamespace = namespace
+	}
+}
+
+// WithSecretFetchers gives the embedded secret manager additional fetchers, consulted in order
+// before the one its configuration selects. A fetcher reports a secret it does not hold with
+// ErrCodeSecretNotFound, so the next fetcher (and finally the configured store) is tried; any other
+// error fails the lookup. This lets a deployment resolve secrets from its own source (for example a
+// control-plane secret service) without copying them into the configured store first.
+func WithSecretFetchers(fetchers ...SecretFetcher) Option {
+	return func(o *mutatorOptions) {
+		o.secretFetchers = append(o.secretFetchers, fetchers...)
 	}
 }
 
@@ -150,7 +196,7 @@ func NewSecretsMutatorWithOptions(
 	globalSecretManagerConfig := secretmanager.GetConfig()
 	for _, secretManagerType := range enabledSecretManagerTypes {
 		injector, err := newSecretsInjector(ctx, secretManagerType, cfg, globalSecretManagerConfig, podNamespace,
-			o.limitNamespace, scope.NewSubScope("secret_injector"))
+			o.limitNamespace, o.secretFetchers, scope.NewSubScope("secret_injector"))
 		if err != nil {
 			return nil, err
 		}

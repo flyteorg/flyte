@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"connectrpc.com/connect"
-	"connectrpc.com/otelconnect"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	otelInterceptor, err := otelconnect.NewInterceptor()
+	otelInterceptor, err := otelutils.NewConnectInterceptor()
 	if err != nil {
 		log.Fatalf("Failed to create otel interceptor: %v", err)
 	}

@@ -210,6 +210,10 @@ message ActionMetadata {
   // Set only when this action was recovered from a prior run instead of executed
   // here: the source action (source run id + action name) whose result was reused.
   common.ActionIdentifier recovered_from = 18;
+
+  // Set when this action was enqueued with inputs or code overridden from the
+  // run's overrides file (see flyteidl2.task.ActionOverridesData).
+  bool override_applied = 19;
 }
 
 enum ActionType {

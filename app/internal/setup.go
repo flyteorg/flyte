@@ -4,12 +4,14 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/otelconnect"
 	stdlibapp "github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/sentryutils"
 
 	appconfig "github.com/flyteorg/flyte/v2/app/internal/config"
 	appk8s "github.com/flyteorg/flyte/v2/app/internal/k8s"
@@ -18,6 +20,10 @@ import (
 )
 
 const otelServiceName = "internal-app-service"
+const (
+	activeAppsGauge          = "flyte.active_apps"
+	activeAppsGaugesInterval = time.Minute
+)
 
 // Setup registers the InternalAppService handler on the SetupContext mux.
 // It is mounted at /internal<path> to avoid collision with the control plane
@@ -44,11 +50,26 @@ func Setup(ctx context.Context, sc *stdlibapp.SetupContext, cfg *appconfig.Inter
 		return nil
 	})
 
+	// app.Setup initializes Sentry; it runs after this
+	if !sentryutils.Disabled() {
+		sc.AddWorker("app-sentry-active-gauges", func(ctx context.Context) error {
+			return sentryutils.SampleGauges(ctx, activeAppsGaugesInterval, func(ctx context.Context) (map[string]float64, error) {
+				n, err := appK8sClient.CountActiveApps(ctx)
+				if err != nil {
+					return nil, err
+				}
+				return map[string]float64{
+					activeAppsGauge: float64(n),
+				}, nil
+			})
+		})
+	}
+
 	otelCfg := otelutils.GetConfig()
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
-	otelInterceptor, err := otelconnect.NewInterceptor(
+	otelInterceptor, err := otelutils.NewConnectInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
 		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
 	)

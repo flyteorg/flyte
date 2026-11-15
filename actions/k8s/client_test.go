@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/metric/noop"
 	"google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/proto"
@@ -25,7 +26,6 @@ import (
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
-	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -62,7 +62,7 @@ func TestNotifyRunService_DeduplicateRecordAction(t *testing.T) {
 
 	mockClient := runmocks.NewInternalRunServiceClient(t)
 
-	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	filter, err := fastcheck.NewOppoBloomFilter(128, "test", noop.NewMeterProvider())
 	assert.NoError(t, err)
 
 	c := &ActionsClient{
@@ -91,7 +91,7 @@ func TestNotifyRunService_FailedRecordAllowsRetry(t *testing.T) {
 
 	mockClient := runmocks.NewInternalRunServiceClient(t)
 
-	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	filter, err := fastcheck.NewOppoBloomFilter(128, "test", noop.NewMeterProvider())
 	assert.NoError(t, err)
 
 	c := &ActionsClient{
@@ -566,7 +566,7 @@ func TestNotifyRunService_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testi
 	ctx := context.Background()
 
 	mockClient := runmocks.NewInternalRunServiceClient(t)
-	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	filter, err := fastcheck.NewOppoBloomFilter(128, "test", noop.NewMeterProvider())
 	require.NoError(t, err)
 
 	c := &ActionsClient{
@@ -622,7 +622,7 @@ func TestNotifyRunService_ProcessesNonTerminalAddedEvents(t *testing.T) {
 	ctx := context.Background()
 
 	mockClient := runmocks.NewInternalRunServiceClient(t)
-	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	filter, err := fastcheck.NewOppoBloomFilter(128, "test", noop.NewMeterProvider())
 	require.NoError(t, err)
 
 	c := &ActionsClient{
@@ -669,7 +669,7 @@ func TestNotifyRunService_DuplicateAddedSkipsRecordAction(t *testing.T) {
 	ctx := context.Background()
 
 	mockClient := runmocks.NewInternalRunServiceClient(t)
-	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	filter, err := fastcheck.NewOppoBloomFilter(128, "test", noop.NewMeterProvider())
 	require.NoError(t, err)
 
 	c := &ActionsClient{
@@ -699,7 +699,7 @@ func TestNotifyRunService_TerminalDuplicateRepairsTimestamps(t *testing.T) {
 	ctx := context.Background()
 
 	mockClient := runmocks.NewInternalRunServiceClient(t)
-	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	filter, err := fastcheck.NewOppoBloomFilter(128, "test", noop.NewMeterProvider())
 	require.NoError(t, err)
 
 	c := &ActionsClient{
@@ -839,7 +839,7 @@ func runningTaskAction(name string) *executorv1.TaskAction {
 func TestHandleWatchEvent_CoalescedReadsLatestPhase(t *testing.T) {
 	ctx := context.Background()
 	mockClient := runmocks.NewInternalRunServiceClient(t)
-	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	filter, err := fastcheck.NewOppoBloomFilter(128, "test", noop.NewMeterProvider())
 	require.NoError(t, err)
 
 	c := &ActionsClient{
@@ -876,7 +876,7 @@ func TestHandleWatchEvent_CoalescedReadsLatestPhase(t *testing.T) {
 func TestHandleWatchEvent_CreateThenDeleteStillRecords(t *testing.T) {
 	ctx := context.Background()
 	mockClient := runmocks.NewInternalRunServiceClient(t)
-	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	filter, err := fastcheck.NewOppoBloomFilter(128, "test", noop.NewMeterProvider())
 	require.NoError(t, err)
 
 	c := &ActionsClient{
@@ -905,6 +905,7 @@ func TestHandleWatchEvent_CreateThenDeleteStillRecords(t *testing.T) {
 	})).Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
 
 	c.handleWatchEvent(ctx, watch.Event{Type: watch.Deleted, Object: runningTaskAction("d1")})
+	assert.False(t, filter.Contains(ctx, []byte(buildTaskActionName(buildActionUpdate(ctx, runningTaskAction("d1"), watch.Deleted).ActionID))))
 
 	mockClient.AssertNumberOfCalls(t, "RecordAction", 1)
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
@@ -916,7 +917,7 @@ func TestHandleWatchEvent_CreateThenDeleteStillRecords(t *testing.T) {
 func TestHandleWatchEvent_DeleteAfterRecordDoesNotDoubleRecord(t *testing.T) {
 	ctx := context.Background()
 	mockClient := runmocks.NewInternalRunServiceClient(t)
-	filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	filter, err := fastcheck.NewOppoBloomFilter(128, "test", noop.NewMeterProvider())
 	require.NoError(t, err)
 
 	c := &ActionsClient{
@@ -935,9 +936,34 @@ func TestHandleWatchEvent_DeleteAfterRecordDoesNotDoubleRecord(t *testing.T) {
 		Return(&connect.Response[workflow.UpdateActionStatusResponse]{}, nil).Once()
 
 	c.handleTaskActionEvent(ctx, runningTaskAction("d2"), watch.Deleted)
+	assert.False(t, filter.Contains(ctx, []byte(buildTaskActionName(buildActionUpdate(ctx, runningTaskAction("d2"), watch.Deleted).ActionID))))
 
 	mockClient.AssertNotCalled(t, "RecordAction")
 	mockClient.AssertNumberOfCalls(t, "UpdateActionStatus", 1)
+}
+
+func TestHandleWatchEvent_LabelledDeleteOnlyRemovesFilterEntry(t *testing.T) {
+	ctx := context.Background()
+	mockClient := runmocks.NewInternalRunServiceClient(t)
+	filter := testFilter()
+	ta := runningTaskAction("deleted")
+	parent := "a0"
+	ta.Spec.ParentActionName = &parent
+	ta.Labels = map[string]string{labelTerminalStatusRecorded: "true"}
+	key := []byte(buildTaskActionName(buildActionUpdate(ctx, ta, watch.Deleted).ActionID))
+	filter.Add(ctx, key)
+	c := &ActionsClient{
+		runClient:      mockClient,
+		recordedFilter: filter,
+		bufferSize:     10,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+	}
+	ch := c.Subscribe("run1", parent)
+	c.handleWatchEvent(ctx, watch.Event{Type: watch.Deleted, Object: ta})
+	assert.False(t, filter.Contains(ctx, key))
+	assert.Empty(t, ch, "already-recorded deletions must not notify subscribers")
+	mockClient.AssertNotCalled(t, "RecordAction")
+	mockClient.AssertNotCalled(t, "UpdateActionStatus")
 }
 
 // With several actions replicas, another replica can record the terminal status and
@@ -1180,26 +1206,24 @@ func TestBuildActionUpdate_DeleteOnNonTerminalForcesAborted(t *testing.T) {
 // real client (constructed via NewActionsClient); struct-literal test clients must
 // set it too, otherwise notifyRunService's RecordAction path nil-derefs.
 func testFilter() fastcheck.Filter {
-	f, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+	f, err := fastcheck.NewOppoBloomFilter(128, "test", noop.NewMeterProvider())
 	if err != nil {
 		panic(err)
 	}
 	return f
 }
 
-func TestNewActionsClient_FilterSizeValidation(t *testing.T) {
-	// The dedup filter is mandatory, so recordFilterSize must be positive.
-	// Both negative and zero are rejected.
-	_, err := NewActionsClient(nil, nil, "ns", 10, 1, nil, -1, promutils.NewTestScope())
-	require.Error(t, err)
+func TestNewActionsClient_FilterDependency(t *testing.T) {
+	c, err := NewActionsClient(nil, nil, "ns", 10, 1, nil, nil)
+	require.ErrorContains(t, err, "dedup filter is required")
+	require.Nil(t, c)
 
-	_, err = NewActionsClient(nil, nil, "ns", 10, 1, nil, 0, promutils.NewTestScope())
-	require.Error(t, err)
-
-	// A positive size builds the mandatory filter.
-	c, err := NewActionsClient(nil, nil, "ns", 10, 1, nil, 128, promutils.NewTestScope())
+	// The client accepts any Filter implementation and preserves the supplied instance.
+	filter, err := fastcheck.NewLRUCacheFilter(128, "test", noop.NewMeterProvider())
 	require.NoError(t, err)
-	require.NotNil(t, c.recordedFilter)
+	c, err = NewActionsClient(nil, nil, "ns", 10, 1, nil, filter)
+	require.NoError(t, err)
+	require.Same(t, filter, c.recordedFilter)
 }
 
 // Only cache reads are available; the ActionsClient has no API client to fall back to.

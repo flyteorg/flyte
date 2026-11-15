@@ -85,6 +85,15 @@ message Recover {
   // subtree). A listed condition action re-pauses and waits for a new signal.
   // Unknown names are ignored.
   repeated string force_rerun_actions = 1 [(buf.validate.field).repeated.items.string.min_len = 1];
+
+  // Field numbers of the removed action_overrides and implied_rerun_actions.
+  reserved 2, 3;
+
+  // Marks this recovery run as a fork: it reuses the run being recovered but runs
+  // changed code or inputs, rather than retrying it unchanged. Set by the client
+  // that creates the fork. Informational: it does not change how the run is
+  // recovered.
+  bool fork = 4;
 }
 
 // TaskSpecSource records how a run's task spec was provided at creation time, so

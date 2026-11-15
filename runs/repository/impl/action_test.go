@@ -1225,6 +1225,89 @@ func collectNotificationMetric(t *testing.T, reader *sdkmetric.ManualReader, nam
 	return metricdata.Metrics{}
 }
 
+func TestRegisterActiveRunsGaugeNoop(t *testing.T) {
+	require.NoError(t, registerActiveRunsGauge(nil, nil))
+	require.NoError(t, registerActiveRunsGauge(metricnoop.NewMeterProvider(), nil))
+}
+
+func TestActiveRunsGauge(t *testing.T) {
+	db := setupActionDB(t)
+	defer func() { db.Exec("DELETE FROM actions") }()
+
+	reader := sdkmetric.NewManualReader()
+	provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader))
+	actionRepo, err := NewActionRepo(db, testDbConfig, testNotificationConfig, provider)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	createRun := func(name string, phase common.ActionPhase) {
+		_, err := actionRepo.CreateAction(ctx, &models.Run{
+			Project: "proj1",
+			Domain:  "domain1",
+			RunName: name,
+			Name:    rootActionName,
+			Phase:   int32(phase),
+		}, false)
+		require.NoError(t, err)
+	}
+	createRun("running-1", common.ActionPhase_ACTION_PHASE_RUNNING)
+	createRun("running-2", common.ActionPhase_ACTION_PHASE_RUNNING)
+	createRun("queued", common.ActionPhase_ACTION_PHASE_QUEUED)
+	createRun("succeeded", common.ActionPhase_ACTION_PHASE_SUCCEEDED)
+
+	// A RUNNING child action is not a run and must not be counted. It hangs off an
+	// already-RUNNING run, because creating a child promotes a QUEUED parent to RUNNING.
+	_, err = actionRepo.CreateAction(ctx, &models.Action{
+		Project:          "proj1",
+		Domain:           "domain1",
+		RunName:          "running-1",
+		Name:             "a1",
+		ParentActionName: sql.NullString{String: rootActionName, Valid: true},
+		Phase:            int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+	}, false)
+	require.NoError(t, err)
+
+	gauge, ok := collectNotificationMetric(t, reader, activeRunsMetricName).Data.(metricdata.Gauge[int64])
+	require.True(t, ok)
+	byPhase := make(map[string]int64, len(gauge.DataPoints))
+	for _, dp := range gauge.DataPoints {
+		phase, _ := dp.Attributes.Value(attribute.Key("phase"))
+		byPhase[phase.AsString()] = dp.Value
+	}
+	assert.Equal(t, map[string]int64{
+		"QUEUED":                1,
+		"WAITING_FOR_RESOURCES": 0,
+		"INITIALIZING":          0,
+		"RUNNING":               2, // the RUNNING child action is not a run
+		"PAUSED":                0,
+	}, byPhase)
+}
+
+func TestActiveRunsGaugeQueryErrorDoesNotFailCollect(t *testing.T) {
+	reader := sdkmetric.NewManualReader()
+	provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader))
+	require.NoError(t, registerActiveRunsGauge(provider, func(context.Context) (map[interfaces.PhaseKey]int64, error) {
+		return nil, errors.New("db down")
+	}))
+
+	// A failing callback must not fail the whole collection; otherwise the
+	// periodic reader would skip exporting every runs-service metric.
+	var rm metricdata.ResourceMetrics
+	require.NoError(t, reader.Collect(context.Background(), &rm))
+
+	// A failed query is skipped, not reported as 0, so runs.active must have no
+	// data point this round.
+	for _, sm := range rm.ScopeMetrics {
+		for _, m := range sm.Metrics {
+			if m.Name == activeRunsMetricName {
+				gauge, ok := m.Data.(metricdata.Gauge[int64])
+				require.True(t, ok)
+				assert.Empty(t, gauge.DataPoints)
+			}
+		}
+	}
+}
+
 func TestNotificationBufferLimitConfig(t *testing.T) {
 	r := newNotifyTestRepo(NewNotificationConfig(
 		defaultNotificationBufferSize,
