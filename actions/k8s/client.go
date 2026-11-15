@@ -1117,6 +1117,7 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 		taskAction.Spec.EnvVars = nil
 		taskAction.Spec.Interruptible = nil
 		taskAction.Spec.PodTemplateName = ""
+		taskAction.Spec.ServiceAccount = ""
 		taskAction.Spec.RawDataPrefix = ""
 		taskAction.Spec.RunStartTime = ""
 		return
@@ -1128,6 +1129,7 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 	}
 	taskAction.Spec.EnvVars = keyValuePairsToMap(runSpec.GetEnvs().GetValues())
 	taskAction.Spec.PodTemplateName = runSpec.GetDefaultSettings().GetPodTemplateName()
+	taskAction.Spec.ServiceAccount = runSpec.GetSecurityContext().GetRunAs().GetK8SServiceAccount()
 	taskAction.Spec.RawDataPrefix = runSpec.GetRawDataStorage().GetRawDataPrefix()
 	if runSpec.GetInterruptible() != nil {
 		value := runSpec.GetInterruptible().GetValue()
@@ -1158,6 +1160,7 @@ func inheritRunContextFromParentTaskAction(taskAction *executorv1.TaskAction, pa
 	}
 	taskAction.Spec.EnvVars = cloneStringMap(parentTaskAction.Spec.EnvVars)
 	taskAction.Spec.PodTemplateName = parentTaskAction.Spec.PodTemplateName
+	taskAction.Spec.ServiceAccount = parentTaskAction.Spec.ServiceAccount
 	taskAction.Spec.RawDataPrefix = parentTaskAction.Spec.RawDataPrefix
 	taskAction.Spec.RunStartTime = parentTaskAction.Spec.RunStartTime
 	if len(parentTaskAction.Annotations) > 0 {
@@ -1250,6 +1253,7 @@ func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction
 
 	tmpl = substituteRunStartTime(tmpl, taskAction.Spec.RunStartTime)
 	tmpl = applyPodTemplateName(tmpl, taskAction.Spec.PodTemplateName)
+	tmpl = applyServiceAccount(tmpl, taskAction.Spec.ServiceAccount)
 
 	data, err := proto.Marshal(tmpl)
 	if err != nil {
@@ -1295,6 +1299,30 @@ func applyPodTemplateName(tmpl *core.TaskTemplate, name string) *core.TaskTempla
 		cloned.Metadata = &core.TaskMetadata{}
 	}
 	cloned.Metadata.PodTemplateName = name
+	return cloned
+}
+
+// applyServiceAccount returns a TaskTemplate whose security context names the given Kubernetes
+// service account. It returns the input unchanged when the name is empty or the task already set
+// one itself, so an explicit choice always wins. Other security context fields are kept. The
+// template is cloned before mutation so the caller's proto - which may be persisted separately as
+// the registered task spec - is not affected.
+func applyServiceAccount(tmpl *core.TaskTemplate, name string) *core.TaskTemplate {
+	if name == "" {
+		return tmpl
+	}
+	if tmpl.GetSecurityContext().GetRunAs().GetK8SServiceAccount() != "" {
+		return tmpl
+	}
+
+	cloned := proto.Clone(tmpl).(*core.TaskTemplate)
+	if cloned.SecurityContext == nil {
+		cloned.SecurityContext = &core.SecurityContext{}
+	}
+	if cloned.SecurityContext.RunAs == nil {
+		cloned.SecurityContext.RunAs = &core.Identity{}
+	}
+	cloned.SecurityContext.RunAs.K8SServiceAccount = name
 	return cloned
 }
 
