@@ -1961,7 +1961,7 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(fake.abortCalls).To(BeZero())
 		})
 
-		Context("k8s events follow the status write", func() {
+		Context("k8s events and the status write", func() {
 			startedAt := time.Date(2026, time.August, 25, 0, 0, 0, 0, time.UTC)
 
 			// interceptor.NewClient needs a WithWatch; wrap the envtest config in one.
@@ -1983,7 +1983,7 @@ var _ = Describe("TaskAction Controller", func() {
 				return out
 			}
 
-			It("waits for the reconcile whose status write succeeds, then emits once", func() {
+			It("emits before the status write, and the retried reconcile does not duplicate it", func() {
 				// Fail only the write that carries the Running phase, and only once.
 				// Earlier writes in the same reconcile (AttemptStartedAt) must succeed
 				// so the reconcile reaches recordEvent.
@@ -2009,14 +2009,21 @@ var _ = Describe("TaskAction Controller", func() {
 				_, err := r.Reconcile(ctx, request)
 				Expect(err).To(MatchError(ContainSubstring("injected")))
 				Expect(recorded.RecordedEvents()).To(HaveLen(1), "events service was called")
-				Expect(k8sEventsFor(nn)).To(BeEmpty(), "status not persisted: no k8s Event")
+				k8sEvents := k8sEventsFor(nn)
+				Expect(k8sEvents).To(HaveLen(1), "emitted before the failed status write, so it is not lost")
+				first := k8sEvents[0]
+				Expect(first.Reason).To(Equal(string(ReasonActionRunning)))
+				uid := string(getTaskAction(nn).UID)
+				Expect(first.Name).To(HavePrefix(uid+"."), "the name starts with the TaskAction UID")
+				Expect(first.Name).To(HaveSuffix(".running.0"))
 
 				_, err = r.Reconcile(ctx, request)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(recorded.RecordedEvents()).To(HaveLen(2), "re-recorded; the events DB dedups this")
-				k8sEvents := k8sEventsFor(nn)
-				Expect(k8sEvents).To(HaveLen(1))
-				Expect(k8sEvents[0].Reason).To(Equal(string(ReasonActionRunning)))
+				k8sEvents = k8sEventsFor(nn)
+				Expect(k8sEvents).To(HaveLen(1), "the re-emitted k8s Event has the same name, so the API server keeps one")
+				Expect(k8sEvents[0].Name).To(Equal(first.Name))
+				Expect(k8sEvents[0].UID).To(Equal(first.UID), "the first k8s Event is kept, not replaced")
 			})
 
 			It("keeps the terminal event when a step after the status write fails", func() {

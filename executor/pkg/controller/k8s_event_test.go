@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"encoding/json"
+	"math"
 	"strings"
 	"testing"
 	"unicode/utf8"
@@ -13,6 +14,7 @@ import (
 	eventsv1 "k8s.io/api/events/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/client-go/tools/events"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
@@ -74,7 +76,8 @@ func TestBuildActionEventK8s(t *testing.T) {
 
 		assert.Equal(t, taskAction.Namespace, ev.Namespace)
 		assert.Equal(t, ev.Namespace, ev.Regarding.Namespace)
-		assert.Equal(t, taskAction.Name+"-", ev.GenerateName)
+		assert.Equal(t, "uid-1.1.succeeded.0", ev.Name)
+		assert.Empty(t, ev.GenerateName, "a generated name would let a retried reconcile create a duplicate")
 		assert.Equal(t, flyteorgv1.GroupVersion.String(), ev.Regarding.APIVersion)
 		assert.Equal(t, "TaskAction", ev.Regarding.Kind)
 		assert.Equal(t, taskAction.Name, ev.Regarding.Name)
@@ -400,23 +403,137 @@ func TestEmitK8sEvent(t *testing.T) {
 	}
 }
 
-func TestRecordEventQueueK8sEvent(t *testing.T) {
+func TestK8sEventName(t *testing.T) {
+	const (
+		queued    = common.ActionPhase_ACTION_PHASE_QUEUED
+		waiting   = common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES
+		running   = common.ActionPhase_ACTION_PHASE_RUNNING
+		succeeded = common.ActionPhase_ACTION_PHASE_SUCCEEDED
+		timedOut  = common.ActionPhase_ACTION_PHASE_TIMED_OUT
+	)
+	taskAction := testTaskAction()
+
+	tests := []struct {
+		name     string
+		phase    common.ActionPhase
+		attempt  uint32
+		version  uint32
+		expected string
+	}{
+		{name: "terminal phase", phase: succeeded, attempt: 1, expected: "uid-1.1.succeeded.0"},
+		{name: "later attempt and version", phase: running, attempt: 2, version: 3, expected: "uid-1.2.running.3"},
+		{name: "underscore becomes a dash", phase: waiting, attempt: 1, expected: "uid-1.1.waiting-for-resources.0"},
+		{name: "two underscores", phase: timedOut, attempt: 1, expected: "uid-1.1.timed-out.0"},
+		{
+			name: "system retry version", phase: queued, attempt: 1, version: systemRetryEventVersionBase,
+			expected: "uid-1.1.queued.1073741824",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			event := testActionEvent(tt.phase, tt.version)
+			event.Attempt = tt.attempt
+			assert.Equal(t, tt.expected, k8sEventName(taskAction, event))
+		})
+	}
+
+	t.Run("every phase gives a valid and distinct name", func(t *testing.T) {
+		// A real UID and the largest attempt and version give the longest name.
+		longest := testTaskAction()
+		longest.UID = types.UID("4d0e7a19-2c4b-4f0e-9a51-7f3c2b1d6e80")
+		seen := map[string]common.ActionPhase{}
+		for value := range common.ActionPhase_name {
+			phase := common.ActionPhase(value)
+			event := testActionEvent(phase, math.MaxUint32)
+			event.Attempt = math.MaxUint32
+
+			name := k8sEventName(longest, event)
+			assert.Empty(t, validation.IsDNS1123Subdomain(name), "phase %s gives invalid name %q", phase, name)
+			prev, dup := seen[name]
+			assert.False(t, dup, "phases %s and %s give the same name %q", prev, phase, name)
+			seen[name] = phase
+		}
+	})
+
+	t.Run("same action event gives the same name", func(t *testing.T) {
+		a := testActionEvent(common.ActionPhase_ACTION_PHASE_FAILED, 2)
+		b := testActionEvent(common.ActionPhase_ACTION_PHASE_FAILED, 2)
+		b.ErrorInfo = &workflow.ErrorInfo{Code: "OOMKilled"} // not part of the key
+		assert.Equal(t, k8sEventName(taskAction, a), k8sEventName(taskAction, b))
+	})
+
+	t.Run("recreated TaskAction gets new names", func(t *testing.T) {
+		recreated := testTaskAction()
+		recreated.UID = types.UID("uid-2")
+		event := testActionEvent(common.ActionPhase_ACTION_PHASE_SUCCEEDED, 0)
+		assert.NotEqual(t, k8sEventName(taskAction, event), k8sEventName(recreated, event))
+	})
+}
+
+func TestEmitK8sEventTwiceCreatesOne(t *testing.T) {
 	ctx := context.Background()
 	k8sClient := fake.NewClientBuilder().Build()
 	reconciler := &TaskActionReconciler{
-		Client:       k8sClient,
-		eventsClient: &fakeEventsClient{},
-		K8sEventMode: K8sEventAll,
+		Client:            k8sClient,
+		K8sEventMode:      K8sEventAll,
+		reportingInstance: "taskaction-controller-host1",
 	}
 	taskAction := testTaskAction()
-	event := testActionEvent(common.ActionPhase_ACTION_PHASE_RUNNING, 0)
+	queued := common.ActionPhase_ACTION_PHASE_QUEUED
+	running := common.ActionPhase_ACTION_PHASE_RUNNING
+	succeeded := common.ActionPhase_ACTION_PHASE_SUCCEEDED
 
-	pending := &pendingK8sEvents{}
-	require.NoError(t, reconciler.recordEvent(withPendingK8sEvents(ctx, pending), taskAction, event, common.ActionPhase_ACTION_PHASE_QUEUED))
+	// A retried reconcile emits the same action event again; the second create
+	// gets AlreadyExists and is skipped.
+	reconciler.emitK8sEvent(ctx, taskAction, testActionEvent(running, 0), queued)
+	reconciler.emitK8sEvent(ctx, taskAction, testActionEvent(running, 0), queued)
 
 	created := &eventsv1.EventList{}
 	require.NoError(t, k8sClient.List(ctx, created))
-	assert.Empty(t, created.Items, "recordEvent must not create the k8s Event itself")
-	require.Len(t, pending.items, 1)
-	assert.Same(t, event, pending.items[0].event)
+	require.Len(t, created.Items, 1)
+	assert.Equal(t, "uid-1.1.running.0", created.Items[0].Name)
+
+	// A different action event of the same action still gets its own k8s Event.
+	reconciler.emitK8sEvent(ctx, taskAction, testActionEvent(succeeded, 0), running)
+	require.NoError(t, k8sClient.List(ctx, created))
+	assert.Len(t, created.Items, 2)
+}
+
+func TestRecordEventEmitsK8sEvent(t *testing.T) {
+	ctx := context.Background()
+	taskAction := testTaskAction()
+	running := common.ActionPhase_ACTION_PHASE_RUNNING
+	queued := common.ActionPhase_ACTION_PHASE_QUEUED
+
+	t.Run("emits once the events service stored the event", func(t *testing.T) {
+		k8sClient := fake.NewClientBuilder().Build()
+		reconciler := &TaskActionReconciler{
+			Client:       k8sClient,
+			eventsClient: &fakeEventsClient{},
+			K8sEventMode: K8sEventAll,
+		}
+
+		require.NoError(t, reconciler.recordEvent(ctx, taskAction, testActionEvent(running, 0), queued))
+
+		created := &eventsv1.EventList{}
+		require.NoError(t, k8sClient.List(ctx, created))
+		require.Len(t, created.Items, 1, "recordEvent creates the k8s Event itself, before any status write")
+		assert.Equal(t, "uid-1.1.running.0", created.Items[0].Name)
+	})
+
+	t.Run("no k8s Event when the events service fails", func(t *testing.T) {
+		k8sClient := fake.NewClientBuilder().Build()
+		reconciler := &TaskActionReconciler{
+			Client:       k8sClient,
+			eventsClient: &failingEventsClient{failures: 1},
+			K8sEventMode: K8sEventAll,
+		}
+
+		require.Error(t, reconciler.recordEvent(ctx, taskAction, testActionEvent(running, 0), queued))
+
+		created := &eventsv1.EventList{}
+		require.NoError(t, k8sClient.List(ctx, created))
+		assert.Empty(t, created.Items, "the DB write comes first; a k8s Event must not exist without its row")
+	})
 }
