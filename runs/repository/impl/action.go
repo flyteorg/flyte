@@ -60,6 +60,16 @@ var terminalPhases = []int32{
 	int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
 }
 
+// finalPhases are the terminal phases an action never leaves. An abort that
+// arrives after an action reached one of them is a no-op: rewriting it would turn a
+// SUCCEEDED run into ABORTED and hide its outputs. FAILED and TIMED_OUT are not
+// final (a retry can move the action on), so an abort can still land on them.
+var finalPhases = []int32{
+	int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+	int32(common.ActionPhase_ACTION_PHASE_ABORTED),
+	int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
+}
+
 // activePhases is every ActionPhase not in terminalPhases.
 var activePhases = []int32{
 	int32(common.ActionPhase_ACTION_PHASE_UNSPECIFIED),
@@ -316,8 +326,8 @@ func (r *actionRepo) GetRun(ctx context.Context, runID *common.RunIdentifier) (*
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("run not found: %s/%s/%s",
-				runID.Project, runID.Domain, runID.Name)
+			return nil, fmt.Errorf("run not found: %s/%s/%s: %w",
+				runID.Project, runID.Domain, runID.Name, sql.ErrNoRows)
 		}
 		return nil, fmt.Errorf("failed to get run: %w", err)
 	}
@@ -337,11 +347,18 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 		                    ended_at = COALESCE(ended_at, GREATEST($2, created_at)),
 		                    duration_ms = EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST($2, created_at)) - created_at)) * 1000
 		 WHERE project = $6 AND domain = $7 AND run_name = $8 AND parent_action_name IS NULL
+		   AND NOT (phase = ANY($9))
 		 RETURNING name`,
 		int32(common.ActionPhase_ACTION_PHASE_ABORTED), now, now, 0, reason,
-		runID.Project, runID.Domain, runID.Name,
+		runID.Project, runID.Domain, runID.Name, pq.Array(finalPhases),
 	).Scan(&rootName)
 	if errors.Is(err, sql.ErrNoRows) {
+		// Either the run does not exist, or it already reached a final phase.
+		if _, getErr := r.GetRun(ctx, runID); getErr == nil {
+			logger.Infof(ctx, "AbortRun: run %s/%s/%s already finished; nothing to abort",
+				runID.Project, runID.Domain, runID.Name)
+			return interfaces.ErrActionFinished
+		}
 		return fmt.Errorf("run not found: %w", sql.ErrNoRows)
 	}
 	if err != nil {
@@ -801,13 +818,19 @@ func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIde
 		`UPDATE actions SET phase = $1, updated_at = $2, abort_requested_at = $3, abort_attempt_count = $4, abort_reason = $5,
 		                    ended_at = COALESCE(ended_at, GREATEST($2, created_at)),
 		                    duration_ms = EXTRACT(EPOCH FROM (COALESCE(ended_at, GREATEST($2, created_at)) - created_at)) * 1000
-		 WHERE project = $6 AND domain = $7 AND run_name = $8 AND name = $9`,
+		 WHERE project = $6 AND domain = $7 AND run_name = $8 AND name = $9
+		   AND NOT (phase = ANY($10))`,
 		int32(common.ActionPhase_ACTION_PHASE_ABORTED), now, now, 0, reason,
-		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
+		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name, pq.Array(finalPhases))
 	if err != nil {
 		return fmt.Errorf("failed to abort action: %w", err)
 	}
 	if n, _ := result.RowsAffected(); n == 0 {
+		// Either the action does not exist, or it already reached a final phase.
+		if _, getErr := r.GetAction(ctx, actionID); getErr == nil {
+			logger.Infof(ctx, "AbortAction: %s already finished; nothing to abort", actionID.Name)
+			return interfaces.ErrActionFinished
+		}
 		return fmt.Errorf("action not found: %w", sql.ErrNoRows)
 	}
 

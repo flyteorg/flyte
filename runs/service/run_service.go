@@ -311,6 +311,21 @@ func (s *RunService) CreateRun(
 		}
 	}
 
+	// A run name identifies one execution. Reject a request for a name that already
+	// exists before writing inputs or enqueueing: the insert below is idempotent and
+	// would return the existing run, but Enqueue would still create a TaskAction from
+	// this request's inputs whenever the run's previous TaskAction is gone (aborted,
+	// or garbage-collected after it finished), executing the run a second time and
+	// replacing its outputs. Callers already expect AlreadyExists here (the SDK's
+	// RunAlreadyExistsError, and the trigger executor's skip-if-fired path).
+	if _, err := s.repo.ActionRepo().GetRun(ctx, runId); err == nil {
+		return nil, connect.NewError(connect.CodeAlreadyExists,
+			fmt.Errorf("run %s/%s/%s already exists", runId.GetProject(), runId.GetDomain(), runId.GetName()))
+	} else if !errors.Is(err, sql.ErrNoRows) {
+		logger.Errorf(ctx, "Failed to check for existing run: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
 	// Compute storage URIs before DB insert so they're persisted in the ActionSpec.
 	// runSpec.RunBaseDir overrides the configured storagePrefix when set, either by the
 	// request or from settings above; it must resolve to the same base UploadInputs used
@@ -551,6 +566,10 @@ func (s *RunService) AbortRun(
 	// The reconciler deletes "a0"'s CRD; K8s cascades deletion to all child CRDs
 	// via OwnerReferences, and the action service informer marks them ABORTED in DB.
 	if err := s.repo.ActionRepo().AbortRun(ctx, req.Msg.RunId, reason, nil); err != nil {
+		if errors.Is(err, interfaces.ErrActionFinished) {
+			// The run already finished: aborting it is a no-op that keeps its outcome.
+			return connect.NewResponse(&workflow.AbortRunResponse{}), nil
+		}
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("run not found: %s/%s/%s", req.Msg.RunId.Project, req.Msg.RunId.Domain, req.Msg.RunId.Name))
 		}
@@ -1147,6 +1166,10 @@ func (s *RunService) AbortAction(
 
 	// Abort in database, then push to reconciler for background pod termination.
 	if err := s.repo.ActionRepo().AbortAction(ctx, req.Msg.ActionId, reason, nil); err != nil {
+		if errors.Is(err, interfaces.ErrActionFinished) {
+			// The action already finished: aborting it is a no-op that keeps its outcome.
+			return connect.NewResponse(&workflow.AbortActionResponse{}), nil
+		}
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %s", req.Msg.ActionId.Name))
 		}

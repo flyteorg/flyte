@@ -2,12 +2,18 @@ package interfaces
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
+
+// ErrActionFinished is returned by AbortRun and AbortAction when the run or action
+// already reached a final phase (SUCCEEDED, ABORTED or RECOVERED). The abort is a
+// no-op: the action keeps its phase and outputs.
+var ErrActionFinished = errors.New("action already finished")
 
 // ActionRepo defines the interface for actions/runs data access
 type ActionRepo interface {
