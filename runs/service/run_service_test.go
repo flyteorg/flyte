@@ -957,6 +957,32 @@ func TestListRuns_LabelsFromRunSpec(t *testing.T) {
 	assert.Equal(t, map[string]string{"example.com/job-id": "j-1"}, got.Msg.Runs[0].GetLabels())
 }
 
+// TestListRuns_Annotations verifies a run is listed with the annotations in its run spec.
+func TestListRuns_Annotations(t *testing.T) {
+	actionRepo, _, svc := newTestService(t)
+
+	runSpec, err := proto.Marshal(&task.RunSpec{
+		Annotations: &task.Annotations{Values: map[string]string{"example.com/branch": "feat/x"}},
+	})
+	require.NoError(t, err)
+	actionRepo.On("ListActions", mock.Anything, mock.Anything).Return([]*models.Run{{
+		Project: "p",
+		Domain:  "d",
+		RunName: "run-1",
+		Name:    "a0",
+		RunSpec: runSpec,
+	}}, nil).Once()
+
+	got, err := svc.ListRuns(context.Background(), connect.NewRequest(&workflow.ListRunsRequest{
+		ScopeBy: &workflow.ListRunsRequest_ProjectId{ProjectId: &common.ProjectIdentifier{Name: "p", Domain: "d"}},
+		Request: &common.ListRequest{Limit: 10},
+	}))
+	require.NoError(t, err)
+
+	require.Len(t, got.Msg.Runs, 1)
+	assert.Equal(t, map[string]string{"example.com/branch": "feat/x"}, got.Msg.Runs[0].GetAnnotations())
+}
+
 // TestListAndSendAllActionsUsesAscendingSort guards against regressing the
 // default repo sort order leaking into the WatchActions seed path. Children
 // have a later created_at than their parents; if ListActions returns rows in

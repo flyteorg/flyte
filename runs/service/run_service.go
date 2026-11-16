@@ -1941,20 +1941,27 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 		}
 	}
 
+	spec := runSpec(run)
 	return &workflow.Run{
-		Action: action,
-		Labels: runLabels(run),
+		Action:      action,
+		Labels:      runLabels(run, spec),
+		Annotations: spec.GetAnnotations().GetValues(),
 	}
+}
+
+// runSpec decodes a run's stored run spec.
+func runSpec(run *models.Run) *task.RunSpec {
+	var spec task.RunSpec
+	if err := proto.Unmarshal(run.RunSpec, &spec); err != nil {
+		logger.Warningf(context.Background(), "failed to unmarshal run spec for run %s: %v", run.RunName, err)
+	}
+	return &spec
 }
 
 // runLabels returns a run's labels. Runs created before the labels column existed have
 // them only in their run spec.
-func runLabels(run *models.Run) map[string]string {
+func runLabels(run *models.Run, spec *task.RunSpec) map[string]string {
 	if run.Labels == nil {
-		var spec task.RunSpec
-		if err := proto.Unmarshal(run.RunSpec, &spec); err != nil {
-			logger.Warningf(context.Background(), "failed to unmarshal run spec for run %s: %v", run.RunName, err)
-		}
 		return spec.GetLabels().GetValues()
 	}
 	var labels map[string]string

@@ -59,8 +59,15 @@ RUN_SOURCE_TRACKED: RunSource
 RUN_SOURCE_ARTIFACT_TRIGGER: RunSource
 
 class Run(_message.Message):
-    __slots__ = ["action", "labels"]
+    __slots__ = ["action", "labels", "annotations"]
     class LabelsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    class AnnotationsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
@@ -69,9 +76,11 @@ class Run(_message.Message):
         def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     ACTION_FIELD_NUMBER: _ClassVar[int]
     LABELS_FIELD_NUMBER: _ClassVar[int]
+    ANNOTATIONS_FIELD_NUMBER: _ClassVar[int]
     action: Action
     labels: _containers.ScalarMap[str, str]
-    def __init__(self, action: _Optional[_Union[Action, _Mapping]] = ..., labels: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    annotations: _containers.ScalarMap[str, str]
+    def __init__(self, action: _Optional[_Union[Action, _Mapping]] = ..., labels: _Optional[_Mapping[str, str]] = ..., annotations: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class RunDetails(_message.Message):
     __slots__ = ["run_spec", "action"]
