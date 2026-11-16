@@ -2415,7 +2415,9 @@ func TestAbortRun_FinalPhaseIsNoOp(t *testing.T) {
 
 	for _, phase := range []common.ActionPhase{
 		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		common.ActionPhase_ACTION_PHASE_FAILED,
 		common.ActionPhase_ACTION_PHASE_ABORTED,
+		common.ActionPhase_ACTION_PHASE_TIMED_OUT,
 		common.ActionPhase_ACTION_PHASE_RECOVERED,
 	} {
 		t.Run(phase.String(), func(t *testing.T) {
@@ -2433,8 +2435,7 @@ func TestAbortRun_FinalPhaseIsNoOp(t *testing.T) {
 	}
 }
 
-// Runs still in progress, and FAILED or TIMED_OUT runs (which a retry can move
-// on from), are still aborted.
+// Runs still in progress are aborted.
 func TestAbortRun_NonFinalPhaseIsAborted(t *testing.T) {
 	db := setupActionDB(t)
 	repo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
@@ -2443,9 +2444,8 @@ func TestAbortRun_NonFinalPhaseIsAborted(t *testing.T) {
 
 	for _, phase := range []common.ActionPhase{
 		common.ActionPhase_ACTION_PHASE_QUEUED,
+		common.ActionPhase_ACTION_PHASE_INITIALIZING,
 		common.ActionPhase_ACTION_PHASE_RUNNING,
-		common.ActionPhase_ACTION_PHASE_FAILED,
-		common.ActionPhase_ACTION_PHASE_TIMED_OUT,
 	} {
 		t.Run(phase.String(), func(t *testing.T) {
 			runID := abortTestRun(t, repo, "live-"+strings.ToLower(phase.String()[13:]), phase)

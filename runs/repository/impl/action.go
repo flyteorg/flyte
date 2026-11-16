@@ -60,15 +60,14 @@ var terminalPhases = []int32{
 	int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
 }
 
-// finalPhases are the terminal phases an action never leaves. An abort that
-// arrives after an action reached one of them is a no-op: rewriting it would turn a
-// SUCCEEDED run into ABORTED and hide its outputs. FAILED and TIMED_OUT are not
-// final (a retry can move the action on), so an abort can still land on them.
-var finalPhases = []int32{
-	int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
-	int32(common.ActionPhase_ACTION_PHASE_ABORTED),
-	int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
-}
+// finalPhases are the phases a run or action reports only once it has ended. An abort
+// that arrives after one of them is a no-op: rewriting it would turn a SUCCEEDED run
+// into ABORTED and hide its outputs, or replace a FAILED run's error with abort info.
+// FAILED and TIMED_OUT are final here even though UpdateActionPhase lets them move
+// on: the executor reports a retrying attempt as QUEUED (in-place restart, and
+// restart after a max-runtime timeout), so an action reports FAILED or TIMED_OUT
+// only once its retries are exhausted.
+var finalPhases = terminalPhases
 
 // activePhases is every ActionPhase not in terminalPhases.
 var activePhases = []int32{

@@ -11,8 +11,8 @@ import (
 )
 
 // ErrActionFinished is returned by AbortRun and AbortAction when the run or action
-// already reached a final phase (SUCCEEDED, ABORTED or RECOVERED). The abort is a
-// no-op: the action keeps its phase and outputs.
+// already ended (SUCCEEDED, FAILED, ABORTED, TIMED_OUT or RECOVERED). The abort is a
+// no-op: the action keeps its phase, outputs and error.
 var ErrActionFinished = errors.New("action already finished")
 
 // ActionRepo defines the interface for actions/runs data access
