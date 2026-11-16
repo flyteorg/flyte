@@ -6894,6 +6894,12 @@ spec:
                   RunOutputBase is the base path where this action should write its output.
                   Empty for conditions; the reconciler validates presence for tasks.
                 type: string
+              serviceAccount:
+                description: |-
+                  ServiceAccount is the run-scoped Kubernetes service account projected from
+                  RunSpec.SecurityContext. Stamped onto tasks that do not set one themselves.
+                maxLength: 253
+                type: string
               shortName:
                 description: ShortName is the human-readable display name for this
                   task

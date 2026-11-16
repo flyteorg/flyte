@@ -22,6 +22,10 @@ func podTemplateSettings(name *settings.StringSetting) *settings.Settings {
 	return &settings.Settings{PodTemplateName: name}
 }
 
+func serviceAccountSettings(name *settings.StringSetting) *settings.Settings {
+	return &settings.Settings{Security: &settings.SecuritySettings{ServiceAccount: name}}
+}
+
 func runBaseDirSettings(baseDir *settings.StringSetting) *settings.Settings {
 	return &settings.Settings{Run: &settings.RunSettings{RunBaseDir: baseDir}}
 }
@@ -32,14 +36,15 @@ func rawDataSettings(rawDataPath *settings.StringSetting) *settings.Settings {
 
 func TestApplyRunSettings(t *testing.T) {
 	tests := []struct {
-		name              string
-		spec              *task.RunSpec
-		resolved          *settings.Settings
-		wantQueue         string
-		wantConcurrency   uint32
-		wantPodTemplate   string
-		wantRunBaseDir    string
-		wantRawDataPrefix string
+		name               string
+		spec               *task.RunSpec
+		resolved           *settings.Settings
+		wantQueue          string
+		wantConcurrency    uint32
+		wantPodTemplate    string
+		wantServiceAccount string
+		wantRunBaseDir     string
+		wantRawDataPrefix  string
 	}{
 		{
 			name:      "empty queue takes the settings value",
@@ -106,6 +111,33 @@ func TestApplyRunSettings(t *testing.T) {
 			wantPodTemplate: "",
 		},
 		{
+			name:               "empty service account takes the settings value",
+			spec:               &task.RunSpec{},
+			resolved:           serviceAccountSettings(&settings.StringSetting{State: stateValue, StringValue: "settings-sa"}),
+			wantServiceAccount: "settings-sa",
+		},
+		{
+			name: "an explicit service account wins over settings",
+			spec: &task.RunSpec{SecurityContext: &core.SecurityContext{
+				RunAs: &core.Identity{K8SServiceAccount: "user-sa"},
+			}},
+			resolved:           serviceAccountSettings(&settings.StringSetting{State: stateValue, StringValue: "settings-sa"}),
+			wantServiceAccount: "user-sa",
+		},
+		{
+			name:               "a service account in INHERIT contributes nothing",
+			spec:               &task.RunSpec{},
+			resolved:           serviceAccountSettings(&settings.StringSetting{State: stateInherit, StringValue: "settings-sa"}),
+			wantServiceAccount: "",
+		},
+		{
+			// A security context without a service account still counts as no request value.
+			name:               "a security context with no service account takes the settings value",
+			spec:               &task.RunSpec{SecurityContext: &core.SecurityContext{RunAs: &core.Identity{IamRole: "role"}}},
+			resolved:           serviceAccountSettings(&settings.StringSetting{State: stateValue, StringValue: "settings-sa"}),
+			wantServiceAccount: "settings-sa",
+		},
+		{
 			name:           "empty run base dir takes the settings value",
 			spec:           &task.RunSpec{},
 			resolved:       runBaseDirSettings(&settings.StringSetting{State: stateValue, StringValue: "s3://settings-base"}),
@@ -157,6 +189,7 @@ func TestApplyRunSettings(t *testing.T) {
 			assert.Equal(t, tt.wantQueue, tt.spec.GetQueue())
 			assert.Equal(t, tt.wantConcurrency, tt.spec.GetMaxActionConcurrency())
 			assert.Equal(t, tt.wantPodTemplate, tt.spec.GetDefaultSettings().GetPodTemplateName())
+			assert.Equal(t, tt.wantServiceAccount, tt.spec.GetSecurityContext().GetRunAs().GetK8SServiceAccount())
 			assert.Equal(t, tt.wantRunBaseDir, tt.spec.GetRunBaseDir())
 			assert.Equal(t, tt.wantRawDataPrefix, tt.spec.GetRawDataStorage().GetRawDataPrefix())
 		})
