@@ -2,10 +2,12 @@ package service
 
 import (
 	"context"
+	crand "crypto/rand"
 	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/big"
 	"regexp"
 	"slices"
 	"sort"
@@ -20,7 +22,6 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
-	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
@@ -61,9 +62,25 @@ const (
 	RootActionName  = "a0"
 )
 
-func generateRunName(seed int64) string {
-	rand.Seed(seed)
-	return fmt.Sprintf(runStringFormat, rand.String(runIDLength-1))
+// runNameAlphabet is k8s.io/apimachinery/pkg/util/rand's: vowels (a, e, i, o, u, y) are left
+// out so a random name cannot spell a word, and 0, 1 and 3 because they read as vowels.
+const runNameAlphabet = "bcdfghjklmnpqrstvwxz2456789"
+
+// generateRunName draws from crypto/rand. A generated name has to be unique, not just varied:
+// CreateRun does not check it for duplicates. Seeding the process-global math/rand source with
+// the time and then drawing from it did not give that, since concurrent creates reseeded it
+// under each other and could draw the same name.
+func generateRunName() string {
+	b := make([]byte, runIDLength-1)
+	n := big.NewInt(int64(len(runNameAlphabet)))
+	for i := range b {
+		k, err := crand.Int(crand.Reader, n)
+		if err != nil {
+			panic(fmt.Sprintf("crypto/rand: %v", err))
+		}
+		b[i] = runNameAlphabet[k.Int64()]
+	}
+	return fmt.Sprintf(runStringFormat, string(b))
 }
 
 // sdkVersionRegex extracts the MAJOR.MINOR.PATCH core from an SDK version string, ignoring any
@@ -201,7 +218,7 @@ func (s *RunService) CreateRun(
 		runId = &common.RunIdentifier{
 			Project: id.ProjectId.Name,
 			Domain:  id.ProjectId.Domain,
-			Name:    generateRunName(time.Now().UnixNano()),
+			Name:    generateRunName(),
 		}
 		request.Id = &workflow.CreateRunRequest_RunId{
 			RunId: runId,
