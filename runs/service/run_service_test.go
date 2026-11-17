@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -1013,38 +1014,58 @@ func TestListAndSendAllActionsUsesAscendingSort(t *testing.T) {
 
 func TestGenerateRunName(t *testing.T) {
 	t.Run("starts with r prefix", func(t *testing.T) {
-		name := generateRunName(42)
+		name := generateRunName()
 		assert.True(t, strings.HasPrefix(name, "r"), "run name should start with 'r', got: %s", name)
 	})
 
 	t.Run("has correct length", func(t *testing.T) {
-		name := generateRunName(42)
+		name := generateRunName()
 		assert.Equal(t, runIDLength, len(name))
 	})
 
-	t.Run("different seeds produce different names", func(t *testing.T) {
-		name1 := generateRunName(1)
-		name2 := generateRunName(2)
-		assert.NotEqual(t, name1, name2)
-	})
-
-	t.Run("same seed produces same name", func(t *testing.T) {
-		name1 := generateRunName(12345)
-		name2 := generateRunName(12345)
-		assert.Equal(t, name1, name2)
+	t.Run("uses only the run name alphabet", func(t *testing.T) {
+		for _, c := range generateRunName()[1:] {
+			assert.Contains(t, runNameAlphabet, string(c))
+		}
 	})
 
 	t.Run("generated names pass run name validation", func(t *testing.T) {
-		for seed := int64(0); seed < 100; seed++ {
-			assert.NoError(t, validateRunName(generateRunName(seed)))
+		for i := 0; i < 100; i++ {
+			assert.NoError(t, validateRunName(generateRunName()))
 		}
+	})
+
+	// Concurrent creates used to reseed one shared source with the time and could draw the
+	// same name.
+	t.Run("unique under concurrency", func(t *testing.T) {
+		const goroutines, each = 64, 500
+		var mu sync.Mutex
+		seen := make(map[string]struct{}, goroutines*each)
+		var wg sync.WaitGroup
+		for g := 0; g < goroutines; g++ {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				names := make([]string, each)
+				for i := range names {
+					names[i] = generateRunName()
+				}
+				mu.Lock()
+				defer mu.Unlock()
+				for _, n := range names {
+					seen[n] = struct{}{}
+				}
+			}()
+		}
+		wg.Wait()
+		assert.Len(t, seen, goroutines*each)
 	})
 }
 
 func TestConvertRunToProto(t *testing.T) {
 	// Define the test cases as a slice of structs.
 	s := &RunService{}
-	name := generateRunName(int64(0))
+	name := generateRunName()
 	project := "test_project"
 	domain := "test_domain"
 	startTime := timestamppb.New(time.Date(2026, time.March, 24, 9, 0, 0, 0, time.UTC))
