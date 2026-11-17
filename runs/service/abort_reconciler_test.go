@@ -1,4 +1,4 @@
-package rpc
+package service_test
 
 import (
 	"context"
@@ -16,6 +16,7 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
+	"github.com/flyteorg/flyte/v2/runs/rpc"
 	"github.com/flyteorg/flyte/v2/runs/service"
 )
 
@@ -28,7 +29,7 @@ func newTestReconciler(t *testing.T) (*repoMocks.ActionRepo, *actionsconnectmock
 
 	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 
-	reconciler := service.NewAbortReconciler(repo, AbortAction(actionsClient), service.AbortReconcilerConfig{
+	reconciler := service.NewAbortReconciler(repo, rpc.AbortAction(actionsClient), service.AbortReconcilerConfig{
 		Workers:      2,
 		MaxAttempts:  3,
 		QueueSize:    100,
