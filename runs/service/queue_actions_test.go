@@ -1,10 +1,9 @@
-package rpc
+package service
 
 import (
 	"context"
 	"testing"
 
-	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -13,7 +12,6 @@ import (
 
 	common "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	workflow "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
-	"github.com/flyteorg/flyte/v2/runs/service"
 )
 
 func TestListActionsRejectsUnsupportedAndInvalidQueueScopes(t *testing.T) {
@@ -21,16 +19,16 @@ func TestListActionsRejectsUnsupportedAndInvalidQueueScopes(t *testing.T) {
 	for _, tt := range []struct {
 		name    string
 		request *workflow.ListActionsRequest
-		code    connect.Code
+		wantErr ErrorKind
 	}{
-		{"queue scope", &workflow.ListActionsRequest{ScopeBy: &workflow.ListActionsRequest_QueueId{QueueId: queue}}, connect.CodeUnimplemented},
-		{"missing scope", &workflow.ListActionsRequest{}, connect.CodeInvalidArgument},
-		{"nil run scope", &workflow.ListActionsRequest{ScopeBy: &workflow.ListActionsRequest_RunId{}}, connect.CodeInvalidArgument},
-		{"nil queue scope", &workflow.ListActionsRequest{ScopeBy: &workflow.ListActionsRequest_QueueId{}}, connect.CodeInvalidArgument},
+		{"queue scope", &workflow.ListActionsRequest{ScopeBy: &workflow.ListActionsRequest_QueueId{QueueId: queue}}, ErrRunUnimplemented},
+		{"missing scope", &workflow.ListActionsRequest{}, ErrRunInvalidArgument},
+		{"nil run scope", &workflow.ListActionsRequest{ScopeBy: &workflow.ListActionsRequest_RunId{}}, ErrRunInvalidArgument},
+		{"nil queue scope", &workflow.ListActionsRequest{ScopeBy: &workflow.ListActionsRequest_QueueId{}}, ErrRunInvalidArgument},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := (&runHandler{run: &service.RunService{}}).ListActions(context.Background(), connect.NewRequest(tt.request))
-			assert.Equal(t, tt.code, connect.CodeOf(err))
+			_, err := (&RunService{}).ListActions(context.Background(), tt.request)
+			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}
 }
