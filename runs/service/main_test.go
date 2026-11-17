@@ -14,7 +14,7 @@ import (
 var testDB *sqlx.DB
 
 func TestMain(m *testing.M) {
-	os.Exit(database.RunTestMain(m, 15433, "flyte_runs_test", &testDB, func(db *sqlx.DB) error {
+	os.Exit(database.RunTestMain(m, 15436, "flyte_runs_test", &testDB, func(db *sqlx.DB) error {
 		return runsmigrations.RunMigrations(context.Background(), db)
 	}))
 }

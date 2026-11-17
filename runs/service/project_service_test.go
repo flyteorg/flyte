@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -24,7 +23,7 @@ func TestProjectCRUD(t *testing.T) {
 	ctx := context.Background()
 	svc := setupProjectService(t)
 
-	_, err := svc.CreateProject(ctx, connect.NewRequest(&project.CreateProjectRequest{
+	_, err := svc.CreateProject(ctx, &project.CreateProjectRequest{
 		Project: &project.Project{
 			Id:          "p1",
 			Name:        "Project 1",
@@ -35,19 +34,19 @@ func TestProjectCRUD(t *testing.T) {
 			State: project.ProjectState_PROJECT_STATE_ACTIVE,
 			Org:   "org1",
 		},
-	}))
+	})
 	require.NoError(t, err)
 
-	getResp, err := svc.GetProject(ctx, connect.NewRequest(&project.GetProjectRequest{
+	getResp, err := svc.GetProject(ctx, &project.GetProjectRequest{
 		Id:  "p1",
 		Org: "org1",
-	}))
+	})
 	require.NoError(t, err)
-	assert.Equal(t, "Project 1", getResp.Msg.GetProject().GetName())
-	assert.Equal(t, project.ProjectState_PROJECT_STATE_ACTIVE, getResp.Msg.GetProject().GetState())
-	assert.Equal(t, "development", getResp.Msg.GetProject().GetDomains()[0].GetId())
+	assert.Equal(t, "Project 1", getResp.GetProject().GetName())
+	assert.Equal(t, project.ProjectState_PROJECT_STATE_ACTIVE, getResp.GetProject().GetState())
+	assert.Equal(t, "development", getResp.GetProject().GetDomains()[0].GetId())
 
-	_, err = svc.UpdateProject(ctx, connect.NewRequest(&project.UpdateProjectRequest{
+	_, err = svc.UpdateProject(ctx, &project.UpdateProjectRequest{
 		Project: &project.Project{
 			Id:          "p1",
 			Name:        "Project 1 Updated",
@@ -58,151 +57,151 @@ func TestProjectCRUD(t *testing.T) {
 			State: project.ProjectState_PROJECT_STATE_ARCHIVED,
 			Org:   "org1",
 		},
-	}))
+	})
 	require.NoError(t, err)
 
-	getResp, err = svc.GetProject(ctx, connect.NewRequest(&project.GetProjectRequest{
+	getResp, err = svc.GetProject(ctx, &project.GetProjectRequest{
 		Id:  "p1",
 		Org: "org1",
-	}))
+	})
 	require.NoError(t, err)
-	assert.Equal(t, "Project 1 Updated", getResp.Msg.GetProject().GetName())
-	assert.Equal(t, project.ProjectState_PROJECT_STATE_ARCHIVED, getResp.Msg.GetProject().GetState())
-	assert.Equal(t, "development", getResp.Msg.GetProject().GetDomains()[0].GetId())
+	assert.Equal(t, "Project 1 Updated", getResp.GetProject().GetName())
+	assert.Equal(t, project.ProjectState_PROJECT_STATE_ARCHIVED, getResp.GetProject().GetState())
+	assert.Equal(t, "development", getResp.GetProject().GetDomains()[0].GetId())
 }
 
 func TestListProjects_DefaultExcludesArchived(t *testing.T) {
 	ctx := context.Background()
 	svc := setupProjectService(t)
 
-	_, err := svc.CreateProject(ctx, connect.NewRequest(&project.CreateProjectRequest{
+	_, err := svc.CreateProject(ctx, &project.CreateProjectRequest{
 		Project: &project.Project{
 			Id:    "active",
 			Name:  "Active",
 			State: project.ProjectState_PROJECT_STATE_ACTIVE,
 			Org:   "org1",
 		},
-	}))
+	})
 	require.NoError(t, err)
 
-	_, err = svc.CreateProject(ctx, connect.NewRequest(&project.CreateProjectRequest{
+	_, err = svc.CreateProject(ctx, &project.CreateProjectRequest{
 		Project: &project.Project{
 			Id:    "archived",
 			Name:  "Archived",
 			State: project.ProjectState_PROJECT_STATE_ARCHIVED,
 			Org:   "org1",
 		},
-	}))
+	})
 	require.NoError(t, err)
 
-	resp, err := svc.ListProjects(ctx, connect.NewRequest(&project.ListProjectsRequest{
+	resp, err := svc.ListProjects(ctx, &project.ListProjectsRequest{
 		Org:   "org1",
 		Limit: 10,
-	}))
+	})
 	require.NoError(t, err)
 
-	require.NotNil(t, resp.Msg.GetProjects())
-	assert.Len(t, resp.Msg.GetProjects().GetProjects(), 1)
-	assert.Equal(t, "active", resp.Msg.GetProjects().GetProjects()[0].GetId())
+	require.NotNil(t, resp.GetProjects())
+	assert.Len(t, resp.GetProjects().GetProjects(), 1)
+	assert.Equal(t, "active", resp.GetProjects().GetProjects()[0].GetId())
 }
 
 func TestListProjects_WithFiltersIncludesArchived(t *testing.T) {
 	ctx := context.Background()
 	svc := setupProjectService(t)
 
-	_, err := svc.CreateProject(ctx, connect.NewRequest(&project.CreateProjectRequest{
+	_, err := svc.CreateProject(ctx, &project.CreateProjectRequest{
 		Project: &project.Project{
 			Id:    "active",
 			Name:  "Active",
 			State: project.ProjectState_PROJECT_STATE_ACTIVE,
 			Org:   "org1",
 		},
-	}))
+	})
 	require.NoError(t, err)
 
-	_, err = svc.CreateProject(ctx, connect.NewRequest(&project.CreateProjectRequest{
+	_, err = svc.CreateProject(ctx, &project.CreateProjectRequest{
 		Project: &project.Project{
 			Id:    "archived",
 			Name:  "Archived",
 			State: project.ProjectState_PROJECT_STATE_ARCHIVED,
 			Org:   "org1",
 		},
-	}))
+	})
 	require.NoError(t, err)
 
-	resp, err := svc.ListProjects(ctx, connect.NewRequest(&project.ListProjectsRequest{
+	resp, err := svc.ListProjects(ctx, &project.ListProjectsRequest{
 		Org:     "org1",
 		Limit:   10,
 		Filters: "eq(state,1)",
-	}))
+	})
 	require.NoError(t, err)
 
-	require.NotNil(t, resp.Msg.GetProjects())
-	assert.Len(t, resp.Msg.GetProjects().GetProjects(), 1)
-	assert.Equal(t, "archived", resp.Msg.GetProjects().GetProjects()[0].GetId())
+	require.NotNil(t, resp.GetProjects())
+	assert.Len(t, resp.GetProjects().GetProjects(), 1)
+	assert.Equal(t, "archived", resp.GetProjects().GetProjects()[0].GetId())
 }
 
 func TestListProjects_ValueInState(t *testing.T) {
 	ctx := context.Background()
 	svc := setupProjectService(t)
 
-	_, err := svc.CreateProject(ctx, connect.NewRequest(&project.CreateProjectRequest{
+	_, err := svc.CreateProject(ctx, &project.CreateProjectRequest{
 		Project: &project.Project{
 			Id:    "active",
 			Name:  "Active",
 			State: project.ProjectState_PROJECT_STATE_ACTIVE,
 		},
-	}))
+	})
 	require.NoError(t, err)
 
-	_, err = svc.CreateProject(ctx, connect.NewRequest(&project.CreateProjectRequest{
+	_, err = svc.CreateProject(ctx, &project.CreateProjectRequest{
 		Project: &project.Project{
 			Id:    "archived",
 			Name:  "Archived",
 			State: project.ProjectState_PROJECT_STATE_ARCHIVED,
 		},
-	}))
+	})
 	require.NoError(t, err)
 
-	resp, err := svc.ListProjects(ctx, connect.NewRequest(&project.ListProjectsRequest{
+	resp, err := svc.ListProjects(ctx, &project.ListProjectsRequest{
 		Limit:   10,
 		Filters: "value_in(state,0;1;2)",
-	}))
+	})
 	require.NoError(t, err)
 
-	require.NotNil(t, resp.Msg.GetProjects())
-	assert.Len(t, resp.Msg.GetProjects().GetProjects(), 2)
+	require.NotNil(t, resp.GetProjects())
+	assert.Len(t, resp.GetProjects().GetProjects(), 2)
 }
 
 func TestListProjects_ZeroLimitDoesNotApplyLimit(t *testing.T) {
 	ctx := context.Background()
 	svc := setupProjectService(t)
 
-	_, err := svc.CreateProject(ctx, connect.NewRequest(&project.CreateProjectRequest{
+	_, err := svc.CreateProject(ctx, &project.CreateProjectRequest{
 		Project: &project.Project{
 			Id:    "one",
 			Name:  "One",
 			State: project.ProjectState_PROJECT_STATE_ACTIVE,
 			Org:   "org1",
 		},
-	}))
+	})
 	require.NoError(t, err)
 
-	_, err = svc.CreateProject(ctx, connect.NewRequest(&project.CreateProjectRequest{
+	_, err = svc.CreateProject(ctx, &project.CreateProjectRequest{
 		Project: &project.Project{
 			Id:    "two",
 			Name:  "Two",
 			State: project.ProjectState_PROJECT_STATE_ACTIVE,
 			Org:   "org1",
 		},
-	}))
+	})
 	require.NoError(t, err)
 
-	resp, err := svc.ListProjects(ctx, connect.NewRequest(&project.ListProjectsRequest{
+	resp, err := svc.ListProjects(ctx, &project.ListProjectsRequest{
 		Org: "org1",
-	}))
+	})
 	require.NoError(t, err)
-	require.NotNil(t, resp.Msg.GetProjects())
-	assert.Len(t, resp.Msg.GetProjects().GetProjects(), 2)
-	assert.Equal(t, "", resp.Msg.GetProjects().GetToken())
+	require.NotNil(t, resp.GetProjects())
+	assert.Len(t, resp.GetProjects().GetProjects(), 2)
+	assert.Equal(t, "", resp.GetProjects().GetToken())
 }

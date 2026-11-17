@@ -1,8 +1,9 @@
 package service
 
 import (
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"google.golang.org/protobuf/reflect/protoreflect"
+
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 )
 
 // hasAnyField reports whether m has any populated field. A message with none

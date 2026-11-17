@@ -1,4 +1,4 @@
-package service
+package rpc
 
 import (
 	"context"
@@ -13,6 +13,7 @@ import (
 
 	common "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	workflow "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
+	"github.com/flyteorg/flyte/v2/runs/service"
 )
 
 func TestListActionsRejectsUnsupportedAndInvalidQueueScopes(t *testing.T) {
@@ -28,7 +29,7 @@ func TestListActionsRejectsUnsupportedAndInvalidQueueScopes(t *testing.T) {
 		{"nil queue scope", &workflow.ListActionsRequest{ScopeBy: &workflow.ListActionsRequest_QueueId{}}, connect.CodeInvalidArgument},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := (&RunService{}).ListActions(context.Background(), connect.NewRequest(tt.request))
+			_, err := (&runHandler{run: &service.RunService{}}).ListActions(context.Background(), connect.NewRequest(tt.request))
 			assert.Equal(t, tt.code, connect.CodeOf(err))
 		})
 	}

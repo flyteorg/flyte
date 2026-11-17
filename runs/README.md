@@ -372,6 +372,8 @@ runs/
 │   ├── interfaces.go        # Repository interface
 │   ├── models.go            # Database models
 │   └── postgres.go          # PostgreSQL/SQLite implementation
+├── rpc/
+│   └── run_handler.go       # Connect RPC handlers
 ├── service/
 │   └── run_service.go       # Service implementation
 ├── migrations/
@@ -424,7 +426,7 @@ make run
 3. Update repository interface in `repository/interfaces/`
 4. Update DB models in `repository/models/`
 5. Implement in `repository/impl/`
-6. Add service handler in `service/xxx_service.go`
+6. Add the Connect handler in `rpc/` and run operations in `service/`
 7. Add tests and update client
 
 ## Troubleshooting

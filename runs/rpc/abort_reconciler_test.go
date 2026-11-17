@@ -1,4 +1,4 @@
-package service
+package rpc
 
 import (
 	"context"
@@ -16,10 +16,11 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
+	"github.com/flyteorg/flyte/v2/runs/service"
 )
 
 // newTestReconciler builds a reconciler wired to mocks with fast timing for tests.
-func newTestReconciler(t *testing.T) (*repoMocks.ActionRepo, *actionsconnectmocks.ActionsServiceClient, *AbortReconciler) {
+func newTestReconciler(t *testing.T) (*repoMocks.ActionRepo, *actionsconnectmocks.ActionsServiceClient, *service.AbortReconciler) {
 	t.Helper()
 	actionRepo := repoMocks.NewActionRepo(t)
 	repo := repoMocks.NewRepository(t)
@@ -27,7 +28,7 @@ func newTestReconciler(t *testing.T) (*repoMocks.ActionRepo, *actionsconnectmock
 
 	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
 
-	reconciler := NewAbortReconciler(repo, actionsClient, AbortReconcilerConfig{
+	reconciler := service.NewAbortReconciler(repo, AbortAction(actionsClient), service.AbortReconcilerConfig{
 		Workers:      2,
 		MaxAttempts:  3,
 		QueueSize:    100,

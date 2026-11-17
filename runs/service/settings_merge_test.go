@@ -185,7 +185,7 @@ func TestMergeSettings(t *testing.T) {
 		Run:                  &settings.RunSettings{DefaultQueue: str(stateValue, "default")},
 		EnvironmentVariables: strMap(stateValue, map[string]string{"LOG_LEVEL": "info"}),
 		TaskResource: &settings.TaskResourceSettings{
-			Max: &settings.TaskResourceDefaults{Cpu: quantity(stateValue, "16")},
+			Max: &settings.TaskResourceDefaults{Cpu: &settings.QuantitySetting{State: stateValue, QuantityValue: "16"}},
 		},
 	}
 	domain := &settings.Settings{
@@ -195,7 +195,7 @@ func TestMergeSettings(t *testing.T) {
 	project := &settings.Settings{
 		EnvironmentVariables: strMap(stateValue, map[string]string{"TEAM": "ml"}),
 		TaskResource: &settings.TaskResourceSettings{
-			Max: &settings.TaskResourceDefaults{Cpu: quantity(stateValue, "32")},
+			Max: &settings.TaskResourceDefaults{Cpu: &settings.QuantitySetting{State: stateValue, QuantityValue: "32"}},
 		},
 		PodTemplateName: str(stateValue, "gpu-template"),
 	}
@@ -415,3 +415,9 @@ func TestMergeObservabilitySettings(t *testing.T) {
 		assert.Nil(t, mergeSettings([]*settings.Settings{nil, nil, nil}).GetObservability())
 	})
 }
+
+const (
+	stateValue   = settings.SettingState_SETTING_STATE_VALUE
+	stateInherit = settings.SettingState_SETTING_STATE_INHERIT
+	stateUnset   = settings.SettingState_SETTING_STATE_UNSET
+)
