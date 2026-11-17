@@ -174,7 +174,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 	projectRepo := impl.NewProjectRepo(sc.DB)
 	projectSvc := service.NewProjectService(projectRepo, domains)
-	abortReconciler := service.NewAbortReconciler(repo, rpc.AbortAction(actionsClient), service.AbortReconcilerConfig{
+	abortReconciler := service.NewAbortReconciler(repo, service.AbortAction(actionsClient), service.AbortReconcilerConfig{
 		Workers:      5,
 		MaxAttempts:  10,
 		QueueSize:    1000,
