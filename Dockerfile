@@ -25,6 +25,8 @@ COPY --from=flyteconsole /app/ cmd/single/dist
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
     go build -tags console -v -o dist/flyte cmd/main.go
 
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
+    go build -v -o dist/flyteadmin-retention github.com/flyteorg/flyte/flyteadmin/cmd/retention
 
 FROM debian:bookworm-slim
 
@@ -42,6 +44,8 @@ RUN apt-get update && apt-get install --no-install-recommends --yes \
 
 # Copy compiled executable into image
 COPY --from=flytebuilder /flyteorg/build/dist/flyte /usr/local/bin/
+
+COPY --from=flytebuilder /flyteorg/build/dist/flyteadmin-retention /usr/local/bin/
 
 # Set entrypoint
 ENTRYPOINT [ "/usr/bin/tini", "-g", "--", "/usr/local/bin/flyte" ]
