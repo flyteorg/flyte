@@ -280,7 +280,8 @@ func TestEmbedTaskTemplate_SubstitutesRunStartTime(t *testing.T) {
 
 	embedded := func(action *actions.Action) *core.TaskTemplate {
 		ta := &executorv1.TaskAction{Spec: executorv1.TaskActionSpec{}}
-		require.NoError(t, embedTaskTemplate(action, ta, &task.RunSpec{RunStartTime: timestamppb.New(startTime)}))
+		applyRunSpecToTaskAction(ta, &task.RunSpec{RunStartTime: timestamppb.New(startTime)})
+		require.NoError(t, embedTaskTemplate(action, ta))
 		out := &core.TaskTemplate{}
 		require.NoError(t, proto.Unmarshal(ta.Spec.TaskTemplate, out))
 		return out
@@ -299,7 +300,7 @@ func TestEmbedTaskTemplate_SubstitutesRunStartTime(t *testing.T) {
 
 	t.Run("no-op when run start time is unset", func(t *testing.T) {
 		ta := &executorv1.TaskAction{Spec: executorv1.TaskActionSpec{}}
-		require.NoError(t, embedTaskTemplate(newAction(), ta, &task.RunSpec{}))
+		require.NoError(t, embedTaskTemplate(newAction(), ta))
 		out := &core.TaskTemplate{}
 		require.NoError(t, proto.Unmarshal(ta.Spec.TaskTemplate, out))
 		assert.Equal(t, runStartTimeTemplateVar, out.GetContainer().GetArgs()[2])
@@ -356,6 +357,9 @@ func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
 		DefaultSettings: &task.DefaultSettings{
 			PodTemplateName: "gpu-template",
 		},
+		SecurityContext: &core.SecurityContext{
+			RunAs: &core.Identity{K8SServiceAccount: "run-sa"},
+		},
 	})
 
 	require.NotNil(t, taskAction.Spec.Interruptible)
@@ -367,6 +371,21 @@ func TestApplyRunSpecToTaskAction_ProjectsRuntimeSettings(t *testing.T) {
 	assert.Equal(t, "platform", taskAction.Labels["team"])
 	assert.Equal(t, "sdk", taskAction.Annotations["owner"])
 	assert.Equal(t, "gpu-template", taskAction.Spec.PodTemplateName)
+	assert.Equal(t, "run-sa", taskAction.Spec.ServiceAccount)
+}
+
+func TestApplyRunSpecToTaskAction_ServiceAccount(t *testing.T) {
+	t.Run("unset service account stays empty", func(t *testing.T) {
+		ta := &executorv1.TaskAction{}
+		applyRunSpecToTaskAction(ta, &task.RunSpec{})
+		assert.Empty(t, ta.Spec.ServiceAccount)
+	})
+
+	t.Run("nil run spec clears a stale service account", func(t *testing.T) {
+		ta := &executorv1.TaskAction{Spec: executorv1.TaskActionSpec{ServiceAccount: "stale-sa"}}
+		applyRunSpecToTaskAction(ta, nil)
+		assert.Empty(t, ta.Spec.ServiceAccount)
+	})
 }
 
 func TestApplyRunSpecToTaskAction_RawDataPrefix(t *testing.T) {
@@ -401,6 +420,7 @@ func TestInheritRunContextFromParentTaskAction(t *testing.T) {
 			},
 			Interruptible:   &interruptible,
 			PodTemplateName: "gpu-template",
+			ServiceAccount:  "run-sa",
 			RawDataPrefix:   "s3://raw-bucket/prefix",
 		},
 	}
@@ -424,6 +444,7 @@ func TestInheritRunContextFromParentTaskAction(t *testing.T) {
 	assert.Equal(t, "run1", child.Labels["flyte.org/run"])
 	assert.Equal(t, "sdk", child.Annotations["owner"])
 	assert.Equal(t, "gpu-template", child.Spec.PodTemplateName)
+	assert.Equal(t, "run-sa", child.Spec.ServiceAccount)
 
 	// Verify deep copy (child mutation must not mutate parent map).
 	child.Spec.EnvVars["TRACE_ID"] = "mutated"
@@ -542,7 +563,7 @@ func TestEmbedTaskTemplate_StampsPodTemplateName(t *testing.T) {
 
 	embedded := func(action *actions.Action, name string) *core.TaskTemplate {
 		ta := &executorv1.TaskAction{Spec: executorv1.TaskActionSpec{PodTemplateName: name}}
-		require.NoError(t, embedTaskTemplate(action, ta, &task.RunSpec{}))
+		require.NoError(t, embedTaskTemplate(action, ta))
 		out := &core.TaskTemplate{}
 		require.NoError(t, proto.Unmarshal(ta.Spec.TaskTemplate, out))
 		return out
@@ -560,6 +581,65 @@ func TestEmbedTaskTemplate_StampsPodTemplateName(t *testing.T) {
 		out := embedded(newAction(), "")
 		assert.Empty(t, out.GetMetadata().GetPodTemplateName())
 	})
+}
+
+func TestApplyServiceAccount(t *testing.T) {
+	sa := func(tmpl *core.TaskTemplate) string {
+		return tmpl.GetSecurityContext().GetRunAs().GetK8SServiceAccount()
+	}
+
+	t.Run("stamps a task that sets none", func(t *testing.T) {
+		got := applyServiceAccount(&core.TaskTemplate{}, "run-sa")
+		assert.Equal(t, "run-sa", sa(got))
+	})
+
+	t.Run("the task's own service account wins", func(t *testing.T) {
+		tmpl := &core.TaskTemplate{SecurityContext: &core.SecurityContext{
+			RunAs: &core.Identity{K8SServiceAccount: "task-sa"},
+		}}
+		got := applyServiceAccount(tmpl, "run-sa")
+		assert.Equal(t, "task-sa", sa(got))
+		assert.Same(t, tmpl, got)
+	})
+
+	t.Run("empty name is a no-op", func(t *testing.T) {
+		tmpl := &core.TaskTemplate{}
+		got := applyServiceAccount(tmpl, "")
+		assert.Same(t, tmpl, got)
+		assert.Nil(t, got.GetSecurityContext())
+	})
+
+	t.Run("keeps the other security context fields", func(t *testing.T) {
+		tmpl := &core.TaskTemplate{SecurityContext: &core.SecurityContext{
+			RunAs:   &core.Identity{IamRole: "arn:aws:iam::123:role/task"},
+			Secrets: []*core.Secret{{Key: "token"}},
+		}}
+		got := applyServiceAccount(tmpl, "run-sa")
+		assert.Equal(t, "run-sa", sa(got))
+		assert.Equal(t, "arn:aws:iam::123:role/task", got.GetSecurityContext().GetRunAs().GetIamRole())
+		assert.Len(t, got.GetSecurityContext().GetSecrets(), 1)
+		// The caller's proto must be left untouched (it is persisted separately as the task spec).
+		assert.Empty(t, sa(tmpl))
+	})
+}
+
+func TestEmbedTaskTemplate_StampsServiceAccount(t *testing.T) {
+	action := &actions.Action{
+		Spec: &actions.Action_Task{
+			Task: &workflow.TaskAction{
+				Spec: &task.TaskSpec{
+					TaskTemplate: &core.TaskTemplate{Type: "python"},
+				},
+			},
+		},
+	}
+	ta := &executorv1.TaskAction{Spec: executorv1.TaskActionSpec{ServiceAccount: "run-sa"}}
+	require.NoError(t, embedTaskTemplate(action, ta))
+
+	out := &core.TaskTemplate{}
+	require.NoError(t, proto.Unmarshal(ta.Spec.TaskTemplate, out))
+	assert.Equal(t, "run-sa", out.GetSecurityContext().GetRunAs().GetK8SServiceAccount())
+	assert.Nil(t, action.GetSpec().(*actions.Action_Task).Task.Spec.TaskTemplate.GetSecurityContext())
 }
 
 func TestNotifyRunService_SkipsTerminalAddedEventsOnlyWhenInBloomFilter(t *testing.T) {

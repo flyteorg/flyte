@@ -33,6 +33,10 @@ message Run {
   // precedence, and the merged set is stored here and on the RunSpec.
   // It is part of Run so that it gets returned in a list request.
   map<string, string> labels = 2;
+
+  // User-defined annotations attached to this run at creation time, the same as
+  // RunSpec.annotations. It is part of Run so that it gets returned in a list request.
+  map<string, string> annotations = 3;
 }
 
 message RunDetails {

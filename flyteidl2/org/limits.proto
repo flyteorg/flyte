@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package flyteidl2.org;
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/org";
+
+// OrgLimitExceeded is attached as an error detail when a request is refused
+// because it would push an org past one of its limits. It lets clients show the
+// limit, the org's value for it and the org's usage without parsing the error
+// message.
+message OrgLimitExceeded {
+  // Name of the limit, e.g. "max_concurrent_runs".
+  string limit = 1;
+
+  // The org's value for the limit.
+  int64 ceiling = 2;
+
+  // The org's usage of the limit before this request.
+  int64 current = 3;
+
+  // How much this request would have added.
+  int64 requested = 4;
+
+  // The limit's default for the org's tier, named by tier. Unset when the org
+  // has no tier defaults; differs from ceiling when the org's value was changed
+  // for it.
+  optional int64 tier_default = 5;
+
+  // Where to ask for the limit to be raised. Empty when the server has none.
+  string upgrade_url = 6;
+
+  // Display name of the tier whose default tier_default is, e.g. "Teams".
+  // Empty exactly when tier_default is unset.
+  string tier = 7;
+}
+
+// OrgEntitlementRequired is attached as an error detail when a request is
+// refused because the org isn't entitled to a capability. It lets clients show
+// what to ask for without parsing the error message.
+message OrgEntitlementRequired {
+  // Name of the entitlement, e.g. "allowed_clouds".
+  string entitlement = 1;
+
+  // For an entitlement with values, the ones the request needed that the org
+  // isn't entitled to, e.g. ["coreweave"]. Empty for a yes/no entitlement.
+  repeated string values = 2;
+
+  // Where to ask for the entitlement. Empty when the server has none.
+  string upgrade_url = 3;
+}

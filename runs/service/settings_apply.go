@@ -39,6 +39,19 @@ func applyRunSettings(spec *task.RunSpec, resolved *settings.Settings) {
 		spec.DefaultSettings.PodTemplateName = podTemplate.GetStringValue()
 	}
 
+	// Projected onto tasks that set no service account of their own, at action creation.
+	// Only the service account is filled; other security context fields are kept.
+	if serviceAccount := resolved.GetSecurity().GetServiceAccount(); spec.GetSecurityContext().GetRunAs().GetK8SServiceAccount() == "" &&
+		serviceAccount.GetState() == settings.SettingState_SETTING_STATE_VALUE {
+		if spec.SecurityContext == nil {
+			spec.SecurityContext = &core.SecurityContext{}
+		}
+		if spec.SecurityContext.RunAs == nil {
+			spec.SecurityContext.RunAs = &core.Identity{}
+		}
+		spec.SecurityContext.RunAs.K8SServiceAccount = serviceAccount.GetStringValue()
+	}
+
 	// Base for run metadata; also raw outputs when raw_data_prefix is empty.
 	if baseDir := resolved.GetRun().GetRunBaseDir(); spec.GetRunBaseDir() == "" &&
 		baseDir.GetState() == settings.SettingState_SETTING_STATE_VALUE {

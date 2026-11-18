@@ -195,10 +195,20 @@ type TaskActionSpec struct {
 	// +kubebuilder:validation:MaxLength=253
 	PodTemplateName string `json:"podTemplateName,omitempty"`
 
+	// ServiceAccount is the run-scoped Kubernetes service account projected from
+	// RunSpec.SecurityContext. Stamped onto tasks that do not set one themselves.
+	// +optional
+	// +kubebuilder:validation:MaxLength=253
+	ServiceAccount string `json:"serviceAccount,omitempty"`
+
 	// RawDataPrefix is the run-scoped raw data base projected from RunSpec.RawDataStorage.
 	// Empty writes raw data under RunOutputBase.
 	// +optional
 	RawDataPrefix string `json:"rawDataPrefix,omitempty"`
+
+	// RunStartTime is the run-scoped start time in RFC3339 UTC, inherited by child tasks.
+	// +optional
+	RunStartTime string `json:"runStartTime,omitempty"`
 
 	// Group is the group this action belongs to, if applicable.
 	// +optional
