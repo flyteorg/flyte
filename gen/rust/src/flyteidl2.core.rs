@@ -3154,6 +3154,12 @@ pub enum WorkerKind {
     /// environment, identified by ReusePolicy.name and ReusePolicy.version, and the scheduler sends
     /// it only that environment's actions.
     Reusable = 3,
+    /// Runs each task in its own gVisor sandbox (a user-space kernel), such as an interactive
+    /// sandbox session, rather than a pod. Like WORKER_KIND_MICROVM, it needs a scheduler and
+    /// workers that support this kind, and schedulers that support it should not retry such a
+    /// task: a retry would start a fresh sandbox at a new address while callers still hold the
+    /// old one.
+    Gvisor = 4,
 }
 impl WorkerKind {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -3166,6 +3172,7 @@ impl WorkerKind {
             WorkerKind::Sandbox => "WORKER_KIND_SANDBOX",
             WorkerKind::Microvm => "WORKER_KIND_MICROVM",
             WorkerKind::Reusable => "WORKER_KIND_REUSABLE",
+            WorkerKind::Gvisor => "WORKER_KIND_GVISOR",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -3175,6 +3182,7 @@ impl WorkerKind {
             "WORKER_KIND_SANDBOX" => Some(Self::Sandbox),
             "WORKER_KIND_MICROVM" => Some(Self::Microvm),
             "WORKER_KIND_REUSABLE" => Some(Self::Reusable),
+            "WORKER_KIND_GVISOR" => Some(Self::Gvisor),
             _ => None,
         }
     }
