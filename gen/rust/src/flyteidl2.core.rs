@@ -1798,6 +1798,9 @@ pub struct PodLogContext {
     pub primary_container_name: ::prost::alloc::string::String,
     #[prost(message, repeated, tag="5")]
     pub init_containers: ::prost::alloc::vec::Vec<ContainerContext>,
+    /// Cluster configured on the executor that reported this pod.
+    #[prost(string, tag="6")]
+    pub cluster: ::prost::alloc::string::String,
 }
 /// Contains metadata required to identify logs produces by a single container
 #[pyo3::pyclass(dict, get_all, set_all)]

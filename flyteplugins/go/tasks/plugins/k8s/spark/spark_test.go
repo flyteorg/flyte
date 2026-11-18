@@ -31,6 +31,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	k8smocks "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	stdlibUtils "github.com/flyteorg/flyte/v2/flytestdlib/utils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
@@ -1065,9 +1066,9 @@ func TestGetPropertiesSpark(t *testing.T) {
 	assert.Equal(t, expected, sparkResourceHandler.GetProperties())
 }
 
-func TestGetTaskPhaseWithNamespaceInLogContext(t *testing.T) {
+func TestGetTaskPhaseWithPodLocationInLogContext(t *testing.T) {
 	sparkResourceHandler := sparkResourceHandler{}
-	ctx := context.TODO()
+	ctx := contextutils.WithCluster(t.Context(), "", "west")
 
 	pluginCtx := dummySparkPluginContext(dummySparkTaskTemplateContainer("", dummySparkConf), k8s.PluginState{})
 	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, pluginCtx, dummySparkApplication(sj.ApplicationStateRunning))
@@ -1076,7 +1077,10 @@ func TestGetTaskPhaseWithNamespaceInLogContext(t *testing.T) {
 	assert.NotNil(t, taskPhase.Info().LogContext)
 	assert.Equal(t, 2, len(taskPhase.Info().LogContext.Pods))
 
-	// Verify namespace is set in the driver pod log context
+	for _, pod := range taskPhase.Info().LogContext.Pods {
+		assert.Equal(t, "west", pod.GetCluster())
+	}
+
 	driverPodLogContext := taskPhase.Info().LogContext.Pods[0]
 	assert.Equal(t, "spark-namespace", driverPodLogContext.Namespace)
 	assert.Equal(t, "spark-pod", driverPodLogContext.PodName)

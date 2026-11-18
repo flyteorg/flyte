@@ -1374,6 +1374,8 @@ func (m *PodLogContext) validate(all bool) error {
 
 	}
 
+	// no validation rules for Cluster
+
 	if len(errors) > 0 {
 		return PodLogContextMultiError(errors)
 	}

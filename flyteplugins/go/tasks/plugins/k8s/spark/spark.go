@@ -23,6 +23,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
@@ -472,6 +473,7 @@ func getEventInfoForSpark(ctx context.Context, pluginContext k8s.PluginContext, 
 		PrimaryPodName: sj.Status.DriverInfo.PodName,
 	}
 	logCtx.Pods = append(logCtx.Pods, &core.PodLogContext{
+		Cluster:              contextutils.ClusterName(ctx),
 		Namespace:            sj.Namespace,
 		PodName:              sj.Status.DriverInfo.PodName,
 		PrimaryContainerName: defaultDriverPrimaryContainerName,
@@ -483,6 +485,7 @@ func getEventInfoForSpark(ctx context.Context, pluginContext k8s.PluginContext, 
 	for executorPodName, executorState := range sj.Status.ExecutorState {
 		if executorState != sparkOp.ExecutorStatePending && executorState != sparkOp.ExecutorStateUnknown {
 			logCtx.Pods = append(logCtx.Pods, &core.PodLogContext{
+				Cluster:              contextutils.ClusterName(ctx),
 				Namespace:            sj.Namespace,
 				PodName:              executorPodName,
 				PrimaryContainerName: "spark-kubernetes-executor",
