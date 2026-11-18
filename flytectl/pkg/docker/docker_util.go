@@ -120,7 +120,11 @@ func GetDevPorts() (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, error
 }
 
 // GetSandboxPorts will return sandbox ports
-func GetSandboxPorts() (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, error) {
+func GetSandboxPorts(customPorts []string) (map[nat.Port]struct{}, map[nat.Port][]nat.PortBinding, error) {
+	if len(customPorts) > 0 {
+		return nat.ParsePortSpecs(customPorts)
+	}
+
 	return nat.ParsePortSpecs([]string{
 		// Notice that two host ports are mapped to the same container port in the case of Flyteconsole, this is done to
 		// support the generated URLs produced by pyflyte run

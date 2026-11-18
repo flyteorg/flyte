@@ -113,7 +113,7 @@ func dummyReader() io.ReadCloser {
 
 func TestStartFunc(t *testing.T) {
 	defaultImagePrefix := "dind"
-	exposedPorts, portBindings, _ := docker.GetSandboxPorts()
+	exposedPorts, portBindings, _ := docker.GetSandboxPorts(nil)
 	config := sandboxCmdConfig.DefaultConfig
 	config.Image = "dummyimage"
 	config.ImagePullOptions = docker.ImagePullOptions{

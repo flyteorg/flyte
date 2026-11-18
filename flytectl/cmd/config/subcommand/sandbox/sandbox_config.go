@@ -46,6 +46,9 @@ type Config struct {
 
 	// Allow user to specify the port for the sandbox
 	Port string `json:"port" pflag:",Optional. Specify the port for the Kubernetes in the sandbox."`
+
+	// Allow user to specify custom port mappings for the sandbox
+	Ports []string `json:"ports" pflag:",Optional. Custom port mappings for sandbox."`
 }
 
 //go:generate pflags Config --default-var DefaultConfig --bind-default-var
@@ -58,3 +61,4 @@ var (
 func (c Config) GetK8sEndpoint() string {
 	return fmt.Sprintf("https://127.0.0.1:%s", c.Port)
 }
+
