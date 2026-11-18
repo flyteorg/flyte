@@ -444,6 +444,13 @@ enum WorkerKind {
   // environment, identified by ReusePolicy.name and ReusePolicy.version, and the scheduler sends
   // it only that environment's actions.
   WORKER_KIND_REUSABLE = 3;
+
+  // Runs each task in its own gVisor sandbox (a user-space kernel), such as an interactive
+  // sandbox session, rather than a pod. Like WORKER_KIND_MICROVM, it needs a scheduler and
+  // workers that support this kind, and schedulers that support it should not retry such a
+  // task: a retry would start a fresh sandbox at a new address while callers still hold the
+  // old one.
+  WORKER_KIND_GVISOR = 4;
 }
 
 // ----------------- First class Plugins

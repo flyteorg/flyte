@@ -68,6 +68,7 @@ class WorkerKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     WORKER_KIND_SANDBOX: _ClassVar[WorkerKind]
     WORKER_KIND_MICROVM: _ClassVar[WorkerKind]
     WORKER_KIND_REUSABLE: _ClassVar[WorkerKind]
+    WORKER_KIND_GVISOR: _ClassVar[WorkerKind]
 ACCELERATOR_MODEL_UNSPECIFIED: AcceleratorModel
 NVIDIA_K80: AcceleratorModel
 NVIDIA_M60: AcceleratorModel
@@ -114,6 +115,7 @@ WORKER_KIND_UNSPECIFIED: WorkerKind
 WORKER_KIND_SANDBOX: WorkerKind
 WORKER_KIND_MICROVM: WorkerKind
 WORKER_KIND_REUSABLE: WorkerKind
+WORKER_KIND_GVISOR: WorkerKind
 ACCELERATOR_NAME_FIELD_NUMBER: _ClassVar[int]
 accelerator_name: _descriptor.FieldDescriptor
 
