@@ -164,12 +164,6 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		connect.WithInterceptors(otelInterceptor),
 	)
 
-	runsServiceURL := fmt.Sprintf("http://localhost:%d", cfg.Server.Port)
-	projectClient := projectconnect.NewProjectServiceClient(
-		http.DefaultClient,
-		runsServiceURL,
-		connect.WithInterceptors(otelInterceptor),
-	)
 	abortReconciler := service.NewAbortReconciler(repo, actionsClient, service.AbortReconcilerConfig{
 		Workers:      5,
 		MaxAttempts:  10,
@@ -181,8 +175,17 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return abortReconciler.Run(ctx)
 	})
 
-	runsSvc := service.NewRunService(repo, settingsRepo, actionsClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
-	taskSvc := service.NewTaskService(repo, projectClient)
+	domains := make([]*projectpb.Domain, 0, len(cfg.Domains))
+	for _, d := range cfg.Domains {
+		domains = append(domains, &projectpb.Domain{
+			Id:   d.ID,
+			Name: d.Name,
+		})
+	}
+	projectSvc := service.NewProjectService(impl.NewProjectRepo(sc.DB), domains)
+
+	runsSvc := service.NewRunService(repo, settingsRepo, actionsClient, projectSvc, cfg.StoragePrefix, sc.DataStore, abortReconciler, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
+	taskSvc := service.NewTaskService(repo, projectSvc)
 
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc, connect.WithInterceptors(interceptors...))
 	sc.Mux.Handle(runsPath, runsHandler)
@@ -218,14 +221,6 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(triggerPath, triggerHandler)
 	logger.Infof(ctx, "Mounted TriggerService at %s", triggerPath)
 
-	domains := make([]*projectpb.Domain, 0, len(cfg.Domains))
-	for _, d := range cfg.Domains {
-		domains = append(domains, &projectpb.Domain{
-			Id:   d.ID,
-			Name: d.Name,
-		})
-	}
-	projectSvc := service.NewProjectService(impl.NewProjectRepo(sc.DB), domains)
 	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(projectSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(projectPath, projectHandler)
 	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
@@ -240,7 +235,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	}
 
 	if cfg.TriggerScheduler.Enabled {
-		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, http.DefaultClient, runsServiceURL, connect.WithInterceptors(otelInterceptor))
+		worker := scheduler.Start(repo.TriggerRepo(), cfg.TriggerScheduler, runsSvc)
 		sc.AddWorker("trigger-scheduler", worker)
 		logger.Infof(ctx, "Registered trigger-scheduler worker")
 	}

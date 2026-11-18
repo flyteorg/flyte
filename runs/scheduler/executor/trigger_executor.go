@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"hash/fnv"
-	"net/http"
 	"time"
 
 	"connectrpc.com/connect"
@@ -21,35 +20,17 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-// TriggerExecutor fires a CreateRun call for a scheduled trigger execution.
+// TriggerExecutor creates runs for scheduled trigger executions.
 type TriggerExecutor struct {
-	runClient workflowconnect.RunServiceClient
-	limiter   *rate.Limiter
+	runs    workflowconnect.RunServiceHandler
+	limiter *rate.Limiter
 }
 
-// TriggerExecutorConfig holds tunables for the executor.
-type TriggerExecutorConfig struct {
-	// BaseURL is the URL of the runs service (e.g. "http://localhost:8090").
-	BaseURL string
-	// HTTPClient is the client used for outbound RunService calls.
-	HTTPClient connect.HTTPClient
-	// QPS is the token-bucket rate for CreateRun calls (tokens/second).
-	QPS float64
-	// Burst is the token-bucket burst size.
-	Burst int
-	// ClientOpts are connect client options for the outbound RunService client.
-	ClientOpts []connect.ClientOption
-}
-
-// NewTriggerExecutor constructs a TriggerExecutor.
-func NewTriggerExecutor(cfg TriggerExecutorConfig) *TriggerExecutor {
-	httpClient := cfg.HTTPClient
-	if httpClient == nil {
-		httpClient = http.DefaultClient
-	}
+// NewTriggerExecutor rate-limits scheduled calls to the in-process run service.
+func NewTriggerExecutor(runs workflowconnect.RunServiceHandler, qps float64, burst int) *TriggerExecutor {
 	return &TriggerExecutor{
-		runClient: workflowconnect.NewRunServiceClient(httpClient, cfg.BaseURL, cfg.ClientOpts...),
-		limiter:   rate.NewLimiter(rate.Limit(cfg.QPS), cfg.Burst),
+		runs:    runs,
+		limiter: rate.NewLimiter(rate.Limit(qps), burst),
 	}
 }
 
@@ -96,7 +77,7 @@ func (e *TriggerExecutor) Execute(ctx context.Context, t *models.Trigger, schedu
 
 	req := connect.NewRequest(createReq)
 
-	_, err := e.runClient.CreateRun(ctx, req)
+	_, err := e.runs.CreateRun(ctx, req)
 	if err != nil {
 		// AlreadyExists means the run was already fired — treat as success.
 		if connect.CodeOf(err) == connect.CodeAlreadyExists {
