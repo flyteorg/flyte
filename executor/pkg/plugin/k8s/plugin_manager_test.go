@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/core/v1"
+	eventsv1 "k8s.io/api/events/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -872,7 +873,8 @@ func TestAttachRecentObjectEventsGpuFault(t *testing.T) {
 			k8s.PluginState{}, time.Time{}, time.Time{})
 		require.NotNil(t, got.Info())
 		reasons := got.Info().AdditionalReasons
-		require.Len(t, reasons, 5)
+		require.Len(t, reasons, 4)
+		assert.Equal(t, ordinary.Message, reasons[3].Reason)
 		return reasons
 	}
 
@@ -903,6 +905,38 @@ func TestAttachRecentObjectEventsGpuFault(t *testing.T) {
 			assert.Nil(t, reason.GpuFault, reason.Reason)
 		}
 	})
+}
+
+func TestAttachRecentObjectEventsSkipsReplacedResource(t *testing.T) {
+	pod := failedPod()
+	staleAt := time.Date(2026, 8, 19, 10, 0, 0, 0, time.UTC)
+	lastEventAt := staleAt.Add(-time.Second)
+	pm := NewPluginManager("test-plugin", nil, nil)
+	watcher := &controllerRuntimeEventWatcher{}
+	watcher.OnAdd(&eventsv1.Event{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace:         pod.Namespace,
+			Name:              "previous-pod-event",
+			CreationTimestamp: metav1.NewTime(staleAt),
+		},
+		Regarding: v1.ObjectReference{
+			Kind:      "Pod",
+			Namespace: pod.Namespace,
+			Name:      pod.Name,
+			UID:       "previous-pod-uid",
+		},
+		Note: "Failed to pull image for previous pod",
+	}, false)
+	pm.eventWatcher = watcher
+
+	phase := pluginsCore.PhaseInfoRunning(1, &pluginsCore.TaskInfo{})
+	previous := k8s.PluginState{Phase: phase.Phase(), PhaseVersion: phase.Version()}
+	got, createdAt, recordedAt := pm.attachRecentObjectEvents(pod, phase, previous, lastEventAt, lastEventAt)
+
+	assert.Empty(t, got.Info().AdditionalReasons)
+	assert.Equal(t, phase.Version(), got.Version())
+	assert.Equal(t, lastEventAt, createdAt)
+	assert.Equal(t, lastEventAt, recordedAt)
 }
 
 func TestClassifyGpuFailureSkips(t *testing.T) {

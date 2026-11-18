@@ -402,14 +402,17 @@ func (pm *PluginManager) attachRecentObjectEvents(
 	}
 
 	recentEvents := pm.eventWatcher.List(objectKeyFor(resource), lastEventUpdate, lastEventRecordedAt)
-	if len(recentEvents) == 0 {
-		return phaseInfo, lastEventUpdate, lastEventRecordedAt
-	}
+	resourceUID := resource.GetUID()
+	reasonCount := len(info.AdditionalReasons)
 
 	// A reason carries its GPU fault as data only when the event passes the same trust
 	// rule classification applies, so nobody downstream has to read it out of the text.
 	pod, isPod := gpuFaultPod(resource)
 	for _, event := range recentEvents {
+		// A replacement resource can reuse the same cache key.
+		if resourceUID != "" && event.RegardingUID != "" && event.RegardingUID != resourceUID {
+			continue
+		}
 		reason := pluginsCore.ReasonInfo{
 			Reason:     event.Message,
 			OccurredAt: &event.CreatedAt,
@@ -422,7 +425,8 @@ func (pm *PluginManager) attachRecentObjectEvents(
 		lastEventRecordedAt = event.RecordedAt
 	}
 
-	if phaseInfo.Phase() == lastObservedState.Phase && phaseInfo.Version() <= lastObservedState.PhaseVersion {
+	if len(info.AdditionalReasons) > reasonCount &&
+		phaseInfo.Phase() == lastObservedState.Phase && phaseInfo.Version() <= lastObservedState.PhaseVersion {
 		phaseInfo = phaseInfo.WithVersion(lastObservedState.PhaseVersion + 1)
 	}
 
