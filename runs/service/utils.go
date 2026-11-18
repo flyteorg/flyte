@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"crypto/sha256"
 	"database/sql"
 	"encoding/base64"
@@ -10,34 +9,14 @@ import (
 	"strings"
 	"time"
 
-	"connectrpc.com/connect"
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/util/validation"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	flyteIdlCore "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 )
-
-// TruncateShortDescription truncates the short description to 255 characters if it exceeds the maximum length.
-func truncateShortDescription(description string) string {
-	if len(description) > 255 {
-		return description[:255]
-	}
-	return description
-}
-
-// truncateLongDescription truncates the long description to 2048 characters if it exceeds the maximum length.
-func truncateLongDescription(description string) string {
-	if len(description) > 2048 {
-		return description[:2048]
-	}
-	return description
-}
 
 func CoalesceNullString(s sql.NullString) string {
 	if s.Valid {
@@ -136,11 +115,11 @@ const runNameMaxLength = 30
 // be a valid DNS-1035 label. Server-generated names always satisfy this.
 func validateRunName(name string) error {
 	if len(name) > runNameMaxLength {
-		return connect.NewError(connect.CodeInvalidArgument,
+		return ErrRunInvalidArgument.wrap(
 			fmt.Errorf("invalid run name %q: must be no more than %d characters", name, runNameMaxLength))
 	}
 	if errs := validation.IsDNS1035Label(name); len(errs) > 0 {
-		return connect.NewError(connect.CodeInvalidArgument,
+		return ErrRunInvalidArgument.wrap(
 			fmt.Errorf("invalid run name %q: %s", name, strings.Join(errs, "; ")))
 	}
 	return nil
@@ -155,22 +134,8 @@ func validatePodTemplateName(name string) error {
 	}
 
 	if errs := validation.IsDNS1123Subdomain(name); len(errs) > 0 {
-		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid pod template name %q: %s", name, strings.Join(errs, "; ")))
+		return ErrRunInvalidArgument.wrap(fmt.Errorf("invalid pod template name %q: %s", name, strings.Join(errs, "; ")))
 	}
 
-	return nil
-}
-
-// validateProjectExists checks that the given project ID exists by calling the ProjectService.
-func validateProjectExists(ctx context.Context, projectClient projectconnect.ProjectServiceClient, projectID string) error {
-	if _, err := projectClient.GetProject(ctx, connect.NewRequest(&project.GetProjectRequest{
-		Id: projectID,
-	})); err != nil {
-		if connect.CodeOf(err) == connect.CodeNotFound {
-			return connect.NewError(connect.CodeNotFound, fmt.Errorf("project %q not found", projectID))
-		}
-		logger.Errorf(ctx, "Failed to validate project %q: %v", projectID, err)
-		return connect.NewError(connect.CodeInternal, fmt.Errorf("failed to validate project: %w", err))
-	}
 	return nil
 }

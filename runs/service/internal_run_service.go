@@ -3,65 +3,19 @@ package service
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
-	"io"
 	"time"
 
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
-
-	"connectrpc.com/connect"
-	grpcstatus "google.golang.org/genproto/googleapis/rpc/status"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-// Ensure RunService implements the InternalRunService handler interface.
-var _ workflowconnect.InternalRunServiceHandler = (*RunService)(nil)
-
-// RecordAction records a new action in the database.
-func (s *RunService) RecordAction(
-	ctx context.Context,
-	req *connect.Request[workflow.RecordActionRequest],
-) (*connect.Response[workflow.RecordActionResponse], error) {
-	resp := s.recordAction(ctx, req.Msg)
-	return connect.NewResponse(resp), nil
-}
-
-// RecordActionStream is the bidirectional streaming variant of RecordAction.
-func (s *RunService) RecordActionStream(
-	ctx context.Context,
-	stream *connect.BidiStream[workflow.RecordActionStreamRequest, workflow.RecordActionStreamResponse],
-) error {
-	for {
-		req, err := stream.Receive()
-		if errors.Is(err, io.EOF) {
-			return nil
-		}
-		if err != nil {
-			return err
-		}
-		resp := s.recordAction(ctx, req.GetRequest())
-		if err := stream.Send(&workflow.RecordActionStreamResponse{Response: resp}); err != nil {
-			return err
-		}
-	}
-}
-
-func (s *RunService) recordAction(ctx context.Context, req *workflow.RecordActionRequest) *workflow.RecordActionResponse {
-	err := s.recordSingleAction(ctx, req)
-	st := statusFromError(err)
-	return &workflow.RecordActionResponse{
-		ActionId: req.GetActionId(),
-		Status:   st,
-	}
-}
-
-func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.RecordActionRequest) error {
+// RecordAction persists an action and its execution spec.
+func (s *RunService) RecordAction(ctx context.Context, req *workflow.RecordActionRequest) error {
 	actionID := req.GetActionId()
 
 	// Build the base action model with fields common to all action types.
@@ -118,7 +72,7 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 			taskSpecModel, err := models.NewTaskSpecModel(ctx, taskSpec)
 			if err != nil {
 				logger.Warnf(ctx, "RecordAction: failed to create task spec model: %v", err)
-				return connect.NewError(connect.CodeInternal, err)
+				return ErrRunInternal.wrap(err)
 			}
 			if err := s.repo.TaskRepo().CreateTaskSpec(ctx, taskSpecModel); err != nil {
 				logger.Warnf(ctx, "RecordAction: failed to store task spec: %v", err)
@@ -174,14 +128,14 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 		info.Condition = v.Condition
 
 	default:
-		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("unsupported action spec type: %T", req.GetSpec()))
+		return ErrRunInvalidArgument.wrap(fmt.Errorf("unsupported action spec type: %T", req.GetSpec()))
 	}
 
 	// Marshal ActionSpec proto into bytes for storage.
 	actionSpecBytes, err := proto.Marshal(spec)
 	if err != nil {
 		logger.Warnf(ctx, "RecordAction: failed to marshal action spec: %v", err)
-		return connect.NewError(connect.CodeInternal, err)
+		return ErrRunInternal.wrap(err)
 	}
 	action.ActionSpec = actionSpecBytes
 
@@ -189,59 +143,19 @@ func (s *RunService) recordSingleAction(ctx context.Context, req *workflow.Recor
 	detailedInfo, err := proto.Marshal(info)
 	if err != nil {
 		logger.Warnf(ctx, "RecordAction: failed to marshal run info: %v", err)
-		return connect.NewError(connect.CodeInternal, err)
+		return ErrRunInternal.wrap(err)
 	}
 	action.DetailedInfo = detailedInfo
 
 	if _, err := s.repo.ActionRepo().CreateAction(ctx, action, false); err != nil {
 		logger.Warnf(ctx, "RecordAction: failed to create action %s: %v", actionID.GetName(), err)
-		return connect.NewError(connect.CodeInternal, err)
+		return ErrRunInternal.wrap(err)
 	}
 	return nil
 }
 
-// UpdateActionStatus updates the phase of an action.
-func (s *RunService) UpdateActionStatus(
-	ctx context.Context,
-	req *connect.Request[workflow.UpdateActionStatusRequest],
-) (*connect.Response[workflow.UpdateActionStatusResponse], error) {
-	resp := s.updateActionStatus(ctx, req.Msg)
-	return connect.NewResponse(resp), nil
-}
-
-// UpdateActionStatusStream is the bidirectional streaming variant of UpdateActionStatus.
-func (s *RunService) UpdateActionStatusStream(
-	ctx context.Context,
-	stream *connect.BidiStream[workflow.UpdateActionStatusStreamRequest, workflow.UpdateActionStatusStreamResponse],
-) error {
-	for {
-		req, err := stream.Receive()
-		if errors.Is(err, io.EOF) {
-			return nil
-		}
-		if err != nil {
-			return err
-		}
-		resp := s.updateActionStatus(ctx, req.GetRequest())
-		if err := stream.Send(&workflow.UpdateActionStatusStreamResponse{
-			Response: resp,
-			Nonce:    req.GetNonce(),
-		}); err != nil {
-			return err
-		}
-	}
-}
-
-func (s *RunService) updateActionStatus(ctx context.Context, req *workflow.UpdateActionStatusRequest) *workflow.UpdateActionStatusResponse {
-	err := s.updateSingleActionStatus(ctx, req)
-	st := statusFromError(err)
-	return &workflow.UpdateActionStatusResponse{
-		ActionId: req.GetActionId(),
-		Status:   st,
-	}
-}
-
-func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow.UpdateActionStatusRequest) error {
+// UpdateActionStatus persists the latest phase and any terminal signal payload.
+func (s *RunService) UpdateActionStatus(ctx context.Context, req *workflow.UpdateActionStatusRequest) error {
 	actionStatus := req.GetStatus()
 	var endTime *time.Time
 	if actionStatus.GetEndTime() != nil {
@@ -262,7 +176,7 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 	if req.GetOutput() != nil || req.GetPrincipal() != nil {
 		if err := s.mergeRunInfoOutput(ctx, req); err != nil {
 			logger.Warnf(ctx, "UpdateActionStatus: failed to persist output for %s: %v", req.GetActionId().GetName(), err)
-			return connect.NewError(connect.CodeInternal, err)
+			return ErrRunInternal.wrap(err)
 		}
 	}
 
@@ -276,7 +190,7 @@ func (s *RunService) updateSingleActionStatus(ctx context.Context, req *workflow
 		startTime,
 	); err != nil {
 		logger.Warnf(ctx, "UpdateActionStatus: failed to update action %s: %v", req.GetActionId().GetName(), err)
-		return connect.NewError(connect.CodeInternal, err)
+		return ErrRunInternal.wrap(err)
 	}
 
 	return nil
@@ -308,78 +222,20 @@ func (s *RunService) mergeRunInfoOutput(ctx context.Context, req *workflow.Updat
 	return s.repo.ActionRepo().UpdateActionDetailedInfo(ctx, req.GetActionId(), detailedInfo)
 }
 
-// RecordActionEvents records a batch of action events.
-func (s *RunService) RecordActionEvents(
-	ctx context.Context,
-	req *connect.Request[workflow.RecordActionEventsRequest],
-) (*connect.Response[workflow.RecordActionEventsResponse], error) {
-	err := s.recordEvents(ctx, req.Msg.GetEvents())
-	return connect.NewResponse(&workflow.RecordActionEventsResponse{
-		Status: statusFromError(err),
-	}), nil
-}
-
-// RecordActionEventStream is the bidirectional streaming variant of RecordActionEvents.
-func (s *RunService) RecordActionEventStream(
-	ctx context.Context,
-	stream *connect.BidiStream[workflow.RecordActionEventStreamRequest, workflow.RecordActionEventStreamResponse],
-) error {
-	for {
-		req, err := stream.Receive()
-		if errors.Is(err, io.EOF) {
-			return nil
-		}
-		if err != nil {
-			return err
-		}
-		event := req.GetRequest().GetEvent()
-		eventErr := s.recordEvents(ctx, []*workflow.ActionEvent{event})
-		if err := stream.Send(&workflow.RecordActionEventStreamResponse{
-			Response: &workflow.RecordActionEventResponse{
-				ActionId: event.GetId(),
-				Status:   statusFromError(eventErr),
-			},
-			Nonce: req.GetNonce(),
-		}); err != nil {
-			return err
-		}
-	}
-}
-
-// recordEvents inserts ActionEvents into the dedicated table and updates the action phase.
-func (s *RunService) recordEvents(ctx context.Context, events []*workflow.ActionEvent) error {
+// RecordActionEvents inserts ActionEvents into the dedicated table and updates the action phase.
+func (s *RunService) RecordActionEvents(ctx context.Context, events []*workflow.ActionEvent) error {
 	eventModels := make([]*models.ActionEvent, 0, len(events))
 	for _, event := range events {
 		m, err := models.NewActionEventModel(event)
 		if err != nil {
 			logger.Warnf(ctx, "RecordActionEvents: failed to build event model for %s: %v", event.GetId().GetName(), err)
-			return connect.NewError(connect.CodeInternal, err)
+			return ErrRunInternal.wrap(err)
 		}
 		eventModels = append(eventModels, m)
 	}
 	if err := s.repo.ActionRepo().InsertEvents(ctx, eventModels); err != nil {
 		logger.Warnf(ctx, "RecordActionEvents: failed to insert events: %v", err)
-		return connect.NewError(connect.CodeInternal, err)
+		return ErrRunInternal.wrap(err)
 	}
 	return nil
-}
-
-// statusFromError converts a Go error to a google.rpc.Status proto.
-// Returns an OK status (code 0) when err is nil.
-func statusFromError(err error) *grpcstatus.Status {
-	if err == nil {
-		return &grpcstatus.Status{}
-	}
-	// Unwrap connect errors to get the gRPC code.
-	var connectErr *connect.Error
-	if errors.As(err, &connectErr) {
-		return &grpcstatus.Status{
-			Code:    int32(connectErr.Code()),
-			Message: connectErr.Message(),
-		}
-	}
-	return &grpcstatus.Status{
-		Code:    int32(connect.CodeInternal),
-		Message: err.Error(),
-	}
 }

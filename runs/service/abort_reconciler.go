@@ -6,15 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
-	"strings"
 	"sync"
 	"time"
 
-	"connectrpc.com/connect"
-
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 )
@@ -110,14 +106,14 @@ func (q *dedupeQueue) remove(key string) {
 // AbortReconciler watches for abort requests and drives pod termination to completion
 // with exponential backoff retries.
 type AbortReconciler struct {
-	repo          interfaces.Repository
-	actionsClient actionsconnect.ActionsServiceClient
-	queue         *dedupeQueue
-	cfg           AbortReconcilerConfig
+	repo  interfaces.Repository
+	abort func(context.Context, *actions.AbortRequest) error
+	queue *dedupeQueue
+	cfg   AbortReconcilerConfig
 }
 
 // NewAbortReconciler creates a new AbortReconciler. Zero-value cfg fields are filled with defaults.
-func NewAbortReconciler(repo interfaces.Repository, actionsClient actionsconnect.ActionsServiceClient, cfg AbortReconcilerConfig) *AbortReconciler {
+func NewAbortReconciler(repo interfaces.Repository, abort func(context.Context, *actions.AbortRequest) error, cfg AbortReconcilerConfig) *AbortReconciler {
 	def := defaultConfig()
 	if cfg.Workers <= 0 {
 		cfg.Workers = def.Workers
@@ -135,10 +131,10 @@ func NewAbortReconciler(repo interfaces.Repository, actionsClient actionsconnect
 		cfg.MaxDelay = def.MaxDelay
 	}
 	return &AbortReconciler{
-		repo:          repo,
-		actionsClient: actionsClient,
-		queue:         newDedupeQueue(cfg.QueueSize),
-		cfg:           cfg,
+		repo:  repo,
+		abort: abort,
+		queue: newDedupeQueue(cfg.QueueSize),
+		cfg:   cfg,
 	}
 }
 
@@ -233,12 +229,12 @@ func (r *AbortReconciler) processTask(ctx context.Context, task abortTask) {
 	}
 
 	reason := task.reason
-	_, abortErr := r.actionsClient.Abort(ctx, connect.NewRequest(&actions.AbortRequest{
+	abortErr := r.abort(ctx, &actions.AbortRequest{
 		ActionId: task.actionID,
 		Reason:   &reason,
-	}))
+	})
 
-	if abortErr == nil || isAlreadyTerminated(abortErr) {
+	if abortErr == nil {
 		// Success (or already gone — treat as success).
 		if clearErr := r.repo.ActionRepo().ClearAbortRequest(ctx, task.actionID); clearErr != nil {
 			logger.Errorf(ctx, "AbortReconciler: failed to clear abort request for %s: %v", task.key, clearErr)
@@ -270,27 +266,4 @@ func (r *AbortReconciler) processTask(ctx context.Context, task abortTask) {
 	delay := time.Duration(rand.Int63n(int64(ceiling) + 1))
 	logger.Infof(ctx, "AbortReconciler: scheduling retry for %s in %s", task.key, delay)
 	r.queue.scheduleRequeue(ctx, task, delay)
-}
-
-// isAlreadyTerminated returns true for errors that indicate the action is already gone.
-// The actions service may wrap a Kubernetes "not found" error as CodeInternal rather
-// than CodeNotFound, so we also check for that case by inspecting the message.
-func isAlreadyTerminated(err error) bool {
-	if err == nil {
-		return false
-	}
-	connectErr, ok := err.(*connect.Error)
-	if !ok {
-		return false
-	}
-	if connectErr.Code() == connect.CodeNotFound {
-		return true
-	}
-	// The actions service forwards Kubernetes API "not found" errors with CodeInternal.
-	// Treat those as "already gone" so the reconciler clears the DB entry instead of
-	// retrying indefinitely.
-	if connectErr.Code() == connect.CodeInternal && strings.Contains(connectErr.Message(), "not found") {
-		return true
-	}
-	return false
 }

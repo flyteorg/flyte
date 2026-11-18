@@ -4,10 +4,8 @@ import (
 	"context"
 	"fmt"
 	"hash/fnv"
-	"net/http"
 	"time"
 
-	"connectrpc.com/connect"
 	"golang.org/x/time/rate"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -17,40 +15,19 @@ import (
 	corepb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	taskpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
+	"github.com/flyteorg/flyte/v2/runs/service"
 )
 
 // TriggerExecutor fires a CreateRun call for a scheduled trigger execution.
 type TriggerExecutor struct {
-	runClient workflowconnect.RunServiceClient
-	limiter   *rate.Limiter
+	runs    service.Run
+	limiter *rate.Limiter
 }
 
-// TriggerExecutorConfig holds tunables for the executor.
-type TriggerExecutorConfig struct {
-	// BaseURL is the URL of the runs service (e.g. "http://localhost:8090").
-	BaseURL string
-	// HTTPClient is the client used for outbound RunService calls.
-	HTTPClient connect.HTTPClient
-	// QPS is the token-bucket rate for CreateRun calls (tokens/second).
-	QPS float64
-	// Burst is the token-bucket burst size.
-	Burst int
-	// ClientOpts are connect client options for the outbound RunService client.
-	ClientOpts []connect.ClientOption
-}
-
-// NewTriggerExecutor constructs a TriggerExecutor.
-func NewTriggerExecutor(cfg TriggerExecutorConfig) *TriggerExecutor {
-	httpClient := cfg.HTTPClient
-	if httpClient == nil {
-		httpClient = http.DefaultClient
-	}
-	return &TriggerExecutor{
-		runClient: workflowconnect.NewRunServiceClient(httpClient, cfg.BaseURL, cfg.ClientOpts...),
-		limiter:   rate.NewLimiter(rate.Limit(cfg.QPS), cfg.Burst),
-	}
+// NewTriggerExecutor constructs an executor with a token bucket for scheduled runs.
+func NewTriggerExecutor(runs service.Run, qps float64, burst int) *TriggerExecutor {
+	return &TriggerExecutor{runs: runs, limiter: rate.NewLimiter(rate.Limit(qps), burst)}
 }
 
 // Execute fires a single CreateRun for the trigger at the given scheduled time.
@@ -94,15 +71,8 @@ func (e *TriggerExecutor) Execute(ctx context.Context, t *models.Trigger, schedu
 		}
 	}
 
-	req := connect.NewRequest(createReq)
-
-	_, err := e.runClient.CreateRun(ctx, req)
-	if err != nil {
-		// AlreadyExists means the run was already fired — treat as success.
-		if connect.CodeOf(err) == connect.CodeAlreadyExists {
-			logger.Infof(ctx, "scheduler: run %s already exists, skipping", runName)
-			return nil
-		}
+	// Scheduled runs have no authenticated caller.
+	if _, err := e.runs.CreateRun(ctx, createReq, nil); err != nil {
 		return err
 	}
 

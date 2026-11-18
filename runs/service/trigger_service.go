@@ -6,13 +6,9 @@ import (
 	"errors"
 	"fmt"
 
-	"connectrpc.com/connect"
-
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	commonpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
-	taskpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger/triggerconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
@@ -20,28 +16,36 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/schedule"
 )
 
-type triggerService struct {
-	triggerconnect.UnimplementedTriggerServiceHandler
-	db interfaces.Repository
+// Trigger provides transport-independent trigger operations.
+type Trigger interface {
+	DeployTrigger(context.Context, *triggerpb.DeployTriggerRequest) (*triggerpb.DeployTriggerResponse, error)
+	GetTriggerDetails(context.Context, *triggerpb.GetTriggerDetailsRequest) (*triggerpb.GetTriggerDetailsResponse, error)
+	GetTriggerRevisionDetails(context.Context, *triggerpb.GetTriggerRevisionDetailsRequest) (*triggerpb.GetTriggerRevisionDetailsResponse, error)
+	ListTriggers(context.Context, *triggerpb.ListTriggersRequest) (*triggerpb.ListTriggersResponse, error)
+	GetTriggerRevisionHistory(context.Context, *triggerpb.GetTriggerRevisionHistoryRequest) (*triggerpb.GetTriggerRevisionHistoryResponse, error)
+	UpdateTriggers(context.Context, *triggerpb.UpdateTriggersRequest) (*triggerpb.UpdateTriggersResponse, error)
+	DeleteTriggers(context.Context, *triggerpb.DeleteTriggersRequest) (*triggerpb.DeleteTriggersResponse, error)
 }
 
-func NewTriggerService(repo interfaces.Repository) triggerconnect.TriggerServiceHandler {
-	return &triggerService{db: repo}
+// TriggerService manages triggers and their revisions.
+type TriggerService struct {
+	triggers interfaces.TriggerRepo
 }
 
-var _ triggerconnect.TriggerServiceHandler = (*triggerService)(nil)
+// NewTriggerService constructs a trigger service backed by the given repository.
+func NewTriggerService(triggers interfaces.TriggerRepo) *TriggerService {
+	return &TriggerService{triggers: triggers}
+}
 
-func (s *triggerService) DeployTrigger(
+func (s *TriggerService) DeployTrigger(
 	ctx context.Context,
-	req *connect.Request[triggerpb.DeployTriggerRequest],
-) (*connect.Response[triggerpb.DeployTriggerResponse], error) {
-	request := req.Msg
-
+	request *triggerpb.DeployTriggerRequest,
+) (*triggerpb.DeployTriggerResponse, error) {
 	if err := request.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, ErrInvalidArgument.wrap(err)
 	}
-	if err := validateCronExpression(request.GetName().GetName(), request.GetAutomationSpec()); err != nil {
-		return nil, err
+	if err := schedule.ValidateCronExpression(request.GetName().GetName(), request.GetAutomationSpec()); err != nil {
+		return nil, ErrInvalidArgument.wrap(err)
 	}
 
 	id := &commonpb.TriggerIdentifier{
@@ -50,70 +54,68 @@ func (s *triggerService) DeployTrigger(
 	}
 	triggerModel, err := transformers.NewTriggerModel(ctx, id, request.GetSpec(), request.GetAutomationSpec())
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrInternal.wrap(err)
 	}
 
-	saved, err := s.db.TriggerRepo().SaveTrigger(ctx, triggerModel, request.GetRevision())
+	saved, err := s.triggers.SaveTrigger(ctx, triggerModel, request.GetRevision())
 	if err != nil {
 		logger.Errorf(ctx, "DeployTrigger failed: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrInternal.wrap(err)
 	}
 
 	details, err := transformers.TriggerModelToTriggerDetails(ctx, saved)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrInternal.wrap(err)
 	}
-	return connect.NewResponse(&triggerpb.DeployTriggerResponse{Trigger: details}), nil
+	return &triggerpb.DeployTriggerResponse{Trigger: details}, nil
 }
 
-func (s *triggerService) GetTriggerDetails(
+func (s *TriggerService) GetTriggerDetails(
 	ctx context.Context,
-	req *connect.Request[triggerpb.GetTriggerDetailsRequest],
-) (*connect.Response[triggerpb.GetTriggerDetailsResponse], error) {
-	n := req.Msg.GetName()
-	m, err := s.db.TriggerRepo().GetTrigger(ctx, transformers.ToTriggerKey(n))
+	request *triggerpb.GetTriggerDetailsRequest,
+) (*triggerpb.GetTriggerDetailsResponse, error) {
+	n := request.GetName()
+	m, err := s.triggers.GetTrigger(ctx, transformers.ToTriggerKey(n))
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, connect.NewError(connect.CodeNotFound, err)
+			return nil, ErrNotFound.wrap(err)
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrInternal.wrap(err)
 	}
 	details, err := transformers.TriggerModelToTriggerDetails(ctx, m)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrInternal.wrap(err)
 	}
-	return connect.NewResponse(&triggerpb.GetTriggerDetailsResponse{Trigger: details}), nil
+	return &triggerpb.GetTriggerDetailsResponse{Trigger: details}, nil
 }
 
-func (s *triggerService) GetTriggerRevisionDetails(
+func (s *TriggerService) GetTriggerRevisionDetails(
 	ctx context.Context,
-	req *connect.Request[triggerpb.GetTriggerRevisionDetailsRequest],
-) (*connect.Response[triggerpb.GetTriggerRevisionDetailsResponse], error) {
-	id := req.Msg.GetId()
+	request *triggerpb.GetTriggerRevisionDetailsRequest,
+) (*triggerpb.GetTriggerRevisionDetailsResponse, error) {
+	id := request.GetId()
 	n := id.GetName()
-	m, err := s.db.TriggerRepo().GetTriggerRevision(ctx, n.GetProject(), n.GetDomain(), n.GetTaskName(), n.GetName(), id.GetRevision())
+	m, err := s.triggers.GetTriggerRevision(ctx, n.GetProject(), n.GetDomain(), n.GetTaskName(), n.GetName(), id.GetRevision())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, connect.NewError(connect.CodeNotFound, err)
+			return nil, ErrNotFound.wrap(err)
 		}
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrInternal.wrap(err)
 	}
 	details, err := transformers.TriggerRevisionModelToTriggerDetails(ctx, m)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrInternal.wrap(err)
 	}
-	return connect.NewResponse(&triggerpb.GetTriggerRevisionDetailsResponse{Trigger: details}), nil
+	return &triggerpb.GetTriggerRevisionDetailsResponse{Trigger: details}, nil
 }
 
-func (s *triggerService) ListTriggers(
+func (s *TriggerService) ListTriggers(
 	ctx context.Context,
-	req *connect.Request[triggerpb.ListTriggersRequest],
-) (*connect.Response[triggerpb.ListTriggersResponse], error) {
-	request := req.Msg
-
+	request *triggerpb.ListTriggersRequest,
+) (*triggerpb.ListTriggersResponse, error) {
 	listInput, err := impl.NewListResourceInputFromProto(request.GetRequest(), models.TriggerColumns)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, ErrInvalidArgument.wrap(err)
 	}
 
 	switch scope := request.GetScopeBy().(type) {
@@ -132,84 +134,72 @@ func (s *triggerService) ListTriggers(
 			And(impl.NewEqualFilter("task_name", tn.GetName()))
 	}
 
-	ms, err := s.db.TriggerRepo().ListTriggers(ctx, listInput)
+	ms, err := s.triggers.ListTriggers(ctx, listInput)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrInternal.wrap(err)
 	}
 
 	triggers, err := transformers.TriggerModelsToTriggers(ctx, ms)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrInternal.wrap(err)
 	}
 
 	var token string
 	if len(triggers) > 0 && len(triggers) == listInput.Limit {
 		token = fmt.Sprintf("%d", listInput.Offset+listInput.Limit)
 	}
-	return connect.NewResponse(&triggerpb.ListTriggersResponse{Triggers: triggers, Token: token}), nil
+	return &triggerpb.ListTriggersResponse{Triggers: triggers, Token: token}, nil
 }
 
-func (s *triggerService) GetTriggerRevisionHistory(
+func (s *TriggerService) GetTriggerRevisionHistory(
 	ctx context.Context,
-	req *connect.Request[triggerpb.GetTriggerRevisionHistoryRequest],
-) (*connect.Response[triggerpb.GetTriggerRevisionHistoryResponse], error) {
-	request := req.Msg
+	request *triggerpb.GetTriggerRevisionHistoryRequest,
+) (*triggerpb.GetTriggerRevisionHistoryResponse, error) {
 	n := request.GetName()
 
 	listInput, err := impl.NewListResourceInputFromProto(request.GetRequest(), models.TriggerRevisionColumns)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, ErrInvalidArgument.wrap(err)
 	}
 
-	ms, err := s.db.TriggerRepo().ListTriggerRevisions(ctx,
+	ms, err := s.triggers.ListTriggerRevisions(ctx,
 		n.GetProject(), n.GetDomain(), n.GetTaskName(), n.GetName(), listInput)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrInternal.wrap(err)
 	}
 
 	revisions, err := transformers.TriggerRevisionModelsToTriggerRevisions(ctx, ms)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrInternal.wrap(err)
 	}
 
 	var token string
 	if len(revisions) > 0 && len(revisions) == listInput.Limit {
 		token = fmt.Sprintf("%d", listInput.Offset+listInput.Limit)
 	}
-	return connect.NewResponse(&triggerpb.GetTriggerRevisionHistoryResponse{Triggers: revisions, Token: token}), nil
+	return &triggerpb.GetTriggerRevisionHistoryResponse{Triggers: revisions, Token: token}, nil
 }
 
-func (s *triggerService) UpdateTriggers(
+func (s *TriggerService) UpdateTriggers(
 	ctx context.Context,
-	req *connect.Request[triggerpb.UpdateTriggersRequest],
-) (*connect.Response[triggerpb.UpdateTriggersResponse], error) {
-	request := req.Msg
+	request *triggerpb.UpdateTriggersRequest,
+) (*triggerpb.UpdateTriggersResponse, error) {
 	keys := namesToKeys(request.GetNames())
-	if err := s.db.TriggerRepo().UpdateTriggers(ctx, keys, request.GetActive()); err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+	if err := s.triggers.UpdateTriggers(ctx, keys, request.GetActive()); err != nil {
+		return nil, ErrInternal.wrap(err)
 	}
-	return connect.NewResponse(&triggerpb.UpdateTriggersResponse{}), nil
+	return &triggerpb.UpdateTriggersResponse{}, nil
 }
 
-func (s *triggerService) DeleteTriggers(
+func (s *TriggerService) DeleteTriggers(
 	ctx context.Context,
-	req *connect.Request[triggerpb.DeleteTriggersRequest],
-) (*connect.Response[triggerpb.DeleteTriggersResponse], error) {
-	request := req.Msg
+	request *triggerpb.DeleteTriggersRequest,
+) (*triggerpb.DeleteTriggersResponse, error) {
 	keys := namesToKeys(request.GetNames())
-	if err := s.db.TriggerRepo().DeleteTriggers(ctx, keys); err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+	if err := s.triggers.DeleteTriggers(ctx, keys); err != nil {
+		return nil, ErrInternal.wrap(err)
 	}
-	return connect.NewResponse(&triggerpb.DeleteTriggersResponse{}), nil
-}
-
-// validateCronExpression validates the cron expression in a TriggerAutomationSpec, if present.
-func validateCronExpression(triggerName string, spec *taskpb.TriggerAutomationSpec) error {
-	if _, err := schedule.ParseCron(spec.GetSchedule()); err != nil {
-		return connect.NewError(connect.CodeInvalidArgument,
-			fmt.Errorf("trigger %q has invalid cron expression: %w", triggerName, err))
-	}
-	return nil
+	return &triggerpb.DeleteTriggersResponse{}, nil
 }
 
 func namesToKeys(names []*commonpb.TriggerName) []interfaces.TriggerNameKey {

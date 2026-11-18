@@ -4,42 +4,46 @@ import (
 	"context"
 	"fmt"
 
-	"connectrpc.com/connect"
-
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	commonpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task/taskconnect"
 	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"github.com/flyteorg/flyte/v2/runs/repository/transformers"
+	"github.com/flyteorg/flyte/v2/runs/schedule"
 )
 
-type taskService struct {
-	taskconnect.UnimplementedTaskServiceHandler
-	db            interfaces.Repository
-	projectClient projectconnect.ProjectServiceClient
+// Task provides transport-independent task operations.
+type Task interface {
+	DeployTask(context.Context, *task.DeployTaskRequest) (*task.DeployTaskResponse, error)
+	GetTaskDetails(context.Context, *task.GetTaskDetailsRequest) (*task.GetTaskDetailsResponse, error)
+	ListTasks(context.Context, *task.ListTasksRequest) (*task.ListTasksResponse, error)
+	ListVersions(context.Context, *task.ListVersionsRequest) (*task.ListVersionsResponse, error)
 }
 
-func NewTaskService(repo interfaces.Repository, projectClient projectconnect.ProjectServiceClient) taskconnect.TaskServiceHandler {
-	return &taskService{
-		db:            repo,
-		projectClient: projectClient,
+// TaskService manages task deployments and version lookups.
+type TaskService struct {
+	tasks    interfaces.TaskRepo
+	projects *ProjectService
+}
+
+// NewTaskService constructs a task service backed by the given repository.
+func NewTaskService(tasks interfaces.TaskRepo, projects *ProjectService) *TaskService {
+	return &TaskService{
+		tasks:    tasks,
+		projects: projects,
 	}
 }
 
-func (s *taskService) DeployTask(ctx context.Context, c *connect.Request[task.DeployTaskRequest]) (*connect.Response[task.DeployTaskResponse], error) {
-	request := c.Msg
-
+func (s *TaskService) DeployTask(ctx context.Context, request *task.DeployTaskRequest) (*task.DeployTaskResponse, error) {
 	if err := request.Validate(); err != nil {
 		logger.Errorf(ctx, "Invalid DeployTask request: %v", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, ErrInvalidArgument.wrap(err)
 	}
 
-	if err := validateProjectExists(ctx, s.projectClient, request.GetTaskId().GetProject()); err != nil {
+	if err := s.projects.ValidateProjectExists(ctx, request.GetTaskId().GetProject()); err != nil {
 		return nil, err
 	}
 
@@ -60,21 +64,21 @@ func (s *taskService) DeployTask(ctx context.Context, c *connect.Request[task.De
 	// caught before we touch the DB (mirrors close-source TaskService.DeployTask).
 	triggerModels, err := buildTriggerModels(ctx, taskId, request.GetTriggers())
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, ErrInvalidArgument.wrap(err)
 	}
 
 	taskModel, err := transformers.NewTaskModel(ctx, taskId, taskSpec)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrInternal.wrap(err)
 	}
 	taskModel.TotalTriggers = uint32(len(request.GetTriggers()))
 
 	// Single transaction: upsert task + insert trigger revisions + refresh task meta.
-	if err := s.db.TaskRepo().CreateTask(ctx, taskModel, triggerModels); err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+	if err := s.tasks.CreateTask(ctx, taskModel, triggerModels); err != nil {
+		return nil, ErrInternal.wrap(err)
 	}
 
-	return connect.NewResponse(&task.DeployTaskResponse{}), nil
+	return &task.DeployTaskResponse{}, nil
 }
 
 // buildTriggerModels converts the embedded TaskTrigger list into Trigger revision models
@@ -88,7 +92,7 @@ func buildTriggerModels(
 	triggerModels := make([]*models.Trigger, 0, len(taskTriggers))
 	for _, tt := range taskTriggers {
 		// Validate cron expression up-front.
-		if err := validateCronExpression(tt.GetName(), tt.GetAutomationSpec()); err != nil {
+		if err := schedule.ValidateCronExpression(tt.GetName(), tt.GetAutomationSpec()); err != nil {
 			return nil, err
 		}
 
@@ -124,29 +128,26 @@ func buildTriggerModels(
 	return triggerModels, nil
 }
 
-func (s *taskService) GetTaskDetails(ctx context.Context, c *connect.Request[task.GetTaskDetailsRequest]) (*connect.Response[task.GetTaskDetailsResponse], error) {
-	request := c.Msg
-	model, err := s.db.TaskRepo().GetTask(ctx, transformers.ToTaskKey(request.GetTaskId()))
+func (s *TaskService) GetTaskDetails(ctx context.Context, request *task.GetTaskDetailsRequest) (*task.GetTaskDetailsResponse, error) {
+	model, err := s.tasks.GetTask(ctx, transformers.ToTaskKey(request.GetTaskId()))
 	if err != nil {
-		return nil, connect.NewError(connect.CodeNotFound, err)
+		return nil, ErrNotFound.wrap(err)
 	}
 
 	// TODO(nary): Add identity enrichment after adding auth
 	tasks, err := transformers.TaskModelsToTaskDetailsWithoutIdentity(ctx, []*models.Task{model})
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrInternal.wrap(err)
 	}
 
-	return connect.NewResponse(&task.GetTaskDetailsResponse{
+	return &task.GetTaskDetailsResponse{
 		Details: tasks[0],
-	}), nil
+	}, nil
 }
 
 // ListTasks lists tasks based on the provided request. This implicitly returns a list that is sorted by project, domain, name in descending order.
 // Thus there is no need to add a sort by name clause to this request.
-func (s *taskService) ListTasks(ctx context.Context, c *connect.Request[task.ListTasksRequest]) (*connect.Response[task.ListTasksResponse], error) {
-	request := c.Msg
-
+func (s *TaskService) ListTasks(ctx context.Context, request *task.ListTasksRequest) (*task.ListTasksResponse, error) {
 	// TODO(nary): Add auth and get organization from identity context
 	// org := authz.IdentityContextFromContext(ctx).Organization()
 	// For now, we'll skip org-level filtering
@@ -154,7 +155,7 @@ func (s *taskService) ListTasks(ctx context.Context, c *connect.Request[task.Lis
 	// Convert request to ListResourceInput
 	listInput, err := impl.NewListResourceInputFromProto(request.GetRequest(), models.TaskColumns)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, ErrInvalidArgument.wrap(err)
 	}
 
 	// Apply scope filters based on request
@@ -180,9 +181,9 @@ func (s *taskService) ListTasks(ctx context.Context, c *connect.Request[task.Lis
 		}
 	}
 
-	taskResWithCounts, err := s.db.TaskRepo().ListTasks(ctx, listInput)
+	taskResWithCounts, err := s.tasks.ListTasks(ctx, listInput)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrInternal.wrap(err)
 	}
 
 	// TODO(nary): Extract task names and get latest runs after adding ActionRepo.GetLatestRunByTasks
@@ -193,7 +194,7 @@ func (s *taskService) ListTasks(ctx context.Context, c *connect.Request[task.Lis
 	tasks, taskMetadata, err := transformers.TaskListResultToTasksAndMetadata(
 		ctx, taskResWithCounts, latestRuns, nil, false, false)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrInternal.wrap(err)
 	}
 
 	var token string
@@ -201,30 +202,28 @@ func (s *taskService) ListTasks(ctx context.Context, c *connect.Request[task.Lis
 		token = fmt.Sprintf("%d", listInput.Offset+listInput.Limit)
 	}
 
-	return connect.NewResponse(&task.ListTasksResponse{
+	return &task.ListTasksResponse{
 		Tasks:    tasks,
 		Token:    token,
 		Metadata: taskMetadata,
-	}), nil
+	}, nil
 }
 
 // ListVersions lists versions based on the provided request. This implicitly returns a list that is sorted by deployedAt in descending order.
-func (s *taskService) ListVersions(ctx context.Context, c *connect.Request[task.ListVersionsRequest]) (*connect.Response[task.ListVersionsResponse], error) {
-	request := c.Msg
-
+func (s *TaskService) ListVersions(ctx context.Context, request *task.ListVersionsRequest) (*task.ListVersionsResponse, error) {
 	// Convert request to ListResourceInput
 	listInput, err := impl.NewListResourceInputFromProto(request.GetRequest(), models.TaskVersionColumns)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, ErrInvalidArgument.wrap(err)
 	}
 
 	// Add task name filter
 	taskNameFilter := impl.NewTaskNameFilter(request.GetTaskName())
 	listInput = listInput.WithFilter(taskNameFilter)
 
-	versionModels, err := s.db.TaskRepo().ListVersions(ctx, listInput)
+	versionModels, err := s.tasks.ListVersions(ctx, listInput)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrInternal.wrap(err)
 	}
 
 	versions := transformers.VersionModelsToVersionResponses(versionModels)
@@ -235,8 +234,24 @@ func (s *taskService) ListVersions(ctx context.Context, c *connect.Request[task.
 		token = fmt.Sprintf("%d", listInput.Offset+listInput.Limit)
 	}
 
-	return connect.NewResponse(&task.ListVersionsResponse{
+	return &task.ListVersionsResponse{
 		Versions: versions,
 		Token:    token,
-	}), nil
+	}, nil
+}
+
+// TruncateShortDescription truncates the short description to 255 characters if it exceeds the maximum length.
+func truncateShortDescription(description string) string {
+	if len(description) > 255 {
+		return description[:255]
+	}
+	return description
+}
+
+// truncateLongDescription truncates the long description to 2048 characters if it exceeds the maximum length.
+func truncateLongDescription(description string) string {
+	if len(description) > 2048 {
+		return description[:2048]
+	}
+	return description
 }

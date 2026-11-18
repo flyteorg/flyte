@@ -4,32 +4,23 @@ import (
 	"context"
 	"time"
 
-	"connectrpc.com/connect"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/scheduler/core"
 	"github.com/flyteorg/flyte/v2/runs/scheduler/executor"
+	"github.com/flyteorg/flyte/v2/runs/service"
 )
 
 // Start wires together the trigger scheduler and returns a worker function
 // that blocks until ctx is cancelled. The caller should register it with
 // sc.AddWorker("trigger-scheduler", ...).
 func Start(
-	ctx context.Context,
 	triggerRepo interfaces.TriggerRepo,
 	cfg config.TriggerSchedulerConfig,
-	httpClient connect.HTTPClient,
-	baseURL string,
-	clientOpts ...connect.ClientOption,
+	runs service.Run,
 ) func(ctx context.Context) error {
-	exec := executor.NewTriggerExecutor(executor.TriggerExecutorConfig{
-		BaseURL:    baseURL,
-		HTTPClient: httpClient,
-		QPS:        cfg.ExecutionQPS,
-		Burst:      cfg.ExecutionBurst,
-		ClientOpts: clientOpts,
-	})
+	exec := executor.NewTriggerExecutor(runs, cfg.ExecutionQPS, cfg.ExecutionBurst)
 
 	sched := core.NewGoCronScheduler(exec)
 	sched.Start()
