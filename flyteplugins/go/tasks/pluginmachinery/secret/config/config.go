@@ -1,7 +1,11 @@
 package config
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -10,6 +14,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
 
 //go:generate enumer --type=SecretManagerType --trimprefix=SecretManagerType -json -yaml
@@ -102,6 +107,7 @@ var (
 			ImagePullSecrets: ImagePullSecretsConfig{
 				Enabled: false,
 			},
+			EnvVarMountMode: EnvVarMountModeFlyteManagedReference,
 		},
 		ImageBuilderConfig: ImageBuilderConfig{
 			ExcludedContainerNames: []string{EmbeddedSecretsFileMountInitContainerName},
@@ -218,6 +224,60 @@ type EmbeddedSecretManagerConfig struct {
 	// resolved, or a pod outside K8sConfig.Namespace), as files are. The value is then part of the
 	// pod spec. Off, such a mount fails, so env vars only ever reference a Kubernetes secret.
 	EnvVarsFromValues bool `json:"envVarsFromValues" pflag:",Inject an env-var secret that no Kubernetes secret in the pod's namespace holds as its value"` //nolint:lll
+	// EnvVarMountMode controls how a secret mounted as an environment variable is injected.
+	// See EnvVarMountMode for the available modes. Defaults to FlyteManagedReference, which an empty
+	// value also resolves to; an unrecognized value falls back to Inline when the config is loaded.
+	EnvVarMountMode EnvVarMountMode `json:"envVarMountMode" pflag:",How ENV_VAR secrets are injected: Inline puts the value in the pod spec outside the secret namespace; Reference skips Flyte and uses secretKeyRef to a user-managed Secret in the pod namespace, named by the secret group with the key as its key, or as Flyte names it without a group; FlyteManagedReference uses secretKeyRef only in the secret namespace and fails elsewhere. Defaults to FlyteManagedReference; unrecognized values fall back to Inline."` //nolint:lll
+}
+
+// EnvVarMountMode defines how the embedded secret manager injects a secret mounted as an
+// environment variable.
+type EnvVarMountMode string
+
+const (
+	// EnvVarMountModeReference references a user-managed Secret in the pod namespace: the group/key, else Flyte's name.
+	EnvVarMountModeReference EnvVarMountMode = "Reference"
+
+	// EnvVarMountModeInline injects the secret value directly into the pod spec.
+	EnvVarMountModeInline EnvVarMountMode = "Inline"
+
+	// EnvVarMountModeFlyteManagedReference references only the K8sConfig.Namespace Secret (Flyte-managed).
+	EnvVarMountModeFlyteManagedReference EnvVarMountMode = "FlyteManagedReference"
+)
+
+// envVarMountModes lists the supported modes.
+var envVarMountModes = []EnvVarMountMode{
+	EnvVarMountModeInline, EnvVarMountModeReference, EnvVarMountModeFlyteManagedReference,
+}
+
+// ParseEnvVarMountMode returns the EnvVarMountMode named by s, matched case-insensitively. An
+// empty s is FlyteManagedReference, the default. Any other value falls back to Inline, returned
+// together with an error describing the invalid value so callers can report it.
+func ParseEnvVarMountMode(s string) (EnvVarMountMode, error) {
+	if s == "" {
+		return EnvVarMountModeFlyteManagedReference, nil
+	}
+	for _, m := range envVarMountModes {
+		if strings.EqualFold(s, string(m)) {
+			return m, nil
+		}
+	}
+	return EnvVarMountModeInline, fmt.Errorf("invalid envVarMountMode %q: must be one of %v", s, envVarMountModes)
+}
+
+// UnmarshalJSON resolves the configured value to a supported mode when the config is loaded,
+// so consumers never see any other value. An invalid value falls back to Inline with a warning.
+func (m *EnvVarMountMode) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		s = string(data)
+	}
+	parsed, err := ParseEnvVarMountMode(s)
+	if err != nil {
+		logger.Warnf(context.Background(), "%v; falling back to %s", err, parsed)
+	}
+	*m = parsed
+	return nil
 }
 
 type AWSConfig struct {
