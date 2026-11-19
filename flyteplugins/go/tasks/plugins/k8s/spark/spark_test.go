@@ -426,6 +426,10 @@ func dummySparkTaskTemplatePod(id string, sparkConf map[string]string, podSpec *
 }
 
 func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) pluginsCore.TaskExecutionContext {
+	return dummySparkTaskContextWithLabels(taskTemplate, interruptible, map[string]string{"label-1": "val1"})
+}
+
+func dummySparkTaskContextWithLabels(taskTemplate *core.TaskTemplate, interruptible bool, labels map[string]string) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.EXPECT().GetInputPrefixPath().Return("/input/prefix")
@@ -470,7 +474,7 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 	taskExecutionMetadata.EXPECT().GetTaskExecutionID().Return(tID)
 	taskExecutionMetadata.EXPECT().GetNamespace().Return("test-namespace")
 	taskExecutionMetadata.EXPECT().GetAnnotations().Return(map[string]string{"annotation-1": "val1"})
-	taskExecutionMetadata.EXPECT().GetLabels().Return(map[string]string{"label-1": "val1"})
+	taskExecutionMetadata.EXPECT().GetLabels().Return(labels)
 	taskExecutionMetadata.EXPECT().GetOwnerReference().Return(v1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
@@ -951,7 +955,10 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	podSpec.Tolerations = append(podSpec.Tolerations, extraToleration)
 	podSpec.NodeSelector = map[string]string{"x/custom": "foo"}
 	taskTemplate := dummySparkTaskTemplatePod("blah-1", dummySparkConf, podSpec)
-	taskTemplate.GetK8SPod()
+	taskTemplate.GetK8SPod().Metadata = &core.K8SObjectMetadata{
+		Annotations: map[string]string{"annotation-2": "val2"},
+		Labels:      map[string]string{"label-2": "val2"},
+	}
 	sparkResourceHandler := sparkResourceHandler{}
 
 	taskCtx := dummySparkTaskContext(taskTemplate, true)
@@ -981,8 +988,9 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, sparkApplicationFile, *sparkApp.Spec.MainApplicationFile)
 
 	// Driver
-	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultAnnotations, map[string]string{"annotation-1": "val1"}), sparkApp.Spec.Driver.Annotations)
-	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultLabels, map[string]string{"label-1": "val1"}), sparkApp.Spec.Driver.Labels)
+	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultAnnotations, map[string]string{"annotation-1": "val1", "annotation-2": "val2"}), sparkApp.Spec.Driver.Annotations)
+	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultLabels, map[string]string{"label-1": "val1", "label-2": "val2"}), sparkApp.Spec.Driver.Labels)
+	assert.Nil(t, sparkApp.Spec.Driver.PriorityClassName)
 	assert.Equal(t, len(findEnvVarByName(sparkApp.Spec.Driver.Env, "FLYTE_MAX_ATTEMPTS").Value), 1)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Driver.Env, "foo").Value)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Driver.Env, "fooEnv").Value)
@@ -1019,8 +1027,9 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, dummySparkConf["spark.driver.memory"], *sparkApp.Spec.Driver.Memory)
 
 	// Executor
-	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultAnnotations, map[string]string{"annotation-1": "val1"}), sparkApp.Spec.Executor.Annotations)
-	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultLabels, map[string]string{"label-1": "val1"}), sparkApp.Spec.Executor.Labels)
+	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultAnnotations, map[string]string{"annotation-1": "val1", "annotation-2": "val2"}), sparkApp.Spec.Executor.Annotations)
+	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultLabels, map[string]string{"label-1": "val1", "label-2": "val2"}), sparkApp.Spec.Executor.Labels)
+	assert.Nil(t, sparkApp.Spec.Executor.PriorityClassName)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Executor.Env, "foo").Value)
 	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Executor.Env, "fooEnv").Value)
 	assert.Equal(t, findEnvVarByName(dummyEnvVarsWithSecretRef, "SECRET"), findEnvVarByName(sparkApp.Spec.Executor.Env, "SECRET"))
@@ -1057,6 +1066,115 @@ func TestBuildResourcePodTemplate(t *testing.T) {
 	assert.Equal(t, intPtr(int32(instances)), sparkApp.Spec.Executor.Instances)
 	assert.Equal(t, intPtr(int32(cores)), sparkApp.Spec.Executor.Cores)
 	assert.Equal(t, dummySparkConf["spark.executor.memory"], *sparkApp.Spec.Executor.Memory)
+}
+
+// TestBuildResourceDefaultPodTemplateMetadata checks that the labels, annotations and priority
+// class from the default pod template and the task's executor pod reach the explicit
+// SparkPodSpec fields, with or without the pod template pass-through.
+func TestBuildResourceDefaultPodTemplateMetadata(t *testing.T) {
+	require.NoError(t, setSparkConfig(&Config{EnablePodTemplate: true}))
+	k8sConfig := defaultPluginConfig()
+	k8sConfig.DefaultPodTemplateName = "spark-default"
+	require.NoError(t, config.SetK8sPluginConfig(k8sConfig))
+
+	podTemplate := &corev1.PodTemplate{
+		ObjectMeta: v1.ObjectMeta{Name: "spark-default", Namespace: "test-namespace"},
+		Template: corev1.PodTemplateSpec{
+			ObjectMeta: v1.ObjectMeta{
+				Labels:      map[string]string{"azure.workload.identity/use": "true"},
+				Annotations: map[string]string{"template-annotation": "val"},
+			},
+			Spec: corev1.PodSpec{PriorityClassName: "platform-default"},
+		},
+	}
+	flytek8s.DefaultPodTemplateStore.Store(podTemplate)
+	t.Cleanup(func() { flytek8s.DefaultPodTemplateStore.Delete(podTemplate) })
+
+	executorPodSpecPb, err := utils.MarshalObjToStruct(&corev1.PodSpec{
+		PriorityClassName: "user-executor",
+		Containers:        []corev1.Container{{Name: "primary"}},
+	})
+	require.NoError(t, err)
+	sparkJob := dummySparkCustomObj(dummySparkConf)
+	sparkJob.ExecutorPod = &core.K8SPod{
+		Metadata:             &core.K8SObjectMetadata{Labels: map[string]string{"executor-label": "val"}},
+		PodSpec:              executorPodSpecPb,
+		PrimaryContainerName: "primary",
+	}
+	sparkJobJSON, err := utils.MarshalToString(sparkJob)
+	require.NoError(t, err)
+	structObj := structpb.Struct{}
+	require.NoError(t, stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj))
+	taskTemplate := &core.TaskTemplate{
+		Id:     &core.Identifier{Name: "spark-default-pod-template"},
+		Type:   "container",
+		Target: &core.TaskTemplate_Container{Container: &core.Container{Image: testImage, Args: testArgs, Env: dummyEnvVars}},
+		Custom: &structObj,
+	}
+
+	expectedLabels := utils.UnionMaps(k8sConfig.DefaultLabels, map[string]string{"azure.workload.identity/use": "true", "label-1": "val1"})
+	expectedAnnotations := utils.UnionMaps(k8sConfig.DefaultAnnotations, map[string]string{"template-annotation": "val", "annotation-1": "val1"})
+
+	defer setPodTemplateSupportedForTest(true)
+	for _, templateSupported := range []bool{true, false} {
+		setPodTemplateSupportedForTest(templateSupported)
+		res, err := sparkResourceHandler{}.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
+		require.NoError(t, err)
+		sparkApp := res.(*sj.SparkApplication)
+
+		assert.Equal(t, expectedLabels, sparkApp.Spec.Driver.Labels)
+		assert.Equal(t, expectedAnnotations, sparkApp.Spec.Driver.Annotations)
+		assert.Equal(t, strPtr("platform-default"), sparkApp.Spec.Driver.PriorityClassName)
+
+		assert.Equal(t, utils.UnionMaps(expectedLabels, map[string]string{"executor-label": "val"}), sparkApp.Spec.Executor.Labels)
+		assert.Equal(t, expectedAnnotations, sparkApp.Spec.Executor.Annotations)
+		assert.Equal(t, strPtr("user-executor"), sparkApp.Spec.Executor.PriorityClassName)
+	}
+}
+
+// TestBuildResourcePreservedLabelsNotOverridable verifies that a custom driver/executor pod
+// label can't take the pods out of the executor's pod cache or overwrite the identity they
+// are looked up and attributed by, while other custom labels still apply.
+func TestBuildResourcePreservedLabelsNotOverridable(t *testing.T) {
+	require.NoError(t, config.SetK8sPluginConfig(defaultPluginConfig()))
+
+	executionLabels := map[string]string{
+		"label-1":                "val1",
+		flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue,
+		flytek8s.RunLabel:        "run-1",
+		flytek8s.ActionLabel:     "action-1",
+		flytek8s.AttemptLabel:    "0",
+		flytek8s.TaskNameLabel:   "task-1",
+	}
+	customPod := &core.K8SPod{Metadata: &core.K8SObjectMetadata{Labels: map[string]string{
+		"user-label":             "val",
+		flytek8s.ManagedLabelKey: "false",
+		flytek8s.RunLabel:        "other-run",
+		flytek8s.ActionLabel:     "other-action",
+		flytek8s.AttemptLabel:    "9",
+		flytek8s.TaskNameLabel:   "other-task",
+	}}}
+	sparkJob := dummySparkCustomObj(dummySparkConf)
+	sparkJob.DriverPod = customPod
+	sparkJob.ExecutorPod = customPod
+	sparkJobJSON, err := utils.MarshalToString(sparkJob)
+	require.NoError(t, err)
+	structObj := structpb.Struct{}
+	require.NoError(t, stdlibUtils.UnmarshalStringToPb(sparkJobJSON, &structObj))
+	taskTemplate := &core.TaskTemplate{
+		Id:     &core.Identifier{Name: "spark-preserved-labels"},
+		Type:   "container",
+		Target: &core.TaskTemplate_Container{Container: &core.Container{Image: testImage, Args: testArgs, Env: dummyEnvVars}},
+		Custom: &structObj,
+	}
+
+	res, err := sparkResourceHandler{}.BuildResource(context.TODO(), dummySparkTaskContextWithLabels(taskTemplate, false, executionLabels))
+	require.NoError(t, err)
+	sparkApp := res.(*sj.SparkApplication)
+
+	expected := utils.UnionMaps(defaultPluginConfig().DefaultLabels, executionLabels, map[string]string{"user-label": "val"})
+	assert.Equal(t, expected, sparkApp.Spec.Driver.Labels)
+	assert.Equal(t, expected, sparkApp.Spec.Executor.Labels)
 }
 
 func TestGetPropertiesSpark(t *testing.T) {
