@@ -219,10 +219,12 @@ func buildGroupPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCon
 	return podSpec, objectMeta, primaryContainerIdx, gpuAccelerator, nil
 }
 
-func buildAutoscalerOptions(options *plugins.AutoscalerOptions) *rayv1.AutoscalerOptions {
-	var autoScalerOptions *rayv1.AutoscalerOptions
+func buildAutoscalerOptions(options *plugins.AutoscalerOptions, securityContext *v1.SecurityContext) *rayv1.AutoscalerOptions {
+	if options == nil && securityContext == nil {
+		return nil
+	}
+	autoScalerOptions := &rayv1.AutoscalerOptions{SecurityContext: securityContext.DeepCopy()}
 	if options != nil {
-		autoScalerOptions = &rayv1.AutoscalerOptions{}
 		if idleTimeoutTime := options.GetIdleTimeoutSeconds(); idleTimeoutTime > 0 {
 			autoScalerOptions.IdleTimeoutSeconds = &idleTimeoutTime
 		}
@@ -270,6 +272,25 @@ func constructRayJob(ctx context.Context, taskCtx pluginsCore.TaskExecutionConte
 		return nil, err
 	}
 
+	headPrimaryContainer, found := lo.Find(headPodTemplate.Spec.Containers, func(container v1.Container) bool {
+		return container.Name == RayHeadContainerName
+	})
+	if !found {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to get primary container from the Ray head pod")
+	}
+	if cfg.LogsSidecar != nil {
+		for i := range headPodTemplate.Spec.Containers {
+			container := &headPodTemplate.Spec.Containers[i]
+			if container.Name == cfg.LogsSidecar.Name && container.SecurityContext == nil {
+				container.SecurityContext = headPrimaryContainer.SecurityContext.DeepCopy()
+			}
+		}
+	}
+	var autoscalerSecurityContext *v1.SecurityContext
+	if rayJob.RayCluster.EnableAutoscaling {
+		autoscalerSecurityContext = headPrimaryContainer.SecurityContext
+	}
+
 	rayClusterSpec := rayv1.RayClusterSpec{
 		HeadGroupSpec: rayv1.HeadGroupSpec{
 			Template:       headPodTemplate,
@@ -279,7 +300,7 @@ func constructRayJob(ctx context.Context, taskCtx pluginsCore.TaskExecutionConte
 		},
 		WorkerGroupSpecs:        []rayv1.WorkerGroupSpec{},
 		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableAutoscaling,
-		AutoscalerOptions:       buildAutoscalerOptions(rayJob.GetRayCluster().GetAutoscalerOptions()),
+		AutoscalerOptions:       buildAutoscalerOptions(rayJob.GetRayCluster().GetAutoscalerOptions(), autoscalerSecurityContext),
 	}
 
 	for _, spec := range rayJob.RayCluster.WorkerGroupSpec {
