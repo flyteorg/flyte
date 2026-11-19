@@ -15,6 +15,45 @@ The executor uses conditions to track task progress:
 - `Succeeded`: Task completed successfully
 - `Failed`: Task execution failed
 
+## Resource Quota Admission
+
+When Kubernetes rejects resource creation with `Forbidden: exceeded quota`, the
+executor fails permanently with `QuotaRequestExceedsHardLimit` if a reported
+request or limit exceeds its hard quota. Otherwise, it reports
+`WAITING_FOR_RESOURCES` and retries admission on reconciliation (every 10 seconds
+by default). Neither path consumes user/system retries, and admission waiting
+does not start the execution-timeout clock. Kubernetes diagnostics are preserved;
+other Forbidden responses retain their existing handling.
+
+Quota waiting defaults to one hour and survives executor restarts. Continued
+rejection after the deadline fails permanently with `QuotaWaitTimeout`.
+Configure the timeout below, or set it to zero or negative to wait indefinitely.
+For Helm deployments, place it under `configuration.inline`:
+
+```yaml
+plugins:
+    k8s:
+        quota-wait-timeout: 1h
+```
+
+Only quantities reported by admission are compared; missing or malformed values
+fall back to waiting. Requests equal to a hard limit can also wait. This does not
+reserve capacity or change node scheduling. Leave quota headroom for child tasks:
+parent pods still consume resources while waiting for them.
+
+### Resource-Pressure Regression Tests
+
+From the repository root, run the admission, scheduling and configuration tests.
+Controller tests additionally require local envtest binaries:
+
+```sh
+go test ./executor/pkg/plugin/... ./flyteplugins/go/tasks/pluginmachinery/flytek8s/... -count=1
+KUBEBUILDER_ASSETS=/path/to/envtest go test ./executor/pkg/controller -run '^TestControllers$' -ginkgo.focus='quota admission' -count=1
+```
+
+Coverage includes hard-cap failures, temporary contention, parsing, persisted
+waiting, timeout, recovery and cancellation. Scheduling cases are synthetic;
+no shared cluster or quota changes are required.
 
 ## Getting Started
 
