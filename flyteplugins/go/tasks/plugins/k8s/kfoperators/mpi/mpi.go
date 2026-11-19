@@ -15,6 +15,7 @@ import (
 	flyteerr "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
@@ -146,12 +147,20 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 		},
 	}
 
+	// Propagate the task's pod metadata (k8s_pod / pod_template labels and annotations) onto the CR
+	// itself, as the pytorch plugin does. Otherwise only the replica pod templates carry it.
+	_, objectMeta, _, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
+	if err != nil {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
+	}
+
 	job := &kubeflowv1.MPIJob{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       kubeflowv1.MPIJobKind,
 			APIVersion: kubeflowv1.SchemeGroupVersion.String(),
 		},
-		Spec: jobSpec,
+		ObjectMeta: *objectMeta,
+		Spec:       jobSpec,
 	}
 
 	return job, nil
