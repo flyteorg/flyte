@@ -6860,6 +6860,11 @@ spec:
                 description: Interruptible is the run-scoped interruptibility override
                   projected from RunSpec.
                 type: boolean
+              overwriteCache:
+                description: |-
+                  OverwriteCache is the run-scoped cache overwrite flag projected from RunSpec. A cacheable
+                  task then skips the cache lookup and reservation, runs, and replaces the cached entry.
+                type: boolean
               parentActionName:
                 description: ParentActionName is the optional name of the parent action
                 maxLength: 30
