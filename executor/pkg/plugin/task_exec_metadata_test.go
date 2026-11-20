@@ -6,6 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/validation"
@@ -16,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	flytesecret "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 )
 
 func TestResolveServiceAccount(t *testing.T) {
@@ -316,4 +319,166 @@ func TestNewTaskExecutionMetadata_CRDLabelsDoNotClobberIdentifyingLabels(t *test
 	labels := meta.GetLabels()
 	require.Equal(t, "run-name", labels[RunLabel])
 	require.Equal(t, "data", labels["team"])
+}
+
+func TestNewTaskExecutionMetadata_TaskResourceDefaults(t *testing.T) {
+	entries := func(kv ...string) []*core.Resources_ResourceEntry {
+		names := map[string]core.Resources_ResourceName{
+			"cpu": core.Resources_CPU, "memory": core.Resources_MEMORY,
+			"gpu": core.Resources_GPU, "storage": core.Resources_EPHEMERAL_STORAGE,
+		}
+		var out []*core.Resources_ResourceEntry
+		for i := 0; i < len(kv); i += 2 {
+			out = append(out, &core.Resources_ResourceEntry{Name: names[kv[i]], Value: kv[i+1]})
+		}
+		return out
+	}
+
+	tests := []struct {
+		name         string
+		taskRequests []*core.Resources_ResourceEntry
+		taskLimits   []*core.Resources_ResourceEntry
+		defaults     *task.TaskResourceDefaults
+		want         v1.ResourceRequirements
+	}{
+		{
+			name:         "an unset dimension takes min",
+			taskRequests: entries("cpu", "500m"),
+			defaults:     &task.TaskResourceDefaults{Requests: entries("memory", "256Mi", "storage", "1Gi")},
+			want: v1.ResourceRequirements{
+				Requests: v1.ResourceList{
+					v1.ResourceCPU: resource.MustParse("500m"), v1.ResourceMemory: resource.MustParse("256Mi"),
+					v1.ResourceEphemeralStorage: resource.MustParse("1Gi"),
+				},
+				Limits: v1.ResourceList{
+					v1.ResourceCPU: resource.MustParse("500m"), v1.ResourceMemory: resource.MustParse("256Mi"),
+					v1.ResourceEphemeralStorage: resource.MustParse("1Gi"),
+				},
+			},
+		},
+		{
+			name:         "a request above max is clamped",
+			taskRequests: entries("cpu", "4", "memory", "1Gi"),
+			defaults:     &task.TaskResourceDefaults{Max: entries("cpu", "1")},
+			want: v1.ResourceRequirements{
+				Requests: v1.ResourceList{v1.ResourceCPU: resource.MustParse("1"), v1.ResourceMemory: resource.MustParse("1Gi")},
+				Limits:   v1.ResourceList{v1.ResourceCPU: resource.MustParse("1"), v1.ResourceMemory: resource.MustParse("1Gi")},
+			},
+		},
+		{
+			name:         "a limit above max is clamped",
+			taskRequests: entries("cpu", "500m", "memory", "1Gi"),
+			taskLimits:   entries("cpu", "4"),
+			defaults:     &task.TaskResourceDefaults{Max: entries("cpu", "1")},
+			want: v1.ResourceRequirements{
+				Requests: v1.ResourceList{v1.ResourceCPU: resource.MustParse("500m"), v1.ResourceMemory: resource.MustParse("1Gi")},
+				Limits:   v1.ResourceList{v1.ResourceCPU: resource.MustParse("1"), v1.ResourceMemory: resource.MustParse("1Gi")},
+			},
+		},
+		{
+			name:         "min above max is capped at max",
+			taskRequests: entries("memory", "1Gi"),
+			defaults:     &task.TaskResourceDefaults{Requests: entries("cpu", "2"), Max: entries("cpu", "1")},
+			want: v1.ResourceRequirements{
+				Requests: v1.ResourceList{v1.ResourceCPU: resource.MustParse("1"), v1.ResourceMemory: resource.MustParse("1Gi")},
+				Limits:   v1.ResourceList{v1.ResourceCPU: resource.MustParse("1"), v1.ResourceMemory: resource.MustParse("1Gi")},
+			},
+		},
+		{
+			name:         "no settings means no change",
+			taskRequests: entries("cpu", "4", "memory", "1Gi"),
+			want: v1.ResourceRequirements{
+				Requests: v1.ResourceList{v1.ResourceCPU: resource.MustParse("4"), v1.ResourceMemory: resource.MustParse("1Gi")},
+				Limits:   v1.ResourceList{v1.ResourceCPU: resource.MustParse("4"), v1.ResourceMemory: resource.MustParse("1Gi")},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			taskTemplate, err := proto.Marshal(&core.TaskTemplate{Target: &core.TaskTemplate_Container{Container: &core.Container{
+				Resources: &core.Resources{Requests: tt.taskRequests, Limits: tt.taskLimits},
+			}}})
+			require.NoError(t, err)
+			var defaults []byte
+			if tt.defaults != nil {
+				defaults, err = proto.Marshal(tt.defaults)
+				require.NoError(t, err)
+			}
+
+			meta, err := NewTaskExecutionMetadata(&flyteorgv1.TaskAction{Spec: flyteorgv1.TaskActionSpec{
+				TaskTemplate:         taskTemplate,
+				TaskResourceDefaults: defaults,
+			}})
+			require.NoError(t, err)
+
+			got := flytek8s.ApplyResourceOverrides(*meta.GetOverrides().GetResources(), *meta.GetPlatformResources(), true)
+			require.Equal(t, len(tt.want.Requests), len(got.Requests), "requests: %v", got.Requests)
+			require.Equal(t, len(tt.want.Limits), len(got.Limits), "limits: %v", got.Limits)
+			for name, want := range tt.want.Requests {
+				require.Zero(t, want.Cmp(got.Requests[name]), "request %s: got %v, want %v", name, got.Requests[name], want)
+			}
+			for name, want := range tt.want.Limits {
+				require.Zero(t, want.Cmp(got.Limits[name]), "limit %s: got %v, want %v", name, got.Limits[name], want)
+			}
+		})
+	}
+}
+
+func TestNewTaskExecutionMetadata_DefaultAccelerator(t *testing.T) {
+	defaultAccelerator := &core.GPUAccelerator{Device: "nvidia-a100-80gb"}
+	defaults, err := proto.Marshal(&task.TaskResourceDefaults{
+		Max:                []*core.Resources_ResourceEntry{{Name: core.Resources_GPU, Value: "2"}},
+		DefaultAccelerator: defaultAccelerator,
+	})
+	require.NoError(t, err)
+
+	gpuRequest := &core.Resources{Requests: []*core.Resources_ResourceEntry{{Name: core.Resources_GPU, Value: "1"}}}
+	tests := []struct {
+		name string
+		tmpl *core.TaskTemplate
+		want *core.GPUAccelerator
+	}{
+		{
+			name: "a task requesting GPUs with no accelerator gets the default",
+			tmpl: &core.TaskTemplate{Target: &core.TaskTemplate_Container{Container: &core.Container{Resources: gpuRequest}}},
+			want: defaultAccelerator,
+		},
+		{
+			name: "a task's own accelerator wins",
+			tmpl: &core.TaskTemplate{
+				Target:            &core.TaskTemplate_Container{Container: &core.Container{Resources: gpuRequest}},
+				ExtendedResources: &core.ExtendedResources{GpuAccelerator: &core.GPUAccelerator{Device: "nvidia-t4"}},
+			},
+			want: &core.GPUAccelerator{Device: "nvidia-t4"},
+		},
+		{
+			name: "a task requesting no GPUs gets no accelerator",
+			tmpl: &core.TaskTemplate{Target: &core.TaskTemplate_Container{Container: &core.Container{}}},
+			want: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			taskTemplate, err := proto.Marshal(tt.tmpl)
+			require.NoError(t, err)
+
+			meta, err := NewTaskExecutionMetadata(&flyteorgv1.TaskAction{Spec: flyteorgv1.TaskActionSpec{
+				TaskTemplate:         taskTemplate,
+				TaskResourceDefaults: defaults,
+			}})
+			require.NoError(t, err)
+
+			got := flytek8s.ApplyExtendedResourcesOverrides(
+				tt.tmpl.GetExtendedResources(),
+				meta.GetOverrides().GetExtendedResources(),
+			).GetGpuAccelerator()
+			require.True(t, proto.Equal(tt.want, got), "got %v, want %v", got, tt.want)
+			// The GPU cap is keyed by the accelerator's resource name, not the generic "gpu".
+			_, generic := meta.GetPlatformResources().Limits["gpu"]
+			require.False(t, generic)
+			require.Contains(t, meta.GetPlatformResources().Limits, v1.ResourceName("nvidia.com/gpu"))
+		})
+	}
 }
