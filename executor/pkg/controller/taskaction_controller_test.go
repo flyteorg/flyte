@@ -2026,6 +2026,41 @@ var _ = Describe("TaskAction Controller", func() {
 				Expect(k8sEvents[0].UID).To(Equal(first.UID), "the first k8s Event is kept, not replaced")
 			})
 
+			It("holds the status write until a failed k8s Event create succeeds", func() {
+				failures := 1
+				flaky := interceptor.NewClient(watchClient(), interceptor.Funcs{
+					Create: func(ctx context.Context, c client.WithWatch, obj client.Object, opts ...client.CreateOption) error {
+						if _, ok := obj.(*eventsv1.Event); ok && failures > 0 {
+							failures--
+							return errors.NewServiceUnavailable("injected event create failure")
+						}
+						return c.Create(ctx, obj, opts...)
+					},
+				})
+				fake := &fakePlugin{id: "timeout-plugin", transitions: []pluginsCore.Transition{runningTransition(startedAt)}}
+				recorded := &recordingEventsClient{}
+				r := newReconciler(fake, testingclock.NewFakeClock(startedAt), recorded, flaky)
+				r.K8sEventMode = K8sEventAll
+				r.reportingInstance = "taskaction-controller-test"
+				template := buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", 0, 0)
+				nn := createTaskAction("k8s-event-create-retry", template)
+				request := reconcile.Request{NamespacedName: nn}
+
+				_, err := r.Reconcile(ctx, request)
+				Expect(err).To(MatchError(ContainSubstring("injected event create failure")))
+				Expect(k8sEventsFor(nn)).To(BeEmpty())
+				Expect(getTaskAction(nn).Status.PluginPhase).NotTo(Equal(pluginsCore.PhaseRunning.String()),
+					"the status write waits for the k8s Event")
+
+				_, err = r.Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(recorded.RecordedEvents()).To(HaveLen(2), "re-recorded; the events DB dedups this")
+				k8sEvents := k8sEventsFor(nn)
+				Expect(k8sEvents).To(HaveLen(1))
+				Expect(k8sEvents[0].Reason).To(Equal(string(ReasonActionRunning)))
+				Expect(getTaskAction(nn).Status.PluginPhase).To(Equal(pluginsCore.PhaseRunning.String()))
+			})
+
 			It("keeps the terminal event when a step after the status write fails", func() {
 				noPatch := interceptor.NewClient(watchClient(), interceptor.Funcs{
 					Patch: func(context.Context, client.WithWatch, client.Object, client.Patch, ...client.PatchOption) error {

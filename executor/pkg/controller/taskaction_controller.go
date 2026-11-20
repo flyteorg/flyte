@@ -139,7 +139,8 @@ type TaskActionReconciler struct {
 // as a Kubernetes Event on taskAction, filtered by K8sEventMode. This happens before
 // the reconcile writes the TaskAction status, so a failed status write does not lose
 // the Kubernetes Event: the retried reconcile emits it again, and its fixed name
-// (see k8sEventName) makes the second create a no-op.
+// (see k8sEventName) makes the second create a no-op. A Kubernetes Event failure that
+// a retry can fix is returned too, so the status write waits for the retry.
 func (r *TaskActionReconciler) recordEvent(
 	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
@@ -160,8 +161,7 @@ func (r *TaskActionReconciler) recordEvent(
 	if err != nil {
 		return err
 	}
-	r.emitK8sEvent(ctx, taskAction, event, prevPhase)
-	return nil
+	return r.emitK8sEvent(ctx, taskAction, event, prevPhase)
 }
 
 // systemRetryReason is the reason on the Queued event published when an attempt is
@@ -490,30 +490,45 @@ func getPhaseLastTransitionTime(
 // emitK8sEvent emits event as Kubernetes Event on taskAction when K8sEventMode
 // selects it. The event carries the action context in annotations, so it is created
 // directly and bypasses the recorder's aggregation. AlreadyExists means an earlier
-// reconcile emitted the same action event, so it is skipped. Other failures are only
-// logged.
+// reconcile emitted the same action event, so it is skipped. A failure that a retry
+// can fix is returned, so the reconcile requeues. A failure that a retry cannot fix
+// is logged and the event is dropped.
 func (r *TaskActionReconciler) emitK8sEvent(
 	ctx context.Context,
 	taskAction *flyteorgv1.TaskAction,
 	event *workflow.ActionEvent,
 	prevPhase common.ActionPhase,
-) {
+) error {
 	if !shouldEmitK8sEvent(r.K8sEventMode, event, prevPhase) {
-		return
+		return nil
 	}
 	logger := log.FromContext(ctx).WithValues("action", event.GetId().GetName())
 	ev, err := buildActionEventK8s(taskAction, event, r.reportingInstance)
 	if err != nil {
+		// A retry builds the same Event and fails the same way.
 		logger.Error(err, "failed to build action k8s event")
-		return
+		return nil
 	}
-	if err := r.Create(ctx, ev); err != nil {
-		if apierrors.IsAlreadyExists(err) {
-			logger.V(1).Info("action k8s event already exists", "event", ev.Name)
-			return
-		}
-		logger.Error(err, "failed to create action k8s event")
+	err = r.Create(ctx, ev)
+	switch {
+	case err == nil:
+		return nil
+	case apierrors.IsAlreadyExists(err):
+		logger.V(1).Info("action k8s event already exists", "event", ev.Name)
+		return nil
+	case isPermanentK8sEventError(err):
+		logger.Error(err, "failed to create action k8s event, dropping it", "event", ev.Name)
+		return nil
+	default:
+		return fmt.Errorf("create k8s event %s: %w", ev.Name, err)
 	}
+}
+
+// isPermanentK8sEventError reports whether a retry of the create fails the same way:
+// an invalid Event, missing RBAC, or a namespace that is being deleted. Returning
+// these would block the action, or its finalizer, until someone fixes the cause.
+func isPermanentK8sEventError(err error) bool {
+	return apierrors.IsInvalid(err) || apierrors.IsBadRequest(err) || apierrors.IsForbidden(err)
 }
 
 // recordAttemptStart anchors the attempt clock the first time this attempt is
@@ -1368,11 +1383,11 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 			corev1.EventTypeWarning,
 			"ActionEventPublishFailed",
 			"PublishingActionEvent",
-			"Failed to persist action event %q: %v",
+			"Failed to record action event %q: %v",
 			actionEvent.GetId().GetName(),
 			err,
 		)
-		logger.Error(err, "failed to persist action event", "action", actionEvent.GetId().GetName())
+		logger.Error(err, "failed to record action event", "action", actionEvent.GetId().GetName())
 		return err
 	}
 

@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"math"
 	"strings"
 	"testing"
@@ -12,11 +13,15 @@ import (
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	eventsv1 "k8s.io/api/events/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/client-go/tools/events"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -381,7 +386,7 @@ func TestEmitK8sEvent(t *testing.T) {
 				reportingInstance: "taskaction-controller-host1",
 			}
 
-			reconciler.emitK8sEvent(ctx, testTaskAction(), testActionEvent(tt.phase, 0), tt.prevPhase)
+			require.NoError(t, reconciler.emitK8sEvent(ctx, testTaskAction(), testActionEvent(tt.phase, 0), tt.prevPhase))
 
 			created := &eventsv1.EventList{}
 			require.NoError(t, k8sClient.List(ctx, created))
@@ -486,8 +491,8 @@ func TestEmitK8sEventTwiceCreatesOne(t *testing.T) {
 
 	// A retried reconcile emits the same action event again; the second create
 	// gets AlreadyExists and is skipped.
-	reconciler.emitK8sEvent(ctx, taskAction, testActionEvent(running, 0), queued)
-	reconciler.emitK8sEvent(ctx, taskAction, testActionEvent(running, 0), queued)
+	require.NoError(t, reconciler.emitK8sEvent(ctx, taskAction, testActionEvent(running, 0), queued))
+	require.NoError(t, reconciler.emitK8sEvent(ctx, taskAction, testActionEvent(running, 0), queued))
 
 	created := &eventsv1.EventList{}
 	require.NoError(t, k8sClient.List(ctx, created))
@@ -495,7 +500,7 @@ func TestEmitK8sEventTwiceCreatesOne(t *testing.T) {
 	assert.Equal(t, "uid-1.1.running.0", created.Items[0].Name)
 
 	// A different action event of the same action still gets its own k8s Event.
-	reconciler.emitK8sEvent(ctx, taskAction, testActionEvent(succeeded, 0), running)
+	require.NoError(t, reconciler.emitK8sEvent(ctx, taskAction, testActionEvent(succeeded, 0), running))
 	require.NoError(t, k8sClient.List(ctx, created))
 	assert.Len(t, created.Items, 2)
 }
@@ -535,5 +540,69 @@ func TestRecordEventEmitsK8sEvent(t *testing.T) {
 		created := &eventsv1.EventList{}
 		require.NoError(t, k8sClient.List(ctx, created))
 		assert.Empty(t, created.Items, "the DB write comes first; a k8s Event must not exist without its row")
+	})
+
+	t.Run("returns a create failure that a retry can fix", func(t *testing.T) {
+		k8sClient := failEventCreate(1, apierrors.NewServiceUnavailable("apiserver unavailable"))
+		reconciler := &TaskActionReconciler{
+			Client:       k8sClient,
+			eventsClient: &fakeEventsClient{},
+			K8sEventMode: K8sEventAll,
+		}
+
+		err := reconciler.recordEvent(ctx, taskAction, testActionEvent(running, 0), queued)
+		require.Error(t, err, "the reconcile must requeue before the status write")
+		assert.True(t, apierrors.IsServiceUnavailable(err), "the API error is wrapped, not replaced")
+
+		// The requeued reconcile records the event again and creates the k8s Event.
+		require.NoError(t, reconciler.recordEvent(ctx, taskAction, testActionEvent(running, 0), queued))
+		created := &eventsv1.EventList{}
+		require.NoError(t, k8sClient.List(ctx, created))
+		require.Len(t, created.Items, 1)
+		assert.Equal(t, "uid-1.1.running.0", created.Items[0].Name)
+	})
+
+	t.Run("drops a create failure that a retry cannot fix", func(t *testing.T) {
+		eventsGR := schema.GroupResource{Group: "events.k8s.io", Resource: "events"}
+		eventGK := schema.GroupKind{Group: "events.k8s.io", Kind: "Event"}
+		eventName := "uid-1.1.running.0"
+		permanent := map[string]error{
+			// Forbidden is also what a create in a terminating namespace returns.
+			"forbidden":   apierrors.NewForbidden(eventsGR, eventName, errors.New("no RBAC")),
+			"invalid":     apierrors.NewInvalid(eventGK, eventName, nil),
+			"bad request": apierrors.NewBadRequest("bad Event"),
+		}
+		for name, createErr := range permanent {
+			t.Run(name, func(t *testing.T) {
+				k8sClient := failEventCreate(1, createErr)
+				reconciler := &TaskActionReconciler{
+					Client:       k8sClient,
+					eventsClient: &fakeEventsClient{},
+					K8sEventMode: K8sEventAll,
+				}
+
+				require.NoError(t, reconciler.recordEvent(ctx, taskAction, testActionEvent(running, 0), queued),
+					"a retry cannot fix it, so the action must not block on it")
+
+				created := &eventsv1.EventList{}
+				require.NoError(t, k8sClient.List(ctx, created))
+				assert.Empty(t, created.Items, "the k8s Event is dropped, not created")
+			})
+		}
+	})
+}
+
+// failEventCreate returns a fake client whose first n creates of an events.k8s.io
+// Event fail with createErr.
+func failEventCreate(n int, createErr error) client.WithWatch {
+	failures := n
+	return interceptor.NewClient(fake.NewClientBuilder().Build(), interceptor.Funcs{
+		Create: func(ctx context.Context, c client.WithWatch, obj client.Object, opts ...client.CreateOption) error {
+			if _, ok := obj.(*eventsv1.Event); ok && failures > 0 {
+				failures--
+				return createErr
+			}
+			return c.Create(ctx, obj, opts...)
+		},
 	})
 }
