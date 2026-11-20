@@ -200,6 +200,14 @@ func (in *TaskActionStatus) DeepCopyInto(out *TaskActionStatus) {
 		*out = make([]byte, len(*in))
 		copy(*out, *in)
 	}
+	if in.AttemptQueuedAt != nil {
+		in, out := &in.AttemptQueuedAt, &out.AttemptQueuedAt
+		*out = (*in).DeepCopy()
+	}
+	if in.AttemptInitializedAt != nil {
+		in, out := &in.AttemptInitializedAt, &out.AttemptInitializedAt
+		*out = (*in).DeepCopy()
+	}
 	if in.AttemptStartedAt != nil {
 		in, out := &in.AttemptStartedAt, &out.AttemptStartedAt
 		*out = (*in).DeepCopy()
