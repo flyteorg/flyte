@@ -34,7 +34,8 @@ data:
         type: K8s
         k8sConfig:
           namespace: {{ tpl .Values.configuration.kubernetes.namespace . }}
-      {{- with .Values.configuration.webhook }}
+        envVarMountMode: {{ .Values.configuration.webhook.envVarMountMode | default "FlyteManagedReference" }}
+      {{- with omit .Values.configuration.webhook "envVarMountMode" }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
   001-plugins.yaml: |

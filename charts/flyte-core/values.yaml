@@ -680,6 +680,11 @@ configuration:
     listenPort: 9443
     cacheInvalidationPort: 9444
     webhookTimeout: 30
+    # -- How ENV_VAR secrets are injected (case-insensitive):
+    # `FlyteManagedReference` (default): secretKeyRef to Flyte's Secret; fails outside its namespace.
+    # `Inline`: secretKeyRef in Flyte's namespace, else the value is written into the pod spec.
+    # `Reference`: secretKeyRef to a user-managed Secret (name: group, key: key) in the pod namespace.
+    envVarMountMode: FlyteManagedReference
 
   coPilot:
     image:
