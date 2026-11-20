@@ -19,21 +19,25 @@ package controller
 import (
 	"context"
 	stderrors "errors"
+	"fmt"
 	"sync"
 	"time"
 
 	"connectrpc.com/connect"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	metricnoop "go.opentelemetry.io/otel/metric/noop"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/events"
 	testingclock "k8s.io/utils/clock/testing"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/client/interceptor"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
@@ -152,6 +156,7 @@ func systemRetryEvents(events []*workflow.ActionEvent) []*workflow.ActionEvent {
 type failingStatusClient struct {
 	client.Client
 	failUpdates bool
+	afterUpdate func()
 }
 
 func (f *failingStatusClient) Status() client.SubResourceWriter {
@@ -174,7 +179,13 @@ func (f *failingStatusWriter) Update(
 	if f.client.failUpdates {
 		return stderrors.New("status unavailable")
 	}
-	return f.SubResourceWriter.Update(ctx, obj, opts...)
+	if err := f.SubResourceWriter.Update(ctx, obj, opts...); err != nil {
+		return err
+	}
+	if f.client.afterUpdate != nil {
+		f.client.afterUpdate()
+	}
+	return nil
 }
 
 // recordingEventsClient captures all recorded ActionEvents for assertion in tests.
@@ -2246,6 +2257,441 @@ var _ = Describe("TaskAction Controller", func() {
 				Expect(fake.handleCalls).To(BeZero())
 			})
 		})
+	})
+
+	Context("terminal failure cleanup", func() {
+		ctx := context.Background()
+		var created []types.NamespacedName
+
+		createTaskAction := func(name string) types.NamespacedName {
+			nn := types.NamespacedName{Name: name, Namespace: "default"}
+			Expect(k8sClient.Create(ctx, &flyteorgv1.TaskAction{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:       nn.Name,
+					Namespace:  nn.Namespace,
+					Finalizers: []string{taskActionFinalizer},
+				},
+				Spec: flyteorgv1.TaskActionSpec{
+					RunName:       "cleanup-run",
+					Project:       "cleanup-project",
+					Domain:        "cleanup-domain",
+					ActionName:    name,
+					InputURI:      "file:///tmp/input",
+					RunOutputBase: "file:///tmp/output",
+					TaskType:      "timeout-test",
+					TaskTemplate:  buildTaskTemplateBytesWithTimeoutAndRetries("timeout-test", "busybox", 0, 0),
+				},
+			})).To(Succeed())
+			created = append(created, nn)
+			return nn
+		}
+
+		newReconciler := func(fake *fakePlugin, eventsClient workflowconnect.EventsProxyServiceClient) *TaskActionReconciler {
+			return &TaskActionReconciler{
+				Client:         k8sClient,
+				Scheme:         k8sClient.Scheme(),
+				Recorder:       events.NewFakeRecorder(20),
+				PluginRegistry: newFakePluginRegistry(fake),
+				DataStore:      dataStore,
+				eventsClient:   eventsClient,
+			}
+		}
+
+		failingWith := func(failure pluginsCore.PhaseInfo) *fakePlugin {
+			return &fakePlugin{
+				id:          "cleanup-plugin",
+				transitions: []pluginsCore.Transition{pluginsCore.DoTransition(failure)},
+			}
+		}
+
+		reconcileFailure := func(name string, failure pluginsCore.PhaseInfo) (*fakePlugin, *flyteorgv1.TaskAction) {
+			nn := createTaskAction(name)
+			fake := failingWith(failure)
+			_, err := newReconciler(fake, &recordingEventsClient{}).Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			Expect(err).NotTo(HaveOccurred())
+
+			persisted := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+			return fake, persisted
+		}
+
+		AfterEach(func() {
+			for _, nn := range created {
+				resource := &flyteorgv1.TaskAction{}
+				if err := k8sClient.Get(ctx, nn, resource); err != nil {
+					Expect(errors.IsNotFound(err)).To(BeTrue())
+					continue
+				}
+				resource.Finalizers = nil
+				Expect(k8sClient.Update(ctx, resource)).To(Succeed())
+				Expect(client.IgnoreNotFound(k8sClient.Delete(ctx, resource))).To(Succeed())
+			}
+			created = nil
+		})
+
+		It("aborts the plugin resource when a permanent failure requests cleanup", func() {
+			now := time.Now()
+			fake, persisted := reconcileFailure("cleanup-permanent", pluginsCore.PhaseInfoFailureWithCleanup(
+				"ContainerCannotRun", "container cannot run", &pluginsCore.TaskInfo{OccurredAt: &now}))
+
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(fake.abortCalls).To(Equal(1))
+		})
+
+		It("aborts the plugin resource when the last attempt fails with cleanup requested", func() {
+			now := time.Now()
+			fake, persisted := reconcileFailure("cleanup-retries-exhausted", pluginsCore.PhaseInfoRetryableFailureWithCleanup(
+				"ImagePullBackOff", "image pull back-off", &pluginsCore.TaskInfo{OccurredAt: &now}))
+
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(persisted.Status.ErrorState.Code).To(Equal("ImagePullBackOff"))
+			Expect(fake.abortCalls).To(Equal(1))
+		})
+
+		It("leaves the plugin resource alone when the failure does not request cleanup", func() {
+			now := time.Now()
+			fake, persisted := reconcileFailure("cleanup-not-requested", pluginsCore.PhaseInfoFailure(
+				"OrdinaryFailure", "ordinary failure", &pluginsCore.TaskInfo{OccurredAt: &now}))
+
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(fake.abortCalls).To(BeZero())
+		})
+
+		It("keeps the plugin resource until the failure is persisted", func() {
+			now := time.Now()
+			nn := createTaskAction("cleanup-after-persist")
+			fake := failingWith(pluginsCore.PhaseInfoFailureWithCleanup(
+				"ContainerCannotRun", "container cannot run", &pluginsCore.TaskInfo{OccurredAt: &now}))
+			r := newReconciler(fake, &failingEventsClient{failures: 1})
+
+			_, err := r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			Expect(err).To(HaveOccurred())
+			Expect(fake.abortCalls).To(BeZero())
+
+			_, err = r.Reconcile(ctx, reconcile.Request{NamespacedName: nn})
+			Expect(err).NotTo(HaveOccurred())
+			persisted := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+			Expect(isTerminal(persisted)).To(BeTrue())
+			Expect(fake.abortCalls).To(Equal(1))
+		})
+
+		It("resumes cleanup after a crash following terminal persistence", func() {
+			nn := createTaskAction("cleanup-crash-persist")
+			now := time.Now()
+			fake := failingWith(pluginsCore.PhaseInfoFailureWithCleanup(
+				"ContainerCannotRun", "container cannot run", &pluginsCore.TaskInfo{OccurredAt: &now}))
+			recorded := &recordingEventsClient{}
+			r := newReconciler(fake, recorded)
+			crash := stderrors.New("controller stopped after status persistence")
+			r.Client = &failingStatusClient{
+				Client: k8sClient,
+				afterUpdate: func() {
+					panic(crash)
+				},
+			}
+			request := reconcile.Request{NamespacedName: nn}
+			Expect(func() { _, _ = r.Reconcile(ctx, request) }).To(PanicWith(crash))
+			Expect(fake.abortCalls).To(BeZero())
+			persisted := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+			Expect(isTerminal(persisted)).To(BeTrue())
+			failure := persisted.Status.ErrorState
+			GinkgoWriter.Printf("after_crash phase=%s cleanup_pending=%t abort_calls=%d\n",
+				persisted.Status.PluginPhase,
+				meta.IsStatusConditionTrue(persisted.Status.Conditions, string(flyteorgv1.ConditionTypeCleanupPending)),
+				fake.abortCalls)
+
+			_, err := newReconciler(fake, recorded).Reconcile(ctx, request)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(fake.abortCalls).To(Equal(1))
+			Expect(fake.handleCalls).To(Equal(1))
+			Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+			Expect(persisted.Status.ErrorState).To(Equal(failure))
+			GinkgoWriter.Printf("after_restart phase=%s cleanup_pending=%t abort_calls=%d error_code=%s\n",
+				persisted.Status.PluginPhase,
+				meta.IsStatusConditionTrue(persisted.Status.Conditions, string(flyteorgv1.ConditionTypeCleanupPending)),
+				fake.abortCalls, persisted.Status.ErrorState.Code)
+			Expect(recorded.RecordedEvents()).To(HaveLen(1))
+			Expect(recorded.RecordedEvents()[0].GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_FAILED))
+		})
+
+		DescribeTable("allows garbage collection after a restart without the cleanup plugin",
+			func(deleting bool) {
+				nn := createTaskAction(fmt.Sprintf("cleanup-missing-plugin-%t", deleting))
+				now := time.Now()
+				fake := failingWith(pluginsCore.PhaseInfoFailureWithCleanup(
+					"ContainerCannotRun", "container cannot run", &pluginsCore.TaskInfo{OccurredAt: &now}))
+				fake.abortErrors = []error{stderrors.New("cleanup temporarily unavailable")}
+				recorded := &recordingEventsClient{}
+				request := reconcile.Request{NamespacedName: nn}
+				_, err := newReconciler(fake, recorded).Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+
+				persisted := &flyteorgv1.TaskAction{}
+				Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+				Expect(isTerminal(persisted)).To(BeTrue())
+				Expect(meta.IsStatusConditionTrue(persisted.Status.Conditions,
+					string(flyteorgv1.ConditionTypeCleanupPending))).To(BeTrue())
+				failure := persisted.Status.ErrorState.DeepCopy()
+				if deleting {
+					Expect(k8sClient.Delete(ctx, persisted)).To(Succeed())
+				}
+
+				restarted := newReconciler(fake, recorded)
+				restarted.PluginRegistry = executorplugin.NewRegistry(nil, emptyPluginRegistry{})
+				Expect(restarted.PluginRegistry.Initialize(ctx)).To(Succeed())
+				result, err := restarted.Reconcile(ctx, request)
+				getErr := k8sClient.Get(ctx, nn, persisted)
+				deleted := errors.IsNotFound(getErr)
+				labeled := persisted.Labels[LabelTerminationStatus] == LabelValueTerminated
+				GinkgoWriter.Printf("missing_plugin deleting=%t cleanup_pending=true reconcile_error=%v "+
+					"action_deleted=%t gc_labeled=%t\n",
+					deleting, err, deleted, labeled)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(result).To(BeZero())
+				if deleting {
+					Expect(deleted).To(BeTrue())
+				} else {
+					Expect(getErr).NotTo(HaveOccurred())
+					Expect(labeled).To(BeTrue())
+					Expect(persisted.Status.ErrorState).To(Equal(failure))
+					Expect(meta.IsStatusConditionTrue(persisted.Status.Conditions,
+						string(flyteorgv1.ConditionTypeCleanupPending))).To(BeTrue())
+					gc := NewGarbageCollector(k8sClient, k8sClient, time.Minute, 0, metricnoop.NewMeterProvider())
+					Expect(gc.collect(ctx)).To(Succeed())
+					Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+					deletionRequested := !persisted.DeletionTimestamp.IsZero()
+					Expect(deletionRequested).To(BeTrue())
+					_, err = restarted.Reconcile(ctx, request)
+					Expect(err).NotTo(HaveOccurred())
+					deleted = errors.IsNotFound(k8sClient.Get(ctx, nn, persisted))
+					GinkgoWriter.Printf("missing_plugin_gc deletion_requested=%t action_deleted=%t\n", deletionRequested, deleted)
+					Expect(deleted).To(BeTrue())
+				}
+				Expect(fake.handleCalls).To(Equal(1))
+				Expect(fake.abortCalls).To(Equal(1))
+				Expect(recorded.RecordedEvents()).To(HaveLen(1))
+				Expect(recorded.RecordedEvents()[0].GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_FAILED))
+			},
+			Entry("before deletion", false),
+			Entry("during deletion", true),
+		)
+
+		It("keeps the finalizer of a replacement TaskAction", func() {
+			nn := createTaskAction("cleanup-replaced")
+			original := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, original)).To(Succeed())
+			Expect(k8sClient.Delete(ctx, original)).To(Succeed())
+			deleting := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, deleting)).To(Succeed())
+			deleting.Finalizers = nil
+			Expect(k8sClient.Update(ctx, deleting)).To(Succeed())
+			createTaskAction(nn.Name)
+			replacement := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, replacement)).To(Succeed())
+			Expect(replacement.UID).NotTo(Equal(original.UID))
+
+			r := &TaskActionReconciler{Client: k8sClient}
+			_, err := r.removeFinalizer(ctx, original)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(k8sClient.Get(ctx, nn, replacement)).To(Succeed())
+			GinkgoWriter.Printf("replacement_task old_uid=%s new_uid=%s finalizers=%v\n",
+				original.UID, replacement.UID, replacement.Finalizers)
+			Expect(replacement.Finalizers).To(ConsistOf(taskActionFinalizer))
+		})
+
+		DescribeTable("preserves concurrent metadata during terminal finalization",
+			func(conflict bool) {
+				nn := createTaskAction(fmt.Sprintf("cleanup-metadata-%t", conflict))
+				now := time.Now()
+				fake := failingWith(pluginsCore.PhaseInfoFailureWithCleanup(
+					"ContainerCannotRun", "container cannot run", &pluginsCore.TaskInfo{OccurredAt: &now}))
+				fake.abortErrors = []error{stderrors.New("cleanup temporarily unavailable")}
+				recorded := &recordingEventsClient{}
+				request := reconcile.Request{NamespacedName: nn}
+				_, err := newReconciler(fake, recorded).Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+
+				persisted := &flyteorgv1.TaskAction{}
+				Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+				Expect(meta.IsStatusConditionTrue(persisted.Status.Conditions,
+					string(flyteorgv1.ConditionTypeCleanupPending))).To(BeTrue())
+				failure := persisted.Status.ErrorState.DeepCopy()
+				persisted.Finalizers = append(persisted.Finalizers, "example.org/other-controller")
+				Expect(k8sClient.Update(ctx, persisted)).To(Succeed())
+				Expect(k8sClient.Delete(ctx, persisted)).To(Succeed())
+
+				apiClient, err := client.NewWithWatch(cfg, client.Options{Scheme: k8sClient.Scheme()})
+				Expect(err).NotTo(HaveOccurred())
+				metadataUpdated := false
+				finalizerWriteUpdated := false
+				conflicts := 0
+				restarted := newReconciler(fake, recorded)
+				restarted.Client = interceptor.NewClient(apiClient, interceptor.Funcs{
+					Get: func(
+						callCtx context.Context, c client.WithWatch, key client.ObjectKey,
+						obj client.Object, opts ...client.GetOption,
+					) error {
+						if err := c.Get(callCtx, key, obj, opts...); err != nil {
+							return err
+						}
+						if metadataUpdated || key != nn {
+							return nil
+						}
+						metadataUpdated = true
+						return c.Patch(callCtx, obj.(*flyteorgv1.TaskAction).DeepCopy(),
+							client.RawPatch(types.MergePatchType, []byte(`{"metadata":{
+								"annotations":{"example.org/cleanup-note":"kept"},
+								"labels":{"example.org/cleanup-owner":"other-controller"}
+							}}`)))
+					},
+					Update: func(
+						callCtx context.Context, c client.WithWatch, obj client.Object, opts ...client.UpdateOption,
+					) error {
+						if conflict && !finalizerWriteUpdated {
+							finalizerWriteUpdated = true
+							if err := c.Patch(callCtx, obj.(*flyteorgv1.TaskAction).DeepCopy(),
+								client.RawPatch(types.MergePatchType, []byte(`{"metadata":{
+									"annotations":{"example.org/finalizer-note":"kept"}
+								}}`))); err != nil {
+								return err
+							}
+						}
+						err := c.Update(callCtx, obj, opts...)
+						if errors.IsConflict(err) {
+							conflicts++
+						}
+						return err
+					},
+				})
+
+				result, err := restarted.Reconcile(ctx, request)
+				Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+				GinkgoWriter.Printf("cleanup_metadata race=%t error=%v note=%q owner=%q finalizers=%v conflicts=%d\n",
+					conflict, err, persisted.Annotations["example.org/cleanup-note"],
+					persisted.Labels["example.org/cleanup-owner"], persisted.Finalizers, conflicts)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(result).To(BeZero())
+				Expect(persisted.Annotations["example.org/cleanup-note"]).To(Equal("kept"))
+				Expect(persisted.Labels["example.org/cleanup-owner"]).To(Equal("other-controller"))
+				Expect(persisted.Finalizers).To(ConsistOf("example.org/other-controller"))
+				Expect(persisted.Status.ErrorState).To(Equal(failure))
+				Expect(meta.IsStatusConditionTrue(persisted.Status.Conditions,
+					string(flyteorgv1.ConditionTypeCleanupPending))).To(BeFalse())
+				if conflict {
+					Expect(persisted.Annotations["example.org/finalizer-note"]).To(Equal("kept"))
+					Expect(conflicts).To(Equal(1))
+				}
+				Expect(recorded.RecordedEvents()).To(HaveLen(1))
+			},
+			Entry("after the initial read", false),
+			Entry("during the finalizer write", true),
+		)
+
+		DescribeTable("allows garbage collection when terminal cleanup cannot build its context",
+			func(deleting bool) {
+				nn := createTaskAction(fmt.Sprintf("cleanup-context-%t", deleting))
+				now := time.Now()
+				fake := failingWith(pluginsCore.PhaseInfoFailureWithCleanup(
+					"ContainerCannotRun", "container cannot run", &pluginsCore.TaskInfo{OccurredAt: &now}))
+				fake.abortErrors = []error{stderrors.New("cleanup temporarily unavailable")}
+				recorded := &recordingEventsClient{}
+				request := reconcile.Request{NamespacedName: nn}
+				_, err := newReconciler(fake, recorded).Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+
+				persisted := &flyteorgv1.TaskAction{}
+				Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+				Expect(meta.IsStatusConditionTrue(persisted.Status.Conditions,
+					string(flyteorgv1.ConditionTypeCleanupPending))).To(BeTrue())
+				failure := persisted.Status.ErrorState.DeepCopy()
+				persisted.Spec.RunOutputBase = "://"
+				Expect(k8sClient.Update(ctx, persisted)).To(Succeed())
+				if deleting {
+					Expect(k8sClient.Delete(ctx, persisted)).To(Succeed())
+				}
+
+				restarted := newReconciler(fake, recorded)
+				result, err := restarted.Reconcile(ctx, request)
+				getErr := k8sClient.Get(ctx, nn, persisted)
+				deleted := errors.IsNotFound(getErr)
+				labeled := persisted.Labels[LabelTerminationStatus] == LabelValueTerminated
+				GinkgoWriter.Printf("cleanup_context deleting=%t reconcile_error=%v action_deleted=%t gc_labeled=%t\n",
+					deleting, err, deleted, labeled)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(result).To(BeZero())
+				if deleting {
+					Expect(deleted).To(BeTrue())
+					Expect(restarted.Recorder.(*events.FakeRecorder).Events).To(
+						Receive(ContainSubstring("Underlying resources may need manual cleanup")))
+				} else {
+					Expect(getErr).NotTo(HaveOccurred())
+					Expect(labeled).To(BeTrue())
+					Expect(persisted.Status.ErrorState).To(Equal(failure))
+					Expect(meta.IsStatusConditionTrue(persisted.Status.Conditions,
+						string(flyteorgv1.ConditionTypeCleanupPending))).To(BeTrue())
+				}
+				Expect(fake.handleCalls).To(Equal(1))
+				Expect(fake.abortCalls).To(Equal(1))
+				Expect(fake.finalizeCalls).To(BeZero())
+				Expect(recorded.RecordedEvents()).To(HaveLen(1))
+			},
+			Entry("before deletion", false),
+			Entry("during finalization", true),
+		)
+
+		DescribeTable("retries failed terminal cleanup after a restart",
+			func(deleting bool) {
+				nn := createTaskAction(fmt.Sprintf("cleanup-recovery-%t", deleting))
+				now := time.Now()
+				fake := failingWith(pluginsCore.PhaseInfoFailureWithCleanup(
+					"ContainerCannotRun", "container cannot run", &pluginsCore.TaskInfo{OccurredAt: &now}))
+				fake.abortErrors = []error{stderrors.New("cleanup temporarily unavailable")}
+				recorded := &recordingEventsClient{}
+				request := reconcile.Request{NamespacedName: nn}
+				result, err := newReconciler(fake, recorded).Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(result.RequeueAfter).To(Equal(TaskActionDefaultRequeueDuration))
+				persisted := &flyteorgv1.TaskAction{}
+				Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+				Expect(isTerminal(persisted)).To(BeTrue())
+				failure := persisted.Status.ErrorState
+				GinkgoWriter.Printf("abort_error deleting=%t phase=%s cleanup_pending=%t abort_calls=%d requeue_after=%s\n",
+					deleting, persisted.Status.PluginPhase,
+					meta.IsStatusConditionTrue(persisted.Status.Conditions, string(flyteorgv1.ConditionTypeCleanupPending)),
+					fake.abortCalls, result.RequeueAfter)
+				if deleting {
+					Expect(k8sClient.Delete(ctx, persisted)).To(Succeed())
+				}
+
+				result, err = newReconciler(fake, recorded).Reconcile(ctx, request)
+				Expect(err).NotTo(HaveOccurred())
+				Expect(result.RequeueAfter).To(BeZero())
+				Expect(fake.abortCalls).To(Equal(2))
+				Expect(fake.handleCalls).To(Equal(1))
+				if deleting {
+					Expect(errors.IsNotFound(k8sClient.Get(ctx, nn, persisted))).To(BeTrue())
+					Expect(fake.finalizeCalls).To(Equal(1))
+					GinkgoWriter.Printf("finalized action_deleted=true abort_calls=%d finalize_calls=%d\n",
+						fake.abortCalls, fake.finalizeCalls)
+				} else {
+					Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+					Expect(persisted.Status.ErrorState).To(Equal(failure))
+					GinkgoWriter.Printf("after_retry phase=%s cleanup_pending=%t abort_calls=%d error_code=%s\n",
+						persisted.Status.PluginPhase,
+						meta.IsStatusConditionTrue(persisted.Status.Conditions, string(flyteorgv1.ConditionTypeCleanupPending)),
+						fake.abortCalls, persisted.Status.ErrorState.Code)
+					_, err = newReconciler(fake, recorded).Reconcile(ctx, request)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(fake.abortCalls).To(Equal(2))
+				}
+				Expect(recorded.RecordedEvents()).To(HaveLen(1))
+				Expect(recorded.RecordedEvents()[0].GetPhase()).To(Equal(common.ActionPhase_ACTION_PHASE_FAILED))
+			},
+			Entry("while the action remains available", false),
+			Entry("during finalization", true),
+		)
 	})
 
 	Context("resetPluginResource", func() {
