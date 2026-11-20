@@ -28,6 +28,7 @@ type stubCatalogClient struct {
 	getFunc                    func(context.Context, catalog.Key) (catalog.Entry, error)
 	getOrExtendReservationFunc func(context.Context, catalog.Key, string, time.Duration) (*cacheservice.Reservation, error)
 	putFunc                    func(context.Context, catalog.Key, io.OutputReader, catalog.Metadata) (catalog.Status, error)
+	updateFunc                 func(context.Context, catalog.Key, io.OutputReader, catalog.Metadata) (catalog.Status, error)
 	releaseReservationFunc     func(context.Context, catalog.Key, string) error
 }
 
@@ -43,8 +44,11 @@ func (s *stubCatalogClient) Put(ctx context.Context, key catalog.Key, reader io.
 	return s.putFunc(ctx, key, reader, metadata)
 }
 
-func (s *stubCatalogClient) Update(context.Context, catalog.Key, io.OutputReader, catalog.Metadata) (catalog.Status, error) {
-	return catalog.Status{}, nil
+func (s *stubCatalogClient) Update(ctx context.Context, key catalog.Key, reader io.OutputReader, metadata catalog.Metadata) (catalog.Status, error) {
+	if s.updateFunc == nil {
+		return catalog.Status{}, nil
+	}
+	return s.updateFunc(ctx, key, reader, metadata)
 }
 
 func (s *stubCatalogClient) ReleaseReservation(ctx context.Context, key catalog.Key, ownerID string) error {
@@ -302,6 +306,69 @@ func TestHandleCacheAfterExecutionReleasesReservationOnFailure(t *testing.T) {
 	_, err := r.finalizeCacheAfterExecution(ctx, taskAction, tCtx, transition, false)
 	require.NoError(t, err)
 	assert.True(t, released)
+}
+
+func TestHandleCacheBeforeExecutionOverwriteSkipsLookupAndReservation(t *testing.T) {
+	ensureTestMetricKeys()
+	ctx := context.Background()
+	taskAction, dataStore := newCacheableTaskAction(t, true, true)
+	taskAction.Spec.OverwriteCache = true
+	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
+
+	r := &TaskActionReconciler{
+		DataStore: dataStore,
+		Catalog: &stubCatalogClient{
+			getFunc: func(context.Context, catalog.Key) (catalog.Entry, error) {
+				t.Fatal("Catalog.Get must not be called when overwriting the cache")
+				return catalog.Entry{}, nil
+			},
+			getOrExtendReservationFunc: func(context.Context, catalog.Key, string, time.Duration) (*cacheservice.Reservation, error) {
+				t.Fatal("reservation must not be requested when overwriting the cache")
+				return nil, nil
+			},
+		},
+	}
+
+	transition, handled, err := r.evaluateCacheBeforeExecution(ctx, taskAction, tCtx, false)
+	require.NoError(t, err)
+	require.False(t, handled)
+	assert.Equal(t, pluginsCore.UnknownTransition, transition)
+}
+
+func TestHandleCacheAfterExecutionOverwriteReplacesEntry(t *testing.T) {
+	ensureTestMetricKeys()
+	ctx := context.Background()
+	taskAction, dataStore := newCacheableTaskAction(t, true, true)
+	taskAction.Spec.OverwriteCache = true
+	tCtx := newTaskExecutionContext(t, taskAction, dataStore)
+	require.NoError(t, tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(&corepb.LiteralMap{}, nil, nil)))
+
+	updated := false
+	r := &TaskActionReconciler{
+		DataStore: dataStore,
+		Catalog: &stubCatalogClient{
+			putFunc: func(context.Context, catalog.Key, io.OutputReader, catalog.Metadata) (catalog.Status, error) {
+				t.Fatal("Catalog.Put keeps an existing entry, so overwriting must use Update")
+				return catalog.Status{}, nil
+			},
+			updateFunc: func(_ context.Context, key catalog.Key, _ io.OutputReader, _ catalog.Metadata) (catalog.Status, error) {
+				updated = true
+				assert.Equal(t, taskAction.Spec.CacheKey, key.CacheVersion)
+				return catalog.NewStatus(corepb.CatalogCacheStatus_CACHE_POPULATED, nil), nil
+			},
+			releaseReservationFunc: func(context.Context, catalog.Key, string) error {
+				t.Fatal("an overwriting task holds no reservation to release")
+				return nil
+			},
+		},
+	}
+
+	transition := pluginsCore.DoTransition(pluginsCore.PhaseInfoSuccess(&pluginsCore.TaskInfo{}))
+	transition, err := r.finalizeCacheAfterExecution(ctx, taskAction, tCtx, transition, false)
+	require.NoError(t, err)
+	assert.True(t, updated)
+	require.Len(t, transition.Info().Info().ExternalResources, 1)
+	assert.Equal(t, corepb.CatalogCacheStatus_CACHE_POPULATED, transition.Info().Info().ExternalResources[0].CacheStatus)
 }
 
 func TestTimeoutMaintainsSerializedCacheReservationUntilTerminal(t *testing.T) {

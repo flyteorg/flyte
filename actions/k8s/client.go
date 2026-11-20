@@ -1120,6 +1120,7 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 		taskAction.Spec.ServiceAccount = ""
 		taskAction.Spec.RawDataPrefix = ""
 		taskAction.Spec.RunStartTime = ""
+		taskAction.Spec.OverwriteCache = false
 		return
 	}
 
@@ -1131,6 +1132,7 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 	taskAction.Spec.PodTemplateName = runSpec.GetDefaultSettings().GetPodTemplateName()
 	taskAction.Spec.ServiceAccount = runSpec.GetSecurityContext().GetRunAs().GetK8SServiceAccount()
 	taskAction.Spec.RawDataPrefix = runSpec.GetRawDataStorage().GetRawDataPrefix()
+	taskAction.Spec.OverwriteCache = runSpec.GetOverwriteCache() || runSpec.GetCacheConfig().GetOverwriteCache()
 	if runSpec.GetInterruptible() != nil {
 		value := runSpec.GetInterruptible().GetValue()
 		taskAction.Spec.Interruptible = &value
@@ -1163,6 +1165,7 @@ func inheritRunContextFromParentTaskAction(taskAction *executorv1.TaskAction, pa
 	taskAction.Spec.ServiceAccount = parentTaskAction.Spec.ServiceAccount
 	taskAction.Spec.RawDataPrefix = parentTaskAction.Spec.RawDataPrefix
 	taskAction.Spec.RunStartTime = parentTaskAction.Spec.RunStartTime
+	taskAction.Spec.OverwriteCache = parentTaskAction.Spec.OverwriteCache
 	if len(parentTaskAction.Annotations) > 0 {
 		if taskAction.Annotations == nil {
 			taskAction.Annotations = map[string]string{}
