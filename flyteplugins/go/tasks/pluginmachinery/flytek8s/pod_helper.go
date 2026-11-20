@@ -891,6 +891,10 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		return nil, nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "invalid TaskSpecification, primary container [%s] not defined", primaryContainerName)
 	}
 
+	if primaryContainer.SecurityContext == nil && config.GetK8sPluginConfig().DefaultSecurityContext != nil {
+		primaryContainer.SecurityContext = config.GetK8sPluginConfig().DefaultSecurityContext.DeepCopy()
+	}
+
 	// add copilot configuration to primaryContainer and PodSpec (if necessary)
 	var dataLoadingConfig *core.DataLoadingConfig
 	if container := taskTemplate.GetContainer(); container != nil {
@@ -915,9 +919,6 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 
 	// update primaryContainer and PodSpec with k8s plugin configuration, etc
 	UpdatePod(tCtx.TaskExecutionMetadata(), resourceRequests, podSpec)
-	if primaryContainer.SecurityContext == nil && config.GetK8sPluginConfig().DefaultSecurityContext != nil {
-		primaryContainer.SecurityContext = config.GetK8sPluginConfig().DefaultSecurityContext.DeepCopy()
-	}
 
 	// Apply device-class-specific PodTemplate (if applicable)
 	// This provides device-specific defaults while allowing task configs to override
@@ -931,6 +932,9 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	if err != nil {
 		return nil, nil, err
 	}
+
+	inheritCoPilotSecurityContext(podSpec, primaryContainerName, config.GetK8sPluginConfig().CoPilot,
+		taskTemplate.GetInterface(), dataLoadingConfig)
 
 	// GPU accelerator
 	if IsAppleSilicon(extendedResources.GetGpuAccelerator()) {
