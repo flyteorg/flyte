@@ -2386,3 +2386,118 @@ func TestCreateActionPromotesOnlyPendingParent(t *testing.T) {
 		})
 	}
 }
+
+// abortTestRun creates a root action (a run) and moves it to phase.
+func abortTestRun(t *testing.T, repo interfaces.ActionRepo, name string, phase common.ActionPhase) *common.RunIdentifier {
+	t.Helper()
+	ctx := context.Background()
+	runID := &common.RunIdentifier{Project: "p", Domain: "d", Name: name}
+	_, err := repo.CreateAction(ctx, &models.Run{
+		Project: runID.Project, Domain: runID.Domain, RunName: runID.Name, Name: rootActionName,
+		Phase: int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+	}, false)
+	require.NoError(t, err)
+	if phase != common.ActionPhase_ACTION_PHASE_QUEUED {
+		endTime := time.Now()
+		require.NoError(t, repo.UpdateActionPhase(ctx, &common.ActionIdentifier{Run: runID, Name: rootActionName},
+			phase, 1, core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil))
+	}
+	return runID
+}
+
+// Aborting a run that already reached a final phase must not rewrite it: a
+// SUCCEEDED run that is aborted afterwards stays SUCCEEDED (and keeps its outputs).
+func TestAbortRun_FinalPhaseIsNoOp(t *testing.T) {
+	db := setupActionDB(t)
+	repo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	for _, phase := range []common.ActionPhase{
+		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
+		common.ActionPhase_ACTION_PHASE_FAILED,
+		common.ActionPhase_ACTION_PHASE_ABORTED,
+		common.ActionPhase_ACTION_PHASE_TIMED_OUT,
+		common.ActionPhase_ACTION_PHASE_RECOVERED,
+	} {
+		t.Run(phase.String(), func(t *testing.T) {
+			runID := abortTestRun(t, repo, "final-"+strings.ToLower(phase.String()[13:]), phase)
+			err := repo.AbortRun(ctx, runID, "late abort", nil)
+			assert.ErrorIs(t, err, interfaces.ErrActionFinished)
+
+			run, err := repo.GetRun(ctx, runID)
+			require.NoError(t, err)
+			assert.Equal(t, int32(phase), run.Phase, "a final phase must not be rewritten by an abort")
+			if phase != common.ActionPhase_ACTION_PHASE_ABORTED {
+				assert.Nil(t, run.AbortReason, "a no-op abort must not record a reason")
+			}
+		})
+	}
+}
+
+// Runs still in progress are aborted.
+func TestAbortRun_NonFinalPhaseIsAborted(t *testing.T) {
+	db := setupActionDB(t)
+	repo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	for _, phase := range []common.ActionPhase{
+		common.ActionPhase_ACTION_PHASE_QUEUED,
+		common.ActionPhase_ACTION_PHASE_INITIALIZING,
+		common.ActionPhase_ACTION_PHASE_RUNNING,
+	} {
+		t.Run(phase.String(), func(t *testing.T) {
+			runID := abortTestRun(t, repo, "live-"+strings.ToLower(phase.String()[13:]), phase)
+			require.NoError(t, repo.AbortRun(ctx, runID, "user abort", nil))
+
+			run, err := repo.GetRun(ctx, runID)
+			require.NoError(t, err)
+			assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_ABORTED), run.Phase)
+		})
+	}
+}
+
+func TestAbortRun_MissingRunIsNotFound(t *testing.T) {
+	db := setupActionDB(t)
+	repo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+
+	err = repo.AbortRun(context.Background(), &common.RunIdentifier{Project: "p", Domain: "d", Name: "missing"}, "x", nil)
+	assert.ErrorIs(t, err, sql.ErrNoRows)
+	assert.NotErrorIs(t, err, interfaces.ErrActionFinished)
+}
+
+func TestAbortAction_FinalPhaseIsNoOp(t *testing.T) {
+	db := setupActionDB(t)
+	repo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	runID := abortTestRun(t, repo, "abort-action", common.ActionPhase_ACTION_PHASE_RUNNING)
+	child := &common.ActionIdentifier{Run: runID, Name: "child"}
+	childModel := models.NewActionModel(child)
+	childModel.ParentActionName = sql.NullString{String: rootActionName, Valid: true}
+	_, err = repo.CreateAction(ctx, childModel, false)
+	require.NoError(t, err)
+	endTime := time.Now()
+	require.NoError(t, repo.UpdateActionPhase(ctx, child, common.ActionPhase_ACTION_PHASE_SUCCEEDED, 1,
+		core.CatalogCacheStatus_CACHE_DISABLED, &endTime, nil))
+
+	assert.ErrorIs(t, repo.AbortAction(ctx, child, "late abort", nil), interfaces.ErrActionFinished)
+	got, err := repo.GetAction(ctx, child)
+	require.NoError(t, err)
+	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED), got.Phase)
+
+	err = repo.AbortAction(ctx, &common.ActionIdentifier{Run: runID, Name: "missing"}, "x", nil)
+	assert.ErrorIs(t, err, sql.ErrNoRows)
+}
+
+func TestGetRun_NotFoundWrapsErrNoRows(t *testing.T) {
+	db := setupActionDB(t)
+	repo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+
+	_, err = repo.GetRun(context.Background(), &common.RunIdentifier{Project: "p", Domain: "d", Name: "nope"})
+	assert.ErrorIs(t, err, sql.ErrNoRows)
+}
