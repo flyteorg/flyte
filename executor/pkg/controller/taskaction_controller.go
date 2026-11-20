@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"os"
 	"reflect"
 	"strings"
 	"time"
@@ -35,6 +36,7 @@ import (
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -122,6 +124,9 @@ type TaskActionReconciler struct {
 	RequeueDuration time.Duration
 	Clock           clock.Clock
 	metrics         *taskActionMetrics
+	// K8sEventMode selects which recorded action events are also emitted as Kubernetes Events.
+	K8sEventMode      K8sEventMode
+	reportingInstance string
 }
 
 // recordEvent persists a single ActionEvent, blocking until it is durably
@@ -130,18 +135,33 @@ type TaskActionReconciler struct {
 // callers still block until their batch commits, so at-least-once semantics are
 // identical to a direct Record (on error the reconcile requeues and re-emits,
 // deduped server-side by ON CONFLICT DO NOTHING). Falls back to a direct Record
-// when no batcher is set (unit tests).
-func (r *TaskActionReconciler) recordEvent(ctx context.Context, event *workflow.ActionEvent) error {
+// when no batcher is set (unit tests). Once persisted, the event is also emitted
+// as a Kubernetes Event on taskAction, filtered by K8sEventMode. This happens before
+// the reconcile writes the TaskAction status, so a failed status write does not lose
+// the Kubernetes Event: the retried reconcile emits it again, and its fixed name
+// (see k8sEventName) makes the second create a no-op.
+func (r *TaskActionReconciler) recordEvent(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	event *workflow.ActionEvent,
+	prevPhase common.ActionPhase,
+) error {
 	if err := event.Validate(); err != nil {
 		return connect.NewError(connect.CodeInvalidArgument, err)
 	}
+	var err error
 	if r.eventBatcher != nil {
-		return r.eventBatcher.Record(ctx, event)
+		err = r.eventBatcher.Record(ctx, event)
+	} else {
+		_, err = r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
+			Events: []*workflow.ActionEvent{event},
+		}))
 	}
-	_, err := r.eventsClient.Record(ctx, connect.NewRequest(&workflow.RecordRequest{
-		Events: []*workflow.ActionEvent{event},
-	}))
-	return err
+	if err != nil {
+		return err
+	}
+	r.emitK8sEvent(ctx, taskAction, event, prevPhase)
+	return nil
 }
 
 // systemRetryReason is the reason on the Queued event published when an attempt is
@@ -467,6 +487,35 @@ func getPhaseLastTransitionTime(
 	return time.Time{}, false
 }
 
+// emitK8sEvent emits event as Kubernetes Event on taskAction when K8sEventMode
+// selects it. The event carries the action context in annotations, so it is created
+// directly and bypasses the recorder's aggregation. AlreadyExists means an earlier
+// reconcile emitted the same action event, so it is skipped. Other failures are only
+// logged.
+func (r *TaskActionReconciler) emitK8sEvent(
+	ctx context.Context,
+	taskAction *flyteorgv1.TaskAction,
+	event *workflow.ActionEvent,
+	prevPhase common.ActionPhase,
+) {
+	if !shouldEmitK8sEvent(r.K8sEventMode, event, prevPhase) {
+		return
+	}
+	logger := log.FromContext(ctx).WithValues("action", event.GetId().GetName())
+	ev, err := buildActionEventK8s(taskAction, event, r.reportingInstance)
+	if err != nil {
+		logger.Error(err, "failed to build action k8s event")
+		return
+	}
+	if err := r.Create(ctx, ev); err != nil {
+		if apierrors.IsAlreadyExists(err) {
+			logger.V(1).Info("action k8s event already exists", "event", ev.Name)
+			return
+		}
+		logger.Error(err, "failed to create action k8s event")
+	}
+}
+
 // recordAttemptStart anchors the attempt clock the first time this attempt is
 // seen Running.
 func (r *TaskActionReconciler) recordAttemptStart(
@@ -632,7 +681,7 @@ func (r *TaskActionReconciler) reconcileTimedOutAttempt(
 	if willRetry {
 		// Publish TIMED_OUT for this attempt before advancing the status.
 		timeoutEvent := r.buildActionEvent(ctx, taskAction, timeoutInfo)
-		if err := r.recordEvent(ctx, timeoutEvent); err != nil {
+		if err := r.recordEvent(ctx, taskAction, timeoutEvent, observedActionPhase(taskAction)); err != nil {
 			logger.Error(err, "failed to persist timed out attempt event, will retry")
 			return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 		}
@@ -749,7 +798,8 @@ func (r *TaskActionReconciler) recordSystemRetry(
 	// no event, and goes back to zero on a new attempt.
 	version := systemRetryEventVersionBase + taskAction.Status.SystemRetries
 	queued := pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, version, systemRetryReason, info)
-	return r.recordEvent(ctx, r.buildActionEvent(ctx, taskAction, queued))
+	event := r.buildActionEvent(ctx, taskAction, queued)
+	return r.recordEvent(ctx, taskAction, event, observedActionPhase(taskAction))
 }
 
 // nonRetryableErrorCodes are plugin error codes whose failures are deterministic:
@@ -868,6 +918,7 @@ func NewTaskActionReconciler(
 		// Non-fatal: degrade to no custom metrics rather than failing controller setup.
 		log.Log.Error(err, "failed to register TaskAction OTel metrics")
 	}
+	hostname, _ := os.Hostname()
 	return &TaskActionReconciler{
 		Client:         c,
 		Scheme:         scheme,
@@ -877,6 +928,8 @@ func NewTaskActionReconciler(
 		eventBatcher:   newEventBatcher(eventsClient, otelutils.GetTracerProvider("executor")), // matches otelServiceName in executor/setup.go; noop until registered
 		cluster:        cluster,
 		metrics:        metrics,
+		// Same reportingInstance client-go gives the Recorder from mgr.GetEventRecorder.
+		reportingInstance: "taskaction-controller-" + hostname,
 	}
 }
 
@@ -1275,7 +1328,7 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 	// buildActionEvent derives UpdatedTime from PhaseHistory, which doesn't include the
 	// abort transition. Override it so mergeEvents uses the actual abort time as end_time.
 	actionEvent.UpdatedTime = timestamppb.New(abortTime)
-	if err := r.recordEvent(ctx, actionEvent); err != nil {
+	if err := r.recordEvent(ctx, taskAction, actionEvent, observedActionPhase(taskAction)); err != nil {
 		logger.Error(err, "failed to emit abort event, will retry")
 		return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
 	}
@@ -1308,7 +1361,7 @@ func (r *TaskActionReconciler) updateTaskActionStatus(
 	}
 
 	actionEvent := r.buildActionEvent(ctx, newTaskAction, phaseInfo)
-	if err := r.recordEvent(ctx, actionEvent); err != nil {
+	if err := r.recordEvent(ctx, newTaskAction, actionEvent, observedActionPhase(oldTaskAction)); err != nil {
 		r.Recorder.Eventf(
 			newTaskAction,
 			nil,
@@ -1419,6 +1472,14 @@ func observedAttempts(taskAction *flyteorgv1.TaskAction) uint32 {
 	}
 	// if attempts is not set, default to 1
 	return 1
+}
+
+func observedActionPhase(taskAction *flyteorgv1.TaskAction) common.ActionPhase {
+	phase, err := pluginsCore.PhaseString(taskAction.Status.PluginPhase)
+	if err != nil {
+		return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
+	}
+	return phaseToActionPhase(phase)
 }
 
 func observedCacheStatus(info *pluginsCore.TaskInfo) core.CatalogCacheStatus {
