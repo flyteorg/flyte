@@ -2,6 +2,9 @@ package logs
 
 import (
 	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"connectrpc.com/connect"
@@ -9,7 +12,9 @@ import (
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/fake"
+	"k8s.io/client-go/rest"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -141,4 +146,33 @@ func TestTailLogs_FollowSetBasedOnPodPhase(t *testing.T) {
 			assert.Equal(t, tt.wantFollow, gotFollow)
 		})
 	}
+}
+
+func TestTailLogs_LogSubresourceNotFound(t *testing.T) {
+	pod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{Name: "gone-pod", Namespace: "default"},
+		Status:     corev1.PodStatus{Phase: corev1.PodSucceeded},
+	}
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/api/v1/namespaces/default/pods/gone-pod":
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(pod)
+		case "/api/v1/namespaces/default/pods/gone-pod/log":
+			w.WriteHeader(http.StatusNotFound)
+			_, _ = w.Write([]byte(`{"kind":"Status","apiVersion":"v1","status":"Failure","reason":"NotFound","code":404}`))
+		default:
+			t.Errorf("unexpected request %s", r.URL.Path)
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+	}))
+	defer server.Close()
+
+	clientset, err := kubernetes.NewForConfig(&rest.Config{Host: server.URL})
+	require.NoError(t, err)
+
+	streamer := &K8sLogStreamer{clientset: clientset}
+	err = streamer.TailLogs(context.Background(), newTestLogContext("gone-pod", "default", "main"), nil)
+	require.Error(t, err)
+	assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
 }

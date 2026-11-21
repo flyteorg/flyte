@@ -36,6 +36,33 @@ The data proxy service uses a YAML configuration file. See [config.example.yaml]
 | `dataproxy.upload.storagePrefix` | Prefix for all uploaded files in storage | `uploads` |
 | `dataproxy.download.maxExpiresIn` | Maximum expiration time for download URLs | `1h` |
 
+### Task Log Settings
+
+`TailLogs` tries the streamers in `dataproxy.logs.streamers` in order, moving to the next
+when one reports the logs as not found. `k8s` reads from the pod while it exists; `loki`
+reads stored lines from Grafana Loki and does not follow a running pod; a query that
+returns no lines counts as not found. Use `[k8s, loki]` to keep logs readable after the
+pod is deleted.
+
+| Field | Description | Default |
+|-------|-------------|---------|
+| `dataproxy.logs.streamers` | Ordered list of log streamers: `k8s`, `loki` | `[k8s]` |
+| `dataproxy.logs.loki.url` | Loki base URL | |
+| `dataproxy.logs.loki.queryTemplate` | Go template for the LogQL selector. Fields: `.Namespace`, `.PodName`, `.ContainerName` | `{namespace="{{ .Namespace }}", pod="{{ .PodName }}", container="{{ .ContainerName }}"}` |
+| `dataproxy.logs.loki.tenantId` | Sent as `X-Scope-OrgID` for multi-tenant Loki | `""` |
+| `dataproxy.logs.loki.basicAuth.username` / `.password` | HTTP basic auth credentials | |
+| `dataproxy.logs.loki.basicAuth.passwordPath` | File holding the basic auth password; mutually exclusive with `password` | |
+| `dataproxy.logs.loki.bearerToken` | Bearer token for the `Authorization` header | |
+| `dataproxy.logs.loki.bearerTokenPath` | File holding the bearer token; mutually exclusive with `bearerToken` | |
+| `dataproxy.logs.loki.timeout` | Per-request timeout | `30s` |
+| `dataproxy.logs.loki.pageSize` | Lines per `query_range` call; keep at or below Loki's `max_entries_limit_per_query` | `1000` |
+| `dataproxy.logs.loki.maxLines` | Cap on lines returned per attempt; `0` for unlimited | `0` |
+| `dataproxy.logs.loki.timePadding` | Padding added around the recorded container start/end window | `1m` |
+| `dataproxy.logs.loki.lookback` | Window queried when the log context has no container start time | `168h` |
+
+Match `queryTemplate` to the labels your collector attaches (the OpenTelemetry collector,
+for example, uses `k8s_namespace_name`, `k8s_pod_name` and `k8s_container_name`).
+
 ### Storage Backend Settings
 
 | Field | Description | Options |

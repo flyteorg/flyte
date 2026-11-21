@@ -35,7 +35,15 @@ data:
         type: K8s
         k8sConfig:
           namespace: {{ .Release.Namespace }}
-{{ tpl ( index .Values "flyte-core-components" | toYaml ) . | nindent 4 }}
+{{- /* Loki credentials are rendered into the configuration Secret instead. */}}
+{{- $core := deepCopy ( index .Values "flyte-core-components" ) }}
+{{- $loki := dig "dataproxy" "logs" "loki" dict $core }}
+{{- if $loki }}
+{{- $_ := unset $loki "basicAuth" }}
+{{- $_ := unset $loki "bearerToken" }}
+{{- if not $loki.queryTemplate }}{{- $_ := unset $loki "queryTemplate" }}{{- end }}
+{{- end }}
+{{ tpl ( $core | toYaml ) . | nindent 4 }}
   001-plugins.yaml: |
     tasks:
       {{- .Values.enabled_plugins.tasks | toYaml | nindent 6 }}
