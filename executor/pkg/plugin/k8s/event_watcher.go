@@ -31,9 +31,15 @@ type eventInfo struct {
 	// are usually limited to events for its own node, so this is what tells an event
 	// written on the node an object ran on from one written anywhere else.
 	ReportingNode string
-	// LastObservedAt is the freshest time the source saw this event. Kubernetes aggregates
-	// a repeating event by updating the same object rather than creating a new one, so
-	// CreatedAt only says when the first occurrence was seen.
+	// FirstObservedAt is the earliest time the source saw this event, on the source's own
+	// clock. CreatedAt is stamped by the API server when the write lands, which can be a
+	// second or more after the source saw the event, so it is a watermark and not a
+	// statement of when the event happened.
+	FirstObservedAt time.Time
+	// LastObservedAt is the freshest time the source saw this event, on the same clock as
+	// FirstObservedAt. Kubernetes aggregates a repeating event by updating the same object
+	// rather than creating a new one, so the first observation only says when the first
+	// occurrence was seen.
 	LastObservedAt time.Time
 }
 
@@ -79,11 +85,11 @@ func (w *controllerRuntimeEventWatcher) OnUpdate(_, newObj interface{}) {
 
 // store records an event, or refreshes the entry an earlier occurrence of the same event
 // left behind. A refresh only moves what the newer occurrence actually tells us, the
-// identity, the node it was reported from and the last observed time; the times the
-// entry was first created and first recorded stay put, so a caller listing by watermark
-// does not see the event again. The reporting node is taken as the object says it now
-// rather than kept from before, so an event rewritten to name another node is judged on
-// what it says.
+// identity, the node it was reported from and the first and last observed times, which
+// only ever widen; the times the entry was first created and first recorded stay put, so
+// a caller listing by watermark does not see the event again. The reporting node is taken
+// as the object says it now rather than kept from before, so an event rewritten to name
+// another node is judged on what it says.
 func (w *controllerRuntimeEventWatcher) store(obj interface{}) {
 	event, ok := obj.(*eventsv1.Event)
 	if !ok || event == nil {
@@ -107,13 +113,14 @@ func (w *controllerRuntimeEventWatcher) store(obj interface{}) {
 	eventInfos := value.(*eventObjects)
 
 	info := &eventInfo{
-		Message:        event.Note,
-		CreatedAt:      event.CreationTimestamp.Time,
-		RecordedAt:     time.Now(),
-		Reason:         event.Reason,
-		RegardingUID:   event.Regarding.UID,
-		ReportingNode:  reportingNode(event),
-		LastObservedAt: lastObservedTime(event),
+		Message:         event.Note,
+		CreatedAt:       event.CreationTimestamp.Time,
+		RecordedAt:      time.Now(),
+		Reason:          event.Reason,
+		RegardingUID:    event.Regarding.UID,
+		ReportingNode:   reportingNode(event),
+		FirstObservedAt: firstObservedTime(event),
+		LastObservedAt:  lastObservedTime(event),
 	}
 
 	eventInfos.mu.Lock()
@@ -122,6 +129,9 @@ func (w *controllerRuntimeEventWatcher) store(obj interface{}) {
 	if existing, ok := eventInfos.eventInfos[eventKey]; ok {
 		info.CreatedAt = existing.CreatedAt
 		info.RecordedAt = existing.RecordedAt
+		if !existing.FirstObservedAt.IsZero() && existing.FirstObservedAt.Before(info.FirstObservedAt) {
+			info.FirstObservedAt = existing.FirstObservedAt
+		}
 		if existing.LastObservedAt.After(info.LastObservedAt) {
 			info.LastObservedAt = existing.LastObservedAt
 		}
@@ -139,6 +149,20 @@ func reportingNode(event *eventsv1.Event) string {
 		return event.ReportingInstance
 	}
 	return event.DeprecatedSource.Host
+}
+
+// firstObservedTime is the earliest occurrence the event reports, on the recorder's clock.
+// Recorders on the events API stamp the event time when they first see the event, and
+// older ones fill in the deprecated first timestamp. Only an event with neither falls back
+// to its creation, which is the API server's clock rather than the recorder's.
+func firstObservedTime(event *eventsv1.Event) time.Time {
+	if !event.EventTime.IsZero() {
+		return event.EventTime.Time
+	}
+	if !event.DeprecatedFirstTimestamp.IsZero() {
+		return event.DeprecatedFirstTimestamp.Time
+	}
+	return event.CreationTimestamp.Time
 }
 
 // lastObservedTime is the freshest occurrence the event reports. An aggregated event
