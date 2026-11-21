@@ -34,6 +34,7 @@ class CredentialKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     CREDENTIAL_KIND_AWS_SIGV4: _ClassVar[CredentialKind]
     CREDENTIAL_KIND_GCP_ACCESS_TOKEN: _ClassVar[CredentialKind]
     CREDENTIAL_KIND_AZURE_SAS: _ClassVar[CredentialKind]
+    CREDENTIAL_KIND_AZURE_ACCESS_TOKEN: _ClassVar[CredentialKind]
 ARTIFACT_TYPE_UNSPECIFIED: ArtifactType
 ARTIFACT_TYPE_REPORT: ArtifactType
 ARTIFACT_TYPE_CODE_BUNDLE: ArtifactType
@@ -44,10 +45,19 @@ CREDENTIAL_KIND_UNSPECIFIED: CredentialKind
 CREDENTIAL_KIND_AWS_SIGV4: CredentialKind
 CREDENTIAL_KIND_GCP_ACCESS_TOKEN: CredentialKind
 CREDENTIAL_KIND_AZURE_SAS: CredentialKind
+CREDENTIAL_KIND_AZURE_ACCESS_TOKEN: CredentialKind
 
 class ProjectDataArea(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
+
+class MetadataStore(_message.Message):
+    __slots__ = ["run_name", "action_name"]
+    RUN_NAME_FIELD_NUMBER: _ClassVar[int]
+    ACTION_NAME_FIELD_NUMBER: _ClassVar[int]
+    run_name: str
+    action_name: str
+    def __init__(self, run_name: _Optional[str] = ..., action_name: _Optional[str] = ...) -> None: ...
 
 class VolumeData(_message.Message):
     __slots__ = ["action_output", "artifact_version"]
@@ -76,20 +86,22 @@ class ArtifactVersion(_message.Message):
     def __init__(self, name: _Optional[str] = ..., version: _Optional[str] = ...) -> None: ...
 
 class GetCloudCredentialsRequest(_message.Message):
-    __slots__ = ["scope", "project_data", "volume", "access", "subpaths", "duration"]
+    __slots__ = ["scope", "project_data", "volume", "metadata_store", "access", "subpaths", "duration"]
     SCOPE_FIELD_NUMBER: _ClassVar[int]
     PROJECT_DATA_FIELD_NUMBER: _ClassVar[int]
     VOLUME_FIELD_NUMBER: _ClassVar[int]
+    METADATA_STORE_FIELD_NUMBER: _ClassVar[int]
     ACCESS_FIELD_NUMBER: _ClassVar[int]
     SUBPATHS_FIELD_NUMBER: _ClassVar[int]
     DURATION_FIELD_NUMBER: _ClassVar[int]
     scope: _identifier_pb2.ProjectIdentifier
     project_data: ProjectDataArea
     volume: VolumeData
+    metadata_store: MetadataStore
     access: CredentialAccess
     subpaths: _containers.RepeatedScalarFieldContainer[str]
     duration: _duration_pb2.Duration
-    def __init__(self, scope: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., project_data: _Optional[_Union[ProjectDataArea, _Mapping]] = ..., volume: _Optional[_Union[VolumeData, _Mapping]] = ..., access: _Optional[_Union[CredentialAccess, str]] = ..., subpaths: _Optional[_Iterable[str]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+    def __init__(self, scope: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., project_data: _Optional[_Union[ProjectDataArea, _Mapping]] = ..., volume: _Optional[_Union[VolumeData, _Mapping]] = ..., metadata_store: _Optional[_Union[MetadataStore, _Mapping]] = ..., access: _Optional[_Union[CredentialAccess, str]] = ..., subpaths: _Optional[_Iterable[str]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
 
 class GetCloudCredentialsResponse(_message.Message):
     __slots__ = ["kind", "access_key_id", "secret_access_key", "session_token", "expiration", "bucket_uri", "granted_prefixes"]

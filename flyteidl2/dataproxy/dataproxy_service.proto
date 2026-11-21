@@ -84,12 +84,36 @@ enum CredentialKind {
   CREDENTIAL_KIND_GCP_ACCESS_TOKEN = 2;
   // An Azure user-delegation SAS query string in session_token.
   CREDENTIAL_KIND_AZURE_SAS = 3;
+  // A Microsoft Entra ID access token for Azure Storage, in session_token. It
+  // carries every storage role of the identity it was issued to: granted_prefixes
+  // says what the server intends, not a limit the store enforces.
+  CREDENTIAL_KIND_AZURE_ACCESS_TOKEN = 4;
 }
 
 // ProjectDataArea names the project/domain's own data area -- the same place
 // CreateUploadLocation writes to. A marker message rather than a bare bool so
 // it can grow a field without a breaking change.
 message ProjectDataArea {}
+
+// MetadataStore names the store a run's data lives in -- its inputs, outputs
+// and offloaded raw data -- by the run, never by path. Which store that is (the
+// organization's own store on a shared queue, or the deployment's) and where in
+// it the run's data sits are the server's to resolve from what it recorded when
+// the run was created; the caller only says which run.
+//
+// The grant reaches the run's metadata prefix and its raw data prefix, each of
+// which the server checks ends in the run's own <org>/<project>/<domain>/<run>
+// namespace before granting it, so a run created with an overridden base
+// directory cannot be used to reach another run's data.
+message MetadataStore {
+  // +required
+  string run_name = 1 [(buf.validate.field).string.min_len = 1];
+
+  // +optional. Narrows the metadata prefix to this action's own data
+  // (<run metadata prefix>/<action_name>/). Raw data is not laid out by action
+  // and stays run-wide.
+  string action_name = 2;
+}
 
 // VolumeData names one Volume the way the platform names it, never by path.
 //
@@ -177,6 +201,7 @@ message GetCloudCredentialsRequest {
 
     ProjectDataArea project_data = 2;
     VolumeData volume = 3;
+    MetadataStore metadata_store = 7;
   }
 
   // +optional. Unspecified reads as READ, which is the safe direction for a
@@ -202,7 +227,10 @@ message GetCloudCredentialsResponse {
   string access_key_id = 2;
   string secret_access_key = 3;
   // The AWS session token, or -- for the other kinds -- the OAuth2 access
-  // token or the SAS query string.
+  // token, the Entra ID access token or the SAS query string. Empty for an AWS
+  // key that is not a session (a store whose organization gave Union a
+  // long-lived key the server cannot exchange); expiration then says when to
+  // ask again.
   string session_token = 4;
 
   // When these stop working. A client that cannot parse this cannot refresh,

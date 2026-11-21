@@ -139,6 +139,110 @@ var _ interface {
 	ErrorName() string
 } = ProjectDataAreaValidationError{}
 
+// Validate checks the field values on MetadataStore with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *MetadataStore) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on MetadataStore with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in MetadataStoreMultiError, or
+// nil if none found.
+func (m *MetadataStore) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *MetadataStore) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for RunName
+
+	// no validation rules for ActionName
+
+	if len(errors) > 0 {
+		return MetadataStoreMultiError(errors)
+	}
+
+	return nil
+}
+
+// MetadataStoreMultiError is an error wrapping multiple validation errors
+// returned by MetadataStore.ValidateAll() if the designated constraints
+// aren't met.
+type MetadataStoreMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m MetadataStoreMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m MetadataStoreMultiError) AllErrors() []error { return m }
+
+// MetadataStoreValidationError is the validation error returned by
+// MetadataStore.Validate if the designated constraints aren't met.
+type MetadataStoreValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MetadataStoreValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MetadataStoreValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MetadataStoreValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MetadataStoreValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MetadataStoreValidationError) ErrorName() string { return "MetadataStoreValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MetadataStoreValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMetadataStore.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MetadataStoreValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MetadataStoreValidationError{}
+
 // Validate checks the field values on VolumeData with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -693,6 +797,47 @@ func (m *GetCloudCredentialsRequest) validate(all bool) error {
 			if err := v.Validate(); err != nil {
 				return GetCloudCredentialsRequestValidationError{
 					field:  "Volume",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *GetCloudCredentialsRequest_MetadataStore:
+		if v == nil {
+			err := GetCloudCredentialsRequestValidationError{
+				field:  "Resource",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetMetadataStore()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetCloudCredentialsRequestValidationError{
+						field:  "MetadataStore",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetCloudCredentialsRequestValidationError{
+						field:  "MetadataStore",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetMetadataStore()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetCloudCredentialsRequestValidationError{
+					field:  "MetadataStore",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
