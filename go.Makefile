@@ -10,6 +10,11 @@ BIN_DIR ?= bin
 BIN_NAME ?= $(SERVICE_NAME)
 GOLANGCI_LINT_VERSION ?= v2.14.0
 LOCALBIN ?= $(shell pwd)/bin
+APPLE_SILICON_PORT ?= 30090
+APPLE_SILICON_DIR := $(HOME)/.flyte/apple-silicon
+APPLE_SILICON_CONFIG := $(APPLE_SILICON_DIR)/$(SERVICE_NAME)-config.yaml
+# Non-empty when APPLE_SILICON is "true", matched case-insensitively like FLYTE_DEV.
+APPLE_SILICON_ENABLED = $(filter true,$(shell echo '$(APPLE_SILICON)' | tr '[:upper:]' '[:lower:]'))
 
 # ANSI color codes for prettier output
 COLOR_RESET   := \033[0m
@@ -118,12 +123,66 @@ bench: ## Run benchmarks
 .PHONY: run
 run: build-fast ## Build and run the service
 	@echo "$(COLOR_GREEN)Running $(SERVICE_NAME)...$(COLOR_RESET)"
-	@./$(BIN_DIR)/$(BIN_NAME) $(RUN_ARGS)
+	@if [ -z "$(APPLE_SILICON_ENABLED)" ]; then \
+		./$(BIN_DIR)/$(BIN_NAME) $(RUN_ARGS); \
+	else \
+		$(MAKE) --no-print-directory apple-silicon-config && \
+		./$(BIN_DIR)/$(BIN_NAME) --config $(APPLE_SILICON_CONFIG); \
+	fi
 
 .PHONY: run-dev
 run-dev: ## Run service directly with go run (no build)
 	@echo "$(COLOR_GREEN)Running $(SERVICE_NAME) (dev mode)...$(COLOR_RESET)"
-	@go run $(CMD_PATH) $(RUN_ARGS)
+	@if [ -z "$(APPLE_SILICON_ENABLED)" ]; then \
+		go run $(CMD_PATH) $(RUN_ARGS); \
+	else \
+		$(MAKE) --no-print-directory apple-silicon-config && \
+		go run $(CMD_PATH) --config $(APPLE_SILICON_CONFIG); \
+	fi
+
+.PHONY: apple-silicon-config
+apple-silicon-config: ## Generate a config with the MLX bridge settings
+	@if [ ! -s $(APPLE_SILICON_DIR)/secret ]; then \
+		echo "$(APPLE_SILICON_DIR)/secret not found, run 'make devbox-run FLYTE_DEV=True APPLE_SILICON=True' first"; \
+		exit 1; \
+	fi
+	@ip=$$(docker exec flyte-devbox cat /etc/hosts | awk '$$2 == "host.docker.internal" { print $$1; exit }'); \
+	if [ -z "$$ip" ]; then \
+		echo "host.docker.internal not found in flyte-devbox, is the devbox running?"; \
+		exit 1; \
+	fi; \
+	type=$$(kubectl --context flyte-devbox -n flyte get svc flyte-binary-http -o jsonpath='{.spec.type}' 2>/dev/null); \
+	if [ -z "$$type" ]; then \
+		kubectl --context flyte-devbox -n flyte create service externalname flyte-binary-http \
+			--external-name flyte-devbox-local.flyte.svc.cluster.local --tcp 8090:8090 >/dev/null || exit 1; \
+		echo "Created flyte-binary-http in flyte-devbox, pointing at the manager on the host"; \
+	elif [ "$$type" != ExternalName ]; then \
+		echo "flyte-binary-http is already served inside flyte-devbox, run 'make devbox-run FLYTE_DEV=True APPLE_SILICON=True' first"; \
+		exit 1; \
+	fi; \
+	if ! grep -q '^  k8s:$$' config.yaml; then \
+		echo "Error: no '  k8s:' line in config.yaml to add apple-silicon-bridge under, failed to create $(APPLE_SILICON_CONFIG)"; \
+		exit 1; \
+	fi; \
+	if ! grep -q 'rustfs-svc\.flyte\.svc\.cluster\.local:9000' config.yaml; then \
+		echo "Error: no 'rustfs-svc.flyte.svc.cluster.local:9000' in config.yaml to replace, failed to create $(APPLE_SILICON_CONFIG)"; \
+		exit 1; \
+	fi; \
+	if ! grep '_U_EP_OVERRIDE' config.yaml | grep -q 'host\.docker\.internal:8090'; then \
+		echo "Error: no '_U_EP_OVERRIDE' with 'host.docker.internal:8090' in config.yaml to replace, failed to create $(APPLE_SILICON_CONFIG)"; \
+		exit 1; \
+	fi; \
+	umask 077; \
+	{ \
+		echo '    apple-silicon-bridge:'; \
+		echo "      endpoint: \"http://$$ip:$(APPLE_SILICON_PORT)\""; \
+		echo "      token-secret: \"$$(cat $(APPLE_SILICON_DIR)/secret)\""; \
+		echo '      host-platform: "darwin/arm64"'; \
+	} | sed -e '/^  k8s:$$/r /dev/stdin' \
+		-e 's|rustfs-svc\.flyte\.svc\.cluster\.local:9000|rustfs-svc.flyte:9000|' \
+		-e '/_U_EP_OVERRIDE/s|host\.docker\.internal:8090|flyte-binary-http.flyte:8090|' \
+		config.yaml > $(APPLE_SILICON_CONFIG); \
+	echo "Apple MLX bridge config set successfully, at $(APPLE_SILICON_CONFIG)"
 
 ##@ Cleanup
 

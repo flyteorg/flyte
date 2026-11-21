@@ -94,6 +94,7 @@ func NewSecretServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			httpClient,
 			baseURL+SecretServiceGetSecretProcedure,
 			connect.WithSchema(secretServiceGetSecretMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		deleteSecret: connect.NewClient[secret.DeleteSecretRequest, secret.DeleteSecretResponse](
@@ -106,6 +107,7 @@ func NewSecretServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			httpClient,
 			baseURL+SecretServiceListSecretsProcedure,
 			connect.WithSchema(secretServiceListSecretsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -176,6 +178,7 @@ func NewSecretServiceHandler(svc SecretServiceHandler, opts ...connect.HandlerOp
 		SecretServiceGetSecretProcedure,
 		svc.GetSecret,
 		connect.WithSchema(secretServiceGetSecretMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	secretServiceDeleteSecretHandler := connect.NewUnaryHandler(
@@ -188,6 +191,7 @@ func NewSecretServiceHandler(svc SecretServiceHandler, opts ...connect.HandlerOp
 		SecretServiceListSecretsProcedure,
 		svc.ListSecrets,
 		connect.WithSchema(secretServiceListSecretsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/flyteidl2.secret.SecretService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

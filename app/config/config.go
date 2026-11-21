@@ -12,6 +12,9 @@ type AppConfig struct {
 	// Server configures the standalone App service HTTP listener.
 	Server ServerConfig `json:"server"`
 
+	// PprofPort is the port the pprof endpoint binds to. 0 disables profiling.
+	PprofPort int `json:"pprofPort" pflag:",Port the pprof endpoint binds to; 0 disables profiling"`
+
 	// InternalAppService configures the InternalAppService client (data plane).
 	// In unified mode this is overridden by the shared mux BaseURL.
 	InternalAppService serviceclient.ServiceConfig `json:"internalAppService" pflag:",Internal app service client configuration"`

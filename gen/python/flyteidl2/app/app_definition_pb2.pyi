@@ -1,5 +1,6 @@
 from buf.validate import validate_pb2 as _validate_pb2
 from flyteidl2.common import identity_pb2 as _identity_pb2
+from flyteidl2.common import kubernetes_pb2 as _kubernetes_pb2
 from flyteidl2.common import runtime_version_pb2 as _runtime_version_pb2
 from flyteidl2.core import artifact_id_pb2 as _artifact_id_pb2
 from flyteidl2.core import security_pb2 as _security_pb2
@@ -181,7 +182,7 @@ class Ingress(_message.Message):
     def __init__(self, public_url: _Optional[str] = ..., cname_url: _Optional[str] = ..., vpc_url: _Optional[str] = ...) -> None: ...
 
 class Spec(_message.Message):
-    __slots__ = ["container", "pod", "autoscaling", "ingress", "desired_state", "cluster_pool", "cluster", "images", "security_context", "extended_resources", "runtime_metadata", "profile", "creator", "inputs", "links", "timeouts"]
+    __slots__ = ["container", "pod", "autoscaling", "ingress", "desired_state", "cluster_pool", "cluster", "images", "security_context", "extended_resources", "runtime_metadata", "profile", "creator", "inputs", "links", "timeouts", "k8s_metadata"]
     class DesiredState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         DESIRED_STATE_UNSPECIFIED: _ClassVar[Spec.DesiredState]
@@ -208,6 +209,7 @@ class Spec(_message.Message):
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     LINKS_FIELD_NUMBER: _ClassVar[int]
     TIMEOUTS_FIELD_NUMBER: _ClassVar[int]
+    K8S_METADATA_FIELD_NUMBER: _ClassVar[int]
     container: _tasks_pb2.Container
     pod: _tasks_pb2.K8sPod
     autoscaling: AutoscalingConfig
@@ -224,7 +226,8 @@ class Spec(_message.Message):
     inputs: InputList
     links: _containers.RepeatedCompositeFieldContainer[Link]
     timeouts: TimeoutConfig
-    def __init__(self, container: _Optional[_Union[_tasks_pb2.Container, _Mapping]] = ..., pod: _Optional[_Union[_tasks_pb2.K8sPod, _Mapping]] = ..., autoscaling: _Optional[_Union[AutoscalingConfig, _Mapping]] = ..., ingress: _Optional[_Union[IngressConfig, _Mapping]] = ..., desired_state: _Optional[_Union[Spec.DesiredState, str]] = ..., cluster_pool: _Optional[str] = ..., cluster: _Optional[str] = ..., images: _Optional[_Union[ImageSpecSet, _Mapping]] = ..., security_context: _Optional[_Union[SecurityContext, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ..., runtime_metadata: _Optional[_Union[_runtime_version_pb2.RuntimeMetadata, _Mapping]] = ..., profile: _Optional[_Union[Profile, _Mapping]] = ..., creator: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., inputs: _Optional[_Union[InputList, _Mapping]] = ..., links: _Optional[_Iterable[_Union[Link, _Mapping]]] = ..., timeouts: _Optional[_Union[TimeoutConfig, _Mapping]] = ...) -> None: ...
+    k8s_metadata: _kubernetes_pb2.K8sMetadata
+    def __init__(self, container: _Optional[_Union[_tasks_pb2.Container, _Mapping]] = ..., pod: _Optional[_Union[_tasks_pb2.K8sPod, _Mapping]] = ..., autoscaling: _Optional[_Union[AutoscalingConfig, _Mapping]] = ..., ingress: _Optional[_Union[IngressConfig, _Mapping]] = ..., desired_state: _Optional[_Union[Spec.DesiredState, str]] = ..., cluster_pool: _Optional[str] = ..., cluster: _Optional[str] = ..., images: _Optional[_Union[ImageSpecSet, _Mapping]] = ..., security_context: _Optional[_Union[SecurityContext, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ..., runtime_metadata: _Optional[_Union[_runtime_version_pb2.RuntimeMetadata, _Mapping]] = ..., profile: _Optional[_Union[Profile, _Mapping]] = ..., creator: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., inputs: _Optional[_Union[InputList, _Mapping]] = ..., links: _Optional[_Iterable[_Union[Link, _Mapping]]] = ..., timeouts: _Optional[_Union[TimeoutConfig, _Mapping]] = ..., k8s_metadata: _Optional[_Union[_kubernetes_pb2.K8sMetadata, _Mapping]] = ...) -> None: ...
 
 class Link(_message.Message):
     __slots__ = ["path", "title", "is_relative"]

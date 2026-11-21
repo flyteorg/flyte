@@ -178,6 +178,7 @@ func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			httpClient,
 			baseURL+RunServiceWatchRunDetailsProcedure,
 			connect.WithSchema(runServiceWatchRunDetailsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		getActionDetails: connect.NewClient[workflow.GetActionDetailsRequest, workflow.GetActionDetailsResponse](
@@ -191,6 +192,7 @@ func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			httpClient,
 			baseURL+RunServiceWatchActionDetailsProcedure,
 			connect.WithSchema(runServiceWatchActionDetailsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		getActionData: connect.NewClient[workflow.GetActionDataRequest, workflow.GetActionDataResponse](
@@ -211,6 +213,7 @@ func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			httpClient,
 			baseURL+RunServiceWatchRunsProcedure,
 			connect.WithSchema(runServiceWatchRunsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		listActions: connect.NewClient[workflow.ListActionsRequest, workflow.ListActionsResponse](
@@ -224,12 +227,14 @@ func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			httpClient,
 			baseURL+RunServiceWatchActionsProcedure,
 			connect.WithSchema(runServiceWatchActionsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		watchClusterEvents: connect.NewClient[workflow.WatchClusterEventsRequest, workflow.WatchClusterEventsResponse](
 			httpClient,
 			baseURL+RunServiceWatchClusterEventsProcedure,
 			connect.WithSchema(runServiceWatchClusterEventsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		abortAction: connect.NewClient[workflow.AbortActionRequest, workflow.AbortActionResponse](
@@ -248,6 +253,7 @@ func NewRunServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			httpClient,
 			baseURL+RunServiceWatchGroupsProcedure,
 			connect.WithSchema(runServiceWatchGroupsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		getActionDataURIs: connect.NewClient[workflow.GetActionDataURIsRequest, workflow.GetActionDataURIsResponse](
@@ -450,6 +456,7 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 		RunServiceWatchRunDetailsProcedure,
 		svc.WatchRunDetails,
 		connect.WithSchema(runServiceWatchRunDetailsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	runServiceGetActionDetailsHandler := connect.NewUnaryHandler(
@@ -463,6 +470,7 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 		RunServiceWatchActionDetailsProcedure,
 		svc.WatchActionDetails,
 		connect.WithSchema(runServiceWatchActionDetailsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	runServiceGetActionDataHandler := connect.NewUnaryHandler(
@@ -483,6 +491,7 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 		RunServiceWatchRunsProcedure,
 		svc.WatchRuns,
 		connect.WithSchema(runServiceWatchRunsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	runServiceListActionsHandler := connect.NewUnaryHandler(
@@ -496,12 +505,14 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 		RunServiceWatchActionsProcedure,
 		svc.WatchActions,
 		connect.WithSchema(runServiceWatchActionsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	runServiceWatchClusterEventsHandler := connect.NewServerStreamHandler(
 		RunServiceWatchClusterEventsProcedure,
 		svc.WatchClusterEvents,
 		connect.WithSchema(runServiceWatchClusterEventsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	runServiceAbortActionHandler := connect.NewUnaryHandler(
@@ -520,6 +531,7 @@ func NewRunServiceHandler(svc RunServiceHandler, opts ...connect.HandlerOption) 
 		RunServiceWatchGroupsProcedure,
 		svc.WatchGroups,
 		connect.WithSchema(runServiceWatchGroupsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	runServiceGetActionDataURIsHandler := connect.NewUnaryHandler(

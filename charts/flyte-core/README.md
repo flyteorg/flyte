@@ -389,6 +389,7 @@ Distributed Flyte 2 core services
 | components.secret.strategy | object | `{}` |  |
 | components.secret.tolerations | list | `[]` |  |
 | components.secret.topologySpreadConstraints | list | `[]` |  |
+| configuration.actions.pprofPort | int | `0` | Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service. |
 | configuration.actions.recordFilterSize | int | `8388608` |  |
 | configuration.actions.runService.url | string | `"{{ include \"flyte-core.componentServiceURL\" (dict \"root\" . \"component\" \"runs\") }}"` |  |
 | configuration.actions.server.host | string | `"0.0.0.0"` |  |
@@ -397,10 +398,12 @@ Distributed Flyte 2 core services
 | configuration.actions.watchWorkers | int | `100` |  |
 | configuration.app.cacheTtl | string | `"30s"` |  |
 | configuration.app.internalAppService.url | string | `"{{ include \"flyte-core.componentServiceURL\" (dict \"root\" . \"component\" \"app\") }}"` |  |
+| configuration.app.pprofPort | int | `0` | Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service. |
 | configuration.app.server.host | string | `"0.0.0.0"` |  |
 | configuration.app.server.port | int | `8080` |  |
 | configuration.cache.heartbeatGracePeriodMultiplier | int | `3` |  |
 | configuration.cache.maxReservationHeartbeat | string | `"10s"` |  |
+| configuration.cache.pprofPort | int | `0` | Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service. |
 | configuration.cache.server.host | string | `"0.0.0.0"` |  |
 | configuration.cache.server.port | int | `8080` |  |
 | configuration.coPilot.image.repository | string | `"cr.flyte.org/flyteorg/flyte-binary-v2"` |  |
@@ -418,6 +421,7 @@ Distributed Flyte 2 core services
 | configuration.database.postgres.readReplicaHost | string | `""` |  |
 | configuration.database.postgres.username | string | `"postgres"` |  |
 | configuration.dataproxy.download.maxExpiresIn | string | `"1h"` |  |
+| configuration.dataproxy.pprofPort | int | `0` | Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service. |
 | configuration.dataproxy.runService.url | string | `"{{ include \"flyte-core.componentServiceURL\" (dict \"root\" . \"component\" \"runs\") }}"` |  |
 | configuration.dataproxy.server.host | string | `"0.0.0.0"` |  |
 | configuration.dataproxy.server.port | int | `8080` |  |
@@ -425,6 +429,7 @@ Distributed Flyte 2 core services
 | configuration.dataproxy.upload.maxExpiresIn | string | `"1h"` |  |
 | configuration.dataproxy.upload.maxSize | string | `"100Mi"` |  |
 | configuration.dataproxy.upload.storagePrefix | string | `"uploads"` |  |
+| configuration.events.pprofPort | int | `0` | Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service. |
 | configuration.events.runService.url | string | `"{{ include \"flyte-core.componentServiceURL\" (dict \"root\" . \"component\" \"runs\") }}"` |  |
 | configuration.events.server.host | string | `"0.0.0.0"` |  |
 | configuration.events.server.port | int | `8080` |  |
@@ -440,6 +445,7 @@ Distributed Flyte 2 core services
 | configuration.executor.maxSystemFailures | int | `3` |  |
 | configuration.executor.metricsPort | int | `10254` |  |
 | configuration.executor.metricsSecure | bool | `false` |  |
+| configuration.executor.pprofPort | int | `0` | Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service. |
 | configuration.executor.requeueDuration | string | `"10s"` |  |
 | configuration.externalConfigMap | string | `""` |  |
 | configuration.externalSecretRef | string | `""` |  |
@@ -481,8 +487,10 @@ Distributed Flyte 2 core services
 | configuration.runs.identityHeaders.emailHeader | string | `""` |  |
 | configuration.runs.identityHeaders.subjectHeader | string | `"X-Amzn-Oidc-Identity"` |  |
 | configuration.runs.notificationBufferLimit | int | `65000` |  |
+| configuration.runs.notifyBatchSize | int | `100` |  |
 | configuration.runs.notifyRetryMaxBackoff | string | `"5s"` |  |
 | configuration.runs.notifyRetryMinBackoff | string | `"50ms"` |  |
+| configuration.runs.pprofPort | int | `0` | Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service. |
 | configuration.runs.seedProjects[0] | string | `"flytesnacks"` |  |
 | configuration.runs.server.host | string | `"0.0.0.0"` |  |
 | configuration.runs.server.port | int | `8080` |  |
@@ -494,6 +502,7 @@ Distributed Flyte 2 core services
 | configuration.runs.triggerScheduler.resyncInterval | string | `"30s"` |  |
 | configuration.runs.trustForwardedIdentityHeaders | bool | `true` |  |
 | configuration.runs.watchBufferSize | int | `100` |  |
+| configuration.secret.pprofPort | int | `0` | Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service. |
 | configuration.secret.server.host | string | `"0.0.0.0"` |  |
 | configuration.secret.server.port | int | `8080` |  |
 | configuration.secret.webhook.url | string | `"{{ include \"flyte-core.executorCacheServiceURL\" . }}"` |  |

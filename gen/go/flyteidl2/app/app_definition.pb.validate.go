@@ -1741,6 +1741,35 @@ func (m *Spec) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetK8SMetadata()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, SpecValidationError{
+					field:  "K8SMetadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, SpecValidationError{
+					field:  "K8SMetadata",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetK8SMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return SpecValidationError{
+				field:  "K8SMetadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch v := m.AppPayload.(type) {
 	case *Spec_Container:
 		if v == nil {

@@ -131,6 +131,7 @@ func NewDataProxyServiceClient(httpClient connect.HTTPClient, baseURL string, op
 			httpClient,
 			baseURL+DataProxyServiceTailLogsProcedure,
 			connect.WithSchema(dataProxyServiceTailLogsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		getCloudCredentials: connect.NewClient[dataproxy.GetCloudCredentialsRequest, dataproxy.GetCloudCredentialsResponse](
@@ -245,6 +246,7 @@ func NewDataProxyServiceHandler(svc DataProxyServiceHandler, opts ...connect.Han
 		DataProxyServiceTailLogsProcedure,
 		svc.TailLogs,
 		connect.WithSchema(dataProxyServiceTailLogsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	dataProxyServiceGetCloudCredentialsHandler := connect.NewUnaryHandler(

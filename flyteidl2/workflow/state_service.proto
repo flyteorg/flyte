@@ -18,10 +18,14 @@ service StateService {
   rpc Put(PutRequest) returns (PutResponse) {}
 
   // get the state of an action.
-  rpc Get(GetRequest) returns (GetResponse) {}
+  rpc Get(GetRequest) returns (GetResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // watch for updates to the state of actions. this api guarantees at-least-once delivery semantics.
-  rpc Watch(WatchRequest) returns (stream WatchResponse) {}
+  rpc Watch(WatchRequest) returns (stream WatchResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 // request message to put the state of an action.

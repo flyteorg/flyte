@@ -25,7 +25,10 @@ var defaultConfig = &Config{
 	// Each entry includes a DeepCopy() of the TaskAction; tune carefully to avoid large memory spikes under backlog.
 	WatchBufferSize: 1000,
 	WatchWorkers:    100,
-	RunService:      serviceclient.ServiceConfig{URL: "http://localhost:8090"},
+	RunService: serviceclient.ServiceConfig{
+		URL:  "http://localhost:8090",
+		HTTP: serviceclient.HTTPConfig{MaxIdleConnsPerHost: 512},
+	},
 	// 8M slots × 8 bytes/pointer = 64 MB; can track ~8M unique actions.
 	RecordFilterSize: 1 << 23,
 }
@@ -36,6 +39,9 @@ var configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
 type Config struct {
 	// HTTP server configuration
 	Server ServerConfig `json:"server"`
+
+	// PprofPort is the port the pprof endpoint binds to. 0 disables profiling.
+	PprofPort int `json:"pprofPort" pflag:",Port the pprof endpoint binds to; 0 disables profiling"`
 
 	// Kubernetes configuration (namespace where TaskAction CRs live; the unified
 	// binary shares the manager's client, this is read by the standalone cmd).

@@ -7,7 +7,9 @@ import (
 	"time"
 
 	v1 "k8s.io/api/core/v1"
+	apimeta "k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
@@ -30,7 +32,8 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("unexpected resource type %T", resource)
 	}
 
-	// Read spec for failure-policy flags (restart_on_host_maintenance).
+	// Read spec for the failure policy (max_restarts, restart_on_host_maintenance,
+	// resume_after_preemption).
 	var spec clusteredpb.ClusteredTaskSpec
 	if taskTemplate, err := pluginContext.TaskReader().Read(ctx); err == nil && taskTemplate != nil {
 		if err := utils.UnmarshalStructToPb(taskTemplate.GetCustom(), &spec); err != nil {
@@ -62,6 +65,7 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 	started := hasJobSetStarted(jobSet, pluginState)
 	pods := currentRestartPods(jobSet, listWorkerPods(ctx, pluginContext, jobSet))
 	maxRestarts := getMaxRestarts(jobSet, &spec)
+	resumeAfterPreemption := spec.GetFailurePolicy().GetResumeAfterPreemption()
 
 	// 1. Is it over? A suspended JobSet is never terminal.
 	switch conditionType(condition) {
@@ -80,7 +84,8 @@ func (clusteredResourceHandler) GetTaskPhase(ctx context.Context, pluginContext 
 	// 2. Has the whole gang ever been up?
 	var phaseInfo pluginsCore.PhaseInfo
 	if started {
-		phaseInfo = afterStart(ctx, pluginContext, jobSet, condition, suspended, pods, maxRestarts, &taskInfo)
+		phaseInfo = afterStart(ctx, pluginContext, jobSet, condition, suspended, pods, maxRestarts,
+			resumeAfterPreemption, &taskInfo)
 	} else {
 		phaseInfo = beforeStart(ctx, pluginContext, jobSet, condition, suspended, pods, maxRestarts, pluginState, &taskInfo)
 	}
@@ -158,11 +163,35 @@ func afterStart(
 	suspended bool,
 	pods []v1.Pod,
 	maxRestarts int32,
+	resumeAfterPreemption bool,
 	taskInfo *pluginsCore.TaskInfo,
 ) pluginsCore.PhaseInfo {
 	// The gate took the gang back: the JobSet is re-suspended and its pods are gone.
 	if suspended {
-		return evictedPhaseInfo(ctx, pluginContext, jobSet, taskInfo)
+		wl, err := workloadForJobSet(ctx, pluginContext.K8sReader(), jobSet)
+		if err != nil {
+			logger.Warnf(ctx, "failed to read the Kueue Workload of JobSet %s/%s; ending the attempt: %v",
+				jobSet.Namespace, jobSet.Name, err)
+		}
+		// Phases never move backwards within an attempt, so a wait is reported as Running.
+		suspendedAt := suspendedSince(jobSet)
+		switch classifySuspension(wl, suspendedAt) {
+		case suspensionUnexplained:
+			if suspendedAt.IsZero() || taskInfo.OccurredAt.Sub(suspendedAt) <= evictionReasonGracePeriod {
+				return runningPhaseInfo(taskInfo, classifyEviction(wl).Summary()+"; waiting for kueue to report why")
+			}
+			logger.Infof(ctx, "JobSet %s/%s: kueue gave no eviction reason within %v; ending the attempt",
+				jobSet.Namespace, jobSet.Name, evictionReasonGracePeriod)
+		case suspensionReadmitted:
+			if resumeAfterPreemption {
+				return runningPhaseInfo(taskInfo, "gang readmitted by kueue; waiting for the JobSet to resume")
+			}
+		case suspensionPreempted:
+			if resumeAfterPreemption {
+				return runningPhaseInfo(taskInfo, classifyEviction(wl).Summary()+"; waiting for re-admission")
+			}
+		}
+		return evictedPhaseInfo(pluginContext, wl, taskInfo)
 	}
 
 	if conditionType(condition) == jobsetv1alpha2.JobSetRestarting {
@@ -193,22 +222,16 @@ func runningPhaseInfo(taskInfo *pluginsCore.TaskInfo, reason string) pluginsCore
 // the gang back. The plugin never suspends a JobSet itself.
 const evictionSource = "kueue"
 
-// evictedPhaseInfo reports a gang the gate took back after it had fully started. The attempt
-// is over and the JobSet is cleaned up. Kueue's Workload says why: a cause the user owns
+// evictedPhaseInfo reports a gang the gate took back after it had fully started, ending the
+// attempt and cleaning up the JobSet. Kueue's Workload says why: a cause the user owns
 // (preemption in the queue they chose, the maximum execution time they set) is a user retry
 // that uses one of the task's retries; any other cause, or a Workload that cannot be read, is
 // a system retry that does not. The message says which, and how many retries are left.
 func evictedPhaseInfo(
-	ctx context.Context,
 	pluginContext k8s.PluginContext,
-	jobSet *jobsetv1alpha2.JobSet,
+	wl *unstructured.Unstructured,
 	taskInfo *pluginsCore.TaskInfo,
 ) pluginsCore.PhaseInfo {
-	wl, err := workloadForJobSet(ctx, pluginContext.K8sReader(), jobSet)
-	if err != nil {
-		logger.Warnf(ctx, "failed to read the Kueue Workload of JobSet %s/%s; reporting its eviction as a system retry: %v",
-			jobSet.Namespace, jobSet.Name, err)
-	}
 	eviction := classifyEviction(wl)
 	if eviction.UserCaused {
 		eviction.RetriesLeft = retriesRemaining(pluginContext)
@@ -277,6 +300,24 @@ func isSuspended(jobSet *jobsetv1alpha2.JobSet, condition *metav1.Condition) boo
 		return true
 	}
 	return conditionType(condition) == jobsetv1alpha2.JobSetSuspended
+}
+
+// evictionReasonGracePeriod bounds how long a started gang that Kueue suspended waits for
+// the Workload's Evicted condition. Kueue writes the condition before it suspends the
+// JobSet, so the wait only covers a Workload read that lags behind the JobSet. A JobSet
+// suspended for another reason, such as Kueue replacing a deleted Workload, never gets
+// one, and its attempt ends once the period is over.
+const evictionReasonGracePeriod = time.Minute
+
+// suspendedSince is when the JobSet's Suspended condition last became True, or zero when the
+// JobSet controller has not written it yet. It is looked up by type rather than taken from
+// the current condition, since another True condition can carry a later or equal timestamp.
+func suspendedSince(jobSet *jobsetv1alpha2.JobSet) time.Time {
+	c := apimeta.FindStatusCondition(jobSet.Status.Conditions, string(jobsetv1alpha2.JobSetSuspended))
+	if c == nil || c.Status != metav1.ConditionTrue {
+		return time.Time{}
+	}
+	return c.LastTransitionTime.Time
 }
 
 func conditionType(condition *metav1.Condition) jobsetv1alpha2.JobSetConditionType {

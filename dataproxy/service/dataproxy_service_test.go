@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"net/url"
 	"testing"
 	"time"
@@ -28,6 +29,8 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/dataproxy/dataproxyconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
 	projectMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect/mocks"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
+	settingsMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings/settingsconnect/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
 	workflowMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect/mocks"
@@ -112,7 +115,7 @@ func TestCreateUploadLocation(t *testing.T) {
 				mockProjectClient.On("GetProject", mock.Anything, mock.Anything).Return(
 					connect.NewResponse(&project.GetProjectResponse{}), nil)
 			}
-			service := NewService(cfg, mockStore, nil, nil, nil, mockProjectClient, nil)
+			service := NewService(cfg, mockStore, nil, nil, nil, mockProjectClient, nil, nil)
 
 			req := &connect.Request[dataproxy.CreateUploadLocationRequest]{
 				Msg: tt.req,
@@ -233,7 +236,7 @@ func TestCheckFileExists(t *testing.T) {
 				mockStore = setupMockDataStoreWithExistingFile(t, tt.existingFileMD5)
 			}
 
-			service := NewService(cfg, mockStore, nil, nil, nil, nil, nil)
+			service := NewService(cfg, mockStore, nil, nil, nil, nil, nil, nil)
 			storagePath := storage.DataReference("s3://test-bucket/uploads/test-project/test-domain/test-root/test-file.txt")
 
 			err := service.checkFileExists(ctx, storagePath, tt.req)
@@ -311,7 +314,7 @@ func TestConstructStoragePath(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStore := setupMockDataStore(t)
-			service := NewService(cfg, mockStore, nil, nil, nil, nil, nil)
+			service := NewService(cfg, mockStore, nil, nil, nil, nil, nil, nil)
 
 			path, err := service.constructStoragePath(ctx, tt.req)
 
@@ -503,7 +506,14 @@ func TestUploadInputs(t *testing.T) {
 				mockProjectClient.On("GetProject", mock.Anything, mock.Anything).Return(
 					connect.NewResponse(&project.GetProjectResponse{}), nil)
 			}
-			svc := NewService(cfg, mockStore, nil, nil, nil, mockProjectClient, nil)
+			// A request that names its own base_dir must never look settings up: the mock fails
+			// the test on any call it was not told to expect.
+			settingsClient := settingsMocks.NewSettingsServiceClient(t)
+			if !tt.wantErr && tt.req.GetBaseDir() == "" {
+				settingsClient.On("GetSettings", mock.Anything, mock.Anything).Return(
+					connect.NewResponse(&settings.GetSettingsResponse{}), nil)
+			}
+			svc := NewService(cfg, mockStore, nil, nil, nil, mockProjectClient, settingsClient, nil)
 
 			req := &connect.Request[dataproxy.UploadInputsRequest]{
 				Msg: tt.req,
@@ -524,6 +534,83 @@ func TestUploadInputs(t *testing.T) {
 					tt.validateResult(t, resp)
 				}
 			}
+		})
+	}
+}
+
+func TestUploadInputs_RunBaseDirFromSettings(t *testing.T) {
+	ctx := context.Background()
+	cfg := config.DataProxyConfig{Upload: config.DataProxyUploadConfig{StoragePrefix: "uploads"}}
+
+	runBaseDir := func(state settings.SettingState, value string) *settings.Settings {
+		return &settings.Settings{Run: &settings.RunSettings{
+			RunBaseDir: &settings.StringSetting{State: state, StringValue: value},
+		}}
+	}
+
+	// Domain and project differ, so a key with the two swapped cannot match.
+	isUploadScope := func(req *connect.Request[settings.GetSettingsRequest]) bool {
+		key := req.Msg.GetKey()
+		return key.GetOrg() == "test-org" && key.GetDomain() == "test-domain" && key.GetProject() == "test-project"
+	}
+
+	tests := []struct {
+		name      string
+		resolved  *settings.Settings
+		lookupErr error
+		wantURI   string
+		wantCode  connect.Code
+	}{
+		{
+			name:     "settings supply the base when the request has none",
+			resolved: runBaseDir(settings.SettingState_SETTING_STATE_VALUE, "s3://settings-bucket/team-b/"),
+			wantURI:  "s3://settings-bucket/team-b/test-org/test-project/test-domain/offloaded-inputs/",
+		},
+		{
+			name:     "a base in UNSET contributes nothing",
+			resolved: runBaseDir(settings.SettingState_SETTING_STATE_UNSET, "s3://settings-bucket/team-b/"),
+			wantURI:  "s3://test-bucket/uploads/test-org/test-project/test-domain/offloaded-inputs/",
+		},
+		{
+			name:      "a failed lookup fails the upload",
+			lookupErr: errors.New("settings service unavailable"),
+			wantCode:  connect.CodeInternal,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			projectClient := projectMocks.NewProjectServiceClient(t)
+			projectClient.On("GetProject", mock.Anything, mock.Anything).Return(
+				connect.NewResponse(&project.GetProjectResponse{}), nil)
+
+			var reply *connect.Response[settings.GetSettingsResponse]
+			if tt.lookupErr == nil {
+				reply = connect.NewResponse(&settings.GetSettingsResponse{
+					SettingsRecord: &settings.SettingsRecord{Settings: tt.resolved},
+				})
+			}
+			settingsClient := settingsMocks.NewSettingsServiceClient(t)
+			settingsClient.On("GetSettings", mock.Anything, mock.MatchedBy(isUploadScope)).Return(reply, tt.lookupErr)
+
+			svc := NewService(cfg, setupMockDataStoreWithWriteProtobuf(t), nil, nil, nil, projectClient, settingsClient, nil)
+			resp, err := svc.UploadInputs(ctx, connect.NewRequest(&dataproxy.UploadInputsRequest{
+				Id: &dataproxy.UploadInputsRequest_RunId{RunId: &common.RunIdentifier{
+					Org: "test-org", Project: "test-project", Domain: "test-domain", Name: "test-run",
+				}},
+				Task: &dataproxy.UploadInputsRequest_TaskSpec{TaskSpec: &task.TaskSpec{
+					TaskTemplate: &core.TaskTemplate{Id: &core.Identifier{Name: "test-task"}, Metadata: &core.TaskMetadata{}},
+				}},
+				Inputs: &task.Inputs{},
+			}))
+
+			if tt.wantCode != 0 {
+				assert.Equal(t, tt.wantCode, connect.CodeOf(err))
+				assert.Nil(t, resp)
+				return
+			}
+			require.NoError(t, err)
+			assert.Contains(t, resp.Msg.GetOffloadedInputData().GetUri(), tt.wantURI)
 		})
 	}
 }
@@ -670,7 +757,7 @@ func TestGetActionData(t *testing.T) {
 				ComposedProtobufStore: mockComposedStore,
 				ReferenceConstructor:  &simpleRefConstructor{},
 			}
-			svc := NewService(cfg, ds, nil, nil, runClient, nil, nil)
+			svc := NewService(cfg, ds, nil, nil, runClient, nil, nil, nil)
 
 			resp, err := svc.GetActionData(ctx, connect.NewRequest(&dataproxy.GetActionDataRequest{
 				ActionId: actionID,
@@ -774,7 +861,7 @@ func TestTailLogs(t *testing.T) {
 			_ = stream.Send(&dataproxy.TailLogsResponse{})
 		}).Return(nil)
 
-		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, nil, streamer)
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, nil, nil, streamer)
 		client := newTailLogsTestClient(t, svc)
 
 		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
@@ -797,7 +884,7 @@ func TestTailLogs(t *testing.T) {
 			nil, connect.NewError(connect.CodeNotFound, assertErr("action missing")))
 
 		streamer := &mockLogStreamer{}
-		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, nil, streamer)
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, nil, nil, streamer)
 		client := newTailLogsTestClient(t, svc)
 
 		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
@@ -820,7 +907,7 @@ func TestTailLogs(t *testing.T) {
 			}), nil)
 
 		streamer := &mockLogStreamer{}
-		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, nil, streamer)
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, nil, nil, streamer)
 		client := newTailLogsTestClient(t, svc)
 
 		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
@@ -844,7 +931,7 @@ func TestTailLogs(t *testing.T) {
 		streamer.On("TailLogs", mock.Anything, logContext, mock.Anything).Return(
 			connect.NewError(connect.CodeInternal, assertErr("streamer boom")))
 
-		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, nil, streamer)
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, nil, nil, streamer)
 		client := newTailLogsTestClient(t, svc)
 
 		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
@@ -868,7 +955,7 @@ func TestTailLogs(t *testing.T) {
 		streamer := &mockLogStreamer{}
 		streamer.On("TailLogs", mock.Anything, logContext, mock.Anything).Return(nil)
 
-		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, nil, streamer)
+		svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, nil, nil, streamer)
 		client := newTailLogsTestClient(t, svc)
 
 		stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{

@@ -26,7 +26,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
 	k8sutil "github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
-	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -56,6 +55,7 @@ type ActionUpdate struct {
 
 const (
 	labelTerminalStatusRecorded = "flyte.org/terminal-status-recorded"
+	parentActionIndex           = "taskAction.parent"
 )
 
 // ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
@@ -94,37 +94,25 @@ type ActionsClient struct {
 	getLatest func(ctx context.Context, name string) (*executorv1.TaskAction, bool, error)
 }
 
-// NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) (*ActionsClient, error) {
+// NewActionsClient creates a new Kubernetes-based actions client. recordedFilter
+// is required to deduplicate RecordAction calls across watch reconnects.
+func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordedFilter fastcheck.Filter) (*ActionsClient, error) {
 	if numWorkers <= 0 {
 		numWorkers = 1
 	}
-	// The dedup filter is mandatory, so its size must be a positive value.
-	if recordFilterSize <= 0 {
-		return nil, fmt.Errorf("actions: recordFilterSize must be positive, got %d", recordFilterSize)
+	if recordedFilter == nil {
+		return nil, fmt.Errorf("actions: RecordAction dedup filter is required")
 	}
-	if scope == nil {
-		return nil, fmt.Errorf("actions: metrics scope is required")
-	}
-	c := &ActionsClient{
-		k8sClient:   k8sClient,
-		sharedCache: sharedCache,
-		namespace:   namespace,
-		bufferSize:  bufferSize,
-		numWorkers:  numWorkers,
-		runClient:   runClient,
-		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
-	}
-
-	// The dedup filter is mandatory: notifyRunService records on every event type
-	// and relies on the filter to keep RecordAction idempotent.
-	filter, err := fastcheck.NewOppoBloomFilter(recordFilterSize, scope.NewSubScope("actions_filter"))
-	if err != nil {
-		return nil, fmt.Errorf("actions: failed to create RecordAction dedup filter (size=%d): %w", recordFilterSize, err)
-	}
-	c.recordedFilter = filter
-
-	return c, nil
+	return &ActionsClient{
+		k8sClient:      k8sClient,
+		sharedCache:    sharedCache,
+		namespace:      namespace,
+		bufferSize:     bufferSize,
+		numWorkers:     numWorkers,
+		runClient:      runClient,
+		recordedFilter: recordedFilter,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+	}, nil
 }
 
 // Enqueue creates a TaskAction CR in etcd (via the K8s API).
@@ -163,7 +151,7 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 		taskAction.Spec.CacheKey = extractTaskCacheKey(action)
 
 		// Embed the inline TaskTemplate if present.
-		if err := embedTaskTemplate(action, taskAction, runSpec); err != nil {
+		if err := embedTaskTemplate(action, taskAction); err != nil {
 			return fmt.Errorf("failed to embed task template: %w", err)
 		}
 
@@ -420,38 +408,32 @@ func (c *ActionsClient) ListRunActions(ctx context.Context, runID *common.RunIde
 	return result, nil
 }
 
-// ListChildActions lists all TaskActions that are children of the given parent action
+// ListChildActions lists the parent and its direct children from the shared
+// informer cache. Cache reads wait for initial sync but may lag subsequent writes.
 func (c *ActionsClient) ListChildActions(ctx context.Context, parentActionID *common.ActionIdentifier) ([]*executorv1.TaskAction, error) {
-	// List all TaskActions in the same run
-	taskActionList := &executorv1.TaskActionList{}
-	listOpts := []client.ListOption{
-		client.InNamespace(c.namespace),
-		client.MatchingLabels{
-			"flyte.org/project": parentActionID.Run.Project,
-			"flyte.org/domain":  parentActionID.Run.Domain,
-			"flyte.org/run":     parentActionID.Run.Name,
-		},
+	items := &executorv1.TaskActionList{}
+	key := parentActionIndexKey(parentActionID.Run.Project, parentActionID.Run.Domain,
+		parentActionID.Run.Name, parentActionID.Name)
+	if err := c.sharedCache.List(ctx, items, client.InNamespace(c.namespace),
+		client.MatchingFields{parentActionIndex: key}); err != nil {
+		return nil, fmt.Errorf("failed to list cached child TaskActions: %w", err)
 	}
 
-	if err := c.k8sClient.List(ctx, taskActionList, listOpts...); err != nil {
-		return nil, fmt.Errorf("failed to list TaskActions: %w", err)
-	}
-
-	// Filter for the parent and its children
 	var result []*executorv1.TaskAction
-	for i := range taskActionList.Items {
-		action := &taskActionList.Items[i]
-		// Include the parent action itself
-		if action.Spec.ActionName == parentActionID.Name {
-			result = append(result, action)
-			continue
-		}
-		// Include direct children
-		if action.Spec.ParentActionName != nil && *action.Spec.ParentActionName == parentActionID.Name {
-			result = append(result, action)
+	parent := &executorv1.TaskAction{}
+	parentName := buildTaskActionName(parentActionID)
+	err := c.sharedCache.Get(ctx, client.ObjectKey{Namespace: c.namespace, Name: parentName}, parent)
+	if err != nil && !apierrors.IsNotFound(err) {
+		return nil, fmt.Errorf("failed to get cached parent TaskAction: %w", err)
+	}
+	if err == nil {
+		result = append(result, parent)
+	}
+	for i := range items.Items {
+		if items.Items[i].Name != parentName {
+			result = append(result, &items.Items[i])
 		}
 	}
-
 	return result, nil
 }
 
@@ -532,11 +514,29 @@ func (c *ActionsClient) StartWatching(ctx context.Context) error {
 
 	logger.Infof(ctx, "Starting TaskAction watcher for namespace: %s (workers: %d)", c.namespace, c.numWorkers)
 
-	if c.sharedCache == nil {
-		return fmt.Errorf("shared cache is required for TaskAction informer")
-	}
-
 	return c.setupInformer(ctx)
+}
+
+// parentActionIndexKey scopes action names, which are only unique within a run.
+func parentActionIndexKey(project, domain, run, parent string) string {
+	return strings.Join([]string{project, domain, run, parent}, "/")
+}
+
+func indexTaskActionParent(obj client.Object) []string {
+	ta := obj.(*executorv1.TaskAction)
+	if ta.Spec.ParentActionName == nil || *ta.Spec.ParentActionName == "" {
+		return nil
+	}
+	return []string{parentActionIndexKey(ta.Spec.Project, ta.Spec.Domain, ta.Spec.RunName, *ta.Spec.ParentActionName)}
+}
+
+// RegisterTaskActionIndexes must be called before starting the shared cache.
+// StartWatching may subsequently attach to an already-running informer.
+func RegisterTaskActionIndexes(ctx context.Context, indexer client.FieldIndexer) error {
+	if err := indexer.IndexField(ctx, &executorv1.TaskAction{}, parentActionIndex, indexTaskActionParent); err != nil {
+		return fmt.Errorf("failed to index TaskAction parents: %w", err)
+	}
+	return nil
 }
 
 func (c *ActionsClient) setupInformer(ctx context.Context) error {
@@ -567,7 +567,7 @@ func (c *ActionsClient) setupInformer(ctx context.Context) error {
 				obj = tombstone.Obj
 			}
 			taskAction, ok := obj.(*executorv1.TaskAction)
-			if !ok || c.shouldSkipTaskAction(taskAction) {
+			if !ok {
 				return
 			}
 			c.dispatchEvent(taskAction, watch.Deleted)
@@ -654,9 +654,6 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 	if !found {
 		return // object already gone; a delete event (if any) handles the terminal state
 	}
-	if c.shouldSkipTaskAction(latest) {
-		return
-	}
 	c.handleTaskActionEvent(ctx, latest, event.Type)
 }
 
@@ -677,8 +674,21 @@ func (c *ActionsClient) handleTaskActionEvent(ctx context.Context, taskAction *e
 	if update == nil {
 		return
 	}
+	if eventType == watch.Deleted {
+		// Preserve deduplication through the final update, then forget the action,
+		// including when its terminal status has already been recorded.
+		defer c.recordedFilter.Remove(ctx, []byte(buildTaskActionName(update.ActionID)))
+		// Already-recorded deletions only need filter cleanup, not notifications.
+		if c.shouldSkipTaskAction(taskAction) {
+			return
+		}
+	}
 
+	// Notify before the skip: subscribers still need the update when another replica recorded it.
 	c.notifySubscribers(ctx, update)
+	if c.shouldSkipTaskAction(taskAction) {
+		return
+	}
 	c.notifyRunService(ctx, taskAction, update, eventType)
 }
 
@@ -1107,11 +1117,20 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 		taskAction.Spec.EnvVars = nil
 		taskAction.Spec.Interruptible = nil
 		taskAction.Spec.PodTemplateName = ""
+		taskAction.Spec.ServiceAccount = ""
+		taskAction.Spec.RawDataPrefix = ""
+		taskAction.Spec.RunStartTime = ""
 		return
 	}
 
+	taskAction.Spec.RunStartTime = ""
+	if ts := runSpec.GetRunStartTime(); ts != nil {
+		taskAction.Spec.RunStartTime = ts.AsTime().UTC().Format(time.RFC3339)
+	}
 	taskAction.Spec.EnvVars = keyValuePairsToMap(runSpec.GetEnvs().GetValues())
 	taskAction.Spec.PodTemplateName = runSpec.GetDefaultSettings().GetPodTemplateName()
+	taskAction.Spec.ServiceAccount = runSpec.GetSecurityContext().GetRunAs().GetK8SServiceAccount()
+	taskAction.Spec.RawDataPrefix = runSpec.GetRawDataStorage().GetRawDataPrefix()
 	if runSpec.GetInterruptible() != nil {
 		value := runSpec.GetInterruptible().GetValue()
 		taskAction.Spec.Interruptible = &value
@@ -1141,6 +1160,9 @@ func inheritRunContextFromParentTaskAction(taskAction *executorv1.TaskAction, pa
 	}
 	taskAction.Spec.EnvVars = cloneStringMap(parentTaskAction.Spec.EnvVars)
 	taskAction.Spec.PodTemplateName = parentTaskAction.Spec.PodTemplateName
+	taskAction.Spec.ServiceAccount = parentTaskAction.Spec.ServiceAccount
+	taskAction.Spec.RawDataPrefix = parentTaskAction.Spec.RawDataPrefix
+	taskAction.Spec.RunStartTime = parentTaskAction.Spec.RunStartTime
 	if len(parentTaskAction.Annotations) > 0 {
 		if taskAction.Annotations == nil {
 			taskAction.Annotations = map[string]string{}
@@ -1216,9 +1238,9 @@ func extractTaskCacheKey(action *actions.Action) string {
 const runStartTimeTemplateVar = "{{.runStartTime}}"
 
 // embedTaskTemplate serializes the inline TaskTemplate from the Action into the CR spec,
-// substituting the {{.runStartTime}} container-arg placeholder with runSpec.run_start_time when
+// substituting the {{.runStartTime}} container-arg placeholder with the TaskAction's inherited run start time when
 // set. Templates produced by older SDKs omit the placeholder, so the substitution is a no-op.
-func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction, runSpec *task.RunSpec) error {
+func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction) error {
 	taskSpec, ok := action.Spec.(*actions.Action_Task)
 	if !ok || taskSpec.Task == nil || taskSpec.Task.Spec == nil || taskSpec.Task.Spec.TaskTemplate == nil {
 		// Non-task actions do not carry an inline template.
@@ -1229,8 +1251,9 @@ func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction
 	taskAction.Spec.TaskType = tmpl.Type
 	taskAction.Spec.ShortName = taskSpec.Task.Spec.ShortName
 
-	tmpl = substituteRunStartTime(tmpl, runSpec.GetRunStartTime())
+	tmpl = substituteRunStartTime(tmpl, taskAction.Spec.RunStartTime)
 	tmpl = applyPodTemplateName(tmpl, taskAction.Spec.PodTemplateName)
+	tmpl = applyServiceAccount(tmpl, taskAction.Spec.ServiceAccount)
 
 	data, err := proto.Marshal(tmpl)
 	if err != nil {
@@ -1241,17 +1264,16 @@ func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction
 }
 
 // substituteRunStartTime returns a TaskTemplate whose container args have the {{.runStartTime}}
-// placeholder replaced with ts formatted as RFC3339 UTC. It returns the input unchanged when ts is
-// nil or the template has no container args. The template is cloned before mutation so the caller's
+// placeholder replaced with the RFC3339 UTC run start time. It returns the input unchanged when value is
+// empty or the template has no container args. The template is cloned before mutation so the caller's
 // proto — which may be persisted separately as the registered task spec — is not affected.
-func substituteRunStartTime(tmpl *core.TaskTemplate, ts *timestamppb.Timestamp) *core.TaskTemplate {
-	if ts == nil {
+func substituteRunStartTime(tmpl *core.TaskTemplate, value string) *core.TaskTemplate {
+	if value == "" {
 		return tmpl
 	}
 	if tmpl.GetContainer() == nil || len(tmpl.GetContainer().GetArgs()) == 0 {
 		return tmpl
 	}
-	value := ts.AsTime().UTC().Format(time.RFC3339)
 	cloned := proto.Clone(tmpl).(*core.TaskTemplate)
 	args := cloned.GetContainer().GetArgs()
 	for i, arg := range args {
@@ -1277,6 +1299,30 @@ func applyPodTemplateName(tmpl *core.TaskTemplate, name string) *core.TaskTempla
 		cloned.Metadata = &core.TaskMetadata{}
 	}
 	cloned.Metadata.PodTemplateName = name
+	return cloned
+}
+
+// applyServiceAccount returns a TaskTemplate whose security context names the given Kubernetes
+// service account. It returns the input unchanged when the name is empty or the task already set
+// one itself, so an explicit choice always wins. Other security context fields are kept. The
+// template is cloned before mutation so the caller's proto - which may be persisted separately as
+// the registered task spec - is not affected.
+func applyServiceAccount(tmpl *core.TaskTemplate, name string) *core.TaskTemplate {
+	if name == "" {
+		return tmpl
+	}
+	if tmpl.GetSecurityContext().GetRunAs().GetK8SServiceAccount() != "" {
+		return tmpl
+	}
+
+	cloned := proto.Clone(tmpl).(*core.TaskTemplate)
+	if cloned.SecurityContext == nil {
+		cloned.SecurityContext = &core.SecurityContext{}
+	}
+	if cloned.SecurityContext.RunAs == nil {
+		cloned.SecurityContext.RunAs = &core.Identity{}
+	}
+	cloned.SecurityContext.RunAs.K8SServiceAccount = name
 	return cloned
 }
 

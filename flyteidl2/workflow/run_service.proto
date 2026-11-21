@@ -31,7 +31,9 @@ service RunService {
   }
 
   // Stream detailed information updates about a run. The call will terminate when the run reaches a terminal phase.
-  rpc WatchRunDetails(WatchRunDetailsRequest) returns (stream WatchRunDetailsResponse) {}
+  rpc WatchRunDetails(WatchRunDetailsRequest) returns (stream WatchRunDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Get detailed information about an action.
   rpc GetActionDetails(GetActionDetailsRequest) returns (GetActionDetailsResponse) {
@@ -39,7 +41,9 @@ service RunService {
   }
 
   // Stream detailed information updates about an action. The call will terminate when the action reaches a terminal phase.
-  rpc WatchActionDetails(WatchActionDetailsRequest) returns (stream WatchActionDetailsResponse) {}
+  rpc WatchActionDetails(WatchActionDetailsRequest) returns (stream WatchActionDetailsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Deprecated: Use DataProxyService.GetActionData instead.
   rpc GetActionData(GetActionDataRequest) returns (GetActionDataResponse) {
@@ -54,7 +58,9 @@ service RunService {
 
   // Stream updates for runs based on the provided filter criteria. Responses may include newly discovered
   // runs or updates to existing ones from the point of invocation.
-  rpc WatchRuns(WatchRunsRequest) returns (stream WatchRunsResponse) {}
+  rpc WatchRuns(WatchRunsRequest) returns (stream WatchRunsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // List actions for a run, or live pending and in-flight task actions for a queue
   // when supported. Phase filters in the list request select the returned phases.
@@ -64,10 +70,14 @@ service RunService {
 
   // Stream updates for actions given a run. Responses may include newly discovered nested runs or updates
   // to  existing ones from the point of invocation.
-  rpc WatchActions(WatchActionsRequest) returns (stream WatchActionsResponse) {}
+  rpc WatchActions(WatchActionsRequest) returns (stream WatchActionsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Stream of k8s cluster events in human readable form
-  rpc WatchClusterEvents(WatchClusterEventsRequest) returns (stream WatchClusterEventsResponse) {}
+  rpc WatchClusterEvents(WatchClusterEventsRequest) returns (stream WatchClusterEventsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // AbortAction aborts a single action that was previously created or is currently being processed by a worker.
   rpc AbortAction(AbortActionRequest) returns (AbortActionResponse) {}
@@ -79,7 +89,9 @@ service RunService {
   rpc SignalEvent(SignalEventRequest) returns (SignalEventResponse) {}
 
   // Stream updates for task groups based on the provided filter criteria.
-  rpc WatchGroups(WatchGroupsRequest) returns (stream WatchGroupsResponse) {}
+  rpc WatchGroups(WatchGroupsRequest) returns (stream WatchGroupsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Get the storage URIs for an action's input and output data.
   rpc GetActionDataURIs(GetActionDataURIsRequest) returns (GetActionDataURIsResponse) {
@@ -97,8 +109,13 @@ message CreateRunRequest {
   oneof id {
     option (buf.validate.oneof).required = true;
 
-    // The user provided run id.
-    common.RunIdentifier run_id = 1;
+    // The user provided run id. The name must not contain '/' or ':', which separate the parts
+    // of an action's key. Only checked here, so that existing runs stay readable.
+    common.RunIdentifier run_id = 1 [(buf.validate.field).cel = {
+      id: "run_id.name.no_separators"
+      message: "Run name must not contain '/' or ':'"
+      expression: "!this.name.matches('[/:]')"
+    }];
 
     // The project id for this run. Run name will be generated.
     common.ProjectIdentifier project_id = 6;

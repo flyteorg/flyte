@@ -40,6 +40,7 @@ class AcceleratorModel(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     NVIDIA_GB10: _ClassVar[AcceleratorModel]
     NVIDIA_RTX_PRO_6000: _ClassVar[AcceleratorModel]
     NVIDIA_RTX_PRO_4500: _ClassVar[AcceleratorModel]
+    NVIDIA_A2: _ClassVar[AcceleratorModel]
     GOOGLE_TPU_V5E: _ClassVar[AcceleratorModel]
     GOOGLE_TPU_V5P: _ClassVar[AcceleratorModel]
     GOOGLE_TPU_V6E: _ClassVar[AcceleratorModel]
@@ -67,6 +68,7 @@ class WorkerKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     WORKER_KIND_SANDBOX: _ClassVar[WorkerKind]
     WORKER_KIND_MICROVM: _ClassVar[WorkerKind]
     WORKER_KIND_REUSABLE: _ClassVar[WorkerKind]
+    WORKER_KIND_GVISOR: _ClassVar[WorkerKind]
 ACCELERATOR_MODEL_UNSPECIFIED: AcceleratorModel
 NVIDIA_K80: AcceleratorModel
 NVIDIA_M60: AcceleratorModel
@@ -88,6 +90,7 @@ NVIDIA_GB200: AcceleratorModel
 NVIDIA_GB10: AcceleratorModel
 NVIDIA_RTX_PRO_6000: AcceleratorModel
 NVIDIA_RTX_PRO_4500: AcceleratorModel
+NVIDIA_A2: AcceleratorModel
 GOOGLE_TPU_V5E: AcceleratorModel
 GOOGLE_TPU_V5P: AcceleratorModel
 GOOGLE_TPU_V6E: AcceleratorModel
@@ -112,6 +115,7 @@ WORKER_KIND_UNSPECIFIED: WorkerKind
 WORKER_KIND_SANDBOX: WorkerKind
 WORKER_KIND_MICROVM: WorkerKind
 WORKER_KIND_REUSABLE: WorkerKind
+WORKER_KIND_GVISOR: WorkerKind
 ACCELERATOR_NAME_FIELD_NUMBER: _ClassVar[int]
 accelerator_name: _descriptor.FieldDescriptor
 

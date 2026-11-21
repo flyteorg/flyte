@@ -31,6 +31,7 @@ func newSecretsInjector(
 	globalSecretManagerConfig *secretmanager.Config,
 	podNamespace string,
 	limitNamespace string,
+	extraFetchers []SecretFetcher,
 	scope promutils.Scope,
 ) (SecretsInjector, error) {
 	switch secretManagerType {
@@ -109,12 +110,14 @@ func newSecretsInjector(
 			return nil, fmt.Errorf("failed to create controller-runtime client: %w", err)
 		}
 
-		var secretFetchers []SecretFetcher
 		secretFetcher, err := NewSecretFetcher(ctx, webhookConfig.EmbeddedSecretManagerConfig)
 		if err != nil {
 			return nil, err
 		}
 
+		// Extra fetchers (WithSecretFetchers) are consulted first, the configured store last.
+		secretFetchers := make([]SecretFetcher, 0, len(extraFetchers)+1)
+		secretFetchers = append(secretFetchers, extraFetchers...)
 		secretFetchers = append(secretFetchers, secretFetcher)
 
 		cacheConfig := stdlibCache.GetConfig()

@@ -101,7 +101,7 @@ func (r RemoteFileOutputReader) Read(ctx context.Context) (*core.LiteralMap, *io
 	d := &core.LiteralMap{}
 	if err := r.store.ReadProtobuf(ctx, r.OutPath.GetOutputPath(), d); err != nil {
 		// TODO change flytestdlib to return protobuf unmarshal errors separately. As this can indicate malformed output and we should catch that
-		return nil, nil, fmt.Errorf("failed to read data from dataDir [%v]. Error: %v", r.OutPath.GetOutputPath(), err)
+		return nil, nil, fmt.Errorf("failed to read data from dataDir [%v]. Error: %w", r.OutPath.GetOutputPath(), err)
 	}
 
 	if d.Literals == nil {

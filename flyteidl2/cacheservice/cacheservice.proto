@@ -14,7 +14,9 @@ option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice"
  */
 service CacheService {
   // Retrieves cached data by key.
-  rpc Get(GetCacheRequest) returns (GetCacheResponse);
+  rpc Get(GetCacheRequest) returns (GetCacheResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // Stores or updates cached data by key.
   rpc Put(PutCacheRequest) returns (PutCacheResponse);

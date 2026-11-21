@@ -15,10 +15,24 @@ import (
 )
 
 func TestNewHTTPClientDisabledReturnsBaseClient(t *testing.T) {
-	base := &http.Client{Timeout: time.Second}
+	base := &http.Client{Timeout: time.Second, Transport: http.DefaultTransport}
 	actual, err := NewHTTPClient(context.Background(), base, ServiceConfig{URL: "http://service"})
 	require.NoError(t, err)
-	assert.Same(t, base, actual)
+	assert.Equal(t, base, actual)
+}
+
+// A base client without a transport keeps its timeout and gets one built from cfg.HTTP.
+func TestNewHTTPClientSetsTransportOnBaseClient(t *testing.T) {
+	base := &http.Client{Timeout: time.Second}
+	actual, err := NewHTTPClient(context.Background(), base, ServiceConfig{
+		URL:  "http://service",
+		HTTP: HTTPConfig{MaxIdleConnsPerHost: 50},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, time.Second, actual.Timeout)
+	require.IsType(t, &http.Transport{}, actual.Transport)
+	assert.Equal(t, 50, actual.Transport.(*http.Transport).MaxIdleConnsPerHost)
+	assert.Nil(t, base.Transport, "base client was modified")
 }
 
 func TestNewHTTPClientAuthenticatesAndReusesToken(t *testing.T) {
@@ -122,6 +136,62 @@ func TestNewHTTPClientReadsClientSecretFile(t *testing.T) {
 	resp, err := client.Get(server.URL + "/service")
 	require.NoError(t, err)
 	require.NoError(t, resp.Body.Close())
+}
+
+func TestNewHTTPClientFallsBackToOpenIDConfiguration(t *testing.T) {
+	mux := http.NewServeMux()
+	server := httptest.NewTestServer(t, mux)
+	mux.HandleFunc("/tenant/v2.0"+openIDConfigurationPath, func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = io.WriteString(w, `{"token_endpoint":"`+server.URL+`/token"}`)
+	})
+	mux.HandleFunc("/token", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = io.WriteString(w, `{"access_token":"token","token_type":"Bearer","expires_in":3600}`)
+	})
+	mux.HandleFunc("/service", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "Bearer token", r.Header.Get("Authorization"))
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	client, err := NewHTTPClient(context.Background(), server.Client(), ServiceConfig{
+		URL: server.URL,
+		Auth: AuthConfig{
+			Type:         AuthTypeOAuth2ClientCredentials,
+			IssuerURL:    server.URL + "/tenant/v2.0",
+			ClientID:     "executor",
+			ClientSecret: "secret",
+		},
+	})
+	require.NoError(t, err)
+	resp, err := client.Get(server.URL + "/service")
+	require.NoError(t, err)
+	require.NoError(t, resp.Body.Close())
+	assert.Equal(t, http.StatusNoContent, resp.StatusCode)
+}
+
+func TestNewHTTPClientFallsBackOnlyWhenMetadataIsMissing(t *testing.T) {
+	var openIDRequests atomic.Int32
+	mux := http.NewServeMux()
+	server := httptest.NewTestServer(t, mux)
+	mux.HandleFunc(oauthAuthorizationServerMetadataPath, func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	mux.HandleFunc(openIDConfigurationPath, func(w http.ResponseWriter, _ *http.Request) {
+		openIDRequests.Add(1)
+	})
+
+	_, err := NewHTTPClient(context.Background(), server.Client(), ServiceConfig{
+		URL: server.URL,
+		Auth: AuthConfig{
+			Type:         AuthTypeOAuth2ClientCredentials,
+			IssuerURL:    server.URL,
+			ClientID:     "executor",
+			ClientSecret: "secret",
+		},
+	})
+	require.ErrorContains(t, err, "metadata endpoint returned status 500")
+	assert.Zero(t, openIDRequests.Load())
 }
 
 func TestNewHTTPClientValidatesConfiguration(t *testing.T) {

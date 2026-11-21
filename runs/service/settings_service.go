@@ -12,6 +12,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"k8s.io/apimachinery/pkg/api/resource"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings/settingsconnect"
@@ -208,6 +209,17 @@ func validateMaxActionConcurrency(setting *settings.Int64Setting) error {
 	return nil
 }
 
+// validateLogRetentionDays rejects a negative log retention. 0 leaves it to the server.
+func validateLogRetentionDays(setting *settings.Int64Setting) error {
+	if setting.GetState() != settings.SettingState_SETTING_STATE_VALUE {
+		return nil
+	}
+	if v := setting.GetIntValue(); v < 0 {
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid observability.log_retention_days %d: must not be negative", v))
+	}
+	return nil
+}
+
 // validateQuantity checks that a quantity leaf holds a value Kubernetes can parse.
 // name is the dot-path used in the error message, e.g. "task_resource.max.memory".
 func validateQuantity(name string, setting *settings.QuantitySetting) error {
@@ -246,6 +258,25 @@ var canonicalAcceleratorNames = func() map[string]bool {
 	return names
 }()
 
+// validateStoragePath checks that a path setting is a URI the data store can address.
+// Bad values would otherwise fail every CreateRun in scope.
+func validateStoragePath(name string, setting *settings.StringSetting) error {
+	if setting.GetState() != settings.SettingState_SETTING_STATE_VALUE {
+		return nil
+	}
+	value := setting.GetStringValue()
+	scheme, container, _, err := storage.DataReference(value).Split()
+	if err == nil && scheme == "" {
+		err = errors.New("missing scheme")
+	} else if err == nil && scheme != "file" && container == "" {
+		err = errors.New("missing bucket")
+	}
+	if err != nil {
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid %s %q (e.g. s3://bucket/prefix): %w", name, value, err))
+	}
+	return nil
+}
+
 // validateDefaultAccelerator requires a default accelerator in VALUE state to
 // name a device from the canonical list (core.AcceleratorModel's
 // accelerator_name strings). Unlike a task's own gpu_accelerator, which keeps
@@ -265,6 +296,15 @@ func validateDefaultAccelerator(setting *settings.AcceleratorSetting) error {
 
 func validateSettings(s *settings.Settings) error {
 	if err := validateMaxActionConcurrency(s.GetRun().GetMaxActionConcurrency()); err != nil {
+		return err
+	}
+	if err := validateLogRetentionDays(s.GetObservability().GetLogRetentionDays()); err != nil {
+		return err
+	}
+	if err := validateStoragePath("run.run_base_dir", s.GetRun().GetRunBaseDir()); err != nil {
+		return err
+	}
+	if err := validateStoragePath("storage.raw_data_path", s.GetStorage().GetRawDataPath()); err != nil {
 		return err
 	}
 	if err := validateTaskResourceDefaults("task_resource.min", s.GetTaskResource().GetMin()); err != nil {

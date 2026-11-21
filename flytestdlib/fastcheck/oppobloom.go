@@ -5,8 +5,9 @@
 // This code is liberally copied from the original implementation at https://github.com/jmhodges/opposite_of_a_bloom_filter/blob/master/go/oppobloom/oppobloom.go
 // Package oppobloom implements a filter data structure that may report false negatives but no false positives.
 
-// the fastcheck.OppoBloomFilter provides two methods instead of one, a contains and an add. This makes it possible to
-// check and then optionally add the value. It is possible that two threads may race and add it multiple times
+// The fastcheck.OppoBloomFilter provides separate Contains, Add, and Remove methods.
+// This makes it possible to check and then optionally add the value. It is possible
+// that two threads may race and add it multiple times.
 package fastcheck
 
 import (
@@ -19,7 +20,7 @@ import (
 	"sync/atomic"
 	"unsafe"
 
-	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
+	"go.opentelemetry.io/otel/metric"
 )
 
 var ErrSizeTooLarge = errors.New("oppobloom: size given too large to round to a power of 2")
@@ -65,15 +66,30 @@ func (f *OppoBloomFilter) Add(_ context.Context, id []byte) bool {
 	return !bytes.Equal(oldID, id)
 }
 
-func (f *OppoBloomFilter) Contains(_ context.Context, id []byte) bool {
-	curr := get(f.array, f.getIndex(id))
-	if curr != nil {
-		if bytes.Equal(id, *curr) {
-			f.metrics.Hit.Inc()
+func (f *OppoBloomFilter) Remove(_ context.Context, id []byte) bool {
+	index := f.getIndex(id)
+	indexPtr := (*unsafe.Pointer)(unsafe.Pointer(&f.array[index]))
+	for {
+		curr := get(f.array, index)
+		if curr == nil || !bytes.Equal(id, *curr) {
+			return false
+		}
+		// Only clear the value we checked; a concurrent Add may replace it.
+		if atomic.CompareAndSwapPointer(indexPtr, unsafe.Pointer(curr), nil) {
 			return true
 		}
 	}
-	f.metrics.Miss.Inc()
+}
+
+func (f *OppoBloomFilter) Contains(ctx context.Context, id []byte) bool {
+	curr := get(f.array, f.getIndex(id))
+	if curr != nil {
+		if bytes.Equal(id, *curr) {
+			f.metrics.Hit.Add(ctx, 1, f.metrics.attributes)
+			return true
+		}
+	}
+	f.metrics.Miss.Add(ctx, 1, f.metrics.attributes)
 	return false
 }
 
@@ -105,8 +121,9 @@ func getAndSet(arr []*[]byte, index int32, id []byte) []byte {
 }
 
 // NewOppoBloomFilter creates a new Opposite of Bloom filter proposed in https://github.com/jmhodges/opposite_of_a_bloom_filter/ and
-// the related blog https://www.somethingsimilar.com/2012/05/21/the-opposite-of-a-bloom-filter/
-func NewOppoBloomFilter(size int, scope promutils.Scope) (*OppoBloomFilter, error) {
+// the related blog https://www.somethingsimilar.com/2012/05/21/the-opposite-of-a-bloom-filter/.
+// Scope identifies the filter in OTEL metrics. A nil provider disables metrics.
+func NewOppoBloomFilter(size int, scope string, provider metric.MeterProvider) (*OppoBloomFilter, error) {
 	if size > MaxFilterSize {
 		return nil, ErrSizeTooLarge
 	}
@@ -117,5 +134,24 @@ func NewOppoBloomFilter(size int, scope promutils.Scope) (*OppoBloomFilter, erro
 	size = int(math.Pow(2, math.Ceil(math.Log2(float64(size)))))
 	slice := make([]*[]byte, size)
 	sizeMask := uint32(size - 1) // #nosec G115
-	return &OppoBloomFilter{slice, sizeMask, newMetrics(scope)}, nil
+	f := &OppoBloomFilter{array: slice, sizeMask: sizeMask}
+	metrics, err := newMetrics(scope, "oppobloom", f.size, provider)
+	if err != nil {
+		return nil, err
+	}
+	f.metrics = metrics
+	return f, nil
+}
+
+// size counts occupied slots at collection time without slowing down mutations.
+// Atomic reads keep collection safe during concurrent Add and Remove operations;
+// like Contains, the observation can change while operations are in flight.
+func (f *OppoBloomFilter) size() int64 {
+	var count int64
+	for i := range f.array {
+		if get(f.array, int32(i)) != nil { // #nosec G115 -- capacity is bounded by MaxFilterSize.
+			count++
+		}
+	}
+	return count
 }

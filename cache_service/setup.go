@@ -16,26 +16,28 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice/v2/v2connect"
 )
 
-const otelServiceName = "cache-service"
+// ServiceName identifies telemetry emitted by this service and its clients.
+const ServiceName = "cache-service"
 
 // Setup registers the CacheService handler on the SetupContext mux.
 // Requires sc.DB and sc.DataStore to be set by the standalone binary.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
+	sc.AddProfilingServer("cache", cfg.PprofPort)
 	if err := migrations.RunMigrations(ctx, sc.DB); err != nil {
 		return fmt.Errorf("cache_service: failed to run migrations: %w", err)
 	}
 
 	otelCfg := otelutils.GetConfig()
-	err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg)
+	err := otelutils.RegisterProvidersWithContext(ctx, ServiceName, otelCfg)
 	if err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
 
-	tracerProvider := otelutils.GetTracerProvider(otelServiceName)
-	meterProvider := otelutils.GetMeterProvider(otelServiceName)
+	tracerProvider := otelutils.GetTracerProvider(ServiceName)
+	meterProvider := otelutils.GetMeterProvider(ServiceName)
 
-	otelInterceptor, err := otelconnect.NewInterceptor(otelconnect.WithTracerProvider(tracerProvider), otelconnect.WithMeterProvider(meterProvider))
+	otelInterceptor, err := otelutils.NewConnectInterceptor(otelconnect.WithTracerProvider(tracerProvider), otelconnect.WithMeterProvider(meterProvider))
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}

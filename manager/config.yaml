@@ -99,7 +99,7 @@ plugins:
 storage:
   type: minio
   container: "flyte-data"
-  enable-multicontainer: false
+  enable-multicontainer: true
   stow:
     kind: "s3"
     config:

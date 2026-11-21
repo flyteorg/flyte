@@ -1695,12 +1695,12 @@ func TestGetTaskPhase_RecoverableErrorFile(t *testing.T) {
 		}
 	}
 
-	newErrorDoc := func(kind core.ContainerError_Kind) *core.ErrorDocument {
+	newErrorDoc := func(kind core.ContainerError_Kind, origin core.ExecutionError_ErrorKind) *core.ErrorDocument {
 		return &core.ErrorDocument{Error: &core.ContainerError{
-			Code:    "USER:Unknown",
+			Code:    "TaskError",
 			Message: "boom",
 			Kind:    kind,
-			Origin:  core.ExecutionError_USER,
+			Origin:  origin,
 		}}
 	}
 
@@ -1708,17 +1708,45 @@ func TestGetTaskPhase_RecoverableErrorFile(t *testing.T) {
 		name          string
 		errorDoc      *core.ErrorDocument
 		expectedPhase pluginsCore.Phase
+		expectedKind  core.ExecutionError_ErrorKind
 	}{
-		{"recoverable error.pb maps to retryable failure", newErrorDoc(core.ContainerError_RECOVERABLE), pluginsCore.PhaseRetryableFailure},
-		{"non-recoverable error.pb stays terminal", newErrorDoc(core.ContainerError_NON_RECOVERABLE), pluginsCore.PhasePermanentFailure},
-		{"absent error.pb stays terminal", nil, pluginsCore.PhasePermanentFailure},
-		{"malformed error.pb (nil Error) stays terminal", &core.ErrorDocument{}, pluginsCore.PhasePermanentFailure},
+		{
+			"recoverable user error.pb maps to user retry",
+			newErrorDoc(core.ContainerError_RECOVERABLE, core.ExecutionError_USER),
+			pluginsCore.PhaseRetryableFailure, core.ExecutionError_USER,
+		},
+		{
+			"recoverable system error.pb maps to system retry",
+			newErrorDoc(core.ContainerError_RECOVERABLE, core.ExecutionError_SYSTEM),
+			pluginsCore.PhaseRetryableFailure, core.ExecutionError_SYSTEM,
+		},
+		{
+			"recoverable unknown error.pb keeps user retry",
+			newErrorDoc(core.ContainerError_RECOVERABLE, core.ExecutionError_UNKNOWN),
+			pluginsCore.PhaseRetryableFailure, core.ExecutionError_USER,
+		},
+		{
+			"non-recoverable user error.pb stays terminal",
+			newErrorDoc(core.ContainerError_NON_RECOVERABLE, core.ExecutionError_USER),
+			pluginsCore.PhasePermanentFailure, core.ExecutionError_USER,
+		},
+		{
+			"non-recoverable system error.pb stays terminal",
+			newErrorDoc(core.ContainerError_NON_RECOVERABLE, core.ExecutionError_SYSTEM),
+			pluginsCore.PhasePermanentFailure, core.ExecutionError_USER,
+		},
+		{"absent error.pb stays terminal", nil, pluginsCore.PhasePermanentFailure, core.ExecutionError_USER},
+		{
+			"malformed error.pb (nil Error) stays terminal", &core.ErrorDocument{},
+			pluginsCore.PhasePermanentFailure, core.ExecutionError_USER,
+		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			pluginCtx := rayPluginContextWithErrorDoc(k8s.PluginState{}, tc.errorDoc)
 			phaseInfo, err := handler.GetTaskPhase(ctx, pluginCtx, newFailedRayJob())
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedPhase.String(), phaseInfo.Phase().String())
+			assert.Equal(t, tc.expectedKind, phaseInfo.Err().GetKind())
 		})
 	}
 }

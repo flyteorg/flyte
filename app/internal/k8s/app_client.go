@@ -498,6 +498,36 @@ func (c *AppK8sClient) List(ctx context.Context, project, domain string, limit u
 	return apps, list.Continue, nil
 }
 
+// CountActiveApps counts the managed KServices that are Ready and not stopped,
+// the same apps whose status reports DEPLOYMENT_STATUS_ACTIVE. It reads the
+// informer cache, so it makes no Kubernetes API call.
+func (c *AppK8sClient) CountActiveApps(ctx context.Context) (int64, error) {
+	ns := c.namespace
+	matchLabels := map[string]string{labelAppManaged: "true"}
+	listOpts := []client.ListOption{
+		client.InNamespace(ns),
+		client.MatchingLabels(matchLabels),
+	}
+	list := &servingv1.ServiceList{}
+	if err := c.cache.List(ctx, list, listOpts...); err != nil {
+		return 0, fmt.Errorf("failed to list KServices for active apps: %w", err)
+	}
+
+	count := 0
+	for i := range list.Items {
+		ksvc := &list.Items[i]
+		if ksvc.Labels[labelAppStopped] == "true" {
+			continue
+		}
+		if !ksvc.Status.GetCondition(servingv1.ServiceConditionReady).IsTrue() {
+			continue
+		}
+		count++
+	}
+
+	return int64(count), nil
+}
+
 // PublicIngress returns the deterministic public URL for an app.
 func (c *AppK8sClient) PublicIngress(id *flyteapp.Identifier) *flyteapp.Ingress {
 	if c.cfg.BaseDomain == "" {

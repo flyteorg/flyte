@@ -129,10 +129,12 @@ class RunSettings(_message.Message):
     def __init__(self, default_queue: _Optional[_Union[StringSetting, _Mapping]] = ..., max_action_concurrency: _Optional[_Union[Int64Setting, _Mapping]] = ..., run_base_dir: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
 
 class SecuritySettings(_message.Message):
-    __slots__ = ["service_account"]
+    __slots__ = ["service_account", "kubernetes_namespace"]
     SERVICE_ACCOUNT_FIELD_NUMBER: _ClassVar[int]
+    KUBERNETES_NAMESPACE_FIELD_NUMBER: _ClassVar[int]
     service_account: StringSetting
-    def __init__(self, service_account: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
+    kubernetes_namespace: StringSetting
+    def __init__(self, service_account: _Optional[_Union[StringSetting, _Mapping]] = ..., kubernetes_namespace: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
 
 class StorageSettings(_message.Message):
     __slots__ = ["raw_data_path"]
@@ -172,8 +174,14 @@ class AppSettings(_message.Message):
     app_dns_strategy: StringSetting
     def __init__(self, disallow_anonymous: _Optional[_Union[BoolSetting, _Mapping]] = ..., app_dns_strategy: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
 
+class ObservabilitySettings(_message.Message):
+    __slots__ = ["log_retention_days"]
+    LOG_RETENTION_DAYS_FIELD_NUMBER: _ClassVar[int]
+    log_retention_days: Int64Setting
+    def __init__(self, log_retention_days: _Optional[_Union[Int64Setting, _Mapping]] = ...) -> None: ...
+
 class Settings(_message.Message):
-    __slots__ = ["run", "security", "storage", "task_resource", "labels", "annotations", "environment_variables", "app", "pod_template_name"]
+    __slots__ = ["run", "security", "storage", "task_resource", "labels", "annotations", "environment_variables", "app", "pod_template_name", "observability"]
     RUN_FIELD_NUMBER: _ClassVar[int]
     SECURITY_FIELD_NUMBER: _ClassVar[int]
     STORAGE_FIELD_NUMBER: _ClassVar[int]
@@ -183,6 +191,7 @@ class Settings(_message.Message):
     ENVIRONMENT_VARIABLES_FIELD_NUMBER: _ClassVar[int]
     APP_FIELD_NUMBER: _ClassVar[int]
     POD_TEMPLATE_NAME_FIELD_NUMBER: _ClassVar[int]
+    OBSERVABILITY_FIELD_NUMBER: _ClassVar[int]
     run: RunSettings
     security: SecuritySettings
     storage: StorageSettings
@@ -192,4 +201,5 @@ class Settings(_message.Message):
     environment_variables: StringMapSetting
     app: AppSettings
     pod_template_name: StringSetting
-    def __init__(self, run: _Optional[_Union[RunSettings, _Mapping]] = ..., security: _Optional[_Union[SecuritySettings, _Mapping]] = ..., storage: _Optional[_Union[StorageSettings, _Mapping]] = ..., task_resource: _Optional[_Union[TaskResourceSettings, _Mapping]] = ..., labels: _Optional[_Union[StringMapSetting, _Mapping]] = ..., annotations: _Optional[_Union[StringMapSetting, _Mapping]] = ..., environment_variables: _Optional[_Union[StringMapSetting, _Mapping]] = ..., app: _Optional[_Union[AppSettings, _Mapping]] = ..., pod_template_name: _Optional[_Union[StringSetting, _Mapping]] = ...) -> None: ...
+    observability: ObservabilitySettings
+    def __init__(self, run: _Optional[_Union[RunSettings, _Mapping]] = ..., security: _Optional[_Union[SecuritySettings, _Mapping]] = ..., storage: _Optional[_Union[StorageSettings, _Mapping]] = ..., task_resource: _Optional[_Union[TaskResourceSettings, _Mapping]] = ..., labels: _Optional[_Union[StringMapSetting, _Mapping]] = ..., annotations: _Optional[_Union[StringMapSetting, _Mapping]] = ..., environment_variables: _Optional[_Union[StringMapSetting, _Mapping]] = ..., app: _Optional[_Union[AppSettings, _Mapping]] = ..., pod_template_name: _Optional[_Union[StringSetting, _Mapping]] = ..., observability: _Optional[_Union[ObservabilitySettings, _Mapping]] = ...) -> None: ...

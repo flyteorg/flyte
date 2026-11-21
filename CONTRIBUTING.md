@@ -17,7 +17,7 @@ Thank you for your interest in contributing to Flyte 2! This guide will help you
 
 Before contributing, ensure you have:
 - [Buf CLI](https://buf.build/docs/installation) installed
-- Go 1.27.3 or later
+- Go 1.27.4 or later
 - Node.js and npm (for TypeScript)
 - Python 3.10+ with `uv` package manager
 - Rust toolchain (if working with Rust bindings)
@@ -65,6 +65,14 @@ make devbox-stop
 ```
 
 `FLYTE_DEV=True` is required when you intend to run the manager locally — it disables the in-cluster manager so your local process can take over. The value is case-insensitive. `make devbox-run` writes a kubeconfig pointing at the devbox cluster in global kubeconfig, so `kubectl` will target it automatically.
+
+`APPLE_SILICON=True` activates the Apple MLX bridge (requires an M-series Mac). The value is case-insensitive:
+
+```bash
+# Set the APPLE_SILICON when trigger the devbox and manager.
+make devbox-run FLYTE_DEV=True APPLE_SILICON=True
+make -C manager run APPLE_SILICON=True
+```
 
 ### Build and Run the Manager
 

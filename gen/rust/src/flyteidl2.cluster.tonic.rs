@@ -4,7 +4,6 @@ pub mod cluster_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
     use tonic::codegen::http::Uri;
-    ///
     #[derive(Debug, Clone)]
     pub struct ClusterServiceClient<T> {
         inner: tonic::client::Grpc<T>,
@@ -131,7 +130,6 @@ pub mod cluster_service_server {
             tonic::Status,
         >;
     }
-    ///
     #[derive(Debug)]
     pub struct ClusterServiceServer<T: ClusterService> {
         inner: Arc<T>,

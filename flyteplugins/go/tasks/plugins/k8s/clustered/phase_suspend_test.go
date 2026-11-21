@@ -31,7 +31,11 @@ import (
 const primaryContainerName = "primary"
 
 func twoNodeSpec() *core.TaskTemplate {
-	return buildTaskTemplate(&clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1})
+	return twoNodeSpecWithPolicy(nil)
+}
+
+func twoNodeSpecWithPolicy(policy *clusteredpb.ClusterFailurePolicy) *core.TaskTemplate {
+	return buildTaskTemplate(&clusteredpb.ClusteredTaskSpec{Replicas: 2, NprocPerNode: 1, FailurePolicy: policy})
 }
 
 func TestGetTaskPhase_SuspendedAtCreation_NoCondition_WaitingForResources(t *testing.T) {

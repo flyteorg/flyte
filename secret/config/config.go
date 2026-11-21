@@ -33,6 +33,9 @@ type Config struct {
 	// HTTP server configuration
 	Server ServerConfig `json:"server"`
 
+	// PprofPort is the port the pprof endpoint binds to. 0 disables profiling.
+	PprofPort int `json:"pprofPort" pflag:",Port the pprof endpoint binds to; 0 disables profiling"`
+
 	// Webhook configures the pod webhook's cache invalidation server. After a secret
 	// is written, the service posts there so pods admitted next pick up the new value instead of
 	// waiting out the webhook's cache TTL.

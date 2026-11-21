@@ -41,6 +41,7 @@ type options struct {
 	nodeMutators   []NodeMutator
 	handlers       []ResourceHandler
 	limitNamespace string
+	secretFetchers []secret.SecretFetcher
 }
 
 // WithPodMutators serves additional pod mutators, after the secrets mutator.
@@ -65,6 +66,12 @@ func WithLimitNamespace(namespace string) Option {
 	return func(o *options) { o.limitNamespace = namespace }
 }
 
+// WithSecretFetchers gives the secrets mutator's embedded secret manager additional fetchers,
+// consulted in order before its configured store (see secret.WithSecretFetchers).
+func WithSecretFetchers(fetchers ...secret.SecretFetcher) Option {
+	return func(o *options) { o.secretFetchers = append(o.secretFetchers, fetchers...) }
+}
+
 // NewWebhook builds the secrets handler plus any extra handlers.
 func NewWebhook(ctx context.Context, cfg *webhookConfig.Config, podNamespace string, scheme *runtime.Scheme,
 	scope promutils.Scope, opts ...Option) (*Webhook, error) {
@@ -74,7 +81,7 @@ func NewWebhook(ctx context.Context, cfg *webhookConfig.Config, podNamespace str
 		opt(&o)
 	}
 
-	secretsMutator, err := newSecretsMutator(ctx, cfg, podNamespace, o.limitNamespace, scope.NewSubScope("secrets"))
+	secretsMutator, err := newSecretsMutator(ctx, cfg, podNamespace, o.limitNamespace, o.secretFetchers, scope.NewSubScope("secrets"))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create secrets mutator: %w", err)
 	}

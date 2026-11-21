@@ -150,6 +150,7 @@ func NewTrackedRunServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			httpClient,
 			baseURL+TrackedRunServiceWatchRunDetailsProcedure,
 			connect.WithSchema(trackedRunServiceWatchRunDetailsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		getActionDetails: connect.NewClient[workflow.GetActionDetailsRequest, workflow.GetActionDetailsResponse](
@@ -163,6 +164,7 @@ func NewTrackedRunServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			httpClient,
 			baseURL+TrackedRunServiceWatchActionDetailsProcedure,
 			connect.WithSchema(trackedRunServiceWatchActionDetailsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		listRuns: connect.NewClient[workflow.ListRunsRequest, workflow.ListRunsResponse](
@@ -176,6 +178,7 @@ func NewTrackedRunServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			httpClient,
 			baseURL+TrackedRunServiceWatchRunsProcedure,
 			connect.WithSchema(trackedRunServiceWatchRunsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		listActions: connect.NewClient[workflow.ListActionsRequest, workflow.ListActionsResponse](
@@ -189,6 +192,7 @@ func NewTrackedRunServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			httpClient,
 			baseURL+TrackedRunServiceWatchActionsProcedure,
 			connect.WithSchema(trackedRunServiceWatchActionsMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		abortRun: connect.NewClient[workflow.AbortRunRequest, workflow.AbortRunResponse](
@@ -333,6 +337,7 @@ func NewTrackedRunServiceHandler(svc TrackedRunServiceHandler, opts ...connect.H
 		TrackedRunServiceWatchRunDetailsProcedure,
 		svc.WatchRunDetails,
 		connect.WithSchema(trackedRunServiceWatchRunDetailsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	trackedRunServiceGetActionDetailsHandler := connect.NewUnaryHandler(
@@ -346,6 +351,7 @@ func NewTrackedRunServiceHandler(svc TrackedRunServiceHandler, opts ...connect.H
 		TrackedRunServiceWatchActionDetailsProcedure,
 		svc.WatchActionDetails,
 		connect.WithSchema(trackedRunServiceWatchActionDetailsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	trackedRunServiceListRunsHandler := connect.NewUnaryHandler(
@@ -359,6 +365,7 @@ func NewTrackedRunServiceHandler(svc TrackedRunServiceHandler, opts ...connect.H
 		TrackedRunServiceWatchRunsProcedure,
 		svc.WatchRuns,
 		connect.WithSchema(trackedRunServiceWatchRunsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	trackedRunServiceListActionsHandler := connect.NewUnaryHandler(
@@ -372,6 +379,7 @@ func NewTrackedRunServiceHandler(svc TrackedRunServiceHandler, opts ...connect.H
 		TrackedRunServiceWatchActionsProcedure,
 		svc.WatchActions,
 		connect.WithSchema(trackedRunServiceWatchActionsMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	trackedRunServiceAbortRunHandler := connect.NewUnaryHandler(

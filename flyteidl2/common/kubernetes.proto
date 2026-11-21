@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package flyteidl2.common;
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common";
+
+// K8sMetadata is Kubernetes metadata the server sets for a run or app; clients
+// do not set it.
+message K8sMetadata {
+  // The namespace the run or app's pods are created in. Required when the
+  // message is set.
+  string namespace = 1 [(buf.validate.field).string.min_len = 1];
+}

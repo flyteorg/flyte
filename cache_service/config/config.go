@@ -24,6 +24,9 @@ var configSection = stdconfig.MustRegisterSection(configSectionKey, defaultConfi
 type Config struct {
 	Server ServerConfig `json:"server"`
 
+	// PprofPort is the port the pprof endpoint binds to. 0 disables profiling.
+	PprofPort int `json:"pprofPort" pflag:",Port the pprof endpoint binds to; 0 disables profiling"`
+
 	HeartbeatGracePeriodMultiplier int                `json:"heartbeatGracePeriodMultiplier" pflag:",Number of heartbeats before a reservation expires without an extension."`
 	MaxReservationHeartbeat        stdconfig.Duration `json:"maxReservationHeartbeat" pflag:",Maximum reservation heartbeat interval."`
 }

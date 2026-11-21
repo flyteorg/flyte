@@ -24,6 +24,11 @@ func TestEvictionExecutionError_Kind(t *testing.T) {
 	assert.Equal(t, core.ExecutionError_SYSTEM, system.GetKind())
 }
 
+func TestEvictionSummary_LeavesOutTheCost(t *testing.T) {
+	eviction := Eviction{Source: kueueSource, Reason: preempted, Message: preemptedMessage, UserCaused: true, RetriesLeft: 2}
+	assert.Equal(t, "gang evicted by kueue (Preempted): "+preemptedMessage, eviction.Summary())
+}
+
 func TestEvictionExecutionError_Message(t *testing.T) {
 	tests := []struct {
 		name     string

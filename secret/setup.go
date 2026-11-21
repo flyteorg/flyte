@@ -20,6 +20,7 @@ const otelServiceName = "secret-service"
 // Requires sc.K8sClient and sc.Namespace to be set.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
+	sc.AddProfilingServer("secret", cfg.PprofPort)
 
 	svc, err := service.NewSecretServiceWithConfig(ctx, sc.K8sClient, cfg.Webhook)
 	if err != nil {
@@ -30,7 +31,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
-	otelInterceptor, err := otelconnect.NewInterceptor(
+	otelInterceptor, err := otelutils.NewConnectInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
 		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
 	)

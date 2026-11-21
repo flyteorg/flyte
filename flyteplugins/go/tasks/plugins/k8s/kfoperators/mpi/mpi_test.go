@@ -434,6 +434,52 @@ func TestBuildResourceMPI(t *testing.T) {
 	}
 }
 
+func TestBuildResourceMPIPodTemplateMetadataOnCR(t *testing.T) {
+	const crPodTemplateName = "mpi-cr-pod-template"
+	crPodTemplateLabels := map[string]string{"pod-template-label": "pod-template-label-value"}
+	crPodTemplateAnnotations := map[string]string{"pod-template-annotation": "pod-template-annotation-value"}
+
+	crPodTemplate := &corev1.PodTemplate{
+		ObjectMeta: v1.ObjectMeta{
+			Name: crPodTemplateName,
+		},
+		Template: corev1.PodTemplateSpec{
+			ObjectMeta: v1.ObjectMeta{
+				Labels:      crPodTemplateLabels,
+				Annotations: crPodTemplateAnnotations,
+			},
+		},
+	}
+	flytek8s.DefaultPodTemplateStore.Store(crPodTemplate)
+	defer flytek8s.DefaultPodTemplateStore.Delete(crPodTemplate)
+
+	mpiResourceHandler := mpiOperatorResourceHandler{}
+
+	taskTemplate := dummyMPITaskTemplate(mpiID2, dummyMPICustomObj(100, 50, 1))
+	taskTemplate.Metadata = &core.TaskMetadata{PodTemplateName: crPodTemplateName}
+
+	res, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
+	assert.NoError(t, err)
+	assert.NotNil(t, res)
+
+	mpiJob, ok := res.(*kubeflowv1.MPIJob)
+	assert.True(t, ok)
+
+	// The pod metadata must land on the CR itself, not only on the replica pod templates.
+	for k, v := range crPodTemplateLabels {
+		assert.Equal(t, v, mpiJob.Labels[k])
+	}
+	for k, v := range crPodTemplateAnnotations {
+		assert.Equal(t, v, mpiJob.Annotations[k])
+	}
+
+	for _, replicaSpec := range mpiJob.Spec.MPIReplicaSpecs {
+		for k, v := range crPodTemplateLabels {
+			assert.Equal(t, v, replicaSpec.Template.Labels[k])
+		}
+	}
+}
+
 func TestBuildResourceMPIForWrongInput(t *testing.T) {
 	mpiResourceHandler := mpiOperatorResourceHandler{}
 

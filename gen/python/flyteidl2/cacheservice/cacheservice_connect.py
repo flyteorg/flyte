@@ -44,7 +44,7 @@ class CacheServiceASGIApplication(ConnectASGIApplication[CacheService]):
                         service_name="flyteidl2.cacheservice.CacheService",
                         input=flyteidl2_dot_cacheservice_dot_cacheservice__pb2.GetCacheRequest,
                         output=flyteidl2_dot_cacheservice_dot_cacheservice__pb2.GetCacheResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.get,
                 ),
@@ -107,6 +107,7 @@ class CacheServiceClient(ConnectClient):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_cacheservice_dot_cacheservice__pb2.GetCacheResponse:
         return await self.execute_unary(
             request=request,
@@ -115,10 +116,11 @@ class CacheServiceClient(ConnectClient):
                 service_name="flyteidl2.cacheservice.CacheService",
                 input=flyteidl2_dot_cacheservice_dot_cacheservice__pb2.GetCacheRequest,
                 output=flyteidl2_dot_cacheservice_dot_cacheservice__pb2.GetCacheResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     async def put(
@@ -225,7 +227,7 @@ class CacheServiceWSGIApplication(ConnectWSGIApplication):
                         service_name="flyteidl2.cacheservice.CacheService",
                         input=flyteidl2_dot_cacheservice_dot_cacheservice__pb2.GetCacheRequest,
                         output=flyteidl2_dot_cacheservice_dot_cacheservice__pb2.GetCacheResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.get,
                 ),
@@ -288,6 +290,7 @@ class CacheServiceClientSync(ConnectClientSync):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_cacheservice_dot_cacheservice__pb2.GetCacheResponse:
         return self.execute_unary(
             request=request,
@@ -296,10 +299,11 @@ class CacheServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.cacheservice.CacheService",
                 input=flyteidl2_dot_cacheservice_dot_cacheservice__pb2.GetCacheRequest,
                 output=flyteidl2_dot_cacheservice_dot_cacheservice__pb2.GetCacheResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
     def put(
