@@ -27,7 +27,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/dataproxy/dataproxy_service.proto.
  */
 export const file_flyteidl2_dataproxy_dataproxy_service: GenFile = /*@__PURE__*/
-  fileDesc("CitmbHl0ZWlkbDIvZGF0YXByb3h5L2RhdGFwcm94eV9zZXJ2aWNlLnByb3RvEhNmbHl0ZWlkbDIuZGF0YXByb3h5IhEKD1Byb2plY3REYXRhQXJlYSI/Cg1NZXRhZGF0YVN0b3JlEhkKCHJ1bl9uYW1lGAEgASgJQge6SARyAhABEhMKC2FjdGlvbl9uYW1lGAIgASgJIp0BCgpWb2x1bWVEYXRhEjoKDWFjdGlvbl9vdXRwdXQYASABKAsyIS5mbHl0ZWlkbDIuZGF0YXByb3h5LkFjdGlvbk91dHB1dEgAEkAKEGFydGlmYWN0X3ZlcnNpb24YAiABKAsyJC5mbHl0ZWlkbDIuZGF0YXByb3h5LkFydGlmYWN0VmVyc2lvbkgAQhEKCGlkZW50aXR5EgW6SAIIASJTCgxBY3Rpb25PdXRwdXQSGQoIcnVuX25hbWUYASABKAlCB7pIBHICEAESEwoLYWN0aW9uX25hbWUYAiABKAkSEwoLb3V0cHV0X25hbWUYAyABKAkiOQoPQXJ0aWZhY3RWZXJzaW9uEhUKBG5hbWUYASABKAlCB7pIBHICEAESDwoHdmVyc2lvbhgCIAEoCSKIAwoaR2V0Q2xvdWRDcmVkZW50aWFsc1JlcXVlc3QSMgoFc2NvcGUYASABKAsyIy5mbHl0ZWlkbDIuY29tbW9uLlByb2plY3RJZGVudGlmaWVyEjwKDHByb2plY3RfZGF0YRgCIAEoCzIkLmZseXRlaWRsMi5kYXRhcHJveHkuUHJvamVjdERhdGFBcmVhSAASMQoGdm9sdW1lGAMgASgLMh8uZmx5dGVpZGwyLmRhdGFwcm94eS5Wb2x1bWVEYXRhSAASPAoObWV0YWRhdGFfc3RvcmUYByABKAsyIi5mbHl0ZWlkbDIuZGF0YXByb3h5Lk1ldGFkYXRhU3RvcmVIABI1CgZhY2Nlc3MYBCABKA4yJS5mbHl0ZWlkbDIuZGF0YXByb3h5LkNyZWRlbnRpYWxBY2Nlc3MSEAoIc3VicGF0aHMYBSADKAkSKwoIZHVyYXRpb24YBiABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb25CEQoIcmVzb3VyY2USBbpIAggBIvcBChtHZXRDbG91ZENyZWRlbnRpYWxzUmVzcG9uc2USMQoEa2luZBgBIAEoDjIjLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlZGVudGlhbEtpbmQSFQoNYWNjZXNzX2tleV9pZBgCIAEoCRIZChFzZWNyZXRfYWNjZXNzX2tleRgDIAEoCRIVCg1zZXNzaW9uX3Rva2VuGAQgASgJEi4KCmV4cGlyYXRpb24YBSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhIKCmJ1Y2tldF91cmkYBiABKAkSGAoQZ3JhbnRlZF9wcmVmaXhlcxgHIAMoCSKcAgobQ3JlYXRlVXBsb2FkTG9jYXRpb25SZXF1ZXN0EhgKB3Byb2plY3QYASABKAlCB7pIBHICEAESFwoGZG9tYWluGAIgASgJQge6SARyAhABEhAKCGZpbGVuYW1lGAMgASgJEi0KCmV4cGlyZXNfaW4YBCABKAsyGS5nb29nbGUucHJvdG9idWYuRHVyYXRpb24SHAoLY29udGVudF9tZDUYBSABKAxCB7pIBHoCaBASFQoNZmlsZW5hbWVfcm9vdBgGIAEoCRIgChhhZGRfY29udGVudF9tZDVfbWV0YWRhdGEYByABKAgSCwoDb3JnGAggASgJEhYKDmNvbnRlbnRfbGVuZ3RoGAkgASgDEg0KBXF1ZXVlGAogASgJIvcBChxDcmVhdGVVcGxvYWRMb2NhdGlvblJlc3BvbnNlEhIKCnNpZ25lZF91cmwYASABKAkSEgoKbmF0aXZlX3VybBgCIAEoCRIuCgpleHBpcmVzX2F0GAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBJPCgdoZWFkZXJzGAQgAygLMj4uZmx5dGVpZGwyLmRhdGFwcm94eS5DcmVhdGVVcGxvYWRMb2NhdGlvblJlc3BvbnNlLkhlYWRlcnNFbnRyeRouCgxIZWFkZXJzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASKWAwoTVXBsb2FkSW5wdXRzUmVxdWVzdBIxCgZydW5faWQYASABKAsyHy5mbHl0ZWlkbDIuY29tbW9uLlJ1bklkZW50aWZpZXJIABI5Cgpwcm9qZWN0X2lkGAIgASgLMiMuZmx5dGVpZGwyLmNvbW1vbi5Qcm9qZWN0SWRlbnRpZmllckgAEjEKB3Rhc2tfaWQYAyABKAsyHi5mbHl0ZWlkbDIudGFzay5UYXNrSWRlbnRpZmllckgBEi0KCXRhc2tfc3BlYxgEIAEoCzIYLmZseXRlaWRsMi50YXNrLlRhc2tTcGVjSAESNQoMdHJpZ2dlcl9uYW1lGAUgASgLMh0uZmx5dGVpZGwyLmNvbW1vbi5UcmlnZ2VyTmFtZUgBEiYKBmlucHV0cxgGIAEoCzIWLmZseXRlaWRsMi50YXNrLklucHV0cxIQCghiYXNlX2RpchgHIAEoCRINCgVxdWV1ZRgIIAEoCRITCgtmb3JfdHJpZ2dlchgJIAEoCEILCgJpZBIFukgCCAFCDQoEdGFzaxIFukgCCAEiWgoUVXBsb2FkSW5wdXRzUmVzcG9uc2USQgoUb2ZmbG9hZGVkX2lucHV0X2RhdGEYASABKAsyJC5mbHl0ZWlkbDIuY29tbW9uLk9mZmxvYWRlZElucHV0RGF0YSJTCg1QcmVTaWduZWRVUkxzEhIKCnNpZ25lZF91cmwYASADKAkSLgoKZXhwaXJlc19hdBgCIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAixwIKGUNyZWF0ZURvd25sb2FkTGlua1JlcXVlc3QSQgoNYXJ0aWZhY3RfdHlwZRgBIAEoDjIhLmZseXRlaWRsMi5kYXRhcHJveHkuQXJ0aWZhY3RUeXBlQgi6SAWCAQIgABItCgpleHBpcmVzX2luGAIgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEkYKEWFjdGlvbl9hdHRlbXB0X2lkGAMgASgLMikuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25BdHRlbXB0SWRlbnRpZmllckgAEisKBmFwcF9pZBgEIAEoCzIZLmZseXRlaWRsMi5hcHAuSWRlbnRpZmllckgAEjEKB3Rhc2tfaWQYBSABKAsyHi5mbHl0ZWlkbDIudGFzay5UYXNrSWRlbnRpZmllckgAQg8KBnNvdXJjZRIFukgCCAEiWQoaQ3JlYXRlRG93bmxvYWRMaW5rUmVzcG9uc2USOwoPcHJlX3NpZ25lZF91cmxzGAEgASgLMiIuZmx5dGVpZGwyLmRhdGFwcm94eS5QcmVTaWduZWRVUkxzIogBChRHZXRBY3Rpb25EYXRhUmVxdWVzdBI9CglhY3Rpb25faWQYASABKAsyIi5mbHl0ZWlkbDIuY29tbW9uLkFjdGlvbklkZW50aWZpZXJCBrpIA8gBARIxCgpydW5fc291cmNlGAIgASgOMh0uZmx5dGVpZGwyLndvcmtmbG93LlJ1blNvdXJjZSKSAQoVR2V0QWN0aW9uRGF0YVJlc3BvbnNlEiYKBmlucHV0cxgBIAEoCzIWLmZseXRlaWRsMi50YXNrLklucHV0cxIoCgdvdXRwdXRzGAIgASgLMhcuZmx5dGVpZGwyLnRhc2suT3V0cHV0cxISCgppbnB1dHNfdXJpGAMgASgJEhMKC291dHB1dHNfdXJpGAQgASgJIvEBCg9UYWlsTG9nc1JlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESGAoHYXR0ZW1wdBgCIAEoDUIHukgEKgIgABIVCgtwcmltYXJ5X3BvZBgGIAEoCEgAEhIKCGFsbF9wb2RzGAUgASgISAASEgoIcG9kX25hbWUYAyABKAlIABIfChJjb25uZWN0b3JfZW5kcG9pbnQYBCABKAlIAYgBAUIOCgxwb2Rfc2VsZWN0b3JCFQoTX2Nvbm5lY3Rvcl9lbmRwb2ludCLIAQoQVGFpbExvZ3NSZXNwb25zZRI4CgRsb2dzGAEgAygLMiouZmx5dGVpZGwyLmRhdGFwcm94eS5UYWlsTG9nc1Jlc3BvbnNlLkxvZ3MaegoETG9ncxIwCgVsaW5lcxgBIAMoCzIhLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Mb2dMaW5lEkAKCWNvbnRhaW5lchgCIAEoCzItLmZseXRlaWRsMi5sb2dzLmRhdGFwbGFuZS5Db250YWluZXJJZGVudGlmaWVyKmYKDEFydGlmYWN0VHlwZRIdChlBUlRJRkFDVF9UWVBFX1VOU1BFQ0lGSUVEEAASGAoUQVJUSUZBQ1RfVFlQRV9SRVBPUlQQARIdChlBUlRJRkFDVF9UWVBFX0NPREVfQlVORExFEAIqcwoQQ3JlZGVudGlhbEFjY2VzcxIhCh1DUkVERU5USUFMX0FDQ0VTU19VTlNQRUNJRklFRBAAEhoKFkNSRURFTlRJQUxfQUNDRVNTX1JFQUQQARIgChxDUkVERU5USUFMX0FDQ0VTU19SRUFEX1dSSVRFEAIqvQEKDkNyZWRlbnRpYWxLaW5kEh8KG0NSRURFTlRJQUxfS0lORF9VTlNQRUNJRklFRBAAEh0KGUNSRURFTlRJQUxfS0lORF9BV1NfU0lHVjQQARIkCiBDUkVERU5USUFMX0tJTkRfR0NQX0FDQ0VTU19UT0tFThACEh0KGUNSRURFTlRJQUxfS0lORF9BWlVSRV9TQVMQAxImCiJDUkVERU5USUFMX0tJTkRfQVpVUkVfQUNDRVNTX1RPS0VOEAQyugUKEERhdGFQcm94eVNlcnZpY2USfQoUQ3JlYXRlVXBsb2FkTG9jYXRpb24SMC5mbHl0ZWlkbDIuZGF0YXByb3h5LkNyZWF0ZVVwbG9hZExvY2F0aW9uUmVxdWVzdBoxLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlVXBsb2FkTG9jYXRpb25SZXNwb25zZSIAEmUKDFVwbG9hZElucHV0cxIoLmZseXRlaWRsMi5kYXRhcHJveHkuVXBsb2FkSW5wdXRzUmVxdWVzdBopLmZseXRlaWRsMi5kYXRhcHJveHkuVXBsb2FkSW5wdXRzUmVzcG9uc2UiABJ3ChJDcmVhdGVEb3dubG9hZExpbmsSLi5mbHl0ZWlkbDIuZGF0YXByb3h5LkNyZWF0ZURvd25sb2FkTGlua1JlcXVlc3QaLy5mbHl0ZWlkbDIuZGF0YXByb3h5LkNyZWF0ZURvd25sb2FkTGlua1Jlc3BvbnNlIgASawoNR2V0QWN0aW9uRGF0YRIpLmZseXRlaWRsMi5kYXRhcHJveHkuR2V0QWN0aW9uRGF0YVJlcXVlc3QaKi5mbHl0ZWlkbDIuZGF0YXByb3h5LkdldEFjdGlvbkRhdGFSZXNwb25zZSIDkAIBEl4KCFRhaWxMb2dzEiQuZmx5dGVpZGwyLmRhdGFwcm94eS5UYWlsTG9nc1JlcXVlc3QaJS5mbHl0ZWlkbDIuZGF0YXByb3h5LlRhaWxMb2dzUmVzcG9uc2UiA5ACATABEnoKE0dldENsb3VkQ3JlZGVudGlhbHMSLy5mbHl0ZWlkbDIuZGF0YXByb3h5LkdldENsb3VkQ3JlZGVudGlhbHNSZXF1ZXN0GjAuZmx5dGVpZGwyLmRhdGFwcm94eS5HZXRDbG91ZENyZWRlbnRpYWxzUmVzcG9uc2UiAELYAQoXY29tLmZseXRlaWRsMi5kYXRhcHJveHlCFURhdGFwcm94eVNlcnZpY2VQcm90b0gCUAFaN2dpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9kYXRhcHJveHmiAgNGRFiqAhNGbHl0ZWlkbDIuRGF0YXByb3h5ygITRmx5dGVpZGwyXERhdGFwcm94eeICH0ZseXRlaWRsMlxEYXRhcHJveHlcR1BCTWV0YWRhdGHqAhRGbHl0ZWlkbDI6OkRhdGFwcm94eWIGcHJvdG8z", [file_buf_validate_validate, file_flyteidl2_app_app_definition, file_flyteidl2_common_identifier, file_flyteidl2_common_run, file_flyteidl2_logs_dataplane_payload, file_flyteidl2_task_common, file_flyteidl2_task_task_definition, file_flyteidl2_workflow_run_definition, file_google_protobuf_duration, file_google_protobuf_timestamp]);
+  fileDesc("CitmbHl0ZWlkbDIvZGF0YXByb3h5L2RhdGFwcm94eV9zZXJ2aWNlLnByb3RvEhNmbHl0ZWlkbDIuZGF0YXByb3h5IhEKD1Byb2plY3REYXRhQXJlYSI/Cg1NZXRhZGF0YVN0b3JlEhkKCHJ1bl9uYW1lGAEgASgJQge6SARyAhABEhMKC2FjdGlvbl9uYW1lGAIgASgJIp0BCgpWb2x1bWVEYXRhEjoKDWFjdGlvbl9vdXRwdXQYASABKAsyIS5mbHl0ZWlkbDIuZGF0YXByb3h5LkFjdGlvbk91dHB1dEgAEkAKEGFydGlmYWN0X3ZlcnNpb24YAiABKAsyJC5mbHl0ZWlkbDIuZGF0YXByb3h5LkFydGlmYWN0VmVyc2lvbkgAQhEKCGlkZW50aXR5EgW6SAIIASJTCgxBY3Rpb25PdXRwdXQSGQoIcnVuX25hbWUYASABKAlCB7pIBHICEAESEwoLYWN0aW9uX25hbWUYAiABKAkSEwoLb3V0cHV0X25hbWUYAyABKAkiOQoPQXJ0aWZhY3RWZXJzaW9uEhUKBG5hbWUYASABKAlCB7pIBHICEAESDwoHdmVyc2lvbhgCIAEoCSLGAwoaR2V0Q2xvdWRDcmVkZW50aWFsc1JlcXVlc3QSMgoFc2NvcGUYASABKAsyIy5mbHl0ZWlkbDIuY29tbW9uLlByb2plY3RJZGVudGlmaWVyEjwKDHByb2plY3RfZGF0YRgCIAEoCzIkLmZseXRlaWRsMi5kYXRhcHJveHkuUHJvamVjdERhdGFBcmVhSAASMQoGdm9sdW1lGAMgASgLMh8uZmx5dGVpZGwyLmRhdGFwcm94eS5Wb2x1bWVEYXRhSAASPAoObWV0YWRhdGFfc3RvcmUYByABKAsyIi5mbHl0ZWlkbDIuZGF0YXByb3h5Lk1ldGFkYXRhU3RvcmVIABI8Cg5pbWFnZV9yZWdpc3RyeRgIIAEoCzIiLmZseXRlaWRsMi5kYXRhcHJveHkuSW1hZ2VSZWdpc3RyeUgAEjUKBmFjY2VzcxgEIAEoDjIlLmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlZGVudGlhbEFjY2VzcxIQCghzdWJwYXRocxgFIAMoCRIrCghkdXJhdGlvbhgGIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbkIRCghyZXNvdXJjZRIFukgCCAEiswIKG0dldENsb3VkQ3JlZGVudGlhbHNSZXNwb25zZRIxCgRraW5kGAEgASgOMiMuZmx5dGVpZGwyLmRhdGFwcm94eS5DcmVkZW50aWFsS2luZBIVCg1hY2Nlc3Nfa2V5X2lkGAIgASgJEhkKEXNlY3JldF9hY2Nlc3Nfa2V5GAMgASgJEhUKDXNlc3Npb25fdG9rZW4YBCABKAkSLgoKZXhwaXJhdGlvbhgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASEgoKYnVja2V0X3VyaRgGIAEoCRIYChBncmFudGVkX3ByZWZpeGVzGAcgAygJEjoKDnJlZ2lzdHJ5X2xvZ2luGAggASgLMiIuZmx5dGVpZGwyLmRhdGFwcm94eS5SZWdpc3RyeUxvZ2luIiYKDUltYWdlUmVnaXN0cnkSFQoEaG9zdBgBIAEoCUIHukgEcgIQASJBCg1SZWdpc3RyeUxvZ2luEgwKBGhvc3QYASABKAkSEAoIdXNlcm5hbWUYAiABKAkSEAoIcGFzc3dvcmQYAyABKAkinAIKG0NyZWF0ZVVwbG9hZExvY2F0aW9uUmVxdWVzdBIYCgdwcm9qZWN0GAEgASgJQge6SARyAhABEhcKBmRvbWFpbhgCIAEoCUIHukgEcgIQARIQCghmaWxlbmFtZRgDIAEoCRItCgpleHBpcmVzX2luGAQgASgLMhkuZ29vZ2xlLnByb3RvYnVmLkR1cmF0aW9uEhwKC2NvbnRlbnRfbWQ1GAUgASgMQge6SAR6AmgQEhUKDWZpbGVuYW1lX3Jvb3QYBiABKAkSIAoYYWRkX2NvbnRlbnRfbWQ1X21ldGFkYXRhGAcgASgIEgsKA29yZxgIIAEoCRIWCg5jb250ZW50X2xlbmd0aBgJIAEoAxINCgVxdWV1ZRgKIAEoCSL3AQocQ3JlYXRlVXBsb2FkTG9jYXRpb25SZXNwb25zZRISCgpzaWduZWRfdXJsGAEgASgJEhIKCm5hdGl2ZV91cmwYAiABKAkSLgoKZXhwaXJlc19hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASTwoHaGVhZGVycxgEIAMoCzI+LmZseXRlaWRsMi5kYXRhcHJveHkuQ3JlYXRlVXBsb2FkTG9jYXRpb25SZXNwb25zZS5IZWFkZXJzRW50cnkaLgoMSGVhZGVyc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEilgMKE1VwbG9hZElucHV0c1JlcXVlc3QSMQoGcnVuX2lkGAEgASgLMh8uZmx5dGVpZGwyLmNvbW1vbi5SdW5JZGVudGlmaWVySAASOQoKcHJvamVjdF9pZBgCIAEoCzIjLmZseXRlaWRsMi5jb21tb24uUHJvamVjdElkZW50aWZpZXJIABIxCgd0YXNrX2lkGAMgASgLMh4uZmx5dGVpZGwyLnRhc2suVGFza0lkZW50aWZpZXJIARItCgl0YXNrX3NwZWMYBCABKAsyGC5mbHl0ZWlkbDIudGFzay5UYXNrU3BlY0gBEjUKDHRyaWdnZXJfbmFtZRgFIAEoCzIdLmZseXRlaWRsMi5jb21tb24uVHJpZ2dlck5hbWVIARImCgZpbnB1dHMYBiABKAsyFi5mbHl0ZWlkbDIudGFzay5JbnB1dHMSEAoIYmFzZV9kaXIYByABKAkSDQoFcXVldWUYCCABKAkSEwoLZm9yX3RyaWdnZXIYCSABKAhCCwoCaWQSBbpIAggBQg0KBHRhc2sSBbpIAggBIloKFFVwbG9hZElucHV0c1Jlc3BvbnNlEkIKFG9mZmxvYWRlZF9pbnB1dF9kYXRhGAEgASgLMiQuZmx5dGVpZGwyLmNvbW1vbi5PZmZsb2FkZWRJbnB1dERhdGEiUwoNUHJlU2lnbmVkVVJMcxISCgpzaWduZWRfdXJsGAEgAygJEi4KCmV4cGlyZXNfYXQYAiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIscCChlDcmVhdGVEb3dubG9hZExpbmtSZXF1ZXN0EkIKDWFydGlmYWN0X3R5cGUYASABKA4yIS5mbHl0ZWlkbDIuZGF0YXByb3h5LkFydGlmYWN0VHlwZUIIukgFggECIAASLQoKZXhwaXJlc19pbhgCIAEoCzIZLmdvb2dsZS5wcm90b2J1Zi5EdXJhdGlvbhJGChFhY3Rpb25fYXR0ZW1wdF9pZBgDIAEoCzIpLmZseXRlaWRsMi5jb21tb24uQWN0aW9uQXR0ZW1wdElkZW50aWZpZXJIABIrCgZhcHBfaWQYBCABKAsyGS5mbHl0ZWlkbDIuYXBwLklkZW50aWZpZXJIABIxCgd0YXNrX2lkGAUgASgLMh4uZmx5dGVpZGwyLnRhc2suVGFza0lkZW50aWZpZXJIAEIPCgZzb3VyY2USBbpIAggBIlkKGkNyZWF0ZURvd25sb2FkTGlua1Jlc3BvbnNlEjsKD3ByZV9zaWduZWRfdXJscxgBIAEoCzIiLmZseXRlaWRsMi5kYXRhcHJveHkuUHJlU2lnbmVkVVJMcyKIAQoUR2V0QWN0aW9uRGF0YVJlcXVlc3QSPQoJYWN0aW9uX2lkGAEgASgLMiIuZmx5dGVpZGwyLmNvbW1vbi5BY3Rpb25JZGVudGlmaWVyQga6SAPIAQESMQoKcnVuX3NvdXJjZRgCIAEoDjIdLmZseXRlaWRsMi53b3JrZmxvdy5SdW5Tb3VyY2UikgEKFUdldEFjdGlvbkRhdGFSZXNwb25zZRImCgZpbnB1dHMYASABKAsyFi5mbHl0ZWlkbDIudGFzay5JbnB1dHMSKAoHb3V0cHV0cxgCIAEoCzIXLmZseXRlaWRsMi50YXNrLk91dHB1dHMSEgoKaW5wdXRzX3VyaRgDIAEoCRITCgtvdXRwdXRzX3VyaRgEIAEoCSLxAQoPVGFpbExvZ3NSZXF1ZXN0Ej0KCWFjdGlvbl9pZBgBIAEoCzIiLmZseXRlaWRsMi5jb21tb24uQWN0aW9uSWRlbnRpZmllckIGukgDyAEBEhgKB2F0dGVtcHQYAiABKA1CB7pIBCoCIAASFQoLcHJpbWFyeV9wb2QYBiABKAhIABISCghhbGxfcG9kcxgFIAEoCEgAEhIKCHBvZF9uYW1lGAMgASgJSAASHwoSY29ubmVjdG9yX2VuZHBvaW50GAQgASgJSAGIAQFCDgoMcG9kX3NlbGVjdG9yQhUKE19jb25uZWN0b3JfZW5kcG9pbnQiyAEKEFRhaWxMb2dzUmVzcG9uc2USOAoEbG9ncxgBIAMoCzIqLmZseXRlaWRsMi5kYXRhcHJveHkuVGFpbExvZ3NSZXNwb25zZS5Mb2dzGnoKBExvZ3MSMAoFbGluZXMYASADKAsyIS5mbHl0ZWlkbDIubG9ncy5kYXRhcGxhbmUuTG9nTGluZRJACgljb250YWluZXIYAiABKAsyLS5mbHl0ZWlkbDIubG9ncy5kYXRhcGxhbmUuQ29udGFpbmVySWRlbnRpZmllcipmCgxBcnRpZmFjdFR5cGUSHQoZQVJUSUZBQ1RfVFlQRV9VTlNQRUNJRklFRBAAEhgKFEFSVElGQUNUX1RZUEVfUkVQT1JUEAESHQoZQVJUSUZBQ1RfVFlQRV9DT0RFX0JVTkRMRRACKnMKEENyZWRlbnRpYWxBY2Nlc3MSIQodQ1JFREVOVElBTF9BQ0NFU1NfVU5TUEVDSUZJRUQQABIaChZDUkVERU5USUFMX0FDQ0VTU19SRUFEEAESIAocQ1JFREVOVElBTF9BQ0NFU1NfUkVBRF9XUklURRACKuEBCg5DcmVkZW50aWFsS2luZBIfChtDUkVERU5USUFMX0tJTkRfVU5TUEVDSUZJRUQQABIdChlDUkVERU5USUFMX0tJTkRfQVdTX1NJR1Y0EAESJAogQ1JFREVOVElBTF9LSU5EX0dDUF9BQ0NFU1NfVE9LRU4QAhIdChlDUkVERU5USUFMX0tJTkRfQVpVUkVfU0FTEAMSJgoiQ1JFREVOVElBTF9LSU5EX0FaVVJFX0FDQ0VTU19UT0tFThAEEiIKHkNSRURFTlRJQUxfS0lORF9SRUdJU1RSWV9MT0dJThAFMroFChBEYXRhUHJveHlTZXJ2aWNlEn0KFENyZWF0ZVVwbG9hZExvY2F0aW9uEjAuZmx5dGVpZGwyLmRhdGFwcm94eS5DcmVhdGVVcGxvYWRMb2NhdGlvblJlcXVlc3QaMS5mbHl0ZWlkbDIuZGF0YXByb3h5LkNyZWF0ZVVwbG9hZExvY2F0aW9uUmVzcG9uc2UiABJlCgxVcGxvYWRJbnB1dHMSKC5mbHl0ZWlkbDIuZGF0YXByb3h5LlVwbG9hZElucHV0c1JlcXVlc3QaKS5mbHl0ZWlkbDIuZGF0YXByb3h5LlVwbG9hZElucHV0c1Jlc3BvbnNlIgASdwoSQ3JlYXRlRG93bmxvYWRMaW5rEi4uZmx5dGVpZGwyLmRhdGFwcm94eS5DcmVhdGVEb3dubG9hZExpbmtSZXF1ZXN0Gi8uZmx5dGVpZGwyLmRhdGFwcm94eS5DcmVhdGVEb3dubG9hZExpbmtSZXNwb25zZSIAEmsKDUdldEFjdGlvbkRhdGESKS5mbHl0ZWlkbDIuZGF0YXByb3h5LkdldEFjdGlvbkRhdGFSZXF1ZXN0GiouZmx5dGVpZGwyLmRhdGFwcm94eS5HZXRBY3Rpb25EYXRhUmVzcG9uc2UiA5ACARJeCghUYWlsTG9ncxIkLmZseXRlaWRsMi5kYXRhcHJveHkuVGFpbExvZ3NSZXF1ZXN0GiUuZmx5dGVpZGwyLmRhdGFwcm94eS5UYWlsTG9nc1Jlc3BvbnNlIgOQAgEwARJ6ChNHZXRDbG91ZENyZWRlbnRpYWxzEi8uZmx5dGVpZGwyLmRhdGFwcm94eS5HZXRDbG91ZENyZWRlbnRpYWxzUmVxdWVzdBowLmZseXRlaWRsMi5kYXRhcHJveHkuR2V0Q2xvdWRDcmVkZW50aWFsc1Jlc3BvbnNlIgBC2AEKF2NvbS5mbHl0ZWlkbDIuZGF0YXByb3h5QhVEYXRhcHJveHlTZXJ2aWNlUHJvdG9IAlABWjdnaXRodWIuY29tL2ZseXRlb3JnL2ZseXRlL3YyL2dlbi9nby9mbHl0ZWlkbDIvZGF0YXByb3h5ogIDRkRYqgITRmx5dGVpZGwyLkRhdGFwcm94ecoCE0ZseXRlaWRsMlxEYXRhcHJveHniAh9GbHl0ZWlkbDJcRGF0YXByb3h5XEdQQk1ldGFkYXRh6gIURmx5dGVpZGwyOjpEYXRhcHJveHliBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_app_app_definition, file_flyteidl2_common_identifier, file_flyteidl2_common_run, file_flyteidl2_logs_dataplane_payload, file_flyteidl2_task_common, file_flyteidl2_task_task_definition, file_flyteidl2_workflow_run_definition, file_google_protobuf_duration, file_google_protobuf_timestamp]);
 
 /**
  * ProjectDataArea names the project/domain's own data area -- the same place
@@ -259,6 +259,12 @@ export type GetCloudCredentialsRequest = Message<"flyteidl2.dataproxy.GetCloudCr
      */
     value: MetadataStore;
     case: "metadataStore";
+  } | {
+    /**
+     * @generated from field: flyteidl2.dataproxy.ImageRegistry image_registry = 8;
+     */
+    value: ImageRegistry;
+    case: "imageRegistry";
   } | { case: undefined; value?: undefined };
 
   /**
@@ -364,6 +370,13 @@ export type GetCloudCredentialsResponse = Message<"flyteidl2.dataproxy.GetCloudC
    * @generated from field: repeated string granted_prefixes = 7;
    */
   grantedPrefixes: string[];
+
+  /**
+   * The login for an image_registry request (kind REGISTRY_LOGIN). Secret.
+   *
+   * @generated from field: flyteidl2.dataproxy.RegistryLogin registry_login = 8;
+   */
+  registryLogin?: RegistryLogin;
 };
 
 /**
@@ -372,6 +385,66 @@ export type GetCloudCredentialsResponse = Message<"flyteidl2.dataproxy.GetCloudC
  */
 export const GetCloudCredentialsResponseSchema: GenMessage<GetCloudCredentialsResponse> = /*@__PURE__*/
   messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 6);
+
+/**
+ * ImageRegistry is a container registry the organization owns (Google
+ * Artifact Registry, Amazon ECR or Azure Container Registry), reached with the
+ * identity the organization's registry trusts the control plane as, so that
+ * building an image can pull its base, or push the result, with no long-lived
+ * registry secret. READ pulls; READ_WRITE also pushes. What the login may do
+ * beyond that is the organization's registry permissions, not the server's.
+ *
+ * @generated from message flyteidl2.dataproxy.ImageRegistry
+ */
+export type ImageRegistry = Message<"flyteidl2.dataproxy.ImageRegistry"> & {
+  /**
+   * The registry host, as an image reference names it:
+   * us-docker.pkg.dev, 123456789012.dkr.ecr.us-east-2.amazonaws.com or
+   * example.azurecr.io.
+   * +required
+   *
+   * @generated from field: string host = 1;
+   */
+  host: string;
+};
+
+/**
+ * Describes the message flyteidl2.dataproxy.ImageRegistry.
+ * Use `create(ImageRegistrySchema)` to create a new message.
+ */
+export const ImageRegistrySchema: GenMessage<ImageRegistry> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 7);
+
+/**
+ * RegistryLogin is what docker login takes for a registry.
+ *
+ * @generated from message flyteidl2.dataproxy.RegistryLogin
+ */
+export type RegistryLogin = Message<"flyteidl2.dataproxy.RegistryLogin"> & {
+  /**
+   * The registry host the login is for.
+   *
+   * @generated from field: string host = 1;
+   */
+  host: string;
+
+  /**
+   * @generated from field: string username = 2;
+   */
+  username: string;
+
+  /**
+   * @generated from field: string password = 3;
+   */
+  password: string;
+};
+
+/**
+ * Describes the message flyteidl2.dataproxy.RegistryLogin.
+ * Use `create(RegistryLoginSchema)` to create a new message.
+ */
+export const RegistryLoginSchema: GenMessage<RegistryLogin> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 8);
 
 /**
  * CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.
@@ -476,7 +549,7 @@ export type CreateUploadLocationRequest = Message<"flyteidl2.dataproxy.CreateUpl
  * Use `create(CreateUploadLocationRequestSchema)` to create a new message.
  */
 export const CreateUploadLocationRequestSchema: GenMessage<CreateUploadLocationRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 7);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 9);
 
 /**
  * CreateUploadLocationResponse specifies the response for the CreateUploadLocation API.
@@ -518,7 +591,7 @@ export type CreateUploadLocationResponse = Message<"flyteidl2.dataproxy.CreateUp
  * Use `create(CreateUploadLocationResponseSchema)` to create a new message.
  */
 export const CreateUploadLocationResponseSchema: GenMessage<CreateUploadLocationResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 8);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 10);
 
 /**
  * @generated from message flyteidl2.dataproxy.UploadInputsRequest
@@ -621,7 +694,7 @@ export type UploadInputsRequest = Message<"flyteidl2.dataproxy.UploadInputsReque
  * Use `create(UploadInputsRequestSchema)` to create a new message.
  */
 export const UploadInputsRequestSchema: GenMessage<UploadInputsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 9);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 11);
 
 /**
  * @generated from message flyteidl2.dataproxy.UploadInputsResponse
@@ -638,7 +711,7 @@ export type UploadInputsResponse = Message<"flyteidl2.dataproxy.UploadInputsResp
  * Use `create(UploadInputsResponseSchema)` to create a new message.
  */
 export const UploadInputsResponseSchema: GenMessage<UploadInputsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 10);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 12);
 
 /**
  * PreSignedURLs contains a list of signed URLs for downloading artifacts.
@@ -666,7 +739,7 @@ export type PreSignedURLs = Message<"flyteidl2.dataproxy.PreSignedURLs"> & {
  * Use `create(PreSignedURLsSchema)` to create a new message.
  */
 export const PreSignedURLsSchema: GenMessage<PreSignedURLs> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 11);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 13);
 
 /**
  * CreateDownloadLinkRequest specifies the request for the CreateDownloadLink API.
@@ -724,7 +797,7 @@ export type CreateDownloadLinkRequest = Message<"flyteidl2.dataproxy.CreateDownl
  * Use `create(CreateDownloadLinkRequestSchema)` to create a new message.
  */
 export const CreateDownloadLinkRequestSchema: GenMessage<CreateDownloadLinkRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 12);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 14);
 
 /**
  * CreateDownloadLinkResponse specifies the response for the CreateDownloadLink API.
@@ -745,7 +818,7 @@ export type CreateDownloadLinkResponse = Message<"flyteidl2.dataproxy.CreateDown
  * Use `create(CreateDownloadLinkResponseSchema)` to create a new message.
  */
 export const CreateDownloadLinkResponseSchema: GenMessage<CreateDownloadLinkResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 13);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 15);
 
 /**
  * Request message for querying action data.
@@ -777,7 +850,7 @@ export type GetActionDataRequest = Message<"flyteidl2.dataproxy.GetActionDataReq
  * Use `create(GetActionDataRequestSchema)` to create a new message.
  */
 export const GetActionDataRequestSchema: GenMessage<GetActionDataRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 14);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 16);
 
 /**
  * Response message for querying action data.
@@ -821,7 +894,7 @@ export type GetActionDataResponse = Message<"flyteidl2.dataproxy.GetActionDataRe
  * Use `create(GetActionDataResponseSchema)` to create a new message.
  */
 export const GetActionDataResponseSchema: GenMessage<GetActionDataResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 15);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 17);
 
 /**
  * Request message for tailing logs.
@@ -888,7 +961,7 @@ export type TailLogsRequest = Message<"flyteidl2.dataproxy.TailLogsRequest"> & {
  * Use `create(TailLogsRequestSchema)` to create a new message.
  */
 export const TailLogsRequestSchema: GenMessage<TailLogsRequest> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 16);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 18);
 
 /**
  * Reponse message for tailing logs.
@@ -909,7 +982,7 @@ export type TailLogsResponse = Message<"flyteidl2.dataproxy.TailLogsResponse"> &
  * Use `create(TailLogsResponseSchema)` to create a new message.
  */
 export const TailLogsResponseSchema: GenMessage<TailLogsResponse> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 17);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 19);
 
 /**
  * A batch of logs.
@@ -937,7 +1010,7 @@ export type TailLogsResponse_Logs = Message<"flyteidl2.dataproxy.TailLogsRespons
  * Use `create(TailLogsResponse_LogsSchema)` to create a new message.
  */
 export const TailLogsResponse_LogsSchema: GenMessage<TailLogsResponse_Logs> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 17, 0);
+  messageDesc(file_flyteidl2_dataproxy_dataproxy_service, 19, 0);
 
 /**
  * ArtifactType defines the type of artifact to be downloaded.
@@ -1046,6 +1119,14 @@ export enum CredentialKind {
    * @generated from enum value: CREDENTIAL_KIND_AZURE_ACCESS_TOKEN = 4;
    */
   AZURE_ACCESS_TOKEN = 4,
+
+  /**
+   * A container registry login, in registry_login: the docker username and
+   * password for the requested host.
+   *
+   * @generated from enum value: CREDENTIAL_KIND_REGISTRY_LOGIN = 5;
+   */
+  REGISTRY_LOGIN = 5,
 }
 
 /**

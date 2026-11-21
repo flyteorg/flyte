@@ -844,6 +844,47 @@ func (m *GetCloudCredentialsRequest) validate(all bool) error {
 			}
 		}
 
+	case *GetCloudCredentialsRequest_ImageRegistry:
+		if v == nil {
+			err := GetCloudCredentialsRequestValidationError{
+				field:  "Resource",
+				reason: "oneof value cannot be a typed-nil",
+			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
+		}
+
+		if all {
+			switch v := interface{}(m.GetImageRegistry()).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetCloudCredentialsRequestValidationError{
+						field:  "ImageRegistry",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetCloudCredentialsRequestValidationError{
+						field:  "ImageRegistry",
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(m.GetImageRegistry()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetCloudCredentialsRequestValidationError{
+					field:  "ImageRegistry",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	default:
 		_ = v // ensures v is used
 	}
@@ -989,6 +1030,35 @@ func (m *GetCloudCredentialsResponse) validate(all bool) error {
 
 	// no validation rules for BucketUri
 
+	if all {
+		switch v := interface{}(m.GetRegistryLogin()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, GetCloudCredentialsResponseValidationError{
+					field:  "RegistryLogin",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, GetCloudCredentialsResponseValidationError{
+					field:  "RegistryLogin",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetRegistryLogin()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetCloudCredentialsResponseValidationError{
+				field:  "RegistryLogin",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return GetCloudCredentialsResponseMultiError(errors)
 	}
@@ -1069,6 +1139,214 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetCloudCredentialsResponseValidationError{}
+
+// Validate checks the field values on ImageRegistry with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ImageRegistry) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ImageRegistry with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ImageRegistryMultiError, or
+// nil if none found.
+func (m *ImageRegistry) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ImageRegistry) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Host
+
+	if len(errors) > 0 {
+		return ImageRegistryMultiError(errors)
+	}
+
+	return nil
+}
+
+// ImageRegistryMultiError is an error wrapping multiple validation errors
+// returned by ImageRegistry.ValidateAll() if the designated constraints
+// aren't met.
+type ImageRegistryMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ImageRegistryMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ImageRegistryMultiError) AllErrors() []error { return m }
+
+// ImageRegistryValidationError is the validation error returned by
+// ImageRegistry.Validate if the designated constraints aren't met.
+type ImageRegistryValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ImageRegistryValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ImageRegistryValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ImageRegistryValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ImageRegistryValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ImageRegistryValidationError) ErrorName() string { return "ImageRegistryValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ImageRegistryValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sImageRegistry.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ImageRegistryValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ImageRegistryValidationError{}
+
+// Validate checks the field values on RegistryLogin with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *RegistryLogin) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RegistryLogin with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in RegistryLoginMultiError, or
+// nil if none found.
+func (m *RegistryLogin) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RegistryLogin) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Host
+
+	// no validation rules for Username
+
+	// no validation rules for Password
+
+	if len(errors) > 0 {
+		return RegistryLoginMultiError(errors)
+	}
+
+	return nil
+}
+
+// RegistryLoginMultiError is an error wrapping multiple validation errors
+// returned by RegistryLogin.ValidateAll() if the designated constraints
+// aren't met.
+type RegistryLoginMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RegistryLoginMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RegistryLoginMultiError) AllErrors() []error { return m }
+
+// RegistryLoginValidationError is the validation error returned by
+// RegistryLogin.Validate if the designated constraints aren't met.
+type RegistryLoginValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RegistryLoginValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RegistryLoginValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RegistryLoginValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RegistryLoginValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RegistryLoginValidationError) ErrorName() string { return "RegistryLoginValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RegistryLoginValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRegistryLogin.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RegistryLoginValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RegistryLoginValidationError{}
 
 // Validate checks the field values on CreateUploadLocationRequest with the
 // rules defined in the proto definition for this message. If any rules are

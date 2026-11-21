@@ -35,6 +35,7 @@ class CredentialKind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     CREDENTIAL_KIND_GCP_ACCESS_TOKEN: _ClassVar[CredentialKind]
     CREDENTIAL_KIND_AZURE_SAS: _ClassVar[CredentialKind]
     CREDENTIAL_KIND_AZURE_ACCESS_TOKEN: _ClassVar[CredentialKind]
+    CREDENTIAL_KIND_REGISTRY_LOGIN: _ClassVar[CredentialKind]
 ARTIFACT_TYPE_UNSPECIFIED: ArtifactType
 ARTIFACT_TYPE_REPORT: ArtifactType
 ARTIFACT_TYPE_CODE_BUNDLE: ArtifactType
@@ -46,6 +47,7 @@ CREDENTIAL_KIND_AWS_SIGV4: CredentialKind
 CREDENTIAL_KIND_GCP_ACCESS_TOKEN: CredentialKind
 CREDENTIAL_KIND_AZURE_SAS: CredentialKind
 CREDENTIAL_KIND_AZURE_ACCESS_TOKEN: CredentialKind
+CREDENTIAL_KIND_REGISTRY_LOGIN: CredentialKind
 
 class ProjectDataArea(_message.Message):
     __slots__ = []
@@ -86,11 +88,12 @@ class ArtifactVersion(_message.Message):
     def __init__(self, name: _Optional[str] = ..., version: _Optional[str] = ...) -> None: ...
 
 class GetCloudCredentialsRequest(_message.Message):
-    __slots__ = ["scope", "project_data", "volume", "metadata_store", "access", "subpaths", "duration"]
+    __slots__ = ["scope", "project_data", "volume", "metadata_store", "image_registry", "access", "subpaths", "duration"]
     SCOPE_FIELD_NUMBER: _ClassVar[int]
     PROJECT_DATA_FIELD_NUMBER: _ClassVar[int]
     VOLUME_FIELD_NUMBER: _ClassVar[int]
     METADATA_STORE_FIELD_NUMBER: _ClassVar[int]
+    IMAGE_REGISTRY_FIELD_NUMBER: _ClassVar[int]
     ACCESS_FIELD_NUMBER: _ClassVar[int]
     SUBPATHS_FIELD_NUMBER: _ClassVar[int]
     DURATION_FIELD_NUMBER: _ClassVar[int]
@@ -98,13 +101,14 @@ class GetCloudCredentialsRequest(_message.Message):
     project_data: ProjectDataArea
     volume: VolumeData
     metadata_store: MetadataStore
+    image_registry: ImageRegistry
     access: CredentialAccess
     subpaths: _containers.RepeatedScalarFieldContainer[str]
     duration: _duration_pb2.Duration
-    def __init__(self, scope: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., project_data: _Optional[_Union[ProjectDataArea, _Mapping]] = ..., volume: _Optional[_Union[VolumeData, _Mapping]] = ..., metadata_store: _Optional[_Union[MetadataStore, _Mapping]] = ..., access: _Optional[_Union[CredentialAccess, str]] = ..., subpaths: _Optional[_Iterable[str]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+    def __init__(self, scope: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., project_data: _Optional[_Union[ProjectDataArea, _Mapping]] = ..., volume: _Optional[_Union[VolumeData, _Mapping]] = ..., metadata_store: _Optional[_Union[MetadataStore, _Mapping]] = ..., image_registry: _Optional[_Union[ImageRegistry, _Mapping]] = ..., access: _Optional[_Union[CredentialAccess, str]] = ..., subpaths: _Optional[_Iterable[str]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
 
 class GetCloudCredentialsResponse(_message.Message):
-    __slots__ = ["kind", "access_key_id", "secret_access_key", "session_token", "expiration", "bucket_uri", "granted_prefixes"]
+    __slots__ = ["kind", "access_key_id", "secret_access_key", "session_token", "expiration", "bucket_uri", "granted_prefixes", "registry_login"]
     KIND_FIELD_NUMBER: _ClassVar[int]
     ACCESS_KEY_ID_FIELD_NUMBER: _ClassVar[int]
     SECRET_ACCESS_KEY_FIELD_NUMBER: _ClassVar[int]
@@ -112,6 +116,7 @@ class GetCloudCredentialsResponse(_message.Message):
     EXPIRATION_FIELD_NUMBER: _ClassVar[int]
     BUCKET_URI_FIELD_NUMBER: _ClassVar[int]
     GRANTED_PREFIXES_FIELD_NUMBER: _ClassVar[int]
+    REGISTRY_LOGIN_FIELD_NUMBER: _ClassVar[int]
     kind: CredentialKind
     access_key_id: str
     secret_access_key: str
@@ -119,7 +124,24 @@ class GetCloudCredentialsResponse(_message.Message):
     expiration: _timestamp_pb2.Timestamp
     bucket_uri: str
     granted_prefixes: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, kind: _Optional[_Union[CredentialKind, str]] = ..., access_key_id: _Optional[str] = ..., secret_access_key: _Optional[str] = ..., session_token: _Optional[str] = ..., expiration: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., bucket_uri: _Optional[str] = ..., granted_prefixes: _Optional[_Iterable[str]] = ...) -> None: ...
+    registry_login: RegistryLogin
+    def __init__(self, kind: _Optional[_Union[CredentialKind, str]] = ..., access_key_id: _Optional[str] = ..., secret_access_key: _Optional[str] = ..., session_token: _Optional[str] = ..., expiration: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., bucket_uri: _Optional[str] = ..., granted_prefixes: _Optional[_Iterable[str]] = ..., registry_login: _Optional[_Union[RegistryLogin, _Mapping]] = ...) -> None: ...
+
+class ImageRegistry(_message.Message):
+    __slots__ = ["host"]
+    HOST_FIELD_NUMBER: _ClassVar[int]
+    host: str
+    def __init__(self, host: _Optional[str] = ...) -> None: ...
+
+class RegistryLogin(_message.Message):
+    __slots__ = ["host", "username", "password"]
+    HOST_FIELD_NUMBER: _ClassVar[int]
+    USERNAME_FIELD_NUMBER: _ClassVar[int]
+    PASSWORD_FIELD_NUMBER: _ClassVar[int]
+    host: str
+    username: str
+    password: str
+    def __init__(self, host: _Optional[str] = ..., username: _Optional[str] = ..., password: _Optional[str] = ...) -> None: ...
 
 class CreateUploadLocationRequest(_message.Message):
     __slots__ = ["project", "domain", "filename", "expires_in", "content_md5", "filename_root", "add_content_md5_metadata", "org", "content_length", "queue"]

@@ -88,6 +88,9 @@ enum CredentialKind {
   // carries every storage role of the identity it was issued to: granted_prefixes
   // says what the server intends, not a limit the store enforces.
   CREDENTIAL_KIND_AZURE_ACCESS_TOKEN = 4;
+  // A container registry login, in registry_login: the docker username and
+  // password for the requested host.
+  CREDENTIAL_KIND_REGISTRY_LOGIN = 5;
 }
 
 // ProjectDataArea names the project/domain's own data area -- the same place
@@ -202,6 +205,7 @@ message GetCloudCredentialsRequest {
     ProjectDataArea project_data = 2;
     VolumeData volume = 3;
     MetadataStore metadata_store = 7;
+    ImageRegistry image_registry = 8;
   }
 
   // +optional. Unspecified reads as READ, which is the safe direction for a
@@ -257,6 +261,31 @@ message GetCloudCredentialsResponse {
   // in its own slice-id range -- so the two accesses may return different
   // prefixes for the same resource.
   repeated string granted_prefixes = 7;
+
+  // The login for an image_registry request (kind REGISTRY_LOGIN). Secret.
+  RegistryLogin registry_login = 8;
+}
+
+// ImageRegistry is a container registry the organization owns (Google
+// Artifact Registry, Amazon ECR or Azure Container Registry), reached with the
+// identity the organization's registry trusts the control plane as, so that
+// building an image can pull its base, or push the result, with no long-lived
+// registry secret. READ pulls; READ_WRITE also pushes. What the login may do
+// beyond that is the organization's registry permissions, not the server's.
+message ImageRegistry {
+  // The registry host, as an image reference names it:
+  // us-docker.pkg.dev, 123456789012.dkr.ecr.us-east-2.amazonaws.com or
+  // example.azurecr.io.
+  // +required
+  string host = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// RegistryLogin is what docker login takes for a registry.
+message RegistryLogin {
+  // The registry host the login is for.
+  string host = 1;
+  string username = 2;
+  string password = 3;
 }
 
 // CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.
