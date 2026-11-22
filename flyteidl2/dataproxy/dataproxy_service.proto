@@ -186,7 +186,8 @@ message ArtifactVersion {
 // correct forever. Keyed by a resource inside a scope, authorization is the
 // question the platform already answers, and the path is an OUTPUT.
 message GetCloudCredentialsRequest {
-  // The project/domain this is for: where authorization is answered.
+  // The project/domain this is for: where authorization is answered. Unset
+  // for an organization_store, which names its organization itself.
   //
   // It is NOT, for every resource, a containment boundary. A ProjectDataArea's
   // prefix is inside it. A Volume's chunk prefix is not and cannot be made so
@@ -206,6 +207,7 @@ message GetCloudCredentialsRequest {
     VolumeData volume = 3;
     MetadataStore metadata_store = 7;
     ImageRegistry image_registry = 8;
+    OrganizationStore organization_store = 9;
   }
 
   // +optional. Unspecified reads as READ, which is the safe direction for a
@@ -278,6 +280,21 @@ message ImageRegistry {
   // example.azurecr.io.
   // +required
   string host = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+// OrganizationStore is the whole store an organization brought to a shared
+// queue, for the shared cluster serving it there, whose components act for
+// every run of the organization. Only that cluster's own application may ask,
+// and only for an organization holding a grant to a queue on the cluster's
+// pool. The request's scope is left unset: this resource names its
+// organization itself.
+message OrganizationStore {
+  // The organization whose store this is.
+  // +required
+  string organization = 1 [(buf.validate.field).string.min_len = 1];
+  // The calling cluster, in the caller's own organization (the pool's owner).
+  // +required
+  string cluster = 2 [(buf.validate.field).string.min_len = 1];
 }
 
 // RegistryLogin is what docker login takes for a registry.

@@ -88,12 +88,13 @@ class ArtifactVersion(_message.Message):
     def __init__(self, name: _Optional[str] = ..., version: _Optional[str] = ...) -> None: ...
 
 class GetCloudCredentialsRequest(_message.Message):
-    __slots__ = ["scope", "project_data", "volume", "metadata_store", "image_registry", "access", "subpaths", "duration"]
+    __slots__ = ["scope", "project_data", "volume", "metadata_store", "image_registry", "organization_store", "access", "subpaths", "duration"]
     SCOPE_FIELD_NUMBER: _ClassVar[int]
     PROJECT_DATA_FIELD_NUMBER: _ClassVar[int]
     VOLUME_FIELD_NUMBER: _ClassVar[int]
     METADATA_STORE_FIELD_NUMBER: _ClassVar[int]
     IMAGE_REGISTRY_FIELD_NUMBER: _ClassVar[int]
+    ORGANIZATION_STORE_FIELD_NUMBER: _ClassVar[int]
     ACCESS_FIELD_NUMBER: _ClassVar[int]
     SUBPATHS_FIELD_NUMBER: _ClassVar[int]
     DURATION_FIELD_NUMBER: _ClassVar[int]
@@ -102,10 +103,11 @@ class GetCloudCredentialsRequest(_message.Message):
     volume: VolumeData
     metadata_store: MetadataStore
     image_registry: ImageRegistry
+    organization_store: OrganizationStore
     access: CredentialAccess
     subpaths: _containers.RepeatedScalarFieldContainer[str]
     duration: _duration_pb2.Duration
-    def __init__(self, scope: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., project_data: _Optional[_Union[ProjectDataArea, _Mapping]] = ..., volume: _Optional[_Union[VolumeData, _Mapping]] = ..., metadata_store: _Optional[_Union[MetadataStore, _Mapping]] = ..., image_registry: _Optional[_Union[ImageRegistry, _Mapping]] = ..., access: _Optional[_Union[CredentialAccess, str]] = ..., subpaths: _Optional[_Iterable[str]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+    def __init__(self, scope: _Optional[_Union[_identifier_pb2.ProjectIdentifier, _Mapping]] = ..., project_data: _Optional[_Union[ProjectDataArea, _Mapping]] = ..., volume: _Optional[_Union[VolumeData, _Mapping]] = ..., metadata_store: _Optional[_Union[MetadataStore, _Mapping]] = ..., image_registry: _Optional[_Union[ImageRegistry, _Mapping]] = ..., organization_store: _Optional[_Union[OrganizationStore, _Mapping]] = ..., access: _Optional[_Union[CredentialAccess, str]] = ..., subpaths: _Optional[_Iterable[str]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
 
 class GetCloudCredentialsResponse(_message.Message):
     __slots__ = ["kind", "access_key_id", "secret_access_key", "session_token", "expiration", "bucket_uri", "granted_prefixes", "registry_login"]
@@ -132,6 +134,14 @@ class ImageRegistry(_message.Message):
     HOST_FIELD_NUMBER: _ClassVar[int]
     host: str
     def __init__(self, host: _Optional[str] = ...) -> None: ...
+
+class OrganizationStore(_message.Message):
+    __slots__ = ["organization", "cluster"]
+    ORGANIZATION_FIELD_NUMBER: _ClassVar[int]
+    CLUSTER_FIELD_NUMBER: _ClassVar[int]
+    organization: str
+    cluster: str
+    def __init__(self, organization: _Optional[str] = ..., cluster: _Optional[str] = ...) -> None: ...
 
 class RegistryLogin(_message.Message):
     __slots__ = ["host", "username", "password"]
