@@ -112,3 +112,19 @@ class DeleteTriggersRequest(_message.Message):
 class DeleteTriggersResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
+
+class PromoteTriggerRequest(_message.Message):
+    __slots__ = ["name", "task_version"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    TASK_VERSION_FIELD_NUMBER: _ClassVar[int]
+    name: _identifier_pb2.TriggerName
+    task_version: str
+    def __init__(self, name: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ..., task_version: _Optional[str] = ...) -> None: ...
+
+class PromoteTriggerResponse(_message.Message):
+    __slots__ = ["trigger", "previous_task_version"]
+    TRIGGER_FIELD_NUMBER: _ClassVar[int]
+    PREVIOUS_TASK_VERSION_FIELD_NUMBER: _ClassVar[int]
+    trigger: _trigger_definition_pb2.TriggerDetails
+    previous_task_version: str
+    def __init__(self, trigger: _Optional[_Union[_trigger_definition_pb2.TriggerDetails, _Mapping]] = ..., previous_task_version: _Optional[str] = ...) -> None: ...

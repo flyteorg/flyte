@@ -26,6 +26,7 @@ const (
 	TriggerService_GetTriggerRevisionHistory_FullMethodName = "/flyteidl2.trigger.TriggerService/GetTriggerRevisionHistory"
 	TriggerService_UpdateTriggers_FullMethodName            = "/flyteidl2.trigger.TriggerService/UpdateTriggers"
 	TriggerService_DeleteTriggers_FullMethodName            = "/flyteidl2.trigger.TriggerService/DeleteTriggers"
+	TriggerService_PromoteTrigger_FullMethodName            = "/flyteidl2.trigger.TriggerService/PromoteTrigger"
 )
 
 // TriggerServiceClient is the client API for TriggerService service.
@@ -53,6 +54,10 @@ type TriggerServiceClient interface {
 	UpdateTriggers(ctx context.Context, in *UpdateTriggersRequest, opts ...grpc.CallOption) (*UpdateTriggersResponse, error)
 	// Soft-delete multiple triggers at once.
 	DeleteTriggers(ctx context.Context, in *DeleteTriggersRequest, opts ...grpc.CallOption) (*DeleteTriggersResponse, error)
+	// Point a trigger at a task version and pin it there. A pinned trigger keeps that version
+	// across later deploys of its task until it is promoted again, so deploying a task registers
+	// code without changing what the trigger runs.
+	PromoteTrigger(ctx context.Context, in *PromoteTriggerRequest, opts ...grpc.CallOption) (*PromoteTriggerResponse, error)
 }
 
 type triggerServiceClient struct {
@@ -126,6 +131,15 @@ func (c *triggerServiceClient) DeleteTriggers(ctx context.Context, in *DeleteTri
 	return out, nil
 }
 
+func (c *triggerServiceClient) PromoteTrigger(ctx context.Context, in *PromoteTriggerRequest, opts ...grpc.CallOption) (*PromoteTriggerResponse, error) {
+	out := new(PromoteTriggerResponse)
+	err := c.cc.Invoke(ctx, TriggerService_PromoteTrigger_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TriggerServiceServer is the server API for TriggerService service.
 // All implementations should embed UnimplementedTriggerServiceServer
 // for forward compatibility
@@ -151,6 +165,10 @@ type TriggerServiceServer interface {
 	UpdateTriggers(context.Context, *UpdateTriggersRequest) (*UpdateTriggersResponse, error)
 	// Soft-delete multiple triggers at once.
 	DeleteTriggers(context.Context, *DeleteTriggersRequest) (*DeleteTriggersResponse, error)
+	// Point a trigger at a task version and pin it there. A pinned trigger keeps that version
+	// across later deploys of its task until it is promoted again, so deploying a task registers
+	// code without changing what the trigger runs.
+	PromoteTrigger(context.Context, *PromoteTriggerRequest) (*PromoteTriggerResponse, error)
 }
 
 // UnimplementedTriggerServiceServer should be embedded to have forward compatible implementations.
@@ -177,6 +195,9 @@ func (UnimplementedTriggerServiceServer) UpdateTriggers(context.Context, *Update
 }
 func (UnimplementedTriggerServiceServer) DeleteTriggers(context.Context, *DeleteTriggersRequest) (*DeleteTriggersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTriggers not implemented")
+}
+func (UnimplementedTriggerServiceServer) PromoteTrigger(context.Context, *PromoteTriggerRequest) (*PromoteTriggerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PromoteTrigger not implemented")
 }
 
 // UnsafeTriggerServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -316,6 +337,24 @@ func _TriggerService_DeleteTriggers_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TriggerService_PromoteTrigger_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PromoteTriggerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TriggerServiceServer).PromoteTrigger(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TriggerService_PromoteTrigger_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TriggerServiceServer).PromoteTrigger(ctx, req.(*PromoteTriggerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TriggerService_ServiceDesc is the grpc.ServiceDesc for TriggerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -350,6 +389,10 @@ var TriggerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteTriggers",
 			Handler:    _TriggerService_DeleteTriggers_Handler,
+		},
+		{
+			MethodName: "PromoteTrigger",
+			Handler:    _TriggerService_PromoteTrigger_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -50,6 +50,11 @@ class TriggerServiceStub(object):
                 request_serializer=flyteidl2_dot_trigger_dot_trigger__service__pb2.DeleteTriggersRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_trigger_dot_trigger__service__pb2.DeleteTriggersResponse.FromString,
                 )
+        self.PromoteTrigger = channel.unary_unary(
+                '/flyteidl2.trigger.TriggerService/PromoteTrigger',
+                request_serializer=flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerResponse.FromString,
+                )
 
 
 class TriggerServiceServicer(object):
@@ -112,6 +117,15 @@ class TriggerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def PromoteTrigger(self, request, context):
+        """Point a trigger at a task version and pin it there. A pinned trigger keeps that version
+        across later deploys of its task until it is promoted again, so deploying a task registers
+        code without changing what the trigger runs.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_TriggerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -149,6 +163,11 @@ def add_TriggerServiceServicer_to_server(servicer, server):
                     servicer.DeleteTriggers,
                     request_deserializer=flyteidl2_dot_trigger_dot_trigger__service__pb2.DeleteTriggersRequest.FromString,
                     response_serializer=flyteidl2_dot_trigger_dot_trigger__service__pb2.DeleteTriggersResponse.SerializeToString,
+            ),
+            'PromoteTrigger': grpc.unary_unary_rpc_method_handler(
+                    servicer.PromoteTrigger,
+                    request_deserializer=flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerRequest.FromString,
+                    response_serializer=flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -277,5 +296,22 @@ class TriggerService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl2.trigger.TriggerService/DeleteTriggers',
             flyteidl2_dot_trigger_dot_trigger__service__pb2.DeleteTriggersRequest.SerializeToString,
             flyteidl2_dot_trigger_dot_trigger__service__pb2.DeleteTriggersResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def PromoteTrigger(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.trigger.TriggerService/PromoteTrigger',
+            flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerRequest.SerializeToString,
+            flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

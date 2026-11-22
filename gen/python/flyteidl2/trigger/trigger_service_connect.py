@@ -38,6 +38,9 @@ class TriggerService(Protocol):
     async def delete_triggers(self, request: flyteidl2_dot_trigger_dot_trigger__service__pb2.DeleteTriggersRequest, ctx: RequestContext) -> flyteidl2_dot_trigger_dot_trigger__service__pb2.DeleteTriggersResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
+    async def promote_trigger(self, request: flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerRequest, ctx: RequestContext) -> flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+
 
 class TriggerServiceASGIApplication(ConnectASGIApplication[TriggerService]):
     def __init__(self, service: TriggerService | AsyncGenerator[TriggerService], *, interceptors: Iterable[Interceptor]=(), read_max_bytes: int | None = None, compressions: Iterable[Compression] | None = None) -> None:
@@ -113,6 +116,16 @@ class TriggerServiceASGIApplication(ConnectASGIApplication[TriggerService]):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=svc.delete_triggers,
+                ),
+                "/flyteidl2.trigger.TriggerService/PromoteTrigger": Endpoint.unary(
+                    method=MethodInfo(
+                        name="PromoteTrigger",
+                        service_name="flyteidl2.trigger.TriggerService",
+                        input=flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerRequest,
+                        output=flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=svc.promote_trigger,
                 ),
             },
             interceptors=interceptors,
@@ -275,6 +288,26 @@ class TriggerServiceClient(ConnectClient):
             timeout_ms=timeout_ms,
         )
 
+    async def promote_trigger(
+        self,
+        request: flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerResponse:
+        return await self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="PromoteTrigger",
+                service_name="flyteidl2.trigger.TriggerService",
+                input=flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerRequest,
+                output=flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
 
 class TriggerServiceSync(Protocol):
     def deploy_trigger(self, request: flyteidl2_dot_trigger_dot_trigger__service__pb2.DeployTriggerRequest, ctx: RequestContext) -> flyteidl2_dot_trigger_dot_trigger__service__pb2.DeployTriggerResponse:
@@ -290,6 +323,8 @@ class TriggerServiceSync(Protocol):
     def update_triggers(self, request: flyteidl2_dot_trigger_dot_trigger__service__pb2.UpdateTriggersRequest, ctx: RequestContext) -> flyteidl2_dot_trigger_dot_trigger__service__pb2.UpdateTriggersResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
     def delete_triggers(self, request: flyteidl2_dot_trigger_dot_trigger__service__pb2.DeleteTriggersRequest, ctx: RequestContext) -> flyteidl2_dot_trigger_dot_trigger__service__pb2.DeleteTriggersResponse:
+        raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
+    def promote_trigger(self, request: flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerRequest, ctx: RequestContext) -> flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerResponse:
         raise ConnectError(Code.UNIMPLEMENTED, "Not implemented")
 
 
@@ -366,6 +401,16 @@ class TriggerServiceWSGIApplication(ConnectWSGIApplication):
                         idempotency_level=IdempotencyLevel.UNKNOWN,
                     ),
                     function=service.delete_triggers,
+                ),
+                "/flyteidl2.trigger.TriggerService/PromoteTrigger": EndpointSync.unary(
+                    method=MethodInfo(
+                        name="PromoteTrigger",
+                        service_name="flyteidl2.trigger.TriggerService",
+                        input=flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerRequest,
+                        output=flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerResponse,
+                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                    ),
+                    function=service.promote_trigger,
                 ),
             },
             interceptors=interceptors,
@@ -522,6 +567,26 @@ class TriggerServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.trigger.TriggerService",
                 input=flyteidl2_dot_trigger_dot_trigger__service__pb2.DeleteTriggersRequest,
                 output=flyteidl2_dot_trigger_dot_trigger__service__pb2.DeleteTriggersResponse,
+                idempotency_level=IdempotencyLevel.UNKNOWN,
+            ),
+            headers=headers,
+            timeout_ms=timeout_ms,
+        )
+
+    def promote_trigger(
+        self,
+        request: flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerRequest,
+        *,
+        headers: Headers | Mapping[str, str] | None = None,
+        timeout_ms: int | None = None,
+    ) -> flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerResponse:
+        return self.execute_unary(
+            request=request,
+            method=MethodInfo(
+                name="PromoteTrigger",
+                service_name="flyteidl2.trigger.TriggerService",
+                input=flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerRequest,
+                output=flyteidl2_dot_trigger_dot_trigger__service__pb2.PromoteTriggerResponse,
                 idempotency_level=IdempotencyLevel.UNKNOWN,
             ),
             headers=headers,
