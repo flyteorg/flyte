@@ -20,6 +20,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	storageMocks "github.com/flyteorg/flyte/v2/flytestdlib/storage/mocks"
@@ -2930,6 +2931,69 @@ func TestCreateRun_ExistingRunIsRejected(t *testing.T) {
 	actionsClient.AssertNotCalled(t, "Enqueue", mock.Anything, mock.Anything)
 }
 
+// A CreateRun for a name whose run is still QUEUED re-enqueues that run from its own
+// stored spec (covering a CreateRun interrupted between the insert and Enqueue), never
+// from the new request, and still reports AlreadyExists.
+func TestCreateRun_QueuedRunIsResumedFromStoredSpec(t *testing.T) {
+	runID := &common.RunIdentifier{Project: "myproj", Domain: "production", Name: "rqueued1"}
+	storedSpec, err := proto.Marshal(&workflow.ActionSpec{
+		ActionId:      &common.ActionIdentifier{Run: runID, Name: "a0"},
+		InputUri:      "s3://flyte-data/original/inputs.pb",
+		RunOutputBase: "s3://flyte-data/original/out",
+		Spec: &workflow.ActionSpec_Task{Task: &workflow.TaskAction{
+			Id:       &task.TaskIdentifier{Name: "original-task"},
+			CacheKey: wrapperspb.String("original-cache-key"),
+		}},
+	})
+	require.NoError(t, err)
+
+	for _, tc := range []struct {
+		name       string
+		enqueueErr error
+	}{
+		{"not yet enqueued", nil},
+		{"already enqueued", connect.NewError(connect.CodeAlreadyExists, errors.New("TaskAction CR exists"))},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			actionRepo := &repoMocks.ActionRepo{}
+			actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+			repo := &repoMocks.Repository{}
+			store := &storageMocks.ComposedProtobufStore{}
+			repo.On("ActionRepo").Return(actionRepo)
+			repo.On("TaskRepo").Return(&repoMocks.TaskRepo{}).Maybe()
+			svc := &RunService{
+				repo: repo, settingsRepo: noSettings(t), actionsClient: actionsClient,
+				projectClient: newMockProjectClientAlwaysOK(t), storagePrefix: "s3://flyte-data",
+				dataStore: &storage.DataStore{ComposedProtobufStore: store},
+			}
+			actionRepo.On("GetRun", mock.Anything, mock.Anything).Return(&models.Run{
+				Project: runID.Project, Domain: runID.Domain, RunName: runID.Name, Name: "a0",
+				Phase: int32(common.ActionPhase_ACTION_PHASE_QUEUED), ActionSpec: storedSpec,
+			}, nil).Once()
+			var resp *connect.Response[actions.EnqueueResponse]
+			if tc.enqueueErr == nil {
+				resp = connect.NewResponse(&actions.EnqueueResponse{})
+			}
+			actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(r *connect.Request[actions.EnqueueRequest]) bool {
+				a := r.Msg.GetAction()
+				return a.GetActionId().GetName() == "a0" &&
+					a.GetInputUri() == "s3://flyte-data/original" &&
+					a.GetRunOutputBase() == "s3://flyte-data/original/out" &&
+					a.GetTask().GetId().GetName() == "original-task" &&
+					a.GetTask().GetCacheKey().GetValue() == "original-cache-key"
+			})).Return(resp, tc.enqueueErr).Once()
+
+			_, err := svc.CreateRun(context.Background(), connect.NewRequest(&workflow.CreateRunRequest{
+				Id:   &workflow.CreateRunRequest_RunId{RunId: runID},
+				Task: &workflow.CreateRunRequest_TaskSpec{TaskSpec: &task.TaskSpec{}},
+			}))
+			assert.Equal(t, connect.CodeAlreadyExists, connect.CodeOf(err))
+			store.AssertNotCalled(t, "WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+			actionRepo.AssertNotCalled(t, "CreateAction", mock.Anything, mock.Anything, mock.Anything)
+		})
+	}
+}
+
 // A failure to check whether the run exists is an internal error, not a create.
 func TestCreateRun_ExistenceCheckErrorIsInternal(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
@@ -2959,6 +3023,8 @@ func TestAbort_FinishedIsNoOp(t *testing.T) {
 
 	t.Run("run", func(t *testing.T) {
 		actionRepo, actionsClient, svc := newTestService(t)
+		svc.abortReconciler = NewAbortReconciler(nil, nil, AbortReconcilerConfig{})
+		defer func() { assert.Empty(t, svc.abortReconciler.queue.keys, "nothing to terminate") }()
 		actionRepo.On("AbortRun", mock.Anything, runID, mock.Anything, mock.Anything).Return(
 			fmt.Errorf("wrapped: %w", interfaces.ErrActionFinished))
 		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID}))
@@ -2973,5 +3039,30 @@ func TestAbort_FinishedIsNoOp(t *testing.T) {
 		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID}))
 		assert.NoError(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
+	})
+}
+
+// Aborting a run or action that is already ABORTED succeeds and pushes it to the abort
+// reconciler again, so pods an earlier abort failed to terminate get another attempt.
+func TestAbort_AlreadyAbortedRetriesTermination(t *testing.T) {
+	runID := &common.RunIdentifier{Project: "p", Domain: "d", Name: "raborted12"}
+
+	t.Run("run", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		svc.abortReconciler = NewAbortReconciler(nil, nil, AbortReconcilerConfig{})
+		actionRepo.On("AbortRun", mock.Anything, runID, mock.Anything, mock.Anything).Return(interfaces.ErrActionAborted)
+		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID}))
+		assert.NoError(t, err)
+		assert.Contains(t, svc.abortReconciler.queue.keys, "p/d/raborted12/a0")
+	})
+
+	t.Run("action", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		svc.abortReconciler = NewAbortReconciler(nil, nil, AbortReconcilerConfig{})
+		actionID := &common.ActionIdentifier{Run: runID, Name: "child"}
+		actionRepo.On("AbortAction", mock.Anything, actionID, mock.Anything, mock.Anything).Return(interfaces.ErrActionAborted)
+		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID}))
+		assert.NoError(t, err)
+		assert.Contains(t, svc.abortReconciler.queue.keys, "p/d/raborted12/child")
 	})
 }

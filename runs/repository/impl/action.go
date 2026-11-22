@@ -61,8 +61,10 @@ var terminalPhases = []int32{
 }
 
 // finalPhases are the phases a run or action reports only once it has ended. An abort
-// that arrives after one of them is a no-op: rewriting it would turn a SUCCEEDED run
-// into ABORTED and hide its outputs, or replace a FAILED run's error with abort info.
+// that arrives after one of them does not rewrite it: rewriting would turn a SUCCEEDED
+// run into ABORTED and hide its outputs, or replace a FAILED run's error with abort
+// info. (A repeat abort of an ABORTED one only re-arms pod termination; see
+// finishedAbortResult.)
 // FAILED and TIMED_OUT are final here even though UpdateActionPhase lets them move
 // on: the executor reports a retrying attempt as QUEUED (in-place restart, and
 // restart after a max-runtime timeout), so an action reports FAILED or TIMED_OUT
@@ -353,12 +355,11 @@ func (r *actionRepo) AbortRun(ctx context.Context, runID *common.RunIdentifier, 
 	).Scan(&rootName)
 	if errors.Is(err, sql.ErrNoRows) {
 		// Either the run does not exist, or it already reached a final phase.
-		if _, getErr := r.GetRun(ctx, runID); getErr == nil {
-			logger.Infof(ctx, "AbortRun: run %s/%s/%s already finished; nothing to abort",
-				runID.Project, runID.Domain, runID.Name)
-			return interfaces.ErrActionFinished
+		run, getErr := r.GetRun(ctx, runID)
+		if getErr != nil {
+			return fmt.Errorf("run not found: %w", sql.ErrNoRows)
 		}
-		return fmt.Errorf("run not found: %w", sql.ErrNoRows)
+		return r.finishedAbortResult(ctx, run, now)
 	}
 	if err != nil {
 		return fmt.Errorf("failed to abort run: %w", err)
@@ -826,17 +827,41 @@ func (r *actionRepo) AbortAction(ctx context.Context, actionID *common.ActionIde
 	}
 	if n, _ := result.RowsAffected(); n == 0 {
 		// Either the action does not exist, or it already reached a final phase.
-		if _, getErr := r.GetAction(ctx, actionID); getErr == nil {
-			logger.Infof(ctx, "AbortAction: %s already finished; nothing to abort", actionID.Name)
-			return interfaces.ErrActionFinished
+		action, getErr := r.GetAction(ctx, actionID)
+		if getErr != nil {
+			return fmt.Errorf("action not found: %w", sql.ErrNoRows)
 		}
-		return fmt.Errorf("action not found: %w", sql.ErrNoRows)
+		return r.finishedAbortResult(ctx, action, now)
 	}
 
 	r.notifyActionUpdate(ctx, actionID)
 
 	logger.Infof(ctx, "AbortAction: aborted %s", actionID.Name)
 	return nil
+}
+
+// finishedAbortResult handles an abort of an action that already reached a final phase.
+// For SUCCEEDED, FAILED, TIMED_OUT and RECOVERED it returns ErrActionFinished and
+// changes nothing. For ABORTED it keeps the phase, reason and end time, re-arms the
+// abort request (resetting the attempt count only if no abort is pending) so the
+// reconciler can retry terminating the action's pods, and returns ErrActionAborted.
+func (r *actionRepo) finishedAbortResult(ctx context.Context, action *models.Action, now time.Time) error {
+	if action.Phase != int32(common.ActionPhase_ACTION_PHASE_ABORTED) {
+		logger.Infof(ctx, "Abort: %s/%s/%s/%s already finished; nothing to abort",
+			action.Project, action.Domain, action.RunName, action.Name)
+		return interfaces.ErrActionFinished
+	}
+	if _, err := r.db.ExecContext(ctx,
+		`UPDATE actions SET abort_attempt_count = CASE WHEN abort_requested_at IS NULL THEN 0 ELSE abort_attempt_count END,
+		                    abort_requested_at = COALESCE(abort_requested_at, $1)
+		 WHERE project = $2 AND domain = $3 AND run_name = $4 AND name = $5 AND phase = $6`,
+		now, action.Project, action.Domain, action.RunName, action.Name,
+		int32(common.ActionPhase_ACTION_PHASE_ABORTED)); err != nil {
+		return fmt.Errorf("failed to re-request abort: %w", err)
+	}
+	logger.Infof(ctx, "Abort: %s/%s/%s/%s already aborted; re-requested pod termination",
+		action.Project, action.Domain, action.RunName, action.Name)
+	return interfaces.ErrActionAborted
 }
 
 // ListPendingAborts returns all actions that have abort_requested_at set (i.e. awaiting pod termination).

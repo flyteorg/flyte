@@ -2416,7 +2416,6 @@ func TestAbortRun_FinalPhaseIsNoOp(t *testing.T) {
 	for _, phase := range []common.ActionPhase{
 		common.ActionPhase_ACTION_PHASE_SUCCEEDED,
 		common.ActionPhase_ACTION_PHASE_FAILED,
-		common.ActionPhase_ACTION_PHASE_ABORTED,
 		common.ActionPhase_ACTION_PHASE_TIMED_OUT,
 		common.ActionPhase_ACTION_PHASE_RECOVERED,
 	} {
@@ -2428,11 +2427,48 @@ func TestAbortRun_FinalPhaseIsNoOp(t *testing.T) {
 			run, err := repo.GetRun(ctx, runID)
 			require.NoError(t, err)
 			assert.Equal(t, int32(phase), run.Phase, "a final phase must not be rewritten by an abort")
-			if phase != common.ActionPhase_ACTION_PHASE_ABORTED {
-				assert.Nil(t, run.AbortReason, "a no-op abort must not record a reason")
-			}
+			assert.Nil(t, run.AbortReason, "a no-op abort must not record a reason")
+			assert.Nil(t, run.AbortRequestedAt, "a no-op abort must not request pod termination")
 		})
 	}
+}
+
+// Aborting a run that is already ABORTED keeps the original abort (phase, reason and
+// end time) but re-arms the abort request, so the reconciler can retry terminating its
+// pods after an earlier abort gave up. A pending abort keeps its attempt count.
+func TestAbortRun_RepeatAbortReRequestsTermination(t *testing.T) {
+	db := setupActionDB(t)
+	repo, err := NewActionRepo(db, testDbConfig, testNotificationConfig)
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	runID := abortTestRun(t, repo, "repeat-abort", common.ActionPhase_ACTION_PHASE_RUNNING)
+	rootID := &common.ActionIdentifier{Run: runID, Name: rootActionName}
+	require.NoError(t, repo.AbortRun(ctx, runID, "first abort", nil))
+	first, err := repo.GetRun(ctx, runID)
+	require.NoError(t, err)
+
+	// While the first abort is still pending, a repeat keeps its attempt count.
+	_, err = repo.MarkAbortAttempt(ctx, rootID)
+	require.NoError(t, err)
+	assert.ErrorIs(t, repo.AbortRun(ctx, runID, "second abort", nil), interfaces.ErrActionAborted)
+	pending, err := repo.GetRun(ctx, runID)
+	require.NoError(t, err)
+	assert.Equal(t, 1, pending.AbortAttemptCount)
+	require.NotNil(t, pending.AbortRequestedAt)
+	assert.True(t, first.AbortRequestedAt.Equal(*pending.AbortRequestedAt), "a pending abort request is kept as is")
+
+	// After the reconciler gave up (request cleared), a repeat re-arms it.
+	require.NoError(t, repo.ClearAbortRequest(ctx, rootID))
+	assert.ErrorIs(t, repo.AbortRun(ctx, runID, "third abort", nil), interfaces.ErrActionAborted)
+	got, err := repo.GetRun(ctx, runID)
+	require.NoError(t, err)
+	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_ABORTED), got.Phase)
+	require.NotNil(t, got.AbortReason)
+	assert.Equal(t, "first abort", *got.AbortReason, "the original abort reason is kept")
+	assert.Equal(t, first.EndedAt, got.EndedAt, "the end time is kept")
+	assert.NotNil(t, got.AbortRequestedAt, "the abort request is re-armed")
+	assert.Equal(t, 0, got.AbortAttemptCount)
 }
 
 // Runs still in progress are aborted.
@@ -2491,6 +2527,22 @@ func TestAbortAction_FinalPhaseIsNoOp(t *testing.T) {
 
 	err = repo.AbortAction(ctx, &common.ActionIdentifier{Run: runID, Name: "missing"}, "x", nil)
 	assert.ErrorIs(t, err, sql.ErrNoRows)
+
+	// An already ABORTED action keeps its abort, and its abort request is re-armed.
+	aborted := &common.ActionIdentifier{Run: runID, Name: "aborted-child"}
+	abortedModel := models.NewActionModel(aborted)
+	abortedModel.ParentActionName = sql.NullString{String: rootActionName, Valid: true}
+	_, err = repo.CreateAction(ctx, abortedModel, false)
+	require.NoError(t, err)
+	require.NoError(t, repo.AbortAction(ctx, aborted, "first abort", nil))
+	require.NoError(t, repo.ClearAbortRequest(ctx, aborted))
+	assert.ErrorIs(t, repo.AbortAction(ctx, aborted, "second abort", nil), interfaces.ErrActionAborted)
+	got, err = repo.GetAction(ctx, aborted)
+	require.NoError(t, err)
+	assert.Equal(t, int32(common.ActionPhase_ACTION_PHASE_ABORTED), got.Phase)
+	require.NotNil(t, got.AbortReason)
+	assert.Equal(t, "first abort", *got.AbortReason)
+	assert.NotNil(t, got.AbortRequestedAt)
 }
 
 func TestGetRun_NotFoundWrapsErrNoRows(t *testing.T) {

@@ -11,9 +11,15 @@ import (
 )
 
 // ErrActionFinished is returned by AbortRun and AbortAction when the run or action
-// already ended (SUCCEEDED, FAILED, ABORTED, TIMED_OUT or RECOVERED). The abort is a
-// no-op: the action keeps its phase, outputs and error.
+// already ended in SUCCEEDED, FAILED, TIMED_OUT or RECOVERED. The abort is a no-op: the
+// action keeps its phase, outputs and error.
 var ErrActionFinished = errors.New("action already finished")
+
+// ErrActionAborted is returned by AbortRun and AbortAction when the run or action is
+// already ABORTED. Its phase, abort reason and end time are left as they were, but its
+// abort request is re-armed so the abort reconciler can retry terminating its pods,
+// for example after an earlier abort ran out of attempts.
+var ErrActionAborted = errors.New("action already aborted")
 
 // ActionRepo defines the interface for actions/runs data access
 type ActionRepo interface {
