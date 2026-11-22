@@ -30,6 +30,7 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
+	"github.com/flyteorg/flyte/v2/runs/rpc"
 	"github.com/flyteorg/flyte/v2/runs/scheduler"
 	"github.com/flyteorg/flyte/v2/runs/service"
 )
@@ -147,7 +148,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		})
 	}
 
-	settingsRepo := impl.NewSettingsRepo(sc.DB)
+	settingsSvc := service.NewSettingsService(impl.NewSettingsRepo(sc.DB))
 
 	// In unified mode, intra-service calls go through the same mux.
 	actionsServiceCfg := cfg.ActionsService
@@ -164,13 +165,16 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		connect.WithInterceptors(otelInterceptor),
 	)
 
-	runsServiceURL := fmt.Sprintf("http://localhost:%d", cfg.Server.Port)
-	projectClient := projectconnect.NewProjectServiceClient(
-		http.DefaultClient,
-		runsServiceURL,
-		connect.WithInterceptors(otelInterceptor),
-	)
-	abortReconciler := service.NewAbortReconciler(repo, actionsClient, service.AbortReconcilerConfig{
+	domains := make([]*projectpb.Domain, 0, len(cfg.Domains))
+	for _, d := range cfg.Domains {
+		domains = append(domains, &projectpb.Domain{
+			Id:   d.ID,
+			Name: d.Name,
+		})
+	}
+	projectRepo := impl.NewProjectRepo(sc.DB)
+	projectSvc := service.NewProjectService(projectRepo, domains)
+	abortReconciler := service.NewAbortReconciler(repo, service.AbortAction(actionsClient), service.AbortReconcilerConfig{
 		Workers:      5,
 		MaxAttempts:  10,
 		QueueSize:    1000,
@@ -181,27 +185,27 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return abortReconciler.Run(ctx)
 	})
 
-	runsSvc := service.NewRunService(repo, settingsRepo, actionsClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
-	taskSvc := service.NewTaskService(repo, projectClient)
+	runsSvc := service.NewRun(repo, settingsSvc, actionsClient, projectSvc, cfg.StoragePrefix, sc.DataStore, abortReconciler)
+	taskSvc := service.NewTaskService(repo.TaskRepo(), projectSvc)
 
-	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc, connect.WithInterceptors(interceptors...))
+	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(rpc.NewRunHandler(runsSvc, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders), connect.WithInterceptors(interceptors...))
 	sc.Mux.Handle(runsPath, runsHandler)
 	logger.Infof(ctx, "Mounted RunService at %s", runsPath)
 
-	internalRunsPath, internalRunsHandler := workflowconnect.NewInternalRunServiceHandler(runsSvc, connect.WithInterceptors(otelInterceptor))
+	internalRunsPath, internalRunsHandler := workflowconnect.NewInternalRunServiceHandler(rpc.NewInternalRunHandler(runsSvc), connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(internalRunsPath, internalRunsHandler)
 	logger.Infof(ctx, "Mounted InternalRunService at %s", internalRunsPath)
 
-	taskPath, taskHandler := taskconnect.NewTaskServiceHandler(taskSvc, connect.WithInterceptors(interceptors...))
+	taskPath, taskHandler := taskconnect.NewTaskServiceHandler(rpc.NewTaskHandler(taskSvc), connect.WithInterceptors(interceptors...))
 	sc.Mux.Handle(taskPath, taskHandler)
 	logger.Infof(ctx, "Mounted TaskService at %s", taskPath)
 
-	identitySvc := service.NewIdentityService(cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
+	identitySvc := rpc.NewIdentityService(cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
 	identityPath, identityHandler := authconnect.NewIdentityServiceHandler(identitySvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(identityPath, identityHandler)
 	logger.Infof(ctx, "Mounted IdentityService at %s", identityPath)
 
-	authMetadataSvc := service.NewAuthMetadataService(sc.BaseURL, cfg.AuthMetadata)
+	authMetadataSvc := rpc.NewAuthMetadataService(sc.BaseURL, cfg.AuthMetadata)
 	authMetadataPath, authMetadataHandler := authconnect.NewAuthMetadataServiceHandler(authMetadataSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(authMetadataPath, authMetadataHandler)
 	logger.Infof(ctx, "Mounted AuthMetadataService at %s", authMetadataPath)
@@ -210,37 +214,28 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	// so OAuth2/OIDC discovery clients (flyte-sdk) can find it. When
 	// runs.authMetadata.externalAuthServerBaseUrl is set, this proxies the
 	// external IdP's (e.g. Okta) metadata document.
-	sc.Mux.Handle("/.well-known/oauth-authorization-server", service.OAuth2MetadataHTTPHandler(authMetadataSvc))
+	sc.Mux.Handle("/.well-known/oauth-authorization-server", rpc.OAuth2MetadataHTTPHandler(authMetadataSvc))
 	logger.Infof(ctx, "Mounted OAuth2 metadata at /.well-known/oauth-authorization-server")
 
-	triggerSvc := service.NewTriggerService(repo)
-	triggerPath, triggerHandler := triggerconnect.NewTriggerServiceHandler(triggerSvc, connect.WithInterceptors(interceptors...))
+	triggerSvc := service.NewTriggerService(repo.TriggerRepo())
+	triggerPath, triggerHandler := triggerconnect.NewTriggerServiceHandler(rpc.NewTriggerHandler(triggerSvc), connect.WithInterceptors(interceptors...))
 	sc.Mux.Handle(triggerPath, triggerHandler)
 	logger.Infof(ctx, "Mounted TriggerService at %s", triggerPath)
 
-	domains := make([]*projectpb.Domain, 0, len(cfg.Domains))
-	for _, d := range cfg.Domains {
-		domains = append(domains, &projectpb.Domain{
-			Id:   d.ID,
-			Name: d.Name,
-		})
-	}
-	projectSvc := service.NewProjectService(impl.NewProjectRepo(sc.DB), domains)
-	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(projectSvc, connect.WithInterceptors(otelInterceptor))
+	projectPath, projectHandler := projectconnect.NewProjectServiceHandler(rpc.NewProjectHandler(projectSvc), connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(projectPath, projectHandler)
 	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
 
-	settingsSvc := service.NewSettingsService(settingsRepo)
-	settingsPath, settingsHandler := settingsconnect.NewSettingsServiceHandler(settingsSvc, connect.WithInterceptors(otelInterceptor))
+	settingsPath, settingsHandler := settingsconnect.NewSettingsServiceHandler(rpc.NewSettingsHandler(settingsSvc), connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(settingsPath, settingsHandler)
 	logger.Infof(ctx, "Mounted SettingsService at %s", settingsPath)
 
-	if err := seedProjects(ctx, impl.NewProjectRepo(sc.DB), cfg.SeedProjects); err != nil {
+	if err := seedProjects(ctx, projectRepo, cfg.SeedProjects); err != nil {
 		return fmt.Errorf("runs: failed to seed projects: %w", err)
 	}
 
 	if cfg.TriggerScheduler.Enabled {
-		worker := scheduler.Start(ctx, repo.TriggerRepo(), cfg.TriggerScheduler, http.DefaultClient, runsServiceURL, connect.WithInterceptors(otelInterceptor))
+		worker := scheduler.Start(repo.TriggerRepo(), cfg.TriggerScheduler, runsSvc)
 		sc.AddWorker("trigger-scheduler", worker)
 		logger.Infof(ctx, "Registered trigger-scheduler worker")
 	}

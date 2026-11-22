@@ -6,15 +6,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
-	"net/http/httptest"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	"connectrpc.com/connect"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -25,32 +22,30 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	storageMocks "github.com/flyteorg/flyte/v2/flytestdlib/storage/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
-	actionsconnectmocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect/mocks"
+	actionsMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
-	projectMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect/mocks"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	repoMocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-// noSettings returns a settings repo reporting no stored rows, so run creation
+// noSettings returns a settings service with no stored rows, so run creation
 // resolves to empty settings and the applier changes nothing.
-func noSettings(t *testing.T) *repoMocks.SettingsRepo {
+func noSettings(t *testing.T) *SettingsService {
 	m := &repoMocks.SettingsRepo{}
 	m.On("GetSettingsByKeys", mock.Anything, mock.Anything).Return(nil, nil)
-	return m
+	return NewSettingsService(m)
 }
 
-// settingsRepoWith returns a settings repo holding one org-level row with the given
+// settingsServiceWith returns a settings service with one org-level row with the given
 // settings. The row key must match what fetchLevels asks for, or the lookup aligns
 // to nothing.
-func settingsRepoWith(t *testing.T, s *settings.Settings) *repoMocks.SettingsRepo {
+func settingsServiceWith(t *testing.T, s *settings.Settings) *SettingsService {
 	t.Helper()
 	data, err := protojson.Marshal(s)
 	require.NoError(t, err)
@@ -58,31 +53,30 @@ func settingsRepoWith(t *testing.T, s *settings.Settings) *repoMocks.SettingsRep
 	m := &repoMocks.SettingsRepo{}
 	m.On("GetSettingsByKeys", mock.Anything, mock.Anything).
 		Return([]*models.Settings{{Key: models.EncodeSettingsKey("", ""), Data: data, Version: 1}}, nil)
-	return m
+	return NewSettingsService(m)
 }
 
-// settingsWithQueue returns a settings repo whose one row sets the default queue.
-func settingsWithQueue(t *testing.T, queue string) *repoMocks.SettingsRepo {
+// settingsWithQueue returns a settings service supplying the default queue.
+func settingsWithQueue(t *testing.T, queue string) *SettingsService {
 	t.Helper()
-	return settingsRepoWith(t, &settings.Settings{
+	return settingsServiceWith(t, &settings.Settings{
 		Run: &settings.RunSettings{
 			DefaultQueue: &settings.StringSetting{State: stateValue, StringValue: queue},
 		},
 	})
 }
 
-// newMockProjectClientAlwaysOK returns a mock ProjectServiceClient whose GetProject always succeeds.
-func newMockProjectClientAlwaysOK(t *testing.T) *projectMocks.ProjectServiceClient {
-	pc := projectMocks.NewProjectServiceClient(t)
-	pc.EXPECT().GetProject(mock.Anything, mock.Anything).
-		Return(connect.NewResponse(&project.GetProjectResponse{}), nil).Maybe()
-	return pc
+func existingProjectService(t *testing.T) *ProjectService {
+	t.Helper()
+	repo := repoMocks.NewProjectRepo(t)
+	repo.EXPECT().GetProject(mock.Anything, mock.Anything).Return(&models.Project{}, nil).Once()
+	return NewProjectService(repo, nil)
 }
 
-func newTestService(t *testing.T) (*repoMocks.ActionRepo, *actionsconnectmocks.ActionsServiceClient, *RunService) {
+func newTestService(t *testing.T) (*repoMocks.ActionRepo, *actionsMocks.ActionsServiceClient, *RunService) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	actionsClient := actionsMocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
 	repo.On("TaskRepo").Maybe().Return(taskRepo)
@@ -110,21 +104,10 @@ func matchRunID(expected *common.RunIdentifier) interface{} {
 	})
 }
 
-func newRunServiceTestClient(t *testing.T, svc *RunService) workflowconnect.RunServiceClient {
-	path, handler := workflowconnect.NewRunServiceHandler(svc)
-
-	mux := http.NewServeMux()
-	mux.Handle(path, handler)
-	server := httptest.NewServer(mux)
-	t.Cleanup(server.Close)
-
-	return workflowconnect.NewRunServiceClient(http.DefaultClient, server.URL)
-}
-
 func TestGetRunDetails_WithTaskSpec(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	actionsClient := actionsMocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
 	repo.On("TaskRepo").Maybe().Return(taskRepo)
@@ -176,172 +159,20 @@ func TestGetRunDetails_WithTaskSpec(t *testing.T) {
 	}, nil)
 	actionRepo.On("ListEvents", mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil)
 
-	resp, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
+	resp, err := svc.GetRunDetails(context.Background(), &workflow.GetRunDetailsRequest{
 		RunId: runID,
-	}))
-	require.NoError(t, err)
-	require.NotNil(t, resp.Msg.Details)
-	require.NotNil(t, resp.Msg.Details.Action)
-	require.NotNil(t, resp.Msg.Details.Action.GetTask())
-	assert.Equal(t, "python", resp.Msg.Details.Action.GetTask().GetTaskTemplate().GetType())
-}
-
-func TestWatchClusterEvents_UsesPersistedClusterEvents(t *testing.T) {
-	actionRepo, _, svc := newTestService(t)
-	client := newRunServiceTestClient(t, svc)
-
-	actionID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{
-			Org:     "test-org",
-			Project: "test-project",
-			Domain:  "test-domain",
-			Name:    "rtest12345",
-		},
-		Name: "action-1",
-	}
-
-	actionModel := &models.Action{
-		Project: actionID.Run.Project,
-		Domain:  actionID.Run.Domain,
-		RunName: actionID.Run.Name,
-		Name:    actionID.Name,
-		Phase:   int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
-	}
-
-	clusterEvent := &workflow.ClusterEvent{
-		OccurredAt: timestamppb.New(time.Unix(100, 0)),
-		Message:    "Pod scheduled on node-a",
-	}
-	eventModel, err := models.NewActionEventModel(&workflow.ActionEvent{
-		Id:            actionID,
-		Attempt:       0,
-		Phase:         common.ActionPhase_ACTION_PHASE_RUNNING,
-		Version:       1,
-		UpdatedTime:   timestamppb.New(time.Unix(101, 0)),
-		ClusterEvents: []*workflow.ClusterEvent{clusterEvent},
 	})
 	require.NoError(t, err)
-	eventModel.UpdatedAt = time.Unix(101, 0)
-
-	actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(actionModel, nil).Once()
-	actionRepo.On("WatchActionUpdates", mock.Anything, matchActionID(actionID), mock.Anything, mock.Anything).
-		Run(func(args mock.Arguments) {
-			updates := args.Get(2).(chan<- *models.Action)
-			errs := args.Get(3).(chan<- error)
-			close(updates)
-			close(errs)
-		}).Once()
-	actionRepo.On("ListEventsSince", mock.Anything, matchActionID(actionID), uint32(0), time.Time{}, 0, 500).
-		Return([]*models.ActionEvent{eventModel}, nil).Once()
-
-	stream, err := client.WatchClusterEvents(context.Background(), connect.NewRequest(&workflow.WatchClusterEventsRequest{
-		Id:      actionID,
-		Attempt: 0,
-	}))
-	require.NoError(t, err)
-	require.True(t, stream.Receive())
-
-	resp := stream.Msg()
-	require.Len(t, resp.GetClusterEvents(), 1)
-	assert.Equal(t, "Pod scheduled on node-a", resp.GetClusterEvents()[0].GetMessage())
-
-	assert.False(t, stream.Receive())
-	assert.NoError(t, stream.Err())
-}
-
-func TestWatchClusterEvents_StreamsNewPersistedClusterEventsWithoutReplay(t *testing.T) {
-	actionRepo, _, svc := newTestService(t)
-	client := newRunServiceTestClient(t, svc)
-
-	actionID := &common.ActionIdentifier{
-		Run: &common.RunIdentifier{
-			Org:     "test-org",
-			Project: "test-project",
-			Domain:  "test-domain",
-			Name:    "rtest12345",
-		},
-		Name: "action-1",
-	}
-
-	runningAction := &models.Action{
-		Project: actionID.Run.Project,
-		Domain:  actionID.Run.Domain,
-		RunName: actionID.Run.Name,
-		Name:    actionID.Name,
-		Phase:   int32(common.ActionPhase_ACTION_PHASE_RUNNING),
-	}
-	succeededAction := &models.Action{
-		Project: actionID.Run.Project,
-		Domain:  actionID.Run.Domain,
-		RunName: actionID.Run.Name,
-		Name:    actionID.Name,
-		Phase:   int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
-	}
-
-	event1, err := models.NewActionEventModel(&workflow.ActionEvent{
-		Id:          actionID,
-		Attempt:     0,
-		Phase:       common.ActionPhase_ACTION_PHASE_RUNNING,
-		Version:     1,
-		UpdatedTime: timestamppb.New(time.Unix(101, 0)),
-		ClusterEvents: []*workflow.ClusterEvent{{
-			OccurredAt: timestamppb.New(time.Unix(100, 0)),
-			Message:    "Pod created",
-		}},
-	})
-	require.NoError(t, err)
-	event1.UpdatedAt = time.Unix(101, 0)
-
-	event2, err := models.NewActionEventModel(&workflow.ActionEvent{
-		Id:          actionID,
-		Attempt:     0,
-		Phase:       common.ActionPhase_ACTION_PHASE_SUCCEEDED,
-		Version:     2,
-		UpdatedTime: timestamppb.New(time.Unix(103, 0)),
-		ClusterEvents: []*workflow.ClusterEvent{{
-			OccurredAt: timestamppb.New(time.Unix(102, 0)),
-			Message:    "Pulled container image",
-		}},
-	})
-	require.NoError(t, err)
-	event2.UpdatedAt = time.Unix(103, 0)
-
-	actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(runningAction, nil).Once()
-	actionRepo.On("ListEventsSince", mock.Anything, matchActionID(actionID), uint32(0), time.Time{}, 0, 500).
-		Return([]*models.ActionEvent{event1}, nil).Once()
-	actionRepo.On("WatchActionUpdates", mock.Anything, matchActionID(actionID), mock.Anything, mock.Anything).
-		Run(func(args mock.Arguments) {
-			updates := args.Get(2).(chan<- *models.Action)
-			updates <- succeededAction
-			close(updates)
-		}).Once()
-	actionRepo.On("ListEventsSince", mock.Anything, matchActionID(actionID), uint32(0), event1.UpdatedAt, 0, 500).
-		Return([]*models.ActionEvent{event2}, nil).Once()
-
-	stream, err := client.WatchClusterEvents(context.Background(), connect.NewRequest(&workflow.WatchClusterEventsRequest{
-		Id:      actionID,
-		Attempt: 0,
-	}))
-	require.NoError(t, err)
-
-	require.True(t, stream.Receive())
-	first := stream.Msg()
-	require.Len(t, first.GetClusterEvents(), 1)
-	assert.Equal(t, "Pod created", first.GetClusterEvents()[0].GetMessage())
-
-	require.True(t, stream.Receive())
-	second := stream.Msg()
-	require.Len(t, second.GetClusterEvents(), 1)
-	assert.Equal(t, "Pulled container image", second.GetClusterEvents()[0].GetMessage())
-
-	assert.False(t, stream.Receive())
-	assert.NoError(t, stream.Err())
+	require.NotNil(t, resp.Details)
+	require.NotNil(t, resp.Details.Action)
+	require.NotNil(t, resp.Details.Action.GetTask())
+	assert.Equal(t, "python", resp.Details.Action.GetTask().GetTaskTemplate().GetType())
 }
 
 func TestGetRunDetails_ReturnsRunSpecEnvVars(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	actionsClient := actionsMocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
 	repo.On("TaskRepo").Maybe().Return(taskRepo)
@@ -386,15 +217,15 @@ func TestGetRunDetails_ReturnsRunSpecEnvVars(t *testing.T) {
 	actionRepo.On("GetRun", mock.Anything, runID).Return(runModel, nil)
 	actionRepo.On("ListEvents", mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil)
 
-	resp, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
+	resp, err := svc.GetRunDetails(context.Background(), &workflow.GetRunDetailsRequest{
 		RunId: runID,
-	}))
+	})
 	require.NoError(t, err)
-	require.NotNil(t, resp.Msg.Details)
-	require.NotNil(t, resp.Msg.Details.GetRunSpec())
+	require.NotNil(t, resp.Details)
+	require.NotNil(t, resp.Details.GetRunSpec())
 
 	gotEnv := map[string]string{}
-	for _, kv := range resp.Msg.Details.GetRunSpec().GetEnvs().GetValues() {
+	for _, kv := range resp.Details.GetRunSpec().GetEnvs().GetValues() {
 		gotEnv[kv.GetKey()] = kv.GetValue()
 	}
 	assert.Equal(t, "boo", gotEnv["foo"])
@@ -404,7 +235,7 @@ func TestGetRunDetails_ReturnsRunSpecEnvVars(t *testing.T) {
 func TestGetRunDetails_UsesActionCacheStatus(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	actionsClient := actionsMocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
 	repo.On("TaskRepo").Maybe().Return(taskRepo)
@@ -450,18 +281,18 @@ func TestGetRunDetails_UsesActionCacheStatus(t *testing.T) {
 	actionRepo.On("GetRun", mock.Anything, runID).Return(runModel, nil)
 	actionRepo.On("ListEvents", mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{eventModel}, nil)
 
-	resp, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
+	resp, err := svc.GetRunDetails(context.Background(), &workflow.GetRunDetailsRequest{
 		RunId: runID,
-	}))
+	})
 	require.NoError(t, err)
-	require.NotNil(t, resp.Msg.Details)
-	assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT, resp.Msg.Details.Action.Status.GetCacheStatus())
+	require.NotNil(t, resp.Details)
+	assert.Equal(t, core.CatalogCacheStatus_CACHE_HIT, resp.Details.Action.Status.GetCacheStatus())
 }
 
 func TestGetRunDetails_TaskSpecLookupFails(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	actionsClient := actionsMocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	repo.On("ActionRepo").Return(actionRepo)
 	repo.On("TaskRepo").Maybe().Return(taskRepo)
@@ -498,9 +329,9 @@ func TestGetRunDetails_TaskSpecLookupFails(t *testing.T) {
 	taskRepo.On("GetTaskSpec", mock.Anything, "bad-digest").Return(nil, errors.New("not found"))
 	actionRepo.On("ListEvents", mock.Anything, matchActionID(&common.ActionIdentifier{Run: runID, Name: runID.Name}), 500).Return([]*models.ActionEvent{}, nil)
 
-	_, err := svc.GetRunDetails(context.Background(), connect.NewRequest(&workflow.GetRunDetailsRequest{
+	_, err := svc.GetRunDetails(context.Background(), &workflow.GetRunDetailsRequest{
 		RunId: runID,
-	}))
+	})
 	assert.Error(t, err)
 }
 
@@ -571,7 +402,7 @@ func TestFillDefaultInputsForCreateRun(t *testing.T) {
 func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	actionsClient := actionsMocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -581,9 +412,9 @@ func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
-		settingsRepo:  noSettings(t),
+		settings:      noSettings(t),
 		actionsClient: actionsClient,
-		projectClient: newMockProjectClientAlwaysOK(t),
+		projects:      existingProjectService(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -613,23 +444,23 @@ func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
 	actionsClient.On("Enqueue", mock.Anything, mock.Anything).
 		Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
 
-	resp, err := svc.CreateRun(context.Background(), connect.NewRequest(&workflow.CreateRunRequest{
+	resp, err := svc.CreateRun(context.Background(), &workflow.CreateRunRequest{
 		Id: &workflow.CreateRunRequest_RunId{
 			RunId: runID,
 		},
 		Task: &workflow.CreateRunRequest_TaskSpec{
 			TaskSpec: &task.TaskSpec{},
 		},
-	}))
+	}, nil)
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
-	assert.NotNil(t, resp.Msg.GetRun())
-	assert.NotNil(t, resp.Msg.GetRun().GetAction())
-	assert.NotNil(t, resp.Msg.GetRun().GetAction().GetId())
-	assert.Equal(t, runID.Name, resp.Msg.GetRun().GetAction().GetId().GetName())
-	assert.NotNil(t, resp.Msg.GetRun().GetAction().GetMetadata())
+	assert.NotNil(t, resp.GetRun())
+	assert.NotNil(t, resp.GetRun().GetAction())
+	assert.NotNil(t, resp.GetRun().GetAction().GetId())
+	assert.Equal(t, runID.Name, resp.GetRun().GetAction().GetId().GetName())
+	assert.NotNil(t, resp.GetRun().GetAction().GetMetadata())
 
-	status := resp.Msg.GetRun().GetAction().GetStatus()
+	status := resp.GetRun().GetAction().GetStatus()
 	assert.NotNil(t, status)
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_QUEUED, status.GetPhase())
 	assert.NotNil(t, status.GetStartTime())
@@ -659,7 +490,7 @@ func TestAbortRun(t *testing.T) {
 
 		actionRepo.On("AbortRun", mock.Anything, runID, "User requested abort", (*common.EnrichedIdentity)(nil)).Return(nil)
 
-		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID}))
+		_, err := svc.AbortRun(context.Background(), &workflow.AbortRunRequest{RunId: runID})
 		assert.NoError(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
 	})
@@ -670,7 +501,7 @@ func TestAbortRun(t *testing.T) {
 
 		actionRepo.On("AbortRun", mock.Anything, runID, reason, (*common.EnrichedIdentity)(nil)).Return(nil)
 
-		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID, Reason: &reason}))
+		_, err := svc.AbortRun(context.Background(), &workflow.AbortRunRequest{RunId: runID, Reason: &reason})
 		assert.NoError(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
 	})
@@ -680,7 +511,7 @@ func TestAbortRun(t *testing.T) {
 
 		actionRepo.On("AbortRun", mock.Anything, runID, mock.Anything, mock.Anything).Return(errors.New("db unavailable"))
 
-		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID}))
+		_, err := svc.AbortRun(context.Background(), &workflow.AbortRunRequest{RunId: runID})
 		assert.Error(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
 	})
@@ -702,7 +533,7 @@ func TestAbortAction(t *testing.T) {
 
 		actionRepo.On("AbortAction", mock.Anything, actionID, "User requested abort", (*common.EnrichedIdentity)(nil)).Return(nil)
 
-		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID}))
+		_, err := svc.AbortAction(context.Background(), &workflow.AbortActionRequest{ActionId: actionID})
 		assert.NoError(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
 	})
@@ -713,7 +544,7 @@ func TestAbortAction(t *testing.T) {
 
 		actionRepo.On("AbortAction", mock.Anything, actionID, reason, (*common.EnrichedIdentity)(nil)).Return(nil)
 
-		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID, Reason: reason}))
+		_, err := svc.AbortAction(context.Background(), &workflow.AbortActionRequest{ActionId: actionID, Reason: reason})
 		assert.NoError(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
 	})
@@ -723,7 +554,7 @@ func TestAbortAction(t *testing.T) {
 
 		actionRepo.On("AbortAction", mock.Anything, actionID, mock.Anything, mock.Anything).Return(errors.New("db unavailable"))
 
-		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID}))
+		_, err := svc.AbortAction(context.Background(), &workflow.AbortActionRequest{ActionId: actionID})
 		assert.Error(t, err)
 		actionsClient.AssertNotCalled(t, "Abort")
 	})
@@ -817,16 +648,16 @@ func TestListRuns(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			req := connect.NewRequest(&workflow.ListRunsRequest{Request: tc.req})
+			req := &workflow.ListRunsRequest{Request: tc.req}
 			// Assert the incoming token was decoded into listInput.Offset.
 			actionRepo.On("ListActions", mock.Anything, mock.MatchedBy(func(input interfaces.ListResourceInput) bool {
 				return input.Offset == tc.expectOffset
 			})).Return(tc.mockRes.runs, tc.mockRes.err).Once()
 			got, err := svc.ListRuns(context.Background(), req)
 			assert.NoError(t, err)
-			assert.Equal(t, len(tc.expect.Runs), len(got.Msg.Runs))
-			assert.Equal(t, tc.expect.Runs, got.Msg.Runs)
-			assert.Equal(t, tc.expect.Token, got.Msg.Token)
+			assert.Equal(t, len(tc.expect.Runs), len(got.Runs))
+			assert.Equal(t, tc.expect.Runs, got.Runs)
+			assert.Equal(t, tc.expect.Token, got.Token)
 		})
 	}
 }
@@ -851,10 +682,10 @@ func TestListRuns_SearchFilter(t *testing.T) {
 			{Field: "phase", Function: common.Filter_EQUAL, Values: []string{"2"}},
 		},
 	}
-	_, err := svc.ListRuns(context.Background(), connect.NewRequest(&workflow.ListRunsRequest{
+	_, err := svc.ListRuns(context.Background(), &workflow.ListRunsRequest{
 		ScopeBy: &workflow.ListRunsRequest_ProjectId{ProjectId: &common.ProjectIdentifier{Name: "p", Domain: "d"}},
 		Request: listReq,
-	}))
+	})
 	require.NoError(t, err)
 
 	require.NotNil(t, captured.Filter)
@@ -880,15 +711,15 @@ func TestListRuns_RejectsBadSearchFilter(t *testing.T) {
 	svc := &RunService{repo: repo}
 	t.Cleanup(func() { actionRepo.AssertExpectations(t) })
 
-	_, err := svc.ListRuns(context.Background(), connect.NewRequest(&workflow.ListRunsRequest{
+	_, err := svc.ListRuns(context.Background(), &workflow.ListRunsRequest{
 		ScopeBy: &workflow.ListRunsRequest_ProjectId{ProjectId: &common.ProjectIdentifier{Name: "p", Domain: "d"}},
 		Request: &common.ListRequest{
 			Limit:   10,
 			Filters: []*common.Filter{{Field: "search", Function: common.Filter_GREATER_THAN, Values: []string{"abc"}}},
 		},
-	}))
+	})
 	require.Error(t, err)
-	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+	assert.ErrorIs(t, err, ErrRunInvalidArgument)
 }
 
 // TestListRuns_LabelFilter verifies "labels.<key>" filters reach the repository as label
@@ -908,7 +739,7 @@ func TestListRuns_LabelFilter(t *testing.T) {
 		Labels:  []byte(`{"example.com/job-id":"j-1"}`),
 	}}, nil).Once()
 
-	got, err := svc.ListRuns(context.Background(), connect.NewRequest(&workflow.ListRunsRequest{
+	got, err := svc.ListRuns(context.Background(), &workflow.ListRunsRequest{
 		ScopeBy: &workflow.ListRunsRequest_ProjectId{ProjectId: &common.ProjectIdentifier{Name: "p", Domain: "d"}},
 		Request: &common.ListRequest{
 			Limit: 10,
@@ -917,7 +748,7 @@ func TestListRuns_LabelFilter(t *testing.T) {
 				{Field: "phase", Function: common.Filter_EQUAL, Values: []string{"2"}},
 			},
 		},
-	}))
+	})
 	require.NoError(t, err)
 
 	require.NotNil(t, captured.Filter)
@@ -927,8 +758,8 @@ func TestListRuns_LabelFilter(t *testing.T) {
 	assert.Contains(t, expr.Query, "phase = ?")
 	assert.Contains(t, expr.Args, `{"example.com/job-id":"j-1"}`)
 
-	require.Len(t, got.Msg.Runs, 1)
-	assert.Equal(t, map[string]string{"example.com/job-id": "j-1"}, got.Msg.Runs[0].GetLabels())
+	require.Len(t, got.Runs, 1)
+	assert.Equal(t, map[string]string{"example.com/job-id": "j-1"}, got.Runs[0].GetLabels())
 }
 
 // TestListRuns_LabelsFromRunSpec verifies a run stored before the labels column existed
@@ -948,14 +779,14 @@ func TestListRuns_LabelsFromRunSpec(t *testing.T) {
 		RunSpec: runSpec,
 	}}, nil).Once()
 
-	got, err := svc.ListRuns(context.Background(), connect.NewRequest(&workflow.ListRunsRequest{
+	got, err := svc.ListRuns(context.Background(), &workflow.ListRunsRequest{
 		ScopeBy: &workflow.ListRunsRequest_ProjectId{ProjectId: &common.ProjectIdentifier{Name: "p", Domain: "d"}},
 		Request: &common.ListRequest{Limit: 10},
-	}))
+	})
 	require.NoError(t, err)
 
-	require.Len(t, got.Msg.Runs, 1)
-	assert.Equal(t, map[string]string{"example.com/job-id": "j-1"}, got.Msg.Runs[0].GetLabels())
+	require.Len(t, got.Runs, 1)
+	assert.Equal(t, map[string]string{"example.com/job-id": "j-1"}, got.Runs[0].GetLabels())
 }
 
 // TestListRuns_Annotations verifies a run is listed with the annotations in its run spec.
@@ -974,14 +805,14 @@ func TestListRuns_Annotations(t *testing.T) {
 		RunSpec: runSpec,
 	}}, nil).Once()
 
-	got, err := svc.ListRuns(context.Background(), connect.NewRequest(&workflow.ListRunsRequest{
+	got, err := svc.ListRuns(context.Background(), &workflow.ListRunsRequest{
 		ScopeBy: &workflow.ListRunsRequest_ProjectId{ProjectId: &common.ProjectIdentifier{Name: "p", Domain: "d"}},
 		Request: &common.ListRequest{Limit: 10},
-	}))
+	})
 	require.NoError(t, err)
 
-	require.Len(t, got.Msg.Runs, 1)
-	assert.Equal(t, map[string]string{"example.com/branch": "feat/x"}, got.Msg.Runs[0].GetAnnotations())
+	require.Len(t, got.Runs, 1)
+	assert.Equal(t, map[string]string{"example.com/branch": "feat/x"}, got.Runs[0].GetAnnotations())
 }
 
 // TestListAndSendAllActionsUsesAscendingSort guards against regressing the
@@ -1267,7 +1098,7 @@ func TestInputsProtoCompat(t *testing.T) {
 func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	actionsClient := actionsMocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1277,9 +1108,9 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
-		settingsRepo:  noSettings(t),
+		settings:      noSettings(t),
 		actionsClient: actionsClient,
-		projectClient: newMockProjectClientAlwaysOK(t),
+		projects:      existingProjectService(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1314,7 +1145,7 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	actionsClient.On("Enqueue", mock.Anything, mock.Anything).
 		Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
 
-	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	_, err := svc.CreateRun(context.Background(), req, nil)
 	assert.NoError(t, err)
 
 	repo.AssertExpectations(t)
@@ -1326,7 +1157,7 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	actionsClient := actionsMocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1336,9 +1167,9 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
-		settingsRepo:  noSettings(t),
+		settings:      noSettings(t),
 		actionsClient: actionsClient,
-		projectClient: newMockProjectClientAlwaysOK(t),
+		projects:      existingProjectService(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1370,10 +1201,10 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).Return(expectedRun, nil).Once()
 	actionsClient.On("Enqueue", mock.Anything, mock.Anything).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
 
-	resp, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	resp, err := svc.CreateRun(context.Background(), req, nil)
 	require.NoError(t, err)
 
-	run := resp.Msg.Run
+	run := resp.Run
 	assert.Equal(t, "", run.Action.Id.Run.Org)
 	assert.Equal(t, "myproj", run.Action.Id.Run.Project)
 	assert.Equal(t, "production", run.Action.Id.Run.Domain)
@@ -1390,7 +1221,7 @@ func TestCreateRun_TriggerFire_CarriesRunSpecEnvVars(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
 	triggerRepo := &repoMocks.TriggerRepo{}
-	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	actionsClient := actionsMocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1401,9 +1232,9 @@ func TestCreateRun_TriggerFire_CarriesRunSpecEnvVars(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
-		settingsRepo:  noSettings(t),
+		settings:      noSettings(t),
 		actionsClient: actionsClient,
-		projectClient: newMockProjectClientAlwaysOK(t),
+		projects:      existingProjectService(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1472,7 +1303,7 @@ func TestCreateRun_TriggerFire_CarriesRunSpecEnvVars(t *testing.T) {
 		Source: workflow.RunSource_RUN_SOURCE_SCHEDULE_TRIGGER,
 	}
 
-	_, err = svc.CreateRun(context.Background(), connect.NewRequest(req))
+	_, err = svc.CreateRun(context.Background(), req, nil)
 	require.NoError(t, err)
 
 	require.NotNil(t, persisted, "CreateAction should have been called")
@@ -1489,7 +1320,7 @@ func TestCreateRun_TriggerFire_CarriesRunSpecEnvVars(t *testing.T) {
 func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	actionsClient := actionsMocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1499,9 +1330,9 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
-		settingsRepo:  noSettings(t),
+		settings:      noSettings(t),
 		actionsClient: actionsClient,
-		projectClient: newMockProjectClientAlwaysOK(t),
+		projects:      existingProjectService(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1531,7 +1362,7 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 			req.Msg.Action.ActionId.Run.Name == "rmy-run-123"
 	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
 
-	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	_, err := svc.CreateRun(context.Background(), req, nil)
 	assert.NoError(t, err)
 
 	actionsClient.AssertExpectations(t)
@@ -1570,9 +1401,9 @@ func TestCreateRun_RejectsInvalidRunName(t *testing.T) {
 				},
 			}
 
-			_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+			_, err := svc.CreateRun(context.Background(), req, nil)
 			require.Error(t, err)
-			assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+			assert.ErrorIs(t, err, ErrRunInvalidArgument)
 		})
 	}
 }
@@ -1581,10 +1412,10 @@ func TestCreateRun_RejectsInvalidPodTemplateName(t *testing.T) {
 	// Only the settings and project lookups run before the check. Everything else stays
 	// nil on purpose: were the check missing, the write path would panic and fail the test.
 	svc := &RunService{
-		settingsRepo: settingsRepoWith(t, &settings.Settings{
+		settings: settingsServiceWith(t, &settings.Settings{
 			PodTemplateName: &settings.StringSetting{State: stateValue, StringValue: "GPU Template"},
 		}),
-		projectClient: newMockProjectClientAlwaysOK(t),
+		projects: existingProjectService(t),
 	}
 
 	req := &workflow.CreateRunRequest{
@@ -1602,16 +1433,16 @@ func TestCreateRun_RejectsInvalidPodTemplateName(t *testing.T) {
 		},
 	}
 
-	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	_, err := svc.CreateRun(context.Background(), req, nil)
 	require.Error(t, err)
-	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+	assert.ErrorIs(t, err, ErrRunInvalidArgument)
 	assert.ErrorContains(t, err, "pod template name")
 }
 
 func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	actionsClient := actionsMocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1621,9 +1452,9 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
-		settingsRepo:  noSettings(t),
+		settings:      noSettings(t),
 		actionsClient: actionsClient,
-		projectClient: newMockProjectClientAlwaysOK(t),
+		projects:      existingProjectService(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1675,7 +1506,7 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 		return req.Msg.GetRunSpec().GetRawDataStorage().GetRawDataPrefix() == "s3://custom-raw"
 	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
 
-	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	_, err := svc.CreateRun(context.Background(), req, nil)
 	require.NoError(t, err)
 }
 
@@ -1684,7 +1515,7 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 func TestCreateRun_LeavesRawDataPrefixEmpty(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	actionsClient := actionsMocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1694,9 +1525,9 @@ func TestCreateRun_LeavesRawDataPrefixEmpty(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
-		settingsRepo:  noSettings(t),
+		settings:      noSettings(t),
 		actionsClient: actionsClient,
-		projectClient: newMockProjectClientAlwaysOK(t),
+		projects:      existingProjectService(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1720,7 +1551,7 @@ func TestCreateRun_LeavesRawDataPrefixEmpty(t *testing.T) {
 		return req.Msg.GetRunSpec().GetRawDataStorage().GetRawDataPrefix() == ""
 	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
 
-	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	_, err := svc.CreateRun(context.Background(), req, nil)
 	require.NoError(t, err)
 }
 
@@ -1730,7 +1561,7 @@ func TestCreateRun_LeavesRawDataPrefixEmpty(t *testing.T) {
 func TestCreateRun_AppliesSettingsQueue(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	actionsClient := actionsMocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1740,9 +1571,9 @@ func TestCreateRun_AppliesSettingsQueue(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
-		settingsRepo:  settingsWithQueue(t, "fast-queue"),
+		settings:      settingsWithQueue(t, "fast-queue"),
 		actionsClient: actionsClient,
-		projectClient: newMockProjectClientAlwaysOK(t),
+		projects:      existingProjectService(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1779,7 +1610,7 @@ func TestCreateRun_AppliesSettingsQueue(t *testing.T) {
 		return req.Msg.GetRunSpec().GetQueue() == "fast-queue"
 	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
 
-	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	_, err := svc.CreateRun(context.Background(), req, nil)
 	require.NoError(t, err)
 }
 
@@ -1797,7 +1628,7 @@ func TestCreateRun_StoresLabels(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			actionRepo := &repoMocks.ActionRepo{}
 			taskRepo := &repoMocks.TaskRepo{}
-			actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+			actionsClient := actionsMocks.NewActionsServiceClient(t)
 			repo := &repoMocks.Repository{}
 			store := &storageMocks.ComposedProtobufStore{}
 			dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1807,9 +1638,9 @@ func TestCreateRun_StoresLabels(t *testing.T) {
 
 			svc := &RunService{
 				repo:          repo,
-				settingsRepo:  noSettings(t),
+				settings:      noSettings(t),
 				actionsClient: actionsClient,
-				projectClient: newMockProjectClientAlwaysOK(t),
+				projects:      existingProjectService(t),
 				storagePrefix: "s3://flyte-data",
 				dataStore:     dataStore,
 			}
@@ -1830,7 +1661,7 @@ func TestCreateRun_StoresLabels(t *testing.T) {
 			}), mock.Anything).Return(&models.Run{Project: "proj", Domain: "dev", Name: "rl-123"}, nil).Once()
 			actionsClient.On("Enqueue", mock.Anything, mock.Anything).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
 
-			_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+			_, err := svc.CreateRun(context.Background(), req, nil)
 			require.NoError(t, err)
 			actionRepo.AssertExpectations(t)
 		})
@@ -1848,12 +1679,12 @@ func TestCreateRun_RejectsNULLabel(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
-		settingsRepo:  noSettings(t),
-		projectClient: newMockProjectClientAlwaysOK(t),
+		settings:      noSettings(t),
+		projects:      existingProjectService(t),
 		storagePrefix: "s3://flyte-data",
 	}
 
-	_, err := svc.CreateRun(context.Background(), connect.NewRequest(&workflow.CreateRunRequest{
+	_, err := svc.CreateRun(context.Background(), &workflow.CreateRunRequest{
 		Id: &workflow.CreateRunRequest_RunId{
 			RunId: &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "rl-nul"},
 		},
@@ -1862,9 +1693,9 @@ func TestCreateRun_RejectsNULLabel(t *testing.T) {
 			Labels: &task.Labels{Values: map[string]string{"k": "a\x00b"}},
 		},
 		Task: &workflow.CreateRunRequest_TaskSpec{TaskSpec: &task.TaskSpec{}},
-	}))
+	}, nil)
 	require.Error(t, err)
-	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+	assert.ErrorIs(t, err, ErrRunInvalidArgument)
 }
 
 // TestCreateRun_AppliesSettingsMaps verifies settings labels, annotations and env vars
@@ -1872,7 +1703,7 @@ func TestCreateRun_RejectsNULLabel(t *testing.T) {
 func TestCreateRun_AppliesSettingsMaps(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	actionsClient := actionsMocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1885,13 +1716,13 @@ func TestCreateRun_AppliesSettingsMaps(t *testing.T) {
 	}
 	svc := &RunService{
 		repo: repo,
-		settingsRepo: settingsRepoWith(t, &settings.Settings{
+		settings: settingsServiceWith(t, &settings.Settings{
 			Labels:               entries(map[string]string{"team": "ml"}),
 			Annotations:          entries(map[string]string{"owner": "alice"}),
 			EnvironmentVariables: entries(map[string]string{"LOG_LEVEL": "info", "REGION": "us-east-1"}),
 		}),
 		actionsClient: actionsClient,
-		projectClient: newMockProjectClientAlwaysOK(t),
+		projects:      existingProjectService(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -1920,7 +1751,7 @@ func TestCreateRun_AppliesSettingsMaps(t *testing.T) {
 		}).
 		Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
 
-	_, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	_, err := svc.CreateRun(context.Background(), req, nil)
 	require.NoError(t, err)
 	actionRepo.AssertExpectations(t)
 
@@ -1941,31 +1772,31 @@ func TestCreateRun_RejectsNULLabelFromSettings(t *testing.T) {
 
 	svc := &RunService{
 		repo: repo,
-		settingsRepo: settingsRepoWith(t, &settings.Settings{
+		settings: settingsServiceWith(t, &settings.Settings{
 			Labels: &settings.StringMapSetting{
 				State:    stateValue,
 				MapValue: &settings.StringMap{Entries: map[string]string{"k": "a\x00b"}},
 			},
 		}),
-		projectClient: newMockProjectClientAlwaysOK(t),
+		projects:      existingProjectService(t),
 		storagePrefix: "s3://flyte-data",
 	}
 
-	_, err := svc.CreateRun(context.Background(), connect.NewRequest(&workflow.CreateRunRequest{
+	_, err := svc.CreateRun(context.Background(), &workflow.CreateRunRequest{
 		Id: &workflow.CreateRunRequest_RunId{
 			RunId: &common.RunIdentifier{Org: "org", Project: "proj", Domain: "dev", Name: "rs-nul"},
 		},
 		InputWrapper: &workflow.CreateRunRequest_Inputs{Inputs: &task.Inputs{}},
 		Task:         &workflow.CreateRunRequest_TaskSpec{TaskSpec: &task.TaskSpec{}},
-	}))
+	}, nil)
 	require.Error(t, err)
-	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+	assert.ErrorIs(t, err, ErrRunInvalidArgument)
 }
 
 func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 	actionRepo := &repoMocks.ActionRepo{}
 	taskRepo := &repoMocks.TaskRepo{}
-	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	actionsClient := actionsMocks.NewActionsServiceClient(t)
 	repo := &repoMocks.Repository{}
 	store := &storageMocks.ComposedProtobufStore{}
 	dataStore := &storage.DataStore{ComposedProtobufStore: store}
@@ -1975,9 +1806,9 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 
 	svc := &RunService{
 		repo:          repo,
-		settingsRepo:  noSettings(t),
+		settings:      noSettings(t),
 		actionsClient: actionsClient,
-		projectClient: newMockProjectClientAlwaysOK(t),
+		projects:      existingProjectService(t),
 		storagePrefix: "s3://flyte-data",
 		dataStore:     dataStore,
 	}
@@ -2023,10 +1854,10 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 		return req.Msg.Action.InputUri == offloadedURI
 	})).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
 
-	resp, err := svc.CreateRun(context.Background(), connect.NewRequest(req))
+	resp, err := svc.CreateRun(context.Background(), req, nil)
 	require.NoError(t, err)
 
-	run := resp.Msg.Run
+	run := resp.Run
 	assert.Equal(t, "", run.Action.Id.Run.Org)
 	assert.Equal(t, "testproject", run.Action.Id.Run.Project)
 	assert.Equal(t, "rtest-offloaded", run.Action.Id.Run.Name)
@@ -2060,13 +1891,13 @@ func TestGetActionDataURIs(t *testing.T) {
 		actionRepo, _, svc := newTestService(t)
 		actionRepo.On("GetAction", mock.Anything, matchActionID(actionID)).Return(nil, errors.New("missing"))
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		assert.Nil(t, resp)
 		assert.Error(t, err)
-		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+		assert.ErrorIs(t, err, ErrRunNotFound)
 	})
 
 	t.Run("missing detailed_info returns NotFound", func(t *testing.T) {
@@ -2076,13 +1907,13 @@ func TestGetActionDataURIs(t *testing.T) {
 			DetailedInfo: nil,
 		}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		assert.Nil(t, resp)
 		assert.Error(t, err)
-		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+		assert.ErrorIs(t, err, ErrRunNotFound)
 	})
 
 	t.Run("non-terminal phase returns inputs only", func(t *testing.T) {
@@ -2096,13 +1927,13 @@ func TestGetActionDataURIs(t *testing.T) {
 			}),
 		}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		require.NoError(t, err)
-		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
-		assert.Empty(t, resp.Msg.GetOutputsUri())
+		assert.Equal(t, "s3://bucket/inputs", resp.GetInputsUri())
+		assert.Empty(t, resp.GetOutputsUri())
 	})
 
 	t.Run("trace action returns outputs uri from RunInfo", func(t *testing.T) {
@@ -2116,13 +1947,13 @@ func TestGetActionDataURIs(t *testing.T) {
 			}),
 		}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		require.NoError(t, err)
-		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
-		assert.Equal(t, "s3://bucket/trace-outputs", resp.Msg.GetOutputsUri())
+		assert.Equal(t, "s3://bucket/inputs", resp.GetInputsUri())
+		assert.Equal(t, "s3://bucket/trace-outputs", resp.GetOutputsUri())
 	})
 
 	t.Run("succeeded task returns outputs from latest attempt", func(t *testing.T) {
@@ -2147,13 +1978,13 @@ func TestGetActionDataURIs(t *testing.T) {
 			{Attempt: 0, Phase: int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED), Info: eventBytes},
 		}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		require.NoError(t, err)
-		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
-		assert.Equal(t, "s3://bucket/outputs/0/outputs.pb", resp.Msg.GetOutputsUri())
+		assert.Equal(t, "s3://bucket/inputs", resp.GetInputsUri())
+		assert.Equal(t, "s3://bucket/outputs/0/outputs.pb", resp.GetOutputsUri())
 	})
 
 	t.Run("recovered trace action returns outputs uri from RunInfo", func(t *testing.T) {
@@ -2167,13 +1998,13 @@ func TestGetActionDataURIs(t *testing.T) {
 			}),
 		}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		require.NoError(t, err)
-		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
-		assert.Equal(t, "s3://bucket/trace-outputs", resp.Msg.GetOutputsUri())
+		assert.Equal(t, "s3://bucket/inputs", resp.GetInputsUri())
+		assert.Equal(t, "s3://bucket/trace-outputs", resp.GetOutputsUri())
 	})
 
 	t.Run("recovered task returns outputs from latest attempt", func(t *testing.T) {
@@ -2198,13 +2029,13 @@ func TestGetActionDataURIs(t *testing.T) {
 			{Attempt: 0, Phase: int32(common.ActionPhase_ACTION_PHASE_RECOVERED), Info: eventBytes},
 		}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		require.NoError(t, err)
-		assert.Equal(t, "s3://bucket/inputs", resp.Msg.GetInputsUri())
-		assert.Equal(t, "s3://bucket/outputs/0/outputs.pb", resp.Msg.GetOutputsUri())
+		assert.Equal(t, "s3://bucket/inputs", resp.GetInputsUri())
+		assert.Equal(t, "s3://bucket/outputs/0/outputs.pb", resp.GetOutputsUri())
 	})
 
 	t.Run("succeeded task with no attempts returns NotFound", func(t *testing.T) {
@@ -2218,13 +2049,13 @@ func TestGetActionDataURIs(t *testing.T) {
 		}, nil)
 		actionRepo.On("ListEvents", mock.Anything, matchActionID(actionID), 500).Return([]*models.ActionEvent{}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		assert.Nil(t, resp)
 		assert.Error(t, err)
-		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+		assert.ErrorIs(t, err, ErrRunNotFound)
 	})
 
 	t.Run("succeeded task with empty output_uri returns NotFound", func(t *testing.T) {
@@ -2246,13 +2077,13 @@ func TestGetActionDataURIs(t *testing.T) {
 			{Attempt: 0, Phase: int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED), Info: eventBytes},
 		}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		assert.Nil(t, resp)
 		assert.Error(t, err)
-		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+		assert.ErrorIs(t, err, ErrRunNotFound)
 	})
 
 	t.Run("succeeded task uses last attempt outputs when multiple attempts", func(t *testing.T) {
@@ -2281,12 +2112,12 @@ func TestGetActionDataURIs(t *testing.T) {
 			{Attempt: 1, Info: event1},
 		}, nil)
 
-		resp, err := svc.GetActionDataURIs(context.Background(), connect.NewRequest(&workflow.GetActionDataURIsRequest{
+		resp, err := svc.GetActionDataURIs(context.Background(), &workflow.GetActionDataURIsRequest{
 			ActionId: actionID,
-		}))
+		})
 
 		require.NoError(t, err)
-		assert.Equal(t, "s3://bucket/outputs/1/outputs.pb", resp.Msg.GetOutputsUri())
+		assert.Equal(t, "s3://bucket/outputs/1/outputs.pb", resp.GetOutputsUri())
 	})
 }
 
@@ -2322,42 +2153,42 @@ func TestGetActionLogContext(t *testing.T) {
 			}),
 		}, nil)
 
-		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+		resp, err := svc.GetActionLogContext(context.Background(), &workflow.GetActionLogContextRequest{
 			ActionId: actionID,
 			Attempt:  1,
-		}))
+		})
 
 		require.NoError(t, err)
-		assert.Equal(t, "c1", resp.Msg.GetCluster())
-		assert.Equal(t, "my-pod", resp.Msg.GetLogContext().GetPrimaryPodName())
+		assert.Equal(t, "c1", resp.GetCluster())
+		assert.Equal(t, "my-pod", resp.GetLogContext().GetPrimaryPodName())
 	})
 
 	t.Run("no event found returns NotFound", func(t *testing.T) {
 		actionRepo, _, svc := newTestService(t)
 		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(nil, sql.ErrNoRows)
 
-		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+		resp, err := svc.GetActionLogContext(context.Background(), &workflow.GetActionLogContextRequest{
 			ActionId: actionID,
 			Attempt:  1,
-		}))
+		})
 
 		assert.Nil(t, resp)
 		assert.Error(t, err)
-		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+		assert.ErrorIs(t, err, ErrRunNotFound)
 	})
 
 	t.Run("repo error returns Internal", func(t *testing.T) {
 		actionRepo, _, svc := newTestService(t)
 		actionRepo.On("GetLatestEventByAttempt", mock.Anything, matchActionID(actionID), uint32(1)).Return(nil, errors.New("db blew up"))
 
-		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+		resp, err := svc.GetActionLogContext(context.Background(), &workflow.GetActionLogContextRequest{
 			ActionId: actionID,
 			Attempt:  1,
-		}))
+		})
 
 		assert.Nil(t, resp)
 		assert.Error(t, err)
-		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
+		assert.ErrorIs(t, err, ErrRunInternal)
 	})
 
 	t.Run("event without log context returns NotFound", func(t *testing.T) {
@@ -2370,14 +2201,14 @@ func TestGetActionLogContext(t *testing.T) {
 			}),
 		}, nil)
 
-		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+		resp, err := svc.GetActionLogContext(context.Background(), &workflow.GetActionLogContextRequest{
 			ActionId: actionID,
 			Attempt:  1,
-		}))
+		})
 
 		assert.Nil(t, resp)
 		assert.Error(t, err)
-		assert.Equal(t, connect.CodeNotFound, connect.CodeOf(err))
+		assert.ErrorIs(t, err, ErrRunNotFound)
 	})
 
 	t.Run("undeserializable event returns Internal", func(t *testing.T) {
@@ -2386,14 +2217,14 @@ func TestGetActionLogContext(t *testing.T) {
 			Info: []byte("not-a-proto"),
 		}, nil)
 
-		resp, err := svc.GetActionLogContext(context.Background(), connect.NewRequest(&workflow.GetActionLogContextRequest{
+		resp, err := svc.GetActionLogContext(context.Background(), &workflow.GetActionLogContextRequest{
 			ActionId: actionID,
 			Attempt:  1,
-		}))
+		})
 
 		assert.Nil(t, resp)
 		assert.Error(t, err)
-		assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
+		assert.ErrorIs(t, err, ErrRunInternal)
 	})
 }
 
@@ -2615,174 +2446,6 @@ func TestBuildRunDetails(t *testing.T) {
 	}
 }
 
-func TestWatchRunDetails(t *testing.T) {
-	runID := &common.RunIdentifier{
-		Org:     "test-org",
-		Project: "test-project",
-		Domain:  "test-domain",
-		Name:    "rtest-watch-1",
-	}
-	rootActionID := &common.ActionIdentifier{Run: runID, Name: runID.Name}
-
-	actionSpecBytes, err := proto.Marshal(&workflow.ActionSpec{
-		RunSpec: &task.RunSpec{Labels: &task.Labels{Values: map[string]string{"env": "prod"}}},
-	})
-	require.NoError(t, err)
-
-	runModel := &models.Run{
-		Project:    runID.Project,
-		Domain:     runID.Domain,
-		Name:       runID.Name,
-		Phase:      int32(common.ActionPhase_ACTION_PHASE_RUNNING),
-		Attempts:   1,
-		ActionSpec: actionSpecBytes,
-	}
-
-	// The terminal update: a FAILED run whose last attempt carries error info.
-	failedModel := &models.Run{
-		Project:    runID.Project,
-		Domain:     runID.Domain,
-		Name:       runID.Name,
-		Phase:      int32(common.ActionPhase_ACTION_PHASE_FAILED),
-		Attempts:   1,
-		ActionSpec: actionSpecBytes,
-	}
-	failedEventBytes, err := proto.Marshal(&workflow.ActionEvent{
-		Id:      rootActionID,
-		Attempt: 1,
-		Phase:   common.ActionPhase_ACTION_PHASE_FAILED,
-		ErrorInfo: &workflow.ErrorInfo{
-			Kind:    workflow.ErrorInfo_KIND_USER,
-			Message: "boom",
-		},
-	})
-	require.NoError(t, err)
-	failedEvents := []*models.ActionEvent{{Attempt: 1, Info: failedEventBytes}}
-
-	tests := []struct {
-		name       string
-		setupMocks func(actionRepo *repoMocks.ActionRepo)
-		test       func(t *testing.T, client workflowconnect.RunServiceClient)
-	}{
-		{
-			name: "GetRun_Error_Returns_NotFound",
-			setupMocks: func(actionRepo *repoMocks.ActionRepo) {
-				actionRepo.EXPECT().GetRun(mock.Anything, matchRunID(runID)).Return(nil, fmt.Errorf("run not found"))
-			},
-			test: func(t *testing.T, client workflowconnect.RunServiceClient) {
-				stream, err := client.WatchRunDetails(context.Background(), connect.NewRequest(&workflow.WatchRunDetailsRequest{
-					RunId: runID,
-				}))
-				require.NoError(t, err)
-				assert.False(t, stream.Receive())
-				require.Error(t, stream.Err())
-				var connectErr *connect.Error
-				require.True(t, errors.As(stream.Err(), &connectErr))
-				assert.Equal(t, connect.CodeNotFound, connectErr.Code())
-			},
-		},
-		{
-			name: "Initial_State_Has_RunSpec_And_Attempts",
-			setupMocks: func(actionRepo *repoMocks.ActionRepo) {
-				actionRepo.EXPECT().GetRun(mock.Anything, matchRunID(runID)).Return(runModel, nil)
-				actionRepo.EXPECT().ListEvents(mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil)
-				actionRepo.EXPECT().WatchRunUpdates(mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
-					RunAndReturn(func(ctx context.Context, _ *common.RunIdentifier, _ chan<- *models.Run, _ chan<- error) {
-						<-ctx.Done()
-					}).Call.Maybe()
-			},
-			test: func(t *testing.T, client workflowconnect.RunServiceClient) {
-				ctx, cancel := context.WithCancel(context.Background())
-				defer cancel()
-
-				stream, err := client.WatchRunDetails(ctx, connect.NewRequest(&workflow.WatchRunDetailsRequest{
-					RunId: runID,
-				}))
-				require.NoError(t, err)
-
-				require.True(t, stream.Receive())
-				details := stream.Msg().Details
-				require.NotNil(t, details)
-				assert.Equal(t, "prod", details.GetRunSpec().GetLabels().GetValues()["env"])
-				assert.True(t, proto.Equal(rootActionID, details.GetAction().GetId()))
-				assert.Equal(t, common.ActionPhase_ACTION_PHASE_RUNNING, details.GetAction().GetStatus().GetPhase())
-
-				cancel()
-				assert.False(t, stream.Receive())
-			},
-		},
-		{
-			name: "Watch_Error_Returns_Internal_Error",
-			setupMocks: func(actionRepo *repoMocks.ActionRepo) {
-				actionRepo.EXPECT().GetRun(mock.Anything, matchRunID(runID)).Return(runModel, nil)
-				actionRepo.EXPECT().ListEvents(mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil)
-				actionRepo.EXPECT().WatchRunUpdates(mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
-					RunAndReturn(func(_ context.Context, _ *common.RunIdentifier, _ chan<- *models.Run, errs chan<- error) {
-						errs <- fmt.Errorf("db watch failed")
-					})
-			},
-			test: func(t *testing.T, client workflowconnect.RunServiceClient) {
-				stream, err := client.WatchRunDetails(context.Background(), connect.NewRequest(&workflow.WatchRunDetailsRequest{
-					RunId: runID,
-				}))
-				require.NoError(t, err)
-
-				assert.True(t, stream.Receive())
-				assert.False(t, stream.Receive())
-				require.Error(t, stream.Err())
-				var connectErr *connect.Error
-				require.True(t, errors.As(stream.Err(), &connectErr))
-				assert.Equal(t, connect.CodeInternal, connectErr.Code())
-			},
-		},
-		{
-			name: "Run_Update_Streams_Attempts_And_ErrorInfo",
-			setupMocks: func(actionRepo *repoMocks.ActionRepo) {
-				actionRepo.EXPECT().GetRun(mock.Anything, matchRunID(runID)).Return(runModel, nil)
-				actionRepo.EXPECT().ListEvents(mock.Anything, matchActionID(rootActionID), 500).Return([]*models.ActionEvent{}, nil).Once()
-				actionRepo.EXPECT().ListEvents(mock.Anything, matchActionID(rootActionID), 500).Return(failedEvents, nil).Once()
-				actionRepo.EXPECT().WatchRunUpdates(mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
-					RunAndReturn(func(ctx context.Context, _ *common.RunIdentifier, updates chan<- *models.Run, _ chan<- error) {
-						updates <- failedModel
-						<-ctx.Done()
-					})
-			},
-			test: func(t *testing.T, client workflowconnect.RunServiceClient) {
-				ctx, cancel := context.WithCancel(context.Background())
-				defer cancel()
-
-				stream, err := client.WatchRunDetails(ctx, connect.NewRequest(&workflow.WatchRunDetailsRequest{
-					RunId: runID,
-				}))
-				require.NoError(t, err)
-
-				require.True(t, stream.Receive())
-				require.True(t, stream.Receive())
-				details := stream.Msg().Details
-				require.NotNil(t, details)
-				assert.Equal(t, "prod", details.GetRunSpec().GetLabels().GetValues()["env"])
-				action := details.GetAction()
-				assert.Equal(t, common.ActionPhase_ACTION_PHASE_FAILED, action.GetStatus().GetPhase())
-				require.Len(t, action.GetAttempts(), 1)
-				assert.Equal(t, workflow.ErrorInfo_KIND_USER, action.GetErrorInfo().GetKind())
-				assert.Equal(t, "boom", action.GetErrorInfo().GetMessage())
-
-				cancel()
-				assert.False(t, stream.Receive())
-			},
-		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			actionRepo, _, svc := newTestService(t)
-			tc.setupMocks(actionRepo)
-			client := newRunServiceTestClient(t, svc)
-			tc.test(t, client)
-		})
-	}
-}
-
 // The console decides an action is a signalable condition from metadata.spec
 // alone. The watch stream builds its own metadata rather than reusing
 // actionMetadataFromModel, so the condition arm has to be kept in step: without
@@ -2830,97 +2493,28 @@ func TestConvertNodeUpdateToEnrichedProto_ConditionMetadata(t *testing.T) {
 	assert.Equal(t, core.SimpleType_STRING, condMeta.GetType().GetSimple())
 }
 
-func TestWatchRuns_RelistsOnResync(t *testing.T) {
+func TestWatchRunsStopsSubscriptionOnSendError(t *testing.T) {
 	actionRepo, _, svc := newTestService(t)
-	client := newRunServiceTestClient(t, svc)
-
-	run := func(phase common.ActionPhase) *models.Run {
-		return &models.Run{Project: "p", Domain: "d", RunName: "r1", Name: "a0", Phase: int32(phase)}
-	}
+	stopped := make(chan struct{})
 	actionRepo.On("WatchAllRunUpdates", mock.Anything, mock.Anything, mock.Anything).
 		Run(func(args mock.Arguments) {
-			args.Get(1).(chan<- *models.Run) <- nil
 			<-args.Get(0).(context.Context).Done()
+			close(stopped)
 		}).Once()
 	actionRepo.On("ListActions", mock.Anything, mock.Anything).
-		Return([]*models.Run{run(common.ActionPhase_ACTION_PHASE_RUNNING)}, nil).Once()
-	actionRepo.On("ListActions", mock.Anything, mock.Anything).
-		Return([]*models.Run{run(common.ActionPhase_ACTION_PHASE_SUCCEEDED)}, nil).Once()
+		Return([]*models.Run{{RunName: "r1"}}, nil).Once()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	stream, err := client.WatchRuns(ctx, connect.NewRequest(&workflow.WatchRunsRequest{}))
-	require.NoError(t, err)
-
-	require.True(t, stream.Receive())
-	assert.Equal(t, common.ActionPhase_ACTION_PHASE_RUNNING, stream.Msg().GetRuns()[0].GetAction().GetStatus().GetPhase())
-	require.True(t, stream.Receive())
-	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, stream.Msg().GetRuns()[0].GetAction().GetStatus().GetPhase())
-}
-
-func TestWatchActions_RelistsOnResync(t *testing.T) {
-	actionRepo, _, svc := newTestService(t)
-	client := newRunServiceTestClient(t, svc)
-
-	runID := &common.RunIdentifier{Project: "p", Domain: "d", Name: "r1"}
-	root := func(phase common.ActionPhase, updatedAt time.Time) *models.Action {
-		return &models.Action{Project: "p", Domain: "d", RunName: "r1", Name: "a0", Phase: int32(phase), UpdatedAt: updatedAt}
+	sendErr := errors.New("receiver stopped")
+	err := svc.WatchRuns(ctx, &workflow.WatchRunsRequest{}, func(resp *workflow.WatchRunsResponse) error {
+		require.Len(t, resp.GetRuns(), 1)
+		return sendErr
+	})
+	require.ErrorIs(t, err, sendErr)
+	select {
+	case <-stopped:
+	case <-time.After(5 * time.Second):
+		t.Fatal("repository watch remained active after WatchRuns returned")
 	}
-	child := &models.Action{
-		Project: "p", Domain: "d", RunName: "r1", Name: "a1",
-		ParentActionName: sql.NullString{String: "a0", Valid: true},
-		Phase:            int32(common.ActionPhase_ACTION_PHASE_RUNNING),
-		UpdatedAt:        time.Unix(100, 0),
-	}
-	actionRepo.On("WatchAllActionUpdates", mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
-		Run(func(args mock.Arguments) {
-			args.Get(2).(chan<- *models.Action) <- nil
-			<-args.Get(0).(context.Context).Done()
-		}).Once()
-	actionRepo.On("ListActions", mock.Anything, mock.Anything).
-		Return([]*models.Action{root(common.ActionPhase_ACTION_PHASE_RUNNING, time.Unix(100, 0)), child}, nil).Once()
-	actionRepo.On("ListActions", mock.Anything, mock.Anything).
-		Return([]*models.Action{root(common.ActionPhase_ACTION_PHASE_SUCCEEDED, time.Unix(200, 0)), child}, nil).Once()
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	stream, err := client.WatchActions(ctx, connect.NewRequest(&workflow.WatchActionsRequest{RunId: runID}))
-	require.NoError(t, err)
-
-	require.True(t, stream.Receive())
-	assert.Len(t, stream.Msg().GetEnrichedActions(), 2)
-	require.True(t, stream.Receive())
-	resent := stream.Msg().GetEnrichedActions()
-	require.Len(t, resent, 1, "the unchanged child must not be sent again")
-	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, resent[0].GetAction().GetStatus().GetPhase())
-}
-
-func TestWatchActions_KeepsStreamOnResyncListError(t *testing.T) {
-	actionRepo, _, svc := newTestService(t)
-	client := newRunServiceTestClient(t, svc)
-
-	runID := &common.RunIdentifier{Project: "p", Domain: "d", Name: "r1"}
-	root := func(phase common.ActionPhase, updatedAt time.Time) *models.Action {
-		return &models.Action{Project: "p", Domain: "d", RunName: "r1", Name: "a0", Phase: int32(phase), UpdatedAt: updatedAt}
-	}
-	actionRepo.On("WatchAllActionUpdates", mock.Anything, matchRunID(runID), mock.Anything, mock.Anything).
-		Run(func(args mock.Arguments) {
-			updates := args.Get(2).(chan<- *models.Action)
-			updates <- nil
-			updates <- root(common.ActionPhase_ACTION_PHASE_SUCCEEDED, time.Unix(200, 0))
-			<-args.Get(0).(context.Context).Done()
-		}).Once()
-	actionRepo.On("ListActions", mock.Anything, mock.Anything).
-		Return([]*models.Action{root(common.ActionPhase_ACTION_PHASE_RUNNING, time.Unix(100, 0))}, nil).Once()
-	actionRepo.On("ListActions", mock.Anything, mock.Anything).
-		Return(nil, errors.New("db down")).Once()
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	stream, err := client.WatchActions(ctx, connect.NewRequest(&workflow.WatchActionsRequest{RunId: runID}))
-	require.NoError(t, err)
-
-	require.True(t, stream.Receive())
-	require.True(t, stream.Receive(), "a failed re-list must not end the stream: %v", stream.Err())
-	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, stream.Msg().GetEnrichedActions()[0].GetAction().GetStatus().GetPhase())
 }

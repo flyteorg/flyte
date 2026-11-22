@@ -29,31 +29,68 @@ import (
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions/actionsconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
-	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 	"github.com/flyteorg/flyte/v2/runs/repository/transformers"
 )
 
-// RunService implements the RunServiceHandler interface
+// Run provides run and action operations. Watch methods deliver updates until the
+// request completes, the context is canceled, or the callback returns an error.
+type Run interface {
+	WatchGroups(ctx context.Context, req *workflow.WatchGroupsRequest, send func(*workflow.WatchGroupsResponse) error) error
+	CreateRun(ctx context.Context, req *workflow.CreateRunRequest, executedBy *common.EnrichedIdentity) (*workflow.CreateRunResponse, error)
+	AbortRun(ctx context.Context, req *workflow.AbortRunRequest) (*workflow.AbortRunResponse, error)
+	GetRunDetails(ctx context.Context, req *workflow.GetRunDetailsRequest) (*workflow.GetRunDetailsResponse, error)
+	GetActionDetails(ctx context.Context, req *workflow.GetActionDetailsRequest) (*workflow.GetActionDetailsResponse, error)
+	GetActionData(ctx context.Context, req *workflow.GetActionDataRequest) (*workflow.GetActionDataResponse, error)
+	ListRuns(ctx context.Context, req *workflow.ListRunsRequest) (*workflow.ListRunsResponse, error)
+	ListActions(ctx context.Context, req *workflow.ListActionsRequest) (*workflow.ListActionsResponse, error)
+	GetActionDataURIs(ctx context.Context, req *workflow.GetActionDataURIsRequest) (*workflow.GetActionDataURIsResponse, error)
+	GetActionLogContext(ctx context.Context, req *workflow.GetActionLogContextRequest) (*workflow.GetActionLogContextResponse, error)
+	AbortAction(ctx context.Context, req *workflow.AbortActionRequest) (*workflow.AbortActionResponse, error)
+	SignalEvent(ctx context.Context, req *workflow.SignalEventRequest, signalledBy *common.EnrichedIdentity) (*workflow.SignalEventResponse, error)
+	WatchRunDetails(ctx context.Context, req *workflow.WatchRunDetailsRequest, send func(*workflow.WatchRunDetailsResponse) error) error
+	WatchActionDetails(ctx context.Context, req *workflow.WatchActionDetailsRequest, send func(*workflow.WatchActionDetailsResponse) error) error
+	WatchRuns(ctx context.Context, req *workflow.WatchRunsRequest, send func(*workflow.WatchRunsResponse) error) error
+	WatchActions(ctx context.Context, req *workflow.WatchActionsRequest, send func(*workflow.WatchActionsResponse) error) error
+	WatchClusterEvents(ctx context.Context, req *workflow.WatchClusterEventsRequest, send func(*workflow.WatchClusterEventsResponse) error) error
+}
+
+var _ Run = (*RunService)(nil)
+
+// RunService implements Run using the repository and actions service.
 type RunService struct {
 	repo            interfaces.Repository
-	settingsRepo    interfaces.SettingsRepo
+	settings        Settings
 	actionsClient   actionsconnect.ActionsServiceClient
-	projectClient   projectconnect.ProjectServiceClient
+	projects        Project
 	storagePrefix   string
 	dataStore       *storage.DataStore
 	abortReconciler *AbortReconciler
-	enricher        *identityEnricher
-	// trustHeaders gates deriving executed_by from proxy-forwarded auth headers.
-	trustHeaders bool
-	// identityHeaders names the proxy-forwarded headers identity is read from.
-	identityHeaders config.IdentityHeadersConfig
+}
+
+// NewRun constructs the transport-independent run service.
+func NewRun(
+	repo interfaces.Repository,
+	settings Settings,
+	actionsClient actionsconnect.ActionsServiceClient,
+	projects Project,
+	storagePrefix string,
+	dataStore *storage.DataStore,
+	reconciler *AbortReconciler,
+) *RunService {
+	return &RunService{
+		repo:            repo,
+		settings:        settings,
+		actionsClient:   actionsClient,
+		projects:        projects,
+		storagePrefix:   storagePrefix,
+		dataStore:       dataStore,
+		abortReconciler: reconciler,
+	}
 }
 
 const (
@@ -113,16 +150,16 @@ func meetsRunStartTimeSDKVersion(taskSpec *task.TaskSpec) bool {
 }
 
 // WatchGroups streams task groups (runs grouped by task) from the database.
-func (s *RunService) WatchGroups(ctx context.Context, req *connect.Request[workflow.WatchGroupsRequest], stream *connect.ServerStream[workflow.WatchGroupsResponse]) error {
+func (s *RunService) WatchGroups(ctx context.Context, req *workflow.WatchGroupsRequest, send func(*workflow.WatchGroupsResponse) error) error {
 	logger.Infof(ctx, "Received WatchGroups request")
 
-	groups, err := s.buildTaskGroups(ctx, req.Msg)
+	groups, err := s.buildTaskGroups(ctx, req)
 	if err != nil {
-		return connect.NewError(connect.CodeInternal, err)
+		return ErrRunInternal.wrap(err)
 	}
 
 	// Send initial response with sentinel
-	if err := stream.Send(&workflow.WatchGroupsResponse{
+	if err := send(&workflow.WatchGroupsResponse{
 		TaskGroups: groups,
 		Sentinel:   true,
 	}); err != nil {
@@ -130,7 +167,7 @@ func (s *RunService) WatchGroups(ctx context.Context, req *connect.Request[workf
 	}
 
 	// If EndDate is set, this is a historical query — close the stream
-	if req.Msg.EndDate != nil {
+	if req.EndDate != nil {
 		return nil
 	}
 
@@ -143,13 +180,13 @@ func (s *RunService) WatchGroups(ctx context.Context, req *connect.Request[workf
 		case <-ctx.Done():
 			return nil
 		case <-ticker.C:
-			updated, err := s.buildTaskGroups(ctx, req.Msg)
+			updated, err := s.buildTaskGroups(ctx, req)
 			if err != nil {
 				logger.Warnf(ctx, "Failed to refresh task groups: %v", err)
 				continue
 			}
 			if len(updated) > 0 {
-				if err := stream.Send(&workflow.WatchGroupsResponse{
+				if err := send(&workflow.WatchGroupsResponse{
 					TaskGroups: updated,
 					Sentinel:   true,
 				}); err != nil {
@@ -160,47 +197,17 @@ func (s *RunService) WatchGroups(ctx context.Context, req *connect.Request[workf
 	}
 }
 
-// NewRunService creates a new RunService instance
-func NewRunService(
-	repo interfaces.Repository,
-	settingsRepo interfaces.SettingsRepo,
-	actionsClient actionsconnect.ActionsServiceClient,
-	projectClient projectconnect.ProjectServiceClient,
-	storagePrefix string,
-	dataStore *storage.DataStore,
-	reconciler *AbortReconciler,
-	authServerBaseURL string,
-	trustForwardedIdentityHeaders bool,
-	identityHeaders config.IdentityHeadersConfig,
-) *RunService {
-	return &RunService{
-		repo:            repo,
-		settingsRepo:    settingsRepo,
-		actionsClient:   actionsClient,
-		projectClient:   projectClient,
-		storagePrefix:   storagePrefix,
-		dataStore:       dataStore,
-		abortReconciler: reconciler,
-		enricher:        newIdentityEnricher(authServerBaseURL),
-		trustHeaders:    trustForwardedIdentityHeaders,
-		identityHeaders: identityHeaders,
-	}
-}
-
-// Ensure we implement the interface
-var _ workflowconnect.RunServiceHandler = (*RunService)(nil)
-
 // CreateRun creates a new run
 func (s *RunService) CreateRun(
 	ctx context.Context,
-	req *connect.Request[workflow.CreateRunRequest],
-) (*connect.Response[workflow.CreateRunResponse], error) {
+	request *workflow.CreateRunRequest,
+	executedBy *common.EnrichedIdentity,
+) (*workflow.CreateRunResponse, error) {
 	logger.Infof(ctx, "Received CreateRun request")
-	request := req.Msg
 	// Validate request
 	if err := request.Validate(); err != nil {
 		logger.Errorf(ctx, "Invalid CreateRun request: %v", err)
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, ErrRunInvalidArgument.wrap(err)
 	}
 
 	// Resolve run identity from request. When only a ProjectId is given, generate
@@ -224,10 +231,10 @@ func (s *RunService) CreateRun(
 			RunId: runId,
 		}
 	default:
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid run ID type"))
+		return nil, ErrRunInvalidArgument.wrap(fmt.Errorf("invalid run ID type"))
 	}
 
-	if err := validateProjectExists(ctx, s.projectClient, runId.GetProject()); err != nil {
+	if err := s.projects.ValidateProjectExists(ctx, runId.GetProject()); err != nil {
 		return nil, err
 	}
 
@@ -257,7 +264,7 @@ func (s *RunService) CreateRun(
 		tn := request.GetTriggerName()
 		triggerModel, triggerErr := s.repo.TriggerRepo().GetTrigger(ctx, transformers.ToTriggerKey(tn))
 		if triggerErr != nil {
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("trigger %q not found: %w", tn.GetName(), triggerErr))
+			return nil, ErrRunNotFound.wrap(fmt.Errorf("trigger %q not found: %w", tn.GetName(), triggerErr))
 		}
 		triggerName = tn.GetName()
 		triggerTaskName = triggerModel.TaskName
@@ -279,7 +286,7 @@ func (s *RunService) CreateRun(
 		// CreateRunRequest.run_start_time and surfaces as flyte.ctx().run_start_time instead.
 		triggerDetails, detailsErr := transformers.TriggerModelToTriggerDetails(ctx, triggerModel)
 		if detailsErr != nil {
-			return nil, connect.NewError(connect.CodeInternal, detailsErr)
+			return nil, ErrRunInternal.wrap(detailsErr)
 		}
 		if offloaded := triggerDetails.GetSpec().GetOffloadedInputData(); offloaded != nil && request.GetInputWrapper() == nil {
 			request.InputWrapper = &workflow.CreateRunRequest_OffloadedInputData{OffloadedInputData: offloaded}
@@ -300,20 +307,22 @@ func (s *RunService) CreateRun(
 
 	// Settings sit between an explicit request value and the static config defaults
 	// applied below.
-	resolveSettings, err := resolveSettings(ctx, s.settingsRepo, &settings.SettingsKey{
-		Org:     runId.GetOrg(),
-		Domain:  runId.GetDomain(),
-		Project: runId.GetProject(),
+	resolved, err := s.settings.GetSettings(ctx, &settings.GetSettingsRequest{
+		Key: &settings.SettingsKey{
+			Org:     runId.GetOrg(),
+			Domain:  runId.GetDomain(),
+			Project: runId.GetProject(),
+		},
 	})
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, err
 	}
-	applyRunSettings(runSpec, resolveSettings)
+	applyRunSettings(runSpec, resolved.GetSettingsRecord().GetSettings())
 	if err := validatePodTemplateName(runSpec.GetDefaultSettings().GetPodTemplateName()); err != nil {
 		return nil, err
 	}
 	if err := impl.ValidateLabels(runSpec.GetLabels().GetValues()); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, ErrRunInvalidArgument.wrap(err)
 	}
 
 	// Stamp the run start time, but only for SDKs that understand it (>= 2.3.6) — older task
@@ -363,7 +372,7 @@ func (s *RunService) CreateRun(
 		inputRef := storage.DataReference(inputPrefix + "/inputs.pb")
 		if err := s.dataStore.WriteProtobuf(ctx, inputRef, storage.Options{}, inputs); err != nil {
 			logger.Errorf(ctx, "Failed to write inputs to storage: %v", err)
-			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to write inputs: %w", err))
+			return nil, ErrRunInternal.wrap(fmt.Errorf("failed to write inputs: %w", err))
 		}
 		logger.Infof(ctx, "Wrote inputs to %s", inputRef)
 
@@ -380,23 +389,11 @@ func (s *RunService) CreateRun(
 		}
 	}
 
-	// Capture who created the run from the auth headers the load balancer forwards
-	// (it enforces auth upstream). nil when there is no authenticated identity. On the
-	// Bearer path the token carries only the subject, so enrich name/email via userinfo.
-	// Only trust the proxy-forwarded identity headers when configured to (the JWTs are
-	// decoded, not signature-verified — see Config.TrustForwardedIdentityHeaders).
-	var executedBy *common.EnrichedIdentity
-	if s.trustHeaders {
-		// resolveIdentity enriches only on the Bearer path; the cookie path relies on
-		// the claims the proxy injects (its forwarded access token is already expired).
-		executedBy = resolveIdentity(ctx, req.Header(), s.identityHeaders, s.enricher)
-	}
-
 	// Persist task spec and create a run model
 	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec, request.GetSource(), triggerName, triggerTaskName, triggerRevision, triggerType, executedBy)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create run: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrRunInternal.wrap(err)
 	}
 
 	_, err = s.actionsClient.Enqueue(ctx, connect.NewRequest(&actions.EnqueueRequest{
@@ -420,9 +417,9 @@ func (s *RunService) CreateRun(
 		logger.Infof(ctx, "Successfully enqueued root action for run %s", runId.Name)
 	}
 
-	return connect.NewResponse(&workflow.CreateRunResponse{
+	return &workflow.CreateRunResponse{
 		Run: s.convertRunToProto(run),
-	}), nil
+	}, nil
 }
 
 // persistRunModel stores the task spec, builds the run model, and inserts it to DB via CreateAction.
@@ -549,86 +546,86 @@ func (s *RunService) persistRunModel(
 // AbortRun aborts a run
 func (s *RunService) AbortRun(
 	ctx context.Context,
-	req *connect.Request[workflow.AbortRunRequest],
-) (*connect.Response[workflow.AbortRunResponse], error) {
+	req *workflow.AbortRunRequest,
+) (*workflow.AbortRunResponse, error) {
 	logger.Infof(ctx, "Received AbortRun request for run: %s/%s/%s",
-		req.Msg.RunId.Project, req.Msg.RunId.Domain, req.Msg.RunId.Name)
+		req.RunId.Project, req.RunId.Domain, req.RunId.Name)
 
 	// Validate request
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	if err := req.Validate(); err != nil {
+		return nil, ErrRunInvalidArgument.wrap(err)
 	}
 
 	reason := "User requested abort"
-	if req.Msg.Reason != nil {
-		reason = *req.Msg.Reason
+	if req.Reason != nil {
+		reason = *req.Reason
 	}
 
 	// Mark only the root action ABORTED in DB, then push it to the reconciler.
 	// The reconciler deletes "a0"'s CRD; K8s cascades deletion to all child CRDs
 	// via OwnerReferences, and the action service informer marks them ABORTED in DB.
-	if err := s.repo.ActionRepo().AbortRun(ctx, req.Msg.RunId, reason, nil); err != nil {
+	if err := s.repo.ActionRepo().AbortRun(ctx, req.RunId, reason, nil); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("run not found: %s/%s/%s", req.Msg.RunId.Project, req.Msg.RunId.Domain, req.Msg.RunId.Name))
+			return nil, ErrRunNotFound.wrap(fmt.Errorf("run not found: %s/%s/%s", req.RunId.Project, req.RunId.Domain, req.RunId.Name))
 		}
 		logger.Errorf(ctx, "Failed to abort run: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrRunInternal.wrap(err)
 	}
 
 	if s.abortReconciler != nil {
-		s.abortReconciler.Push(ctx, &common.ActionIdentifier{Run: req.Msg.RunId, Name: "a0"}, reason)
+		s.abortReconciler.Push(ctx, &common.ActionIdentifier{Run: req.RunId, Name: "a0"}, reason)
 	}
 
-	return connect.NewResponse(&workflow.AbortRunResponse{}), nil
+	return &workflow.AbortRunResponse{}, nil
 }
 
 // GetRunDetails gets detailed information about a run from the DB.
 func (s *RunService) GetRunDetails(
 	ctx context.Context,
-	req *connect.Request[workflow.GetRunDetailsRequest],
-) (*connect.Response[workflow.GetRunDetailsResponse], error) {
+	req *workflow.GetRunDetailsRequest,
+) (*workflow.GetRunDetailsResponse, error) {
 	logger.Infof(ctx, "Received GetRunDetails request")
 
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	if err := req.Validate(); err != nil {
+		return nil, ErrRunInvalidArgument.wrap(err)
 	}
 
-	run, err := s.repo.ActionRepo().GetRun(ctx, req.Msg.RunId)
+	run, err := s.repo.ActionRepo().GetRun(ctx, req.RunId)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get run: %v", err)
-		return nil, connect.NewError(connect.CodeNotFound, err)
+		return nil, ErrRunNotFound.wrap(err)
 	}
 
-	details, err := s.buildRunDetails(ctx, run, req.Msg.RunId)
+	details, err := s.buildRunDetails(ctx, run, req.RunId)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to build run action details: %v", err)
 		return nil, err
 	}
 
 	logger.Infof(ctx, "Retrieved run details for: %s", run.Name)
-	return connect.NewResponse(&workflow.GetRunDetailsResponse{Details: details}), nil
+	return &workflow.GetRunDetailsResponse{Details: details}, nil
 }
 
 // GetActionDetails gets detailed information about an action from the DB.
 func (s *RunService) GetActionDetails(
 	ctx context.Context,
-	req *connect.Request[workflow.GetActionDetailsRequest],
-) (*connect.Response[workflow.GetActionDetailsResponse], error) {
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	req *workflow.GetActionDetailsRequest,
+) (*workflow.GetActionDetailsResponse, error) {
+	if err := req.Validate(); err != nil {
+		return nil, ErrRunInvalidArgument.wrap(err)
 	}
 
-	details, err := s.getActionDetails(ctx, req.Msg.GetActionId())
+	details, err := s.getActionDetails(ctx, req.GetActionId())
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&workflow.GetActionDetailsResponse{Details: details}), nil
+	return &workflow.GetActionDetailsResponse{Details: details}, nil
 }
 
 func (s *RunService) getActionDetails(ctx context.Context, actionId *common.ActionIdentifier) (*workflow.ActionDetails, error) {
 	model, err := s.repo.ActionRepo().GetAction(ctx, actionId)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %w", err))
+		return nil, ErrRunNotFound.wrap(fmt.Errorf("action not found: %w", err))
 	}
 	return s.buildActionDetails(ctx, model, actionId)
 }
@@ -678,7 +675,7 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 				}
 				action.Spec = &workflow.ActionDetails_Trace{Trace: spec}
 			default:
-				return connect.NewError(connect.CodeInternal,
+				return ErrRunInternal.wrap(
 					fmt.Errorf("unknown action type %v for action %v", action.GetMetadata().GetActionType(), actionId))
 			}
 		}
@@ -930,26 +927,26 @@ func actionStreamComplete(details *workflow.ActionDetails) bool {
 // backwards compatibility but the server returns Unimplemented.
 func (s *RunService) GetActionData(
 	ctx context.Context,
-	req *connect.Request[workflow.GetActionDataRequest],
-) (*connect.Response[workflow.GetActionDataResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("RunService.GetActionData is deprecated; use DataProxyService.GetActionData instead"))
+	req *workflow.GetActionDataRequest,
+) (*workflow.GetActionDataResponse, error) {
+	return nil, ErrRunUnimplemented.wrap(fmt.Errorf("RunService.GetActionData is deprecated; use DataProxyService.GetActionData instead"))
 }
 
 // ListRuns lists runs based on filter criteria
 func (s *RunService) ListRuns(
 	ctx context.Context,
-	req *connect.Request[workflow.ListRunsRequest],
-) (*connect.Response[workflow.ListRunsResponse], error) {
+	req *workflow.ListRunsRequest,
+) (*workflow.ListRunsResponse, error) {
 	logger.Debugf(ctx, "Received ListRuns request")
 
 	// Validate request
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	if err := req.Validate(); err != nil {
+		return nil, ErrRunInvalidArgument.wrap(err)
 	}
 
 	// Build scope filter: always restrict to root actions (runs).
 	scopeFilter := interfaces.Filter(impl.NewIsRootActionFilter())
-	switch scope := req.Msg.ScopeBy.(type) {
+	switch scope := req.ScopeBy.(type) {
 	case *workflow.ListRunsRequest_ProjectId:
 		scopeFilter = scopeFilter.And(impl.NewProjectIdFilter(scope.ProjectId))
 	case *workflow.ListRunsRequest_TriggerName:
@@ -962,7 +959,7 @@ func (s *RunService) ListRuns(
 
 	// Restrict to runs that contain at least one PAUSED action (e.g. a
 	// human-in-the-loop gate node awaiting input) when requested.
-	if req.Msg.PausedActionsOnly {
+	if req.PausedActionsOnly {
 		scopeFilter = scopeFilter.And(impl.NewHasPausedActionFilter())
 	}
 
@@ -970,14 +967,14 @@ func (s *RunService) ListRuns(
 	// (run name OR task name), and run label filters on "labels.<key>". Resolve them here
 	// and AND them onto the scope filter: the generic parser below validates fields
 	// against the action column allow-list and would reject them.
-	listReq := req.Msg.Request
+	listReq := req.Request
 	searchFilter, remainingFilters, err := impl.SplitSearchFilters(listReq.GetFilters())
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, ErrRunInvalidArgument.wrap(err)
 	}
 	labelFilter, remainingFilters, err := impl.SplitLabelFilters(remainingFilters)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, ErrRunInvalidArgument.wrap(err)
 	}
 	for _, f := range []interfaces.Filter{searchFilter, labelFilter} {
 		if f != nil {
@@ -993,7 +990,7 @@ func (s *RunService) ListRuns(
 	// Parse pagination, sort, and user-supplied filters from the common ListRequest.
 	listInput, err := impl.NewListResourceInputFromProto(listReq, models.ActionColumnsSet)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, ErrRunInvalidArgument.wrap(err)
 	}
 
 	// Merge: scope filter always takes precedence, user filters are ANDed on top.
@@ -1006,7 +1003,7 @@ func (s *RunService) ListRuns(
 	actions, err := s.repo.ActionRepo().ListActions(ctx, listInput)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to list runs: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrRunInternal.wrap(err)
 	}
 
 	// We fetch Limit+1 rows to detect whether a next page exists without a separate COUNT
@@ -1024,34 +1021,34 @@ func (s *RunService) ListRuns(
 	}
 
 	logger.Debugf(ctx, "Listed %d runs", len(actions))
-	return connect.NewResponse(&workflow.ListRunsResponse{
+	return &workflow.ListRunsResponse{
 		Runs:  protoRuns,
 		Token: nextToken,
-	}), nil
+	}, nil
 }
 
 // ListActions lists actions for a run
 func (s *RunService) ListActions(
 	ctx context.Context,
-	req *connect.Request[workflow.ListActionsRequest],
-) (*connect.Response[workflow.ListActionsResponse], error) {
-	if req.Msg.GetRunId() == nil && req.Msg.GetQueueId() == nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("a run_id or queue_id scope is required"))
+	req *workflow.ListActionsRequest,
+) (*workflow.ListActionsResponse, error) {
+	if req.GetRunId() == nil && req.GetQueueId() == nil {
+		return nil, ErrRunInvalidArgument.wrap(fmt.Errorf("a run_id or queue_id scope is required"))
 	}
-	if req.Msg.GetQueueId() != nil {
-		return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("queue-scoped action listing is not supported by this service"))
+	if req.GetQueueId() != nil {
+		return nil, ErrRunUnimplemented.wrap(fmt.Errorf("queue-scoped action listing is not supported by this service"))
 	}
 	logger.Infof(ctx, "Received ListActions request")
 
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	if err := req.Validate(); err != nil {
+		return nil, ErrRunInvalidArgument.wrap(err)
 	}
 
-	listInput, err := impl.NewListResourceInputFromProto(req.Msg.Request, models.ActionColumnsSet)
+	listInput, err := impl.NewListResourceInputFromProto(req.Request, models.ActionColumnsSet)
 	if err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+		return nil, ErrRunInvalidArgument.wrap(err)
 	}
-	runFilter := interfaces.Filter(impl.NewRunActionsFilter(req.Msg.GetRunId()))
+	runFilter := interfaces.Filter(impl.NewRunActionsFilter(req.GetRunId()))
 	if listInput.Filter == nil {
 		listInput.Filter = runFilter
 	} else {
@@ -1061,7 +1058,7 @@ func (s *RunService) ListActions(
 	actions, err := s.repo.ActionRepo().ListActions(ctx, listInput)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to list actions: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrRunInternal.wrap(err)
 	}
 
 	// We fetch Limit+1 rows to detect whether a next page exists without a separate COUNT
@@ -1080,23 +1077,23 @@ func (s *RunService) ListActions(
 	}
 
 	logger.Infof(ctx, "Listed %d actions", len(actions))
-	return connect.NewResponse(&workflow.ListActionsResponse{
+	return &workflow.ListActionsResponse{
 		Actions: protoActions,
 		Token:   nextToken,
-	}), nil
+	}, nil
 }
 
 func (s *RunService) GetActionDataURIs(
 	ctx context.Context,
-	req *connect.Request[workflow.GetActionDataURIsRequest],
-) (*connect.Response[workflow.GetActionDataURIsResponse], error) {
-	action, err := s.repo.ActionRepo().GetAction(ctx, req.Msg.GetActionId())
+	req *workflow.GetActionDataURIsRequest,
+) (*workflow.GetActionDataURIsResponse, error) {
+	action, err := s.repo.ActionRepo().GetAction(ctx, req.GetActionId())
 	if err != nil {
-		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %w", err))
+		return nil, ErrRunNotFound.wrap(fmt.Errorf("action not found: %w", err))
 	}
 
 	if len(action.DetailedInfo) == 0 {
-		return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("run data not available"))
+		return nil, ErrRunNotFound.wrap(fmt.Errorf("run data not available"))
 	}
 
 	info := &workflow.RunInfo{}
@@ -1113,102 +1110,97 @@ func (s *RunService) GetActionDataURIs(
 		if workflow.ActionType(action.ActionType) == workflow.ActionType_ACTION_TYPE_TRACE {
 			resp.OutputsUri = info.GetOutputsUri()
 		} else {
-			attempts, err := s.getAttempts(ctx, req.Msg.GetActionId())
+			attempts, err := s.getAttempts(ctx, req.GetActionId())
 			if err != nil {
 				return nil, err
 			}
 			if len(attempts) == 0 {
-				return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("outputs not available, no attempts for action"))
+				return nil, ErrRunNotFound.wrap(fmt.Errorf("outputs not available, no attempts for action"))
 			}
 			outputUri := attempts[len(attempts)-1].GetOutputs().GetOutputUri()
 			if outputUri == "" {
-				return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("outputs not available"))
+				return nil, ErrRunNotFound.wrap(fmt.Errorf("outputs not available"))
 			}
 			resp.OutputsUri = outputUri
 		}
 	}
 
-	return connect.NewResponse(resp), nil
+	return resp, nil
 }
 
 func (s *RunService) GetActionLogContext(
 	ctx context.Context,
-	req *connect.Request[workflow.GetActionLogContextRequest],
-) (*connect.Response[workflow.GetActionLogContextResponse], error) {
-	logContext, cluster, err := getLogContextAndClusterForAttempt(ctx, s.repo, req.Msg.GetActionId(), req.Msg.GetAttempt())
+	req *workflow.GetActionLogContextRequest,
+) (*workflow.GetActionLogContextResponse, error) {
+	logContext, cluster, err := getLogContextAndClusterForAttempt(ctx, s.repo, req.GetActionId(), req.GetAttempt())
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&workflow.GetActionLogContextResponse{
+	return &workflow.GetActionLogContextResponse{
 		LogContext: logContext,
 		Cluster:    cluster,
-	}), nil
+	}, nil
 }
 
 // AbortAction aborts a specific action
 func (s *RunService) AbortAction(
 	ctx context.Context,
-	req *connect.Request[workflow.AbortActionRequest],
-) (*connect.Response[workflow.AbortActionResponse], error) {
+	req *workflow.AbortActionRequest,
+) (*workflow.AbortActionResponse, error) {
 	logger.Infof(ctx, "Received AbortAction request")
 
 	// Validate request
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	if err := req.Validate(); err != nil {
+		return nil, ErrRunInvalidArgument.wrap(err)
 	}
 
 	reason := "User requested abort"
-	if req.Msg.Reason != "" {
-		reason = req.Msg.Reason
+	if req.Reason != "" {
+		reason = req.Reason
 	}
 
 	// Abort in database, then push to reconciler for background pod termination.
-	if err := s.repo.ActionRepo().AbortAction(ctx, req.Msg.ActionId, reason, nil); err != nil {
+	if err := s.repo.ActionRepo().AbortAction(ctx, req.ActionId, reason, nil); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %s", req.Msg.ActionId.Name))
+			return nil, ErrRunNotFound.wrap(fmt.Errorf("action not found: %s", req.ActionId.Name))
 		}
 		logger.Errorf(ctx, "Failed to abort action: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, err)
+		return nil, ErrRunInternal.wrap(err)
 	}
 
 	if s.abortReconciler != nil {
-		s.abortReconciler.Push(ctx, req.Msg.ActionId, reason)
+		s.abortReconciler.Push(ctx, req.ActionId, reason)
 	}
 
-	return connect.NewResponse(&workflow.AbortActionResponse{}), nil
+	return &workflow.AbortActionResponse{}, nil
 }
 
 // SignalEvent resolves a paused condition action by forwarding the payload to
 // the actions service, which validates and writes it onto the condition CR.
 func (s *RunService) SignalEvent(
 	ctx context.Context,
-	req *connect.Request[workflow.SignalEventRequest],
-) (*connect.Response[workflow.SignalEventResponse], error) {
+	req *workflow.SignalEventRequest,
+	signalledBy *common.EnrichedIdentity,
+) (*workflow.SignalEventResponse, error) {
 	logger.Infof(ctx, "Received SignalEvent request")
 
-	if err := req.Msg.Validate(); err != nil {
-		return nil, connect.NewError(connect.CodeInvalidArgument, err)
-	}
-
-	// Record whoever the auth middleware says is calling; no authz gate (devbox).
-	var signalledBy *common.EnrichedIdentity
-	if s.trustHeaders {
-		signalledBy = identityFromHeaders(req.Header(), s.identityHeaders)
+	if err := req.Validate(); err != nil {
+		return nil, ErrRunInvalidArgument.wrap(err)
 	}
 
 	if _, err := s.actionsClient.Signal(ctx, connect.NewRequest(&actions.SignalRequest{
-		ActionId:         req.Msg.GetActionId(),
-		ParentActionName: req.Msg.GetParentActionName(),
-		Value:            payloadToLiteral(req.Msg.GetPayload()),
+		ActionId:         req.GetActionId(),
+		ParentActionName: req.GetParentActionName(),
+		Value:            payloadToLiteral(req.GetPayload()),
 		SignalledBy:      signalledBy,
 	})); err != nil {
-		logger.Errorf(ctx, "Failed to signal action %s: %v", req.Msg.GetActionId().GetName(), err)
+		logger.Errorf(ctx, "Failed to signal action %s: %v", req.GetActionId().GetName(), err)
 		// Actions-service errors (NotFound / InvalidArgument / FailedPrecondition)
 		// pass through unchanged.
 		return nil, err
 	}
 
-	return connect.NewResponse(&workflow.SignalEventResponse{}), nil
+	return &workflow.SignalEventResponse{}, nil
 }
 
 // payloadToLiteral converts the SignalEvent payload (bool/int/float/string)
@@ -1237,21 +1229,21 @@ func payloadToLiteral(payload *workflow.EventPayload) *core.Literal {
 // WatchRunDetails streams run details updates from the DB.
 func (s *RunService) WatchRunDetails(
 	ctx context.Context,
-	req *connect.Request[workflow.WatchRunDetailsRequest],
-	stream *connect.ServerStream[workflow.WatchRunDetailsResponse],
+	req *workflow.WatchRunDetailsRequest,
+	send func(*workflow.WatchRunDetailsResponse) error,
 ) error {
 	logger.Infof(ctx, "Received WatchRunDetails request")
 
-	run, err := s.repo.ActionRepo().GetRun(ctx, req.Msg.RunId)
+	run, err := s.repo.ActionRepo().GetRun(ctx, req.RunId)
 	if err != nil {
-		return connect.NewError(connect.CodeNotFound, err)
+		return ErrRunNotFound.wrap(err)
 	}
 
-	details, err := s.buildRunDetails(ctx, run, req.Msg.RunId)
+	details, err := s.buildRunDetails(ctx, run, req.RunId)
 	if err != nil {
-		return connect.NewError(connect.CodeInternal, err)
+		return ErrRunInternal.wrap(err)
 	}
-	if err := stream.Send(&workflow.WatchRunDetailsResponse{Details: details}); err != nil {
+	if err := send(&workflow.WatchRunDetailsResponse{Details: details}); err != nil {
 		return err
 	}
 
@@ -1260,23 +1252,25 @@ func (s *RunService) WatchRunDetails(
 	updates := make(chan *models.Run, 50)
 	errs := make(chan error, 1)
 
-	go s.repo.ActionRepo().WatchRunUpdates(ctx, req.Msg.RunId, updates, errs)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	go s.repo.ActionRepo().WatchRunUpdates(ctx, req.RunId, updates, errs)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
 		case err := <-errs:
-			return connect.NewError(connect.CodeInternal, err)
+			return ErrRunInternal.wrap(err)
 		case run := <-updates:
-			details, err := s.buildRunDetails(ctx, run, req.Msg.RunId)
+			details, err := s.buildRunDetails(ctx, run, req.RunId)
 			if err != nil {
 				if ctx.Err() != nil {
 					return nil
 				}
-				return connect.NewError(connect.CodeInternal, err)
+				return ErrRunInternal.wrap(err)
 			}
-			if err := stream.Send(&workflow.WatchRunDetailsResponse{Details: details}); err != nil {
+			if err := send(&workflow.WatchRunDetailsResponse{Details: details}); err != nil {
 				return err
 			}
 			logger.Infof(ctx, "Sent run update for: %s", run.Name)
@@ -1302,25 +1296,27 @@ func (s *RunService) buildRunDetails(ctx context.Context, run *models.Run, runID
 // WatchActionDetails streams action details updates from the DB.
 func (s *RunService) WatchActionDetails(
 	ctx context.Context,
-	req *connect.Request[workflow.WatchActionDetailsRequest],
-	stream *connect.ServerStream[workflow.WatchActionDetailsResponse],
+	req *workflow.WatchActionDetailsRequest,
+	send func(*workflow.WatchActionDetailsResponse) error,
 ) error {
-	actionID := req.Msg.ActionId
+	actionID := req.ActionId
 	logger.Infof(ctx, "Received WatchActionDetails request for: %s/%s", actionID.Run.Name, actionID.Name)
 
 	// Subscribe FIRST to avoid missing notifications that fire between the DB
 	// read and the subscription setup (same pattern as WatchActions).
 	updates := make(chan *models.Action, 50)
 	errs := make(chan error, 1)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID, updates, errs)
 
 	// Step 1: Send initial state from DB
-	details, err := s.getActionDetails(ctx, req.Msg.GetActionId())
+	details, err := s.getActionDetails(ctx, req.GetActionId())
 	if err != nil {
-		return connect.NewError(connect.CodeNotFound, fmt.Errorf("failed to get action details: %w", err))
+		return ErrRunNotFound.wrap(fmt.Errorf("failed to get action details: %w", err))
 	}
 
-	if err := stream.Send(&workflow.WatchActionDetailsResponse{
+	if err := send(&workflow.WatchActionDetailsResponse{
 		Details: details,
 	}); err != nil {
 		return err
@@ -1337,7 +1333,7 @@ func (s *RunService) WatchActionDetails(
 		case <-ctx.Done():
 			return nil
 		case err := <-errs:
-			return connect.NewError(connect.CodeInternal, err)
+			return ErrRunInternal.wrap(err)
 		case updated, ok := <-updates:
 			if !ok {
 				return nil
@@ -1349,9 +1345,9 @@ func (s *RunService) WatchActionDetails(
 					return nil
 				}
 				logger.Errorf(ctx, "failed to get action details for action %s: %v", actionID.Name, err)
-				return connect.NewError(connect.CodeInternal, err)
+				return ErrRunInternal.wrap(err)
 			}
-			if err := stream.Send(&workflow.WatchActionDetailsResponse{
+			if err := send(&workflow.WatchActionDetailsResponse{
 				Details: details,
 			}); err != nil {
 				return err
@@ -1367,8 +1363,8 @@ func (s *RunService) WatchActionDetails(
 // WatchRuns streams run updates based on filter criteria
 func (s *RunService) WatchRuns(
 	ctx context.Context,
-	req *connect.Request[workflow.WatchRunsRequest],
-	stream *connect.ServerStream[workflow.WatchRunsResponse],
+	req *workflow.WatchRunsRequest,
+	send func(*workflow.WatchRunsResponse) error,
 ) error {
 	logger.Infof(ctx, "Received WatchRuns request")
 
@@ -1376,10 +1372,12 @@ func (s *RunService) WatchRuns(
 	// between the initial list and the subscription (same pattern as WatchActions).
 	updatesCh := make(chan *models.Run, 50)
 	errsCh := make(chan error, 1)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	go s.repo.ActionRepo().WatchAllRunUpdates(ctx, updatesCh, errsCh)
 
 	// Step 2: Send existing runs that match filter
-	listInput := s.convertWatchRequestToListInput(req.Msg)
+	listInput := s.convertWatchRequestToListInput(req)
 	sendRuns := func() error {
 		runs, err := s.repo.ActionRepo().ListActions(ctx, listInput)
 		if err != nil {
@@ -1394,7 +1392,7 @@ func (s *RunService) WatchRuns(
 		for i, run := range runs {
 			protoRuns[i] = s.convertRunToProto(run)
 		}
-		return stream.Send(&workflow.WatchRunsResponse{
+		return send(&workflow.WatchRunsResponse{
 			Runs: protoRuns,
 		})
 	}
@@ -1418,13 +1416,13 @@ func (s *RunService) WatchRuns(
 				continue
 			}
 			// Filter the run based on the watch request criteria
-			if !s.runMatchesFilter(run, req.Msg) {
+			if !s.runMatchesFilter(run, req) {
 				continue
 			}
 
 			// Convert and send the updated run
 			protoRun := s.convertRunToProto(run)
-			if err := stream.Send(&workflow.WatchRunsResponse{
+			if err := send(&workflow.WatchRunsResponse{
 				Runs: []*workflow.Run{protoRun},
 			}); err != nil {
 				return err
@@ -1436,23 +1434,25 @@ func (s *RunService) WatchRuns(
 // WatchActions streams action updates for a run from the DB.
 func (s *RunService) WatchActions(
 	ctx context.Context,
-	req *connect.Request[workflow.WatchActionsRequest],
-	stream *connect.ServerStream[workflow.WatchActionsResponse],
+	req *workflow.WatchActionsRequest,
+	send func(*workflow.WatchActionsResponse) error,
 ) error {
-	runID := req.Msg.RunId
+	runID := req.RunId
 	logger.Infof(ctx, "Received WatchActions request for run: %s", runID.Name)
 
 	// Start watching for updates from DB first to prevent event miss
 	updatesCh := make(chan *models.Action, 50)
 	errsCh := make(chan error, 1)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	go s.repo.ActionRepo().WatchAllActionUpdates(ctx, runID, updatesCh, errsCh)
 
-	rsm, err := newRunStateManager(req.Msg.GetFilter())
+	rsm, err := newRunStateManager(req.GetFilter())
 	if err != nil {
 		return err
 	}
 
-	if err := s.listAndSendAllActions(ctx, runID, rsm, stream); err != nil {
+	if err := s.listAndSendAllActions(ctx, runID, rsm, send); err != nil {
 		logger.Errorf(ctx, "Failed to list actions: %v", err)
 		return err
 	}
@@ -1469,7 +1469,7 @@ func (s *RunService) WatchActions(
 			}
 			if updated == nil {
 				// Updates may have been lost; re-list the run.
-				if err := s.listAndSendAllActions(ctx, runID, rsm, stream); err != nil {
+				if err := s.listAndSendAllActions(ctx, runID, rsm, send); err != nil {
 					if !errors.Is(err, errListActions) {
 						return err
 					}
@@ -1481,7 +1481,7 @@ func (s *RunService) WatchActions(
 			if err != nil {
 				return err
 			}
-			if err := s.sendChangedActions(runID, updates, stream); err != nil {
+			if err := s.sendChangedActions(runID, updates, send); err != nil {
 				return err
 			}
 		}
@@ -1495,7 +1495,7 @@ func (s *RunService) listAndSendAllActions(
 	ctx context.Context,
 	runID *common.RunIdentifier,
 	rsm *runStateManager,
-	stream *connect.ServerStream[workflow.WatchActionsResponse],
+	send func(*workflow.WatchActionsResponse) error,
 ) error {
 	// Page the initial snapshot with keyset (cursor) pagination on (created_at, name)
 	// ascending, backed by idx_actions_run_created_name. Each page is an index
@@ -1546,7 +1546,7 @@ func (s *RunService) listAndSendAllActions(
 		if err != nil {
 			return err
 		}
-		if err := s.sendChangedActions(runID, updates, stream); err != nil {
+		if err := s.sendChangedActions(runID, updates, send); err != nil {
 			return err
 		}
 
@@ -1562,7 +1562,7 @@ func (s *RunService) listAndSendAllActions(
 func (s *RunService) sendChangedActions(
 	runID *common.RunIdentifier,
 	updates []*nodeUpdate,
-	stream *connect.ServerStream[workflow.WatchActionsResponse],
+	send func(*workflow.WatchActionsResponse) error,
 ) error {
 	if len(updates) == 0 {
 		return nil
@@ -1577,7 +1577,7 @@ func (s *RunService) sendChangedActions(
 		enriched = append(enriched, enrichedAction)
 	}
 
-	return stream.Send(&workflow.WatchActionsResponse{
+	return send(&workflow.WatchActionsResponse{
 		EnrichedActions: enriched,
 	})
 }
@@ -1585,22 +1585,24 @@ func (s *RunService) sendChangedActions(
 // WatchClusterEvents streams Kubernetes cluster events recorded in action_events.
 func (s *RunService) WatchClusterEvents(
 	ctx context.Context,
-	req *connect.Request[workflow.WatchClusterEventsRequest],
-	stream *connect.ServerStream[workflow.WatchClusterEventsResponse],
+	req *workflow.WatchClusterEventsRequest,
+	send func(*workflow.WatchClusterEventsResponse) error,
 ) error {
-	actionID := req.Msg.Id
-	attempt := req.Msg.GetAttempt()
+	actionID := req.Id
+	attempt := req.GetAttempt()
 	logger.Infof(ctx, "Received WatchClusterEvents request for: %s/%s", actionID.Run.Name, actionID.Name)
 
 	// Start watching first to reduce the chance of missing action updates
 	// between initial state fetch and subscription setup.
 	updatesCh := make(chan *models.Action, 50)
 	errsCh := make(chan error, 1)
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	go s.repo.ActionRepo().WatchActionUpdates(ctx, actionID, updatesCh, errsCh)
 
 	action, err := s.repo.ActionRepo().GetAction(ctx, actionID)
 	if err != nil {
-		return connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %w", err))
+		return ErrRunNotFound.wrap(fmt.Errorf("action not found: %w", err))
 	}
 
 	const maxEvents = 500
@@ -1614,12 +1616,12 @@ func (s *RunService) WatchClusterEvents(
 		for {
 			info, err := s.getClusterEventsInfo(ctx, actionID, attempt, lastUpdatedAt, offset, maxEvents)
 			if err != nil {
-				return connect.NewError(connect.CodeInternal, err)
+				return ErrRunInternal.wrap(err)
 			}
 			isTerminal = isTerminal || info.isTerminal
 
 			if len(info.events) > 0 {
-				if err := stream.Send(&workflow.WatchClusterEventsResponse{ClusterEvents: info.events}); err != nil {
+				if err := send(&workflow.WatchClusterEventsResponse{ClusterEvents: info.events}); err != nil {
 					return err
 				}
 			}
@@ -1641,7 +1643,7 @@ func (s *RunService) WatchClusterEvents(
 		case <-ctx.Done():
 			return nil
 		case err := <-errsCh:
-			return connect.NewError(connect.CodeInternal, err)
+			return ErrRunInternal.wrap(err)
 		case updated, ok := <-updatesCh:
 			if !ok {
 				return nil
@@ -1720,18 +1722,18 @@ func getLogContextAndClusterForAttempt(ctx context.Context, repo interfaces.Repo
 	m, err := repo.ActionRepo().GetLatestEventByAttempt(ctx, actionID, attempt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, "", connect.NewError(connect.CodeNotFound, fmt.Errorf("no event found for action %v attempt %d", actionID, attempt))
+			return nil, "", ErrRunNotFound.wrap(fmt.Errorf("no event found for action %v attempt %d", actionID, attempt))
 		}
-		return nil, "", connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get event for action %v attempt %d: %w", actionID, attempt, err))
+		return nil, "", ErrRunInternal.wrap(fmt.Errorf("failed to get event for action %v attempt %d: %w", actionID, attempt, err))
 	}
 
 	event, err := m.ToActionEvent()
 	if err != nil {
-		return nil, "", connect.NewError(connect.CodeInternal, fmt.Errorf("failed to deserialize event: %w", err))
+		return nil, "", ErrRunInternal.wrap(fmt.Errorf("failed to deserialize event: %w", err))
 	}
 
 	if event.GetLogContext() == nil {
-		return nil, "", connect.NewError(connect.CodeNotFound, fmt.Errorf("no log context found for action %v attempt %d", actionID, attempt))
+		return nil, "", ErrRunNotFound.wrap(fmt.Errorf("no log context found for action %v attempt %d", actionID, attempt))
 	}
 
 	return event.GetLogContext(), event.GetCluster(), nil

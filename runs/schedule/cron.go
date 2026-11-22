@@ -33,3 +33,11 @@ func ParseCron(schedule *task.Schedule) (cron.Schedule, error) {
 	}
 	return parsed, nil
 }
+
+// ValidateCronExpression checks the cron schedule on a trigger before deployment.
+func ValidateCronExpression(triggerName string, spec *task.TriggerAutomationSpec) error {
+	if _, err := ParseCron(spec.GetSchedule()); err != nil {
+		return fmt.Errorf("trigger %q has invalid cron expression: %w", triggerName, err)
+	}
+	return nil
+}

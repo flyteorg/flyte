@@ -36,7 +36,7 @@ func TestActionMetadataFromModel_ExecutedBy(t *testing.T) {
 	})
 
 	t.Run("subject-only identity from created_by", func(t *testing.T) {
-		m := &models.Action{CreatedBy: mustMarshalIdentity(t, subjectOnlyIdentity("00u2"))}
+		m := &models.Action{CreatedBy: mustMarshalIdentity(t, &common.EnrichedIdentity{Principal: &common.EnrichedIdentity_User{User: &common.User{Id: &common.UserIdentifier{Subject: "00u2"}}}})}
 		eb := actionMetadataFromModel(m).GetExecutedBy().GetUser()
 		assert.Equal(t, "00u2", eb.GetId().GetSubject())
 		assert.Nil(t, eb.GetSpec())

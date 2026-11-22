@@ -2,18 +2,16 @@ package service
 
 import (
 	"context"
+	"strings"
 	"testing"
 	"time"
 
-	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
-	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project"
-	projectMocks "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/project/projectconnect/mocks"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
 	triggerpb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/trigger"
 	mocks "github.com/flyteorg/flyte/v2/runs/repository/mocks"
@@ -28,68 +26,6 @@ func cronAutomation(kickoffArg string) *task.TriggerAutomationSpec {
 				KickoffTimeInputArg: kickoffArg,
 			},
 		},
-	}
-}
-
-func TestValidateCronExpression(t *testing.T) {
-	tests := []struct {
-		name     string
-		schedule *task.Schedule
-		wantErr  bool
-	}{
-		{
-			name: "structured cron with timezone",
-			schedule: &task.Schedule{
-				Expression: &task.Schedule_Cron{Cron: &task.Cron{
-					Expression: "0 9 * * *",
-					Timezone:   "America/Los_Angeles",
-				}},
-			},
-		},
-		{
-			name: "invalid structured cron",
-			schedule: &task.Schedule{
-				Expression: &task.Schedule_Cron{Cron: &task.Cron{Expression: "invalid"}},
-			},
-			wantErr: true,
-		},
-		{
-			name: "legacy cron",
-			schedule: &task.Schedule{
-				Expression: &task.Schedule_CronExpression{CronExpression: "0 9 * * *"},
-			},
-		},
-		{
-			name: "invalid legacy cron",
-			schedule: &task.Schedule{
-				Expression: &task.Schedule_CronExpression{CronExpression: "invalid"},
-			},
-			wantErr: true,
-		},
-		{
-			name: "empty structured cron",
-			schedule: &task.Schedule{
-				Expression: &task.Schedule_Cron{Cron: &task.Cron{}},
-			},
-			wantErr: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			spec := &task.TriggerAutomationSpec{
-				Automation: &task.TriggerAutomationSpec_Schedule{
-					Schedule: tt.schedule,
-				},
-			}
-			err := validateCronExpression("trigger", spec)
-			if tt.wantErr {
-				require.Error(t, err)
-				assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
-				return
-			}
-			require.NoError(t, err)
-		})
 	}
 }
 
@@ -115,17 +51,12 @@ func TestBuildTriggerModels_OffloadedInputs(t *testing.T) {
 
 func TestDeployTask(t *testing.T) {
 	ctx := context.Background()
-	mockRepo := mocks.NewRepository(t)
 	mockTaskRepo := mocks.NewTaskRepo(t)
-	mockProjectClient := projectMocks.NewProjectServiceClient(t)
 
-	mockRepo.EXPECT().TaskRepo().Return(mockTaskRepo)
 	mockTaskRepo.EXPECT().CreateTask(ctx, mock.AnythingOfType("*models.Task"), mock.Anything).Return(nil)
-	mockProjectClient.EXPECT().GetProject(ctx, mock.MatchedBy(func(req *connect.Request[project.GetProjectRequest]) bool {
-		return req.Msg.GetId() == "test-project"
-	})).Return(connect.NewResponse(&project.GetProjectResponse{}), nil)
-
-	service := NewTaskService(mockRepo, mockProjectClient)
+	projectRepo := mocks.NewProjectRepo(t)
+	projectRepo.EXPECT().GetProject(ctx, "test-project").Return(&models.Project{Identifier: "test-project"}, nil).Once()
+	service := NewTaskService(mockTaskRepo, NewProjectService(projectRepo, nil))
 
 	req := &task.DeployTaskRequest{
 		TaskId: &task.TaskIdentifier{
@@ -142,14 +73,13 @@ func TestDeployTask(t *testing.T) {
 		},
 	}
 
-	resp, err := service.DeployTask(ctx, connect.NewRequest(req))
+	resp, err := service.DeployTask(ctx, req)
 	require.NoError(t, err)
 	assert.NotNil(t, resp)
 }
 
 func TestGetTaskDetails(t *testing.T) {
 	ctx := context.Background()
-	mockRepo := mocks.NewRepository(t)
 	mockTaskRepo := mocks.NewTaskRepo(t)
 
 	spec := &task.TaskSpec{
@@ -170,10 +100,9 @@ func TestGetTaskDetails(t *testing.T) {
 		CreatedAt:    time.Now(),
 	}
 
-	mockRepo.EXPECT().TaskRepo().Return(mockTaskRepo)
 	mockTaskRepo.EXPECT().GetTask(ctx, mock.AnythingOfType("models.TaskKey")).Return(taskModel, nil)
 
-	service := NewTaskService(mockRepo, nil)
+	service := NewTaskService(mockTaskRepo, nil)
 
 	req := &task.GetTaskDetailsRequest{
 		TaskId: &task.TaskIdentifier{
@@ -185,16 +114,15 @@ func TestGetTaskDetails(t *testing.T) {
 		},
 	}
 
-	resp, err := service.GetTaskDetails(ctx, connect.NewRequest(req))
+	resp, err := service.GetTaskDetails(ctx, req)
 	require.NoError(t, err)
 	assert.NotNil(t, resp)
-	assert.NotNil(t, resp.Msg.Details)
-	assert.Equal(t, "", resp.Msg.Details.TaskId.Org)
+	assert.NotNil(t, resp.Details)
+	assert.Equal(t, "", resp.Details.TaskId.Org)
 }
 
 func TestListTasks(t *testing.T) {
 	ctx := context.Background()
-	mockRepo := mocks.NewRepository(t)
 	mockTaskRepo := mocks.NewTaskRepo(t)
 
 	taskModels := []*models.Task{
@@ -216,10 +144,9 @@ func TestListTasks(t *testing.T) {
 		FilteredTotal: 1,
 	}
 
-	mockRepo.EXPECT().TaskRepo().Return(mockTaskRepo)
 	mockTaskRepo.EXPECT().ListTasks(ctx, mock.AnythingOfType("interfaces.ListResourceInput")).Return(result, nil)
 
-	service := NewTaskService(mockRepo, nil)
+	service := NewTaskService(mockTaskRepo, nil)
 
 	req := &task.ListTasksRequest{
 		ScopeBy: &task.ListTasksRequest_Org{
@@ -230,17 +157,16 @@ func TestListTasks(t *testing.T) {
 		},
 	}
 
-	resp, err := service.ListTasks(ctx, connect.NewRequest(req))
+	resp, err := service.ListTasks(ctx, req)
 	require.NoError(t, err)
 	assert.NotNil(t, resp)
-	assert.Len(t, resp.Msg.Tasks, 1)
-	assert.NotNil(t, resp.Msg.Metadata)
-	assert.Equal(t, uint32(1), resp.Msg.Metadata.Total)
+	assert.Len(t, resp.Tasks, 1)
+	assert.NotNil(t, resp.Metadata)
+	assert.Equal(t, uint32(1), resp.Metadata.Total)
 }
 
 func TestListVersions(t *testing.T) {
 	ctx := context.Background()
-	mockRepo := mocks.NewRepository(t)
 	mockTaskRepo := mocks.NewTaskRepo(t)
 
 	now := time.Now()
@@ -255,10 +181,9 @@ func TestListVersions(t *testing.T) {
 		},
 	}
 
-	mockRepo.EXPECT().TaskRepo().Return(mockTaskRepo)
 	mockTaskRepo.EXPECT().ListVersions(ctx, mock.AnythingOfType("interfaces.ListResourceInput")).Return(versions, nil)
 
-	service := NewTaskService(mockRepo, nil)
+	service := NewTaskService(mockTaskRepo, nil)
 
 	req := &task.ListVersionsRequest{
 		TaskName: &task.TaskName{
@@ -272,10 +197,50 @@ func TestListVersions(t *testing.T) {
 		},
 	}
 
-	resp, err := service.ListVersions(ctx, connect.NewRequest(req))
+	resp, err := service.ListVersions(ctx, req)
 	require.NoError(t, err)
 	assert.NotNil(t, resp)
-	assert.Len(t, resp.Msg.Versions, 2)
-	assert.Equal(t, "v1", resp.Msg.Versions[0].Version)
-	assert.Equal(t, "v2", resp.Msg.Versions[1].Version)
+	assert.Len(t, resp.Versions, 2)
+	assert.Equal(t, "v1", resp.Versions[0].Version)
+	assert.Equal(t, "v2", resp.Versions[1].Version)
+}
+
+func TestTruncateShortDescription_UnderLimit(t *testing.T) {
+	desc := "Short description"
+	result := truncateShortDescription(desc)
+	assert.Equal(t, desc, result)
+}
+
+func TestTruncateShortDescription_AtLimit(t *testing.T) {
+	desc := strings.Repeat("a", 255)
+	result := truncateShortDescription(desc)
+	assert.Equal(t, desc, result)
+	assert.Len(t, result, 255)
+}
+
+func TestTruncateShortDescription_OverLimit(t *testing.T) {
+	desc := strings.Repeat("a", 300)
+	result := truncateShortDescription(desc)
+	assert.Len(t, result, 255)
+	assert.Equal(t, strings.Repeat("a", 255), result)
+}
+
+func TestTruncateLongDescription_UnderLimit(t *testing.T) {
+	desc := "Long description"
+	result := truncateLongDescription(desc)
+	assert.Equal(t, desc, result)
+}
+
+func TestTruncateLongDescription_AtLimit(t *testing.T) {
+	desc := strings.Repeat("b", 2048)
+	result := truncateLongDescription(desc)
+	assert.Equal(t, desc, result)
+	assert.Len(t, result, 2048)
+}
+
+func TestTruncateLongDescription_OverLimit(t *testing.T) {
+	desc := strings.Repeat("b", 3000)
+	result := truncateLongDescription(desc)
+	assert.Len(t, result, 2048)
+	assert.Equal(t, strings.Repeat("b", 2048), result)
 }

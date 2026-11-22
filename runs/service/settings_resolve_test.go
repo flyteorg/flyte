@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"connectrpc.com/connect"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
@@ -13,8 +12,7 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/impl"
 )
 
-// TestResolveSettings resolves a chain without going through a connect handler,
-// which is what run creation will do in phase 3.
+// TestResolveSettings exercises the scope chain used during run creation.
 func TestResolveSettings(t *testing.T) {
 	ctx := context.Background()
 	t.Cleanup(func() { testDB.Exec("DELETE FROM settings") })
@@ -22,19 +20,19 @@ func TestResolveSettings(t *testing.T) {
 	repo := impl.NewSettingsRepo(testDB)
 	svc := NewSettingsService(repo)
 
-	_, err := svc.CreateSettings(ctx, connect.NewRequest(&settings.CreateSettingsRequest{
+	_, err := svc.CreateSettings(ctx, &settings.CreateSettingsRequest{
 		Key:      &settings.SettingsKey{Org: "acme"},
 		Settings: envSettings("LOG_LEVEL", "info"),
-	}))
+	})
 	require.NoError(t, err)
 
-	_, err = svc.CreateSettings(ctx, connect.NewRequest(&settings.CreateSettingsRequest{
+	_, err = svc.CreateSettings(ctx, &settings.CreateSettingsRequest{
 		Key:      &settings.SettingsKey{Org: "acme", Domain: "production", Project: "analytics"},
 		Settings: envSettings("LOG_LEVEL", "debug"),
-	}))
+	})
 	require.NoError(t, err)
 
-	resolved, err := resolveSettings(ctx, repo, &settings.SettingsKey{
+	resolved, err := ResolveSettings(ctx, repo, &settings.SettingsKey{
 		Org: "acme", Domain: "production", Project: "analytics",
 	})
 	require.NoError(t, err)
@@ -62,10 +60,10 @@ func TestResolveSettings_IgnoresOrg(t *testing.T) {
 
 	// Written the way the CLI writes it, under an org derived from the endpoint.
 	_, err := svc.CreateSettings(ctx,
-		connect.NewRequest(&settings.CreateSettingsRequest{
+		&settings.CreateSettingsRequest{
 			Key:      &settings.SettingsKey{Org: "acme"},
 			Settings: envSettings("LOG_LEVEL", "info"),
-		}))
+		})
 	require.NoError(t, err)
 
 	// An instance-level resolve reports SCOPE_LEVEL_ORG, the enum zero value.
@@ -85,7 +83,7 @@ func TestResolveSettings_IgnoresOrg(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			resolved, err := resolveSettings(ctx, repo, &settings.SettingsKey{Org: tc.org})
+			resolved, err := ResolveSettings(ctx, repo, &settings.SettingsKey{Org: tc.org})
 			require.NoError(t, err)
 			require.True(t, proto.Equal(want, resolved.GetEnvironmentVariables()),
 				"got %s", protojson.Format(resolved.GetEnvironmentVariables()))
