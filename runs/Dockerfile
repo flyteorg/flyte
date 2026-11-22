@@ -16,6 +16,7 @@ COPY . ./
 # Build the service
 WORKDIR /workspace/runs
 RUN CGO_ENABLED=1 GOOS=linux go build -a -o runs-service ./cmd/main.go
+RUN CGO_ENABLED=1 GOOS=linux go build -o runs-retention ./cmd/retention
 
 # Final stage
 FROM alpine:latest
@@ -26,6 +27,8 @@ WORKDIR /app
 
 # Copy the binary from builder
 COPY --from=builder /workspace/runs/runs-service .
+
+COPY --from=builder /workspace/runs/runs-retention /usr/local/bin/runs-retention
 
 # Copy default config
 COPY --from=builder /workspace/runs/config.yaml .

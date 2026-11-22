@@ -31,7 +31,8 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     go build -v -o dist/flyte ./manager/cmd/
 RUN --mount=type=cache,target=/root/.cache/go-build \
     go build -v -o dist/flyte-copilot ./flytecopilot
-
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    go build -v -o dist/runs-retention ./runs/cmd/retention
 
 FROM debian:bookworm-slim
 
@@ -52,6 +53,8 @@ RUN apt-get update && apt-get install --no-install-recommends --yes \
 # exact path; the copilot init/sidecar container can then reuse this image.
 COPY --from=flytebuilder /flyteorg/build/dist/flyte /usr/local/bin/
 COPY --from=flytebuilder /flyteorg/build/dist/flyte-copilot /bin/flyte-copilot
+
+COPY --from=flytebuilder /flyteorg/build/dist/runs-retention /usr/local/bin/runs-retention
 
 # Set entrypoint
 ENTRYPOINT [ "/usr/bin/tini", "-g", "--", "/usr/local/bin/flyte" ]

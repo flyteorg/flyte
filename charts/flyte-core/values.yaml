@@ -19,6 +19,19 @@ telemetry:
 components:
   runs:
     enabled: true
+    # One-shot cleanup using the runs image and database configuration.
+    retention:
+      enabled: false
+      suspend: false
+      schedule: "0 3 * * *"
+      timeZone: "Etc/UTC"
+      age: 2160h
+      batchSize: 100
+      maxRuntime: 20m
+      dryRun: true
+      activeDeadlineSeconds: 1500
+      backoffLimit: 1
+      resources: {}
     replicaCount: 1
     # -- Opt-in horizontal autoscaling. Resource utilization requires resource requests.
     autoscaling:

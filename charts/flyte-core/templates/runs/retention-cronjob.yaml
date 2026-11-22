@@ -1,0 +1,127 @@
+{{- $component := .Values.components.runs }}
+{{- $retention := $component.retention }}
+{{- $name := "runs" }}
+{{- if and $component.enabled $retention.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "flyte-core.componentName" (dict "root" $ "component" $name) }}-retention
+  namespace: {{ $.Release.Namespace | quote }}
+  labels:
+    {{- include "flyte-core.componentLabels" (dict "root" $ "component" $name) | nindent 4 }}
+spec:
+  schedule: {{ $retention.schedule | quote }}
+  timeZone: {{ $retention.timeZone | quote }}
+  suspend: {{ $retention.suspend }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: {{ $retention.backoffLimit }}
+      activeDeadlineSeconds: {{ $retention.activeDeadlineSeconds }}
+      template:
+        metadata:
+          labels:
+            {{- include "flyte-core.componentLabels" (dict "root" $ "component" "runs-retention") | nindent 12 }}
+            {{- with $.Values.commonLabels }}
+            {{- tpl (toYaml .) $ | nindent 12 }}
+            {{- end }}
+          {{- with $component.podAnnotations }}
+          annotations:
+            {{- tpl (toYaml .) $ | nindent 12 }}
+          {{- end }}
+        spec:
+          restartPolicy: Never
+          serviceAccountName: {{ default (include "flyte-core.serviceAccountName" $) $component.serviceAccountName }}
+          {{- with $.Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- tpl (toYaml .) $ | nindent 12 }}
+          {{- end }}
+          {{- with $component.podSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $component.nodeSelector }}
+          nodeSelector:
+            {{- tpl (toYaml .) $ | nindent 12 }}
+          {{- end }}
+          {{- with $component.tolerations }}
+          tolerations:
+            {{- tpl (toYaml .) $ | nindent 12 }}
+          {{- end }}
+          {{- with $component.affinity }}
+          affinity:
+            {{- tpl (toYaml .) $ | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: retention
+              image: {{ printf "%s:%s" $component.image.repository $component.image.tag | quote }}
+              imagePullPolicy: {{ $component.image.pullPolicy }}
+              command: [/usr/local/bin/runs-retention]
+              args:
+                - --config
+                - /etc/flyte/config.d/*.yaml
+                - --retention-age={{ $retention.age }}
+                - --batch-size={{ $retention.batchSize }}
+                - --max-runtime={{ $retention.maxRuntime }}
+                - --dry-run={{ $retention.dryRun }}
+              {{- with $component.extraEnv }}
+              env:
+                {{- tpl (toYaml .) $ | nindent 16 }}
+              {{- end }}
+              {{- with $component.envFrom }}
+              envFrom:
+                {{- tpl (toYaml .) $ | nindent 16 }}
+              {{- end }}
+              resources:
+                {{- toYaml $retention.resources | nindent 16 }}
+              {{- with $component.securityContext }}
+              securityContext:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              volumeMounts:
+                - name: config
+                  mountPath: /etc/flyte/config.d
+                  readOnly: true
+                {{- with $component.extraVolumeMounts }}
+                {{- tpl (toYaml .) $ | nindent 16 }}
+                {{- end }}
+          volumes:
+            - name: config
+              projected:
+                sources:
+                  {{- if include "flyte-core.externalConfiguration" $ }}
+                  {{- with $.Values.configuration.externalConfigMap }}
+                  - configMap:
+                      name: {{ tpl . $ }}
+                  {{- end }}
+                  {{- with $.Values.configuration.externalSecretRef }}
+                  - secret:
+                      name: {{ tpl . $ }}
+                  {{- end }}
+                  {{- else }}
+                  - configMap:
+                      name: {{ include "flyte-core.componentConfigMapName" (dict "root" $ "component" $name) }}
+                  - secret:
+                      name: {{ include "flyte-core.configSecretName" $ }}
+                  {{- end }}
+                  {{- with $.Values.configuration.inlineConfigMap }}
+                  - configMap:
+                      name: {{ tpl . $ }}
+                  {{- end }}
+                  {{- with $.Values.configuration.inlineSecretRef }}
+                  - secret:
+                      name: {{ tpl . $ }}
+                  {{- end }}
+                  {{- range $.Values.configuration.extraInlineConfigMapRefs }}
+                  - configMap:
+                      name: {{ tpl . $ }}
+                  {{- end }}
+                  {{- range $.Values.configuration.extraInlineSecretRefs }}
+                  - secret:
+                      name: {{ tpl . $ }}
+                  {{- end }}
+
+            {{- with $component.extraVolumes }}
+            {{- tpl (toYaml .) $ | nindent 12 }}
+            {{- end }}
+{{- end }}
