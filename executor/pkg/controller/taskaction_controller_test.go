@@ -538,6 +538,31 @@ var _ = Describe("TaskAction Controller", func() {
 			Expect(persisted.Status.SystemFailures).To(Equal(uint32(1)))
 		})
 
+		It("persists the count when the TaskAction changed since it was read", func() {
+			r := &TaskActionReconciler{
+				Client:            k8sClient,
+				Scheme:            k8sClient.Scheme(),
+				Recorder:          events.NewFakeRecorder(10),
+				MaxSystemFailures: 3,
+			}
+			ta := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, ta)).To(Succeed())
+			original := ta.DeepCopy()
+
+			// A write the reconciler has not seen leaves ta at a stale resourceVersion.
+			concurrent := ta.DeepCopy()
+			concurrent.Status.PluginPhase = pluginsCore.PhaseQueued.String()
+			Expect(k8sClient.Status().Update(ctx, concurrent)).To(Succeed())
+
+			_, err := r.recordSystemError(ctx, ta, original, "pod", errFakeWebhookDenied, taskTimeouts{})
+			Expect(err).NotTo(HaveOccurred())
+
+			persisted := &flyteorgv1.TaskAction{}
+			Expect(k8sClient.Get(ctx, nn, persisted)).To(Succeed())
+			Expect(persisted.Status.SystemFailures).To(Equal(uint32(1)))
+			Expect(persisted.Status.PluginPhase).To(Equal(pluginsCore.PhaseQueued.String()), "the concurrent write survives")
+		})
+
 		It("converts to PermanentFailure once the threshold is exceeded", func() {
 			r := &TaskActionReconciler{
 				Client:            k8sClient,
@@ -1817,7 +1842,7 @@ var _ = Describe("TaskAction Controller", func() {
 			fakeClock.Step(time.Minute)
 			failingClient.failUpdates = true
 			_, err = r.Reconcile(ctx, request)
-			Expect(err).NotTo(HaveOccurred())
+			Expect(err).To(HaveOccurred())
 			Expect(getTaskAction(nn).Status.SystemRetries).To(BeZero())
 
 			fakeClock.Step(time.Minute)
