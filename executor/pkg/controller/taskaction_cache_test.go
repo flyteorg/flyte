@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	executorplugin "github.com/flyteorg/flyte/v2/executor/pkg/plugin"
@@ -71,6 +72,42 @@ func TestBuildTaskCacheConfig(t *testing.T) {
 	assert.Equal(t, []string{"ignored_input"}, cfg.key.CacheIgnoreInputVars)
 	assert.True(t, cfg.serializable)
 	assert.Equal(t, "default/cacheable-action", cfg.ownerID)
+}
+
+func TestBuildTaskCacheConfigCacheMaxAge(t *testing.T) {
+	tests := []struct {
+		name     string
+		maxAge   *durationpb.Duration
+		expected *time.Duration
+	}{
+		{name: "unset uses client default", maxAge: nil, expected: nil},
+		{name: "zero disables expiry", maxAge: durationpb.New(0), expected: durationPtr(0)},
+		{name: "task age is carried on the key", maxAge: durationpb.New(90 * time.Minute), expected: durationPtr(90 * time.Minute)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ensureTestMetricKeys()
+			ctx := context.Background()
+			taskAction, dataStore := newCacheableTaskAction(t, true, false)
+
+			taskTemplate := &corepb.TaskTemplate{}
+			require.NoError(t, proto.Unmarshal(taskAction.Spec.TaskTemplate, taskTemplate))
+			taskTemplate.GetMetadata().CacheMaxAge = tt.maxAge
+			templateBytes, err := proto.Marshal(taskTemplate)
+			require.NoError(t, err)
+			taskAction.Spec.TaskTemplate = templateBytes
+
+			tCtx := newTaskExecutionContext(t, taskAction, dataStore)
+			cfg, ok, err := buildTaskCacheConfig(ctx, taskAction, tCtx)
+			require.NoError(t, err)
+			require.True(t, ok)
+			assert.Equal(t, tt.expected, cfg.key.MaxCacheAge)
+		})
+	}
+}
+
+func durationPtr(d time.Duration) *time.Duration {
+	return &d
 }
 
 func TestHandleCacheBeforeExecutionHit(t *testing.T) {

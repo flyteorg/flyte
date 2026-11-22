@@ -245,6 +245,95 @@ func TestGetRespectsMaxCacheAge(t *testing.T) {
 	assert.Equal(t, codes.NotFound, grpcstatus.Code(err))
 }
 
+func TestGetKeyMaxCacheAgeOverridesClientDefault(t *testing.T) {
+	tests := []struct {
+		name        string
+		clientAge   time.Duration
+		keyAge      *time.Duration
+		expectedHit bool
+	}{
+		{name: "unset key age falls back to client default", clientAge: time.Hour, expectedHit: false},
+		{name: "longer key age keeps entry", clientAge: time.Hour, keyAge: durationPtr(3 * time.Hour), expectedHit: true},
+		{name: "shorter key age expires entry", clientAge: 0, keyAge: durationPtr(30 * time.Minute), expectedHit: false},
+		{name: "zero key age disables expiry", clientAge: time.Hour, keyAge: durationPtr(0), expectedHit: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			store := newTestDataStore(t)
+			key := newCatalogKey(t)
+			key.MaxCacheAge = tt.keyAge
+			client := NewWithServiceClient(&stubCacheService{
+				getFunc: func(context.Context, *connect.Request[cacheservicev2.GetCacheRequest]) (*connect.Response[cacheservicepb.GetCacheResponse], error) {
+					return connect.NewResponse(&cacheservicepb.GetCacheResponse{
+						Output: &cacheservicepb.CachedOutput{
+							Output: &cacheservicepb.CachedOutput_OutputLiterals{OutputLiterals: &corepb.LiteralMap{}},
+							Metadata: &cacheservicepb.Metadata{
+								SourceIdentifier: key.Identifier,
+								LastUpdatedAt:    timestamppb.New(time.Now().Add(-2 * time.Hour)),
+							},
+						},
+					}), nil
+				},
+			}, store, tt.clientAge)
+
+			entry, err := client.Get(context.Background(), key)
+			if tt.expectedHit {
+				require.NoError(t, err)
+				assert.Equal(t, corepb.CatalogCacheStatus_CACHE_HIT, entry.GetStatus().GetCacheStatus())
+			} else {
+				require.Error(t, err)
+				assert.Equal(t, codes.NotFound, grpcstatus.Code(err))
+			}
+		})
+	}
+}
+
+func TestPutKeyMaxCacheAgeOverridesClientDefault(t *testing.T) {
+	tests := []struct {
+		name      string
+		clientAge time.Duration
+		keyAge    *time.Duration
+		expected  time.Duration
+	}{
+		{name: "unset key age falls back to client default", clientAge: time.Hour, expected: time.Hour},
+		{name: "key age replaces client default", clientAge: time.Hour, keyAge: durationPtr(30 * time.Minute), expected: 30 * time.Minute},
+		{name: "key age applies without client default", clientAge: 0, keyAge: durationPtr(2 * time.Hour), expected: 2 * time.Hour},
+		{name: "zero key age sends no max age", clientAge: time.Hour, keyAge: durationPtr(0), expected: 0},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.Background()
+			store := newTestDataStore(t)
+			var got *cacheservicepb.OverwriteOutput
+
+			client := NewWithServiceClient(&stubCacheService{
+				putFunc: func(
+					_ context.Context, req *connect.Request[cacheservicev2.PutCacheRequest],
+				) (*connect.Response[cacheservicepb.PutCacheResponse], error) {
+					got = req.Msg.GetBaseRequest().GetOverwrite()
+					return connect.NewResponse(&cacheservicepb.PutCacheResponse{}), nil
+				},
+			}, store, tt.clientAge)
+
+			paths := ioutils.NewReadOnlyOutputFilePaths(ctx, store, mem.DataReference("mem://bucket/prefix"))
+			reader := ioutils.NewRemoteFileOutputReader(ctx, store, paths, 0)
+			require.NoError(t, store.WriteProtobuf(ctx, mem.DataReference("mem://bucket/prefix/outputs.pb"), mem.Options{}, &corepb.LiteralMap{}))
+
+			key := newCatalogKey(t)
+			key.MaxCacheAge = tt.keyAge
+			_, err := client.Put(ctx, key, reader, catalog.Metadata{CreatedAt: timestamppb.Now()})
+			require.NoError(t, err)
+			require.NotNil(t, got)
+			assert.Equal(t, tt.expected > 0, got.GetMaxAge() != nil)
+			assert.Equal(t, tt.expected, got.GetMaxAge().AsDuration())
+		})
+	}
+}
+
+func durationPtr(d time.Duration) *time.Duration {
+	return &d
+}
+
 func newCatalogKey(t *testing.T) catalog.Key {
 	reader := ioMocks.NewInputReader(t)
 

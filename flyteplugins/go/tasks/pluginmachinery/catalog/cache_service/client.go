@@ -92,12 +92,12 @@ func (c *Client) Get(ctx context.Context, key catalog.Key) (catalog.Entry, error
 	if output == nil || output.GetOutput() == nil || output.GetMetadata() == nil {
 		return catalog.Entry{}, grpcstatus.Error(codes.Internal, "received malformed response from cache service")
 	}
-	if c.maxCacheAge > 0 {
+	if maxCacheAge := c.maxCacheAgeFor(key); maxCacheAge > 0 {
 		lastUpdatedAt := output.GetMetadata().GetLastUpdatedAt()
 		if lastUpdatedAt == nil {
 			return catalog.Entry{}, grpcstatus.Error(codes.Internal, "received cache metadata without last_updated_at")
 		}
-		if time.Since(lastUpdatedAt.AsTime()) > c.maxCacheAge {
+		if time.Since(lastUpdatedAt.AsTime()) > maxCacheAge {
 			return catalog.Entry{}, grpcstatus.Error(codes.NotFound, "artifact over age limit")
 		}
 	}
@@ -200,10 +200,10 @@ func (c *Client) put(ctx context.Context, key catalog.Key, reader io.OutputReade
 	}
 
 	overwriteOutput := &cacheservicepb.OverwriteOutput{Overwrite: overwrite}
-	if c.maxCacheAge > 0 {
+	if maxCacheAge := c.maxCacheAgeFor(key); maxCacheAge > 0 {
 		// Without max_age the cache service rejects a Put over an existing entry even when that
 		// entry is older than maxCacheAge, so an expired entry would never be replaced.
-		overwriteOutput.MaxAge = durationpb.New(c.maxCacheAge)
+		overwriteOutput.MaxAge = durationpb.New(maxCacheAge)
 	}
 
 	_, err = c.service.Put(ctx, connect.NewRequest(&cacheservicev2.PutCacheRequest{
@@ -222,6 +222,13 @@ func (c *Client) put(ctx context.Context, key catalog.Key, reader io.OutputReade
 	}
 
 	return catalog.NewStatus(corepb.CatalogCacheStatus_CACHE_POPULATED, newCatalogMetadata(newCacheMetadata(key, metadata), metadata.TaskExecutionIdentifier)), nil
+}
+
+func (c *Client) maxCacheAgeFor(key catalog.Key) time.Duration {
+	if key.MaxCacheAge != nil {
+		return *key.MaxCacheAge
+	}
+	return c.maxCacheAge
 }
 
 func buildCacheKey(ctx context.Context, key catalog.Key) (string, error) {
