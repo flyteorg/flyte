@@ -281,12 +281,31 @@ func (pm *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCor
 			if storage.IsExceedsLimit(err) {
 				return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("OutputsTooLarge", err.Error(), p.Info())), nil
 			}
+			// Nothing writes outputs.pb for a raw container that declares no outputs:
+			// co-pilot only adds its uploader when there are outputs to upload.
+			if storage.IsNotFound(err) {
+				declared, readErr := declaresOutputs(ctx, tCtx)
+				if readErr != nil {
+					return pluginsCore.UnknownTransition, readErr
+				}
+				if !declared {
+					return pluginsCore.DoTransition(p), nil
+				}
+			}
 			return pluginsCore.UnknownTransition, err
 		}
 		return pluginsCore.DoTransition(p), nil
 	}
 
 	return pluginsCore.DoTransition(p), nil
+}
+
+func declaresOutputs(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (bool, error) {
+	task, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return false, fmt.Errorf("reading task template: %w", err)
+	}
+	return len(task.GetInterface().GetOutputs().GetVariables()) > 0, nil
 }
 
 // Handle implements pluginsCore.Plugin. It is invoked for every reconciliation round.

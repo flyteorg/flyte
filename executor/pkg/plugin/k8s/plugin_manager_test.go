@@ -6,6 +6,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"k8s.io/apimachinery/pkg/labels"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 
@@ -1433,4 +1434,71 @@ func TestCheckResourcePhase_OutputsOverTheDownloadLimitFailPermanently(t *testin
 	require.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhasePermanentFailure, transition.Info().Phase())
 	assert.Equal(t, "OutputsTooLarge", transition.Info().Err().GetCode())
+}
+
+// A succeeded task without outputs.pb succeeds only if it declares no outputs.
+func TestCheckResourcePhase_MissingOutputs(t *testing.T) {
+	tests := []struct {
+		name      string
+		outputs   *core.VariableMap
+		wantPhase pluginsCore.Phase
+		wantErr   bool
+	}{
+		{name: "none declared", outputs: nil, wantPhase: pluginsCore.PhaseSuccess},
+		{
+			name:    "declared",
+			outputs: &core.VariableMap{Variables: []*core.VariableEntry{{Key: "o0", Value: &core.Variable{}}}},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Given
+			pod := failedPod()
+			pod.Status.Phase = v1.PodSucceeded
+			fakeClient := fake.NewClientBuilder().WithScheme(k8sscheme.Scheme).WithObjects(pod).Build()
+			kubeClient := &pluginsCoreMock.KubeClient{}
+			kubeClient.EXPECT().GetClient().Return(fakeClient)
+
+			plugin := &k8sMocks.Plugin{}
+			plugin.EXPECT().GetTaskPhase(mock.Anything, mock.Anything, mock.Anything).Return(pluginsCore.PhaseInfoSuccess(nil), nil)
+			pm := NewPluginManager("test-plugin", plugin, kubeClient)
+
+			store := &storageMocks.ComposedProtobufStore{}
+			store.EXPECT().Head(mock.Anything, mock.Anything).Return(absentMetadata{}, nil)
+			store.EXPECT().ReadProtobuf(mock.Anything, mock.Anything, mock.Anything).
+				Return(fmt.Errorf("path:s3://bucket/outputs.pb: %w", os.ErrNotExist))
+
+			ow := &ioMocks.OutputWriter{}
+			ow.EXPECT().GetErrorPath().Return("s3://bucket/error.pb")
+			ow.EXPECT().GetOutputPath().Return("s3://bucket/outputs.pb")
+			ow.EXPECT().Put(mock.Anything, mock.Anything).RunAndReturn(func(ctx context.Context, r io.OutputReader) error {
+				_, _, err := r.Read(ctx)
+				return err
+			})
+
+			taskReader := &pluginsCoreMock.TaskReader{}
+			taskReader.EXPECT().Read(mock.Anything).Return(&core.TaskTemplate{
+				Interface: &core.TypedInterface{Outputs: tt.outputs},
+			}, nil)
+
+			tCtx := &pluginsCoreMock.TaskExecutionContext{}
+			tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock(pod.Name))
+			tCtx.EXPECT().DataStore().Return(storage.NewCompositeDataStore(storage.NewURLPathConstructor(), store))
+			tCtx.EXPECT().OutputWriter().Return(ow)
+			tCtx.EXPECT().TaskReader().Return(taskReader)
+			queryObj := &v1.Pod{ObjectMeta: metav1.ObjectMeta{Namespace: pod.Namespace, Name: pod.Name}}
+
+			// When
+			transition, err := pm.checkResourcePhase(context.Background(), tCtx, queryObj, &k8s.PluginState{})
+
+			// Then
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tt.wantPhase, transition.Info().Phase())
+		})
+	}
 }
