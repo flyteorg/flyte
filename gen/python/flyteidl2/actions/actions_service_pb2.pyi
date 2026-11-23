@@ -13,7 +13,7 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Action(_message.Message):
-    __slots__ = ["action_id", "parent_action_name", "input_uri", "run_output_base", "group", "subject", "task", "trace", "condition", "recovered_from", "override_applied"]
+    __slots__ = ["action_id", "parent_action_name", "input_uri", "run_output_base", "group", "subject", "task", "trace", "condition", "recovered_from", "override_applied", "created_by", "trigger"]
     ACTION_ID_FIELD_NUMBER: _ClassVar[int]
     PARENT_ACTION_NAME_FIELD_NUMBER: _ClassVar[int]
     INPUT_URI_FIELD_NUMBER: _ClassVar[int]
@@ -25,6 +25,8 @@ class Action(_message.Message):
     CONDITION_FIELD_NUMBER: _ClassVar[int]
     RECOVERED_FROM_FIELD_NUMBER: _ClassVar[int]
     OVERRIDE_APPLIED_FIELD_NUMBER: _ClassVar[int]
+    CREATED_BY_FIELD_NUMBER: _ClassVar[int]
+    TRIGGER_FIELD_NUMBER: _ClassVar[int]
     action_id: _identifier_pb2.ActionIdentifier
     parent_action_name: str
     input_uri: str
@@ -36,7 +38,9 @@ class Action(_message.Message):
     condition: _run_definition_pb2.ConditionAction
     recovered_from: _identifier_pb2.ActionIdentifier
     override_applied: bool
-    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., input_uri: _Optional[str] = ..., run_output_base: _Optional[str] = ..., group: _Optional[str] = ..., subject: _Optional[str] = ..., task: _Optional[_Union[_run_definition_pb2.TaskAction, _Mapping]] = ..., trace: _Optional[_Union[_run_definition_pb2.TraceAction, _Mapping]] = ..., condition: _Optional[_Union[_run_definition_pb2.ConditionAction, _Mapping]] = ..., recovered_from: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., override_applied: bool = ...) -> None: ...
+    created_by: _identity_pb2.EnrichedIdentity
+    trigger: _identifier_pb2.TriggerName
+    def __init__(self, action_id: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., parent_action_name: _Optional[str] = ..., input_uri: _Optional[str] = ..., run_output_base: _Optional[str] = ..., group: _Optional[str] = ..., subject: _Optional[str] = ..., task: _Optional[_Union[_run_definition_pb2.TaskAction, _Mapping]] = ..., trace: _Optional[_Union[_run_definition_pb2.TraceAction, _Mapping]] = ..., condition: _Optional[_Union[_run_definition_pb2.ConditionAction, _Mapping]] = ..., recovered_from: _Optional[_Union[_identifier_pb2.ActionIdentifier, _Mapping]] = ..., override_applied: bool = ..., created_by: _Optional[_Union[_identity_pb2.EnrichedIdentity, _Mapping]] = ..., trigger: _Optional[_Union[_identifier_pb2.TriggerName, _Mapping]] = ...) -> None: ...
 
 class EnqueueRequest(_message.Message):
     __slots__ = ["action", "run_spec"]

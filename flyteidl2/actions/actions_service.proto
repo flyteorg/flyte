@@ -86,6 +86,14 @@ message Action {
   // set by the parent's controller when this action's inputs or code were overridden
   // from the run's overrides file (see flyteidl2.task.ActionOverridesData).
   bool override_applied = 11;
+
+  // the principal that created the run, typed as a user or an application, if known.
+  // set server-side on the root action only, together with subject; never set by clients on enqueue.
+  flyteidl2.common.EnrichedIdentity created_by = 12;
+
+  // the trigger that fired the run, if one did.
+  // set server-side on the root action only; never set by clients on enqueue.
+  flyteidl2.common.TriggerName trigger = 13;
 }
 
 // ============================================================================
