@@ -364,3 +364,32 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 
 	return nil
 }
+
+// Inherit after PodTemplate merging so explicit helper contexts take precedence.
+func inheritCoPilotSecurityContext(podSpec *v1.PodSpec, primaryContainerName string, cfg config.FlyteCoPilotConfig, iFace *core.TypedInterface, pilot *core.DataLoadingConfig) {
+	if pilot == nil || !pilot.Enabled || iFace == nil {
+		return
+	}
+
+	var securityContext *v1.SecurityContext
+	for idx := range podSpec.Containers {
+		if podSpec.Containers[idx].Name == primaryContainerName {
+			securityContext = podSpec.Containers[idx].SecurityContext
+			break
+		}
+	}
+	if securityContext == nil {
+		return
+	}
+
+	needsDownloader := len(iFace.GetInputs().GetVariables()) > 0
+	needsUploader := len(iFace.GetOutputs().GetVariables()) > 0
+	for idx := range podSpec.InitContainers {
+		container := &podSpec.InitContainers[idx]
+		isDownloader := needsDownloader && container.Name == cfg.NamePrefix+flyteDownloaderContainerName
+		isUploader := needsUploader && container.Name == cfg.NamePrefix+flyteSidecarContainerName
+		if (isDownloader || isUploader) && container.SecurityContext == nil {
+			container.SecurityContext = securityContext.DeepCopy()
+		}
+	}
+}
