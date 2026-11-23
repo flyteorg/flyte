@@ -221,12 +221,8 @@ func (pm *PluginManager) getResource(ctx context.Context, tCtx pluginsCore.TaskE
 			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)
 		return nil, err
 	}
-	taskTemplate, err := tCtx.TaskReader().Read(ctx)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to read task template. Error: %v", err)
-		return nil, err
-	}
-	pm.addObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig(), taskTemplate)
+	// Identity only needs name and namespace; reading the template here would let a malformed one block Abort/Finalize cleanup.
+	pm.addObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig(), nil)
 	return o, nil
 }
 

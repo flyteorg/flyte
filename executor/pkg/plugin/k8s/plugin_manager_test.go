@@ -148,6 +148,25 @@ func taskReaderMock(taskTemplate *core.TaskTemplate) *pluginsCoreMock.TaskReader
 	return reader
 }
 
+// TestGetResource_DoesNotReadTaskTemplate verifies that resolving the resource identity does not
+// depend on the task template, so Abort and Finalize can still clean up when it cannot be read.
+func TestGetResource_DoesNotReadTaskTemplate(t *testing.T) {
+	plugin := &k8sMocks.Plugin{}
+	plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+	plugin.EXPECT().BuildIdentityResource(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+
+	// No TaskReader expectation: reading the template would panic the mock.
+	tCtx := &pluginsCoreMock.TaskExecutionContext{}
+	tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("name"))
+
+	pm := NewPluginManager("test", plugin, nil)
+
+	o, err := pm.getResource(context.Background(), tCtx)
+	assert.NoError(t, err)
+	assert.Equal(t, "name", o.GetName())
+	assert.Equal(t, "ns", o.GetNamespace())
+}
+
 // TestLaunchResource_InvalidCreateFastFails verifies that a deterministic admission/validation
 // rejection (e.g. a derived name exceeding k8s length limits) fast-fails instead of looping via
 // UnknownTransition and leaving the execution stuck RUNNING.
