@@ -103,6 +103,82 @@ func TestEventWatcherOnUpdateKeepsTheFreshestObservation(t *testing.T) {
 	assert.WithinDuration(t, lastObserved, events[0].LastObservedAt, time.Microsecond)
 }
 
+func TestEventWatcherRecordsTheFirstObservation(t *testing.T) {
+	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
+	// The write lands a second after the recorder saw the event, so the creation is later
+	// than the recorder's own time.
+	observedAt := time.Now().Add(-time.Hour).Truncate(time.Second)
+	createdAt := observedAt.Add(time.Second)
+
+	tests := []struct {
+		name  string
+		event func() *eventsv1.Event
+		want  time.Time
+	}{
+		{
+			name: "the event time of a recorder on the events API",
+			event: func() *eventsv1.Event {
+				event := testEvent("event-1", "pod-uid", createdAt)
+				event.EventTime = metav1.NewMicroTime(observedAt)
+				return event
+			},
+			want: observedAt,
+		},
+		{
+			name: "the deprecated first timestamp of an older recorder",
+			event: func() *eventsv1.Event {
+				event := testEvent("event-1", "pod-uid", createdAt)
+				event.DeprecatedFirstTimestamp = metav1.NewTime(observedAt)
+				event.DeprecatedLastTimestamp = metav1.NewTime(observedAt)
+				return event
+			},
+			want: observedAt,
+		},
+		{
+			name:  "the creation when the event carries neither",
+			event: func() *eventsv1.Event { return testEvent("event-1", "pod-uid", createdAt) },
+			want:  createdAt,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			watcher := &controllerRuntimeEventWatcher{}
+			watcher.OnAdd(tt.event(), false)
+
+			events := watcher.List(key, time.Time{}, time.Time{})
+			require.Len(t, events, 1)
+			assert.WithinDuration(t, tt.want, events[0].FirstObservedAt, time.Microsecond)
+			assert.False(t, events[0].LastObservedAt.Before(events[0].FirstObservedAt),
+				"the observed interval is never inverted")
+			assert.Equal(t, createdAt.UTC(), events[0].CreatedAt.UTC())
+		})
+	}
+}
+
+func TestEventWatcherOnUpdateKeepsTheFirstObservation(t *testing.T) {
+	watcher := &controllerRuntimeEventWatcher{}
+	firstObserved := time.Now().Add(-time.Hour).Truncate(time.Second)
+	lastObserved := time.Now().Add(-time.Minute)
+	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
+
+	first := testEvent("event-1", "pod-uid", firstObserved.Add(time.Second))
+	first.EventTime = metav1.NewMicroTime(firstObserved)
+	watcher.OnAdd(first, false)
+
+	// An update that reports a later first occurrence, as a rewritten event can, must not
+	// move the first observation forward, just as an update never walks the last one back.
+	rewritten := testEvent("event-1", "pod-uid", firstObserved.Add(time.Second))
+	rewritten.EventTime = metav1.NewMicroTime(lastObserved)
+	rewritten.Series = &eventsv1.EventSeries{Count: 2, LastObservedTime: metav1.NewMicroTime(lastObserved)}
+	watcher.OnUpdate(first, rewritten)
+
+	events := watcher.List(key, time.Time{}, time.Time{})
+	require.Len(t, events, 1)
+	assert.WithinDuration(t, firstObserved, events[0].FirstObservedAt, time.Microsecond)
+	assert.WithinDuration(t, lastObserved, events[0].LastObservedAt, time.Microsecond)
+}
+
 func TestEventWatcherRecordsTheReportingNode(t *testing.T) {
 	key := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
 	createdAt := time.Now().Add(-time.Hour)

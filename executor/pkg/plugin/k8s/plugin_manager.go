@@ -442,9 +442,10 @@ func objectKeyFor(resource client.Object) watchedObjectKey {
 // distributed job the fault happened on.
 type observedFault struct {
 	fault *core.GpuFault
-	// createdAt is when the fault was first recorded, which is when it happened. It is
-	// what orders faults gathered from several pods into the single sequence
-	// ClassifyFailure expects, so that the first fault of a severity is the earliest.
+	// createdAt is when the fault's event was first created, on the API server's clock,
+	// which is the one clock every node's events share. It is what orders faults gathered
+	// from several pods into the single sequence ClassifyFailure expects, so that the
+	// first fault of a severity is the earliest.
 	createdAt time.Time
 	podName   string
 }
@@ -744,10 +745,14 @@ func (pm *PluginManager) faultsOnPod(
 			}
 			continue
 		}
-		if !gpufault.RelevantToFailure(event.CreatedAt, event.LastObservedAt, failureAt) {
+		// The fault is judged from its first to its last observation, both on the clock of
+		// the recorder that saw it. Its creation is stamped by the API server when the write
+		// lands, which can be after the recorder's last observation and would make a genuine
+		// fault look like an inverted interval or like one that started after the failure.
+		if !gpufault.RelevantToFailure(event.FirstObservedAt, event.LastObservedAt, failureAt) {
 			logger.Debugf(ctx,
 				"ignoring GPU fault event %q on %s: active %s to %s, which does not reach the failure at %s",
-				event.Reason, podKey.Name, event.CreatedAt, event.LastObservedAt, failureAt)
+				event.Reason, podKey.Name, event.FirstObservedAt, event.LastObservedAt, failureAt)
 			continue
 		}
 		observed = append(observed, observedFault{fault: fault, createdAt: event.CreatedAt, podName: podKey.Name})
