@@ -345,17 +345,16 @@ message ListActionsRequest {
   oneof scope_by {
     option (buf.validate.oneof).required = true;
 
-    // List all actions belonging to this run. Mutually exclusive with queue_id.
+    // List all actions belonging to this run.
     common.RunIdentifier run_id = 2;
 
     // List live nonterminal task actions assigned to this queue across runs, including
     // pending and in-flight actions. The "phase" filter in ListRequest.filters selects
     // the returned phases. Assigned actions whose current execution phase has not
     // been reported use ACTION_PHASE_UNSPECIFIED until their phase is known.
-    // Mutually exclusive with run_id. Services that do not implement queue-scoped
-    // listing return UNIMPLEMENTED. Queue scope restricts the matching actions'
-    // project/domain. The synthetic "search" filter matches action, run, task and
-    // project/domain names.
+    // Services that do not implement queue-scoped listing return UNIMPLEMENTED. Queue
+    // scope restricts the matching actions' project/domain. The synthetic "search"
+    // filter matches action, run, task and project/domain names.
     common.QueueIdentifier queue_id = 3;
 
     // List the org's actions across all of its runs; narrow with ListRequest.filters.

@@ -732,7 +732,7 @@ export type ListActionsRequest = Message<"flyteidl2.workflow.ListActionsRequest"
    */
   scopeBy: {
     /**
-     * List all actions belonging to this run. Mutually exclusive with queue_id.
+     * List all actions belonging to this run.
      *
      * @generated from field: flyteidl2.common.RunIdentifier run_id = 2;
      */
@@ -744,10 +744,9 @@ export type ListActionsRequest = Message<"flyteidl2.workflow.ListActionsRequest"
      * pending and in-flight actions. The "phase" filter in ListRequest.filters selects
      * the returned phases. Assigned actions whose current execution phase has not
      * been reported use ACTION_PHASE_UNSPECIFIED until their phase is known.
-     * Mutually exclusive with run_id. Services that do not implement queue-scoped
-     * listing return UNIMPLEMENTED. Queue scope restricts the matching actions'
-     * project/domain. The synthetic "search" filter matches action, run, task and
-     * project/domain names.
+     * Services that do not implement queue-scoped listing return UNIMPLEMENTED. Queue
+     * scope restricts the matching actions' project/domain. The synthetic "search"
+     * filter matches action, run, task and project/domain names.
      *
      * @generated from field: flyteidl2.common.QueueIdentifier queue_id = 3;
      */

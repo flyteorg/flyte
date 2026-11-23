@@ -26,6 +26,8 @@ func TestListActionsRejectsUnsupportedAndInvalidQueueScopes(t *testing.T) {
 		{"missing scope", &workflow.ListActionsRequest{}, connect.CodeInvalidArgument},
 		{"nil run scope", &workflow.ListActionsRequest{ScopeBy: &workflow.ListActionsRequest_RunId{}}, connect.CodeInvalidArgument},
 		{"nil queue scope", &workflow.ListActionsRequest{ScopeBy: &workflow.ListActionsRequest_QueueId{}}, connect.CodeInvalidArgument},
+		{"org scope", &workflow.ListActionsRequest{ScopeBy: &workflow.ListActionsRequest_Org{Org: &common.OrgIdentifier{Name: "org"}}}, connect.CodeUnimplemented},
+		{"nil org scope", &workflow.ListActionsRequest{ScopeBy: &workflow.ListActionsRequest_Org{}}, connect.CodeInvalidArgument},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := (&RunService{}).ListActions(context.Background(), connect.NewRequest(tt.request))
