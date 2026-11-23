@@ -357,6 +357,10 @@ message ListActionsRequest {
     // project/domain. The synthetic "search" filter matches action, run, task and
     // project/domain names.
     common.QueueIdentifier queue_id = 3;
+
+    // List the org's actions across all of its runs; narrow with ListRequest.filters.
+    // Task actions' queue is left as recorded. Services that do not implement it return UNIMPLEMENTED.
+    common.OrgIdentifier org = 4;
   }
 }
 

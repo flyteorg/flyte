@@ -201,14 +201,16 @@ class WatchRunsResponse(_message.Message):
     def __init__(self, runs: _Optional[_Iterable[_Union[_run_definition_pb2.Run, _Mapping]]] = ...) -> None: ...
 
 class ListActionsRequest(_message.Message):
-    __slots__ = ["request", "run_id", "queue_id"]
+    __slots__ = ["request", "run_id", "queue_id", "org"]
     REQUEST_FIELD_NUMBER: _ClassVar[int]
     RUN_ID_FIELD_NUMBER: _ClassVar[int]
     QUEUE_ID_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     request: _list_pb2.ListRequest
     run_id: _identifier_pb2.RunIdentifier
     queue_id: _identifier_pb2.QueueIdentifier
-    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., queue_id: _Optional[_Union[_identifier_pb2.QueueIdentifier, _Mapping]] = ...) -> None: ...
+    org: _identifier_pb2.OrgIdentifier
+    def __init__(self, request: _Optional[_Union[_list_pb2.ListRequest, _Mapping]] = ..., run_id: _Optional[_Union[_identifier_pb2.RunIdentifier, _Mapping]] = ..., queue_id: _Optional[_Union[_identifier_pb2.QueueIdentifier, _Mapping]] = ..., org: _Optional[_Union[_identifier_pb2.OrgIdentifier, _Mapping]] = ...) -> None: ...
 
 class ListActionsResponse(_message.Message):
     __slots__ = ["actions", "token", "total_count"]

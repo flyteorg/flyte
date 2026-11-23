@@ -1041,6 +1041,9 @@ func (s *RunService) ListActions(
 	if req.Msg.GetQueueId() != nil {
 		return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("queue-scoped action listing is not supported by this service"))
 	}
+	if req.Msg.GetOrg() != nil {
+		return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("org-scoped action listing is not supported by this service"))
+	}
 	logger.Infof(ctx, "Received ListActions request")
 
 	if err := req.Msg.Validate(); err != nil {
