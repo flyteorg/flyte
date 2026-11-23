@@ -82,6 +82,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "cacheService.http.maxIdleConnsPerHost"), defaultConfig.CacheService.HTTP.MaxIdleConnsPerHost, "Cache service idle connections kept per host; 0 uses Go's default of 2")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cluster"), defaultConfig.Cluster, "Cluster identifier for action events")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "defaultK8sServiceAccount"), defaultConfig.DefaultK8sServiceAccount, "Default Kubernetes service account for task pods when the task does not set one")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "allowedTaskNamespaces"), defaultConfig.AllowedTaskNamespaces, "Namespaces task definitions may target; empty disables overrides and * permits any namespace")
 	cmdFlags.Int32(fmt.Sprintf("%v%v", prefix, "maxSystemFailures"), defaultConfig.MaxSystemFailures, "Max system-level failures per attempt before forcing permanent failure")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "requeueDuration"), defaultConfig.RequeueDuration.String(), "How long to wait before reconciling a running TaskAction again. 0 means the default of 10s")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "gc.interval"), defaultConfig.GC.Interval.String(), "How often the garbage collector runs. 0 disables GC.")

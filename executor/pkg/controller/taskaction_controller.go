@@ -44,13 +44,16 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	flyteorgv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
 	pluginserrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
@@ -1244,8 +1247,10 @@ func (r *TaskActionReconciler) handleAbortAndFinalize(ctx context.Context, taskA
 		return r.removeFinalizer(ctx, taskAction)
 	}
 
-	// A terminal action already has its outcome; aborting it would report it as ABORTED.
-	if !terminal {
+	// Same-namespace resources are garbage collected with the TaskAction. A
+	// cross-namespace resource has no OwnerReference, so delete it explicitly
+	// even for a terminal action. Its recorded outcome remains unchanged below.
+	if !terminal || tCtx.TaskExecutionMetadata().GetNamespace() != taskAction.Namespace {
 		if err := p.Abort(ctx, tCtx); err != nil {
 			logger.Error(err, "plugin Abort failed, will retry")
 			return ctrl.Result{RequeueAfter: r.requeueDuration()}, nil
@@ -1772,6 +1777,7 @@ func (r *TaskActionReconciler) SetupWithManager(mgr ctrl.Manager, maxConcurrentR
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&flyteorgv1.TaskAction{}).
 		Owns(&corev1.Pod{}).
+		Watches(&corev1.Pod{}, handler.EnqueueRequestsFromMapFunc(taskActionForCrossNamespacePod)).
 		Named("taskaction").
 		WithOptions(controller.Options{MaxConcurrentReconciles: maxConcurrentReconciles}).
 		Complete(r)
@@ -1817,6 +1823,11 @@ func validateTaskAction(taskAction *flyteorgv1.TaskAction, registry pluginResolv
 		return nil, taskTimeouts{}, flyteorgv1.ConditionReasonInvalidSpec,
 			fmt.Errorf("required spec fields are empty: %v", missing)
 	}
+	if !controllerutil.ContainsFinalizer(taskAction, taskActionFinalizer) {
+		if err := plugin.ValidateTaskNamespace(taskAction); err != nil {
+			return nil, taskTimeouts{}, flyteorgv1.ConditionReasonInvalidSpec, err
+		}
+	}
 	timeouts, err := timeoutsFromTaskTemplate(taskAction.Spec.TaskTemplate)
 	if err != nil {
 		return nil, taskTimeouts{}, flyteorgv1.ConditionReasonInvalidSpec, err
@@ -1839,4 +1850,15 @@ func setCondition(taskAction *flyteorgv1.TaskAction, conditionType flyteorgv1.Ta
 		Message: message,
 	}
 	meta.SetStatusCondition(&taskAction.Status.Conditions, condition)
+}
+
+// taskActionForCrossNamespacePod routes pod events back to the control namespace.
+func taskActionForCrossNamespacePod(_ context.Context, obj client.Object) []reconcile.Request {
+	annotations := obj.GetAnnotations()
+	namespace := annotations[flytek8s.TaskActionNamespaceAnnotation]
+	name := annotations[flytek8s.TaskActionNameAnnotation]
+	if namespace == "" || name == "" || namespace == obj.GetNamespace() {
+		return nil
+	}
+	return []reconcile.Request{{NamespacedName: client.ObjectKey{Namespace: namespace, Name: name}}}
 }

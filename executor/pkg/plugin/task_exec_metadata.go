@@ -81,11 +81,14 @@ func resolveServiceAccount(securityContext *core.SecurityContext, defaultSA stri
 
 // NewTaskExecutionMetadata creates a TaskExecutionMetadata from a TaskAction.
 func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecutionMetadata, error) {
+	namespace, err := TaskNamespace(ta)
+	if err != nil {
+		return nil, err
+	}
 	// Extract resource requirements from the inline task template
 	overrides := buildOverridesFromTaskTemplate(ta.Spec.TaskTemplate)
 
 	// Handling secrets
-	var err error
 	securityContext := extractSecurityContextFromTaskTemplate(ta.Spec.TaskTemplate)
 	secretsMap := make(map[string]string)
 	injectLabels := map[string]string{
@@ -139,6 +142,25 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 		interruptible = interruptibleFromTaskTemplate(ta.Spec.TaskTemplate)
 	}
 
+	annotations := pluginsUtils.UnionMaps(ta.Annotations, secretsMap)
+	ownerReference := metav1.OwnerReference{
+		APIVersion: flyteorgv1.GroupVersion.String(), Kind: "TaskAction",
+		Name: ta.Name, UID: ta.UID, Controller: ptr.To(true),
+	}
+	if namespace != ta.Namespace {
+		// Kubernetes owner references cannot cross namespace boundaries. The
+		// TaskAction finalizer cleans up these workloads explicitly.
+		ownerReference = metav1.OwnerReference{}
+		if annotations == nil {
+			annotations = make(map[string]string)
+		}
+		annotations[flytek8s.TaskActionNamespaceAnnotation] = ta.Namespace
+		annotations[flytek8s.TaskActionNameAnnotation] = ta.Name
+	} else {
+		delete(annotations, flytek8s.TaskActionNamespaceAnnotation)
+		delete(annotations, flytek8s.TaskActionNameAnnotation)
+	}
+
 	return &taskExecutionMetadata{
 		ownerID: types.NamespacedName{
 			Name:      ta.Name,
@@ -159,16 +181,10 @@ func NewTaskExecutionMetadata(ta *flyteorgv1.TaskAction) (pluginsCore.TaskExecut
 				TaskId:       taskID,
 			},
 		},
-		namespace: ta.Namespace,
-		ownerReference: metav1.OwnerReference{
-			APIVersion: flyteorgv1.GroupVersion.String(),
-			Kind:       "TaskAction",
-			Name:       ta.Name,
-			UID:        ta.UID,
-			Controller: ptr.To(true),
-		},
+		namespace:       namespace,
+		ownerReference:  ownerReference,
 		labels:          pluginsUtils.UnionMaps(ta.Labels, injectLabels),
-		annotations:     pluginsUtils.UnionMaps(ta.Annotations, secretsMap),
+		annotations:     annotations,
 		maxAttempts:     maxAttempts,
 		overrides:       overrides,
 		envVars:         envVars,
