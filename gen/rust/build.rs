@@ -29,22 +29,22 @@ fn generate_boxed_impls() -> String {
     let tokens = quote! {
         use pyo3::prelude::*;
         use pyo3::conversion::{IntoPyObject, FromPyObject};
-        use std::convert::Infallible;
 
         #(
             impl<'py> IntoPyObject<'py> for Box<#types> {
-                type Target = PyAny;
+                type Target = #types;
                 type Output = Bound<'py, Self::Target>;
-                type Error = Infallible;
+                type Error = PyErr;
 
                 fn into_pyobject(self, py: Python<'py>) -> Result<Self::Output, Self::Error> {
-                    Ok(self.as_ref().clone().into_py(py).into_bound(py))
+                    (*self).clone().into_pyobject(py)
                 }
             }
 
-            impl<'py> FromPyObject<'py> for Box<#types> {
-                fn extract_bound(obj: &Bound<'py, PyAny>) -> PyResult<Self> {
-                    Ok(Box::new(#types::extract_bound(obj)?))
+            impl<'a, 'py> FromPyObject<'a, 'py> for Box<#types> {
+                type Error = PyErr;
+                fn extract(obj: Borrowed<'a, 'py, PyAny>) -> PyResult<Self> {
+                    Ok(Box::new(obj.extract::<#types>()?))
                 }
             }
         )*
