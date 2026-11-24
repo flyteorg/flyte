@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -69,9 +70,18 @@ func TestFetchExecutionError(t *testing.T) {
 
 func TestFetchNodeExecutionDetails(t *testing.T) {
 	getExecutionFetcherSetup()
-	adminClient.EXPECT().ListNodeExecutions(mock.Anything, mock.Anything).Return(&admin.NodeExecutionList{}, nil)
-	_, err := adminFetcherExt.FetchNodeExecutionDetails(ctx, "execName", "dummyProject", "domainValue", "")
-	assert.Nil(t, err)
+	first := &admin.NodeExecution{Id: &core.NodeExecutionIdentifier{NodeId: "first"}}
+	last := &admin.NodeExecution{Id: &core.NodeExecutionIdentifier{NodeId: "last"}}
+	adminClient.EXPECT().ListNodeExecutions(mock.Anything, mock.Anything).
+		Return(&admin.NodeExecutionList{NodeExecutions: []*admin.NodeExecution{first}, Token: "next"}, nil).Once()
+	adminClient.EXPECT().ListNodeExecutions(mock.Anything, mock.MatchedBy(func(r *admin.NodeExecutionListRequest) bool {
+		return r.GetToken() == "next" && r.GetUniqueParentId() == "parent" && r.GetWorkflowExecutionId().GetName() == "execName"
+	})).Return(&admin.NodeExecutionList{NodeExecutions: []*admin.NodeExecution{last}}, nil).Once()
+
+	nodes, err := adminFetcherExt.FetchNodeExecutionDetails(ctx, "execName", "dummyProject", "domainValue", "parent")
+	require.NoError(t, err)
+	assert.Equal(t, []*admin.NodeExecution{first, last}, nodes.GetNodeExecutions())
+	assert.Empty(t, nodes.GetToken())
 }
 
 func TestFetchNodeExecutionDetailsError(t *testing.T) {
@@ -83,16 +93,27 @@ func TestFetchNodeExecutionDetailsError(t *testing.T) {
 
 func TestFetchTaskExecOnNode(t *testing.T) {
 	getExecutionFetcherSetup()
-	adminClient.EXPECT().ListTaskExecutions(mock.Anything, mock.Anything).Return(&admin.TaskExecutionList{}, nil)
-	_, err := adminFetcherExt.FetchTaskExecutionsOnNode(ctx, "nodeId", "execName", "dummyProject", "domainValue")
-	assert.Nil(t, err)
+	first := &admin.TaskExecution{Id: &core.TaskExecutionIdentifier{RetryAttempt: 0}}
+	last := &admin.TaskExecution{Id: &core.TaskExecutionIdentifier{RetryAttempt: 1}}
+	adminClient.EXPECT().ListTaskExecutions(mock.Anything, mock.Anything).
+		Return(&admin.TaskExecutionList{TaskExecutions: []*admin.TaskExecution{first}, Token: "next"}, nil).Once()
+	adminClient.EXPECT().ListTaskExecutions(mock.Anything, mock.MatchedBy(func(r *admin.TaskExecutionListRequest) bool {
+		return r.GetToken() == "next" && r.GetNodeExecutionId().GetNodeId() == "nodeId"
+	})).Return(&admin.TaskExecutionList{TaskExecutions: []*admin.TaskExecution{last}}, nil).Once()
+
+	tasks, err := adminFetcherExt.FetchTaskExecutionsOnNode(ctx, "nodeId", "execName", "dummyProject", "domainValue")
+	require.NoError(t, err)
+	assert.Equal(t, []*admin.TaskExecution{first, last}, tasks.GetTaskExecutions())
+	assert.Empty(t, tasks.GetToken())
 }
 
 func TestFetchTaskExecOnNodeError(t *testing.T) {
 	getExecutionFetcherSetup()
+	adminClient.EXPECT().ListTaskExecutions(mock.Anything, mock.Anything).Return(&admin.TaskExecutionList{Token: "next"}, nil).Once()
 	adminClient.EXPECT().ListTaskExecutions(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
-	_, err := adminFetcherExt.FetchTaskExecutionsOnNode(ctx, "nodeId", "execName", "dummyProject", "domainValue")
+	tasks, err := adminFetcherExt.FetchTaskExecutionsOnNode(ctx, "nodeId", "execName", "dummyProject", "domainValue")
 	assert.Equal(t, fmt.Errorf("failed"), err)
+	assert.Nil(t, tasks)
 }
 
 func TestFetchNodeData(t *testing.T) {
