@@ -64,9 +64,10 @@ var (
 		DefaultPodTemplateResync: config2.Duration{
 			Duration: 30 * time.Second,
 		},
-		UpdateBaseBackoffDuration:          10,
-		UpdateBackoffRetries:               5,
-		AddTolerationsForExtendedResources: []string{},
+		UpdateBaseBackoffDuration:               10,
+		UpdateBackoffRetries:                    5,
+		AddTolerationsForExtendedResources:      []string{},
+		DeleteResourceOnFinalizeExcludedPlugins: []string{},
 	}
 
 	// K8sPluginConfigSection provides a singular top level config section for all plugins.
@@ -143,6 +144,12 @@ type K8sPluginConfig struct {
 	// are kept around (potentially consuming cluster resources). This, however, will cause k8s log links to expire as
 	// soon as the resource is finalized.
 	DeleteResourceOnFinalize bool `json:"delete-resource-on-finalize" pflag:",Instructs the system to delete the resource upon successful execution of a k8s pod rather than have the k8s garbage collector clean it up. This ensures that no resources are kept around (potentially consuming cluster resources). This, however, will cause k8s log links to expire as soon as the resource is finalized."`
+
+	// DeleteResourceOnFinalizeExcludedPlugins lists k8s plugin IDs (e.g. ray, spark, pytorch) whose resources are not
+	// deleted on finalize even when DeleteResourceOnFinalize is enabled. This is useful for operator-managed resources
+	// whose operator already cleans up compute after completion (e.g. via a TTL), and whose status is useful for
+	// debugging after the task finishes. Resources are still garbage collected when their owner is deleted.
+	DeleteResourceOnFinalizeExcludedPlugins []string `json:"delete-resource-on-finalize-excluded-plugins" pflag:",List of k8s plugin IDs whose resources should not be deleted on finalize even when delete-resource-on-finalize is enabled."`
 
 	// Time to wait for transient CreateContainerError errors to be resolved. If the
 	// error persists past this grace period, it will be inferred to be a permanent
