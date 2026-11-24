@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/core/v1"
+	eventsv1 "k8s.io/api/events/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -472,13 +473,14 @@ func gpuFaultEventFor(
 		gpufault.Attribution{NodeName: testNodeName, GPUUUID: "GPU-1234", GPUIndex: 0},
 	)
 	return &eventInfo{
-		Message:        message,
-		Reason:         "GPUXidError",
-		CreatedAt:      createdAt,
-		RecordedAt:     createdAt,
-		LastObservedAt: lastObservedAt,
-		RegardingUID:   regardingUID,
-		ReportingNode:  testNodeName,
+		Message:         message,
+		Reason:          "GPUXidError",
+		CreatedAt:       createdAt,
+		RecordedAt:      createdAt,
+		FirstObservedAt: createdAt,
+		LastObservedAt:  lastObservedAt,
+		RegardingUID:    regardingUID,
+		ReportingNode:   testNodeName,
 	}
 }
 
@@ -727,6 +729,52 @@ func TestClassifyGpuFailureRelevanceIsAnInterval(t *testing.T) {
 		got := classify(t, failedAt.Add(-90*time.Minute), failedAt.Add(-40*time.Minute))
 		assert.Equal(t, "UnknownError", got.Err().GetCode())
 		assert.Nil(t, got.Err().GetGpuFault())
+	})
+}
+
+// TestClassifyGpuFailureJudgesTheRecorderClock covers a fault event whose times come from
+// two clocks. The recorder on the node stamps when it saw the fault, in whole seconds, and
+// the API server stamps the object's creation when the write lands, which can be later.
+// Relevance is judged on the recorder's times alone.
+func TestClassifyGpuFailureJudgesTheRecorderClock(t *testing.T) {
+	failedAt := time.Now().Add(-30 * time.Minute).Truncate(time.Second)
+	phase := pluginsCore.PhaseInfoRetryableFailure(
+		"UnknownError", "Pod failed", &pluginsCore.TaskInfo{OccurredAt: &failedAt})
+
+	faultEvent := func(observedAt, createdAt time.Time) *eventsv1.Event {
+		event := testEvent("event-1", testPodUID, createdAt)
+		event.Note = gpuFaultEvent(79, gpufault.SeverityCritical, observedAt).Message
+		event.ReportingInstance = testNodeName
+		event.EventTime = metav1.NewMicroTime(observedAt)
+		return event
+	}
+	classify := func(t *testing.T, event *eventsv1.Event) pluginsCore.PhaseInfo {
+		t.Helper()
+		watcher := &controllerRuntimeEventWatcher{}
+		watcher.OnAdd(event, false)
+		pm := NewPluginManager("test-plugin", nil, nil)
+		pm.eventWatcher = watcher
+		return pm.classifyGpuFailure(context.Background(), nil, failedPod(), phase)
+	}
+
+	t.Run("a write that lands a second after the recorder saw the fault still explains it", func(t *testing.T) {
+		// The recorder saw the fault in the same second the task died, and the write
+		// landed in the next one. Taking the creation as the start would put it after the
+		// last observation and discard the fault as impossible.
+		got := classify(t, faultEvent(failedAt, failedAt.Add(time.Second)))
+		assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
+		assert.NotNil(t, got.Err().GetGpuFault())
+	})
+
+	t.Run("a delayed write of a fault seen before the failure is not a new occurrence", func(t *testing.T) {
+		// The fault was seen a minute before the failure and kept repeating, but its first
+		// write only landed well after the failure. Taking the creation as the start would
+		// read it as a fault that began after the task died.
+		event := faultEvent(failedAt.Add(-time.Minute), failedAt.Add(gpufault.AfterFailureSlack+3*time.Minute))
+		event.Series = &eventsv1.EventSeries{Count: 4, LastObservedTime: metav1.NewMicroTime(failedAt.Add(10 * time.Minute))}
+		got := classify(t, event)
+		assert.Equal(t, gpufault.CodeGpuFallenOffBus, got.Err().GetCode())
+		assert.NotNil(t, got.Err().GetGpuFault())
 	})
 }
 
