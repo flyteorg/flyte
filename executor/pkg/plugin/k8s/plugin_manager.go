@@ -110,7 +110,9 @@ func (pm *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMeta
 	o.SetName(name)
 
 	if !pm.plugin.GetProperties().DisableInjectOwnerReferences && !cfg.DisableInjectOwnerReferences {
-		o.SetOwnerReferences([]metav1.OwnerReference{taskCtx.GetOwnerReference()})
+		if owner := taskCtx.GetOwnerReference(); owner.Name != "" {
+			o.SetOwnerReferences([]metav1.OwnerReference{owner})
+		}
 	}
 
 	if cfg.InjectFinalizer && !pm.plugin.GetProperties().DisableInjectFinalizer {
@@ -153,6 +155,12 @@ func (pm *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.Ta
 			time.Now(), pluginsCore.DefaultPhaseVersion, "waiting for the previous resource to be deleted")), nil
 	}
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
+		if k8serrors.IsNotFound(err) {
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("NamespaceNotFound", err.Error(), nil)), nil
+		}
+		if k8serrors.HasStatusCause(err, v1.NamespaceTerminatingCause) {
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("NamespaceTerminating", err.Error(), nil)), nil
+		}
 		if k8serrors.IsForbidden(err) {
 			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure("RuntimeFailure", err.Error(), nil)), nil
 		}

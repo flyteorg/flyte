@@ -97,6 +97,10 @@ type Config struct {
 	// assigns the `default` ServiceAccount of the pod's own namespace.
 	DefaultK8sServiceAccount string `json:"defaultK8sServiceAccount" pflag:",Default Kubernetes service account for task pods when the task does not set one"`
 
+	// AllowedTaskNamespaces lists namespaces task definitions may explicitly target.
+	// Empty keeps workloads in the TaskAction namespace; "*" allows any namespace.
+	AllowedTaskNamespaces []string `json:"allowedTaskNamespaces" pflag:",Namespaces task definitions may target; empty disables overrides and * permits any namespace"`
+
 	// MaxSystemFailures bounds the system-level failures (Plugin.Handle Go errors and
 	// plugin-reported system-retryable failures) one attempt may take before the
 	// TaskAction is converted to a permanent failure.

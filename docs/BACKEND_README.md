@@ -6,6 +6,8 @@ This repo also defines the protocol buffer schemas for Flyte's APIs and generate
 
 **Want to contribute?** Join us on [slack.flyte.org](https://slack.flyte.org) to get involved.
 
+For explicit task workload placement, see [Task namespaces](task-namespaces.md).
+
 ## Repository Structure
 
 ```
