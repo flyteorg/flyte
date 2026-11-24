@@ -46,7 +46,7 @@ require (
 	github.com/kubeflow/spark-operator/v2 v2.5.2
 	github.com/kubeflow/training-operator v1.9.4
 	github.com/lib/pq v1.12.3
-	github.com/magiconair/properties v1.18.12
+	github.com/magiconair/properties v1.18.13
 	github.com/onsi/ginkgo/v2 v2.34.0
 	github.com/onsi/gomega v1.44.0
 	github.com/pkg/errors v0.9.1
