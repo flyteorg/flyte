@@ -2,7 +2,7 @@ package config
 
 import (
 	"os"
-	"sync"
+	"sync/atomic"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
@@ -116,9 +116,14 @@ var (
 		SecretEnvVarPrefix: DefaultSecretEnvVarPrefix,
 	}
 
-	configSection = config.MustRegisterSection("webhook", DefaultConfig)
-	initOnce      sync.Once
+	configSection  = config.MustRegisterSection("webhook", DefaultConfig)
+	resolvedConfig atomic.Pointer[cachedConfig]
 )
+
+type cachedConfig struct {
+	source   *Config
+	resolved *Config
+}
 
 // SecretManagerType defines which secret manager to use.
 type SecretManagerType int
@@ -312,12 +317,22 @@ func (c *Config) ResolveKubeClientConfigs() {
 }
 
 func GetConfig() *Config {
-	cfg := configSection.GetConfig().(*Config)
-	// Ensure initialization happens exactly once, thread-safe
-	initOnce.Do(func() {
-		cfg.ResolveKubeClientConfigs()
+	raw := configSection.GetConfig().(*Config)
+	if raw == nil {
+		return nil
+	}
+	cached := resolvedConfig.Load()
+	if cached != nil && cached.source == raw {
+		return cached.resolved
+	}
+
+	resolved := *raw
+	resolved.ResolveKubeClientConfigs()
+	resolvedConfig.CompareAndSwap(cached, &cachedConfig{
+		source:   raw,
+		resolved: &resolved,
 	})
-	return cfg
+	return &resolved
 }
 
 func MustRegisterSubsection(key config.SectionKey, section config.Config) config.Section {
