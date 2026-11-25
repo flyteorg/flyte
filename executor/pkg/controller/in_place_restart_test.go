@@ -29,7 +29,7 @@ func TestQueuedForInPlaceRestart(t *testing.T) {
 
 		got := queuedForInPlaceRestart(failed, restartedAt)
 
-		assert.Equal(t, pluginsCore.PhaseQueued, got.Phase())
+		assert.Equal(t, pluginsCore.PhaseNotReady, got.Phase())
 		require.NotNil(t, got.Info())
 		require.Len(t, got.Info().AdditionalReasons, 1)
 		assert.Equal(t, "GPU fault recorded on pod job-worker-3", got.Info().AdditionalReasons[0].Reason)
@@ -63,7 +63,7 @@ func TestQueuedForInPlaceRestart(t *testing.T) {
 	t.Run("survives a failure that carried no info at all", func(t *testing.T) {
 		got := queuedForInPlaceRestart(pluginsCore.PhaseInfoRetryableFailure("Interrupted", "gone", nil), restartedAt)
 
-		assert.Equal(t, pluginsCore.PhaseQueued, got.Phase())
+		assert.Equal(t, pluginsCore.PhaseNotReady, got.Phase())
 		require.NotNil(t, got.Info())
 		assert.Empty(t, got.Info().AdditionalReasons)
 	})
