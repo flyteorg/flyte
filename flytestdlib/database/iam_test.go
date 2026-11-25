@@ -24,7 +24,6 @@ type fakeTokens struct {
 	mu        sync.Mutex
 	token     string
 	err       error
-	region    string
 	endpoints []string
 	users     []string
 }
@@ -53,10 +52,7 @@ func (f *fakeTokens) build(_ context.Context, endpoint, user string) (string, er
 func stubIAMTokenBuilder(t *testing.T, fake *fakeTokens) {
 	t.Helper()
 	orig := newIAMTokenBuilder
-	newIAMTokenBuilder = func(_ context.Context, region string) (iamTokenBuilder, error) {
-		fake.mu.Lock()
-		fake.region = region
-		fake.mu.Unlock()
+	newIAMTokenBuilder = func(context.Context) (iamTokenBuilder, error) {
 		return fake.build, nil
 	}
 	t.Cleanup(func() { newIAMTokenBuilder = orig })
@@ -99,22 +95,20 @@ func TestConnectorOptions(t *testing.T) {
 		assert.ErrorContains(t, err, "unknown database postgres authType")
 	})
 
-	t.Run("iam auth passes the configured region to the builder", func(t *testing.T) {
-		fake := &fakeTokens{}
-		stubIAMTokenBuilder(t, fake)
-		opts, err := connectorOptions(ctx, PostgresConfig{AuthType: AuthTypeIAM, Region: "ap-southeast-2"})
+	t.Run("iam auth adds the token hook", func(t *testing.T) {
+		stubIAMTokenBuilder(t, &fakeTokens{})
+		opts, err := connectorOptions(ctx, PostgresConfig{AuthType: AuthTypeIAM, ExtraOptions: "sslmode=require"})
 		assert.NoError(t, err)
 		assert.Len(t, opts, 1)
-		assert.Equal(t, "ap-southeast-2", fake.region)
 	})
 
 	t.Run("iam auth surfaces builder setup errors", func(t *testing.T) {
 		orig := newIAMTokenBuilder
 		t.Cleanup(func() { newIAMTokenBuilder = orig })
-		newIAMTokenBuilder = func(context.Context, string) (iamTokenBuilder, error) {
+		newIAMTokenBuilder = func(context.Context) (iamTokenBuilder, error) {
 			return nil, errors.New("no region")
 		}
-		_, err := connectorOptions(ctx, PostgresConfig{AuthType: AuthTypeIAM})
+		_, err := connectorOptions(ctx, PostgresConfig{AuthType: AuthTypeIAM, ExtraOptions: "sslmode=require"})
 		assert.ErrorContains(t, err, "no region")
 	})
 }
@@ -181,7 +175,6 @@ func TestIAMAuthEmbeddedPostgres(t *testing.T) {
 		DbName:   "iam_bootstrap",
 		User:     "iam_user",
 		AuthType: AuthTypeIAM,
-		Region:   "us-east-1",
 		// The embedded server has no TLS; prefer still exercises the IAM path, which rejects sslmode=disable.
 		ExtraOptions: "sslmode=prefer",
 	}
@@ -263,7 +256,7 @@ func TestIAMAuthEmbeddedPostgres(t *testing.T) {
 	})
 }
 
-// The real builder signs locally from the SDK credential chain; static env credentials keep it offline.
+// The real builder signs locally from the SDK credential chain and region; static env credentials keep it offline.
 func TestNewIAMTokenBuilder(t *testing.T) {
 	isolateAWSEnv := func(t *testing.T) {
 		t.Helper()
@@ -277,9 +270,9 @@ func TestNewIAMTokenBuilder(t *testing.T) {
 		t.Setenv("AWS_REGION", "")
 		t.Setenv("AWS_DEFAULT_REGION", "")
 	}
-	buildToken := func(t *testing.T, region string) string {
+	buildToken := func(t *testing.T) string {
 		t.Helper()
-		build, err := newIAMTokenBuilder(context.Background(), region)
+		build, err := newIAMTokenBuilder(context.Background())
 		require.NoError(t, err)
 		token, err := build(context.Background(), "db.example.com:5432", "flyte")
 		require.NoError(t, err)
@@ -288,21 +281,21 @@ func TestNewIAMTokenBuilder(t *testing.T) {
 		return token
 	}
 
-	t.Run("empty region falls back to the SDK's region", func(t *testing.T) {
+	t.Run("region from AWS_REGION", func(t *testing.T) {
 		isolateAWSEnv(t)
 		t.Setenv("AWS_REGION", "ap-southeast-2")
-		assert.Contains(t, buildToken(t, ""), "%2Fap-southeast-2%2Frds-db%2Faws4_request")
+		assert.Contains(t, buildToken(t), "%2Fap-southeast-2%2Frds-db%2Faws4_request")
 	})
 
-	t.Run("configured region wins", func(t *testing.T) {
+	t.Run("region from AWS_DEFAULT_REGION", func(t *testing.T) {
 		isolateAWSEnv(t)
-		t.Setenv("AWS_REGION", "ap-southeast-2")
-		assert.Contains(t, buildToken(t, "us-west-2"), "%2Fus-west-2%2Frds-db%2Faws4_request")
+		t.Setenv("AWS_DEFAULT_REGION", "us-west-2")
+		assert.Contains(t, buildToken(t), "%2Fus-west-2%2Frds-db%2Faws4_request")
 	})
 
 	t.Run("no region anywhere is an error", func(t *testing.T) {
 		isolateAWSEnv(t)
-		_, err := newIAMTokenBuilder(context.Background(), "")
+		_, err := newIAMTokenBuilder(context.Background())
 		assert.ErrorContains(t, err, "RDS IAM auth needs an AWS region")
 	})
 }

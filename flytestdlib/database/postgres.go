@@ -83,7 +83,7 @@ func connectorOptions(ctx context.Context, pgConfig PostgresConfig) ([]stdlib.Op
 	if !pgConfig.IsIAMAuth() {
 		return nil, nil
 	}
-	buildToken, err := newIAMTokenBuilder(ctx, pgConfig.Region)
+	buildToken, err := newIAMTokenBuilder(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +197,7 @@ func NewPostgresListener(ctx context.Context, pgConfig PostgresConfig, minReconn
 		return pq.NewListener(dsn, minReconnect, maxReconnect, callback), nil
 	}
 
-	buildToken, err := newIAMTokenBuilder(ctx, pgConfig.Region)
+	buildToken, err := newIAMTokenBuilder(ctx)
 	if err != nil {
 		return nil, err
 	}

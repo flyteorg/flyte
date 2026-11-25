@@ -523,9 +523,8 @@ configuration:
       # IAM auth needs password and passwordPath unset and SSL, e.g. options: sslmode=require.
       # host must be the RDS/Aurora endpoint itself: AWS rejects tokens signed for a custom DNS name
       # (e.g. a Route 53 CNAME). AWS also recommends 300-1000 MiB of spare database memory for IAM auth.
+      # The token's region comes from AWS_REGION, which EKS Pod Identity and IRSA inject.
       authType: password
-      # region signs IAM auth tokens. Defaults to the region the AWS SDK resolves, e.g. from AWS_REGION.
-      region: ""
 
   storage:
     metadataContainer: my-organization-flyte-container

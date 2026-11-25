@@ -310,20 +310,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_database.postgres.region", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("database.postgres.region", testValue)
-			if vString, err := cmdFlags.GetString("database.postgres.region"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Database.Postgres.Region)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 	t.Run("Test_watchBufferSize", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

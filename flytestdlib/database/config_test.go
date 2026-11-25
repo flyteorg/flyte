@@ -101,7 +101,6 @@ func TestParseIAMDatabaseConfig(t *testing.T) {
 	t.Run("explicitly empty password", func(t *testing.T) {
 		pg := load(t, "iam_config.yaml")
 		assert.True(t, pg.IsIAMAuth())
-		assert.Equal(t, "us-east-1", pg.Region)
 		assert.Empty(t, pg.Password)
 		assert.NoError(t, pg.Validate())
 	})

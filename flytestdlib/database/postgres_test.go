@@ -71,7 +71,6 @@ func TestGetPostgresDsn(t *testing.T) {
 			User:         "postgres",
 			ExtraOptions: "sslmode=require",
 			AuthType:     AuthTypeIAM,
-			Region:       "us-east-1",
 		}
 		dsn := GetPostgresDsn(context.TODO(), iamConfig)
 		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres sslmode=require", dsn)
@@ -126,7 +125,6 @@ func TestGetPostgresReadDsn(t *testing.T) {
 			User:            "postgres",
 			ExtraOptions:    "sslmode=require",
 			AuthType:        AuthTypeIAM,
-			Region:          "us-east-1",
 		}
 		dsn := getPostgresReadDsn(context.TODO(), iamConfig)
 		assert.Equal(t, "host=readReplicaHost port=5432 dbname=postgres user=postgres sslmode=require", dsn)

@@ -60,9 +60,9 @@ type PostgresConfig struct {
 	Debug        bool   `json:"debug" pflag:" Whether or not to start the database connection with debug mode enabled."`
 	// With AuthType 'iam', Host and ReadReplicaHost must be RDS/Aurora endpoints: tokens are signed for
 	// the configured host, and AWS rejects tokens signed for a custom DNS name such as a Route 53 CNAME.
-	// Only the first host of a multi-host value gets a token.
+	// Only the first host of a multi-host value gets a token. The token's AWS region comes from the AWS SDK's
+	// standard configuration, e.g. the AWS_REGION that EKS Pod Identity and IRSA inject.
 	AuthType string `json:"authType" pflag:",Either 'password' (default) or 'iam'. With 'iam', each new connection authenticates with a fresh AWS RDS IAM auth token instead of Password/PasswordPath."`
-	Region   string `json:"region" pflag:",The AWS region of the RDS instance, used to sign IAM auth tokens. Defaults to the region the AWS SDK resolves."`
 }
 
 var emptyPostgresConfig = PostgresConfig{}

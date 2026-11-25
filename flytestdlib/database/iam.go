@@ -19,19 +19,16 @@ import (
 type iamTokenBuilder func(ctx context.Context, endpoint, user string) (string, error)
 
 // newIAMTokenBuilder loads the AWS SDK default credential chain once, so every token reuses its cached
-// credentials. An empty region falls back to the region the SDK resolves (AWS_REGION, profile, ...).
+// credentials. The region comes from the SDK's standard configuration (AWS_REGION, AWS_DEFAULT_REGION or
+// the shared config profile).
 // Replaced in tests.
-var newIAMTokenBuilder = func(ctx context.Context, region string) (iamTokenBuilder, error) {
-	var opts []func(*awsConfig.LoadOptions) error
-	if region != "" {
-		opts = append(opts, awsConfig.WithRegion(region))
-	}
-	awsCfg, err := awsConfig.LoadDefaultConfig(ctx, opts...)
+var newIAMTokenBuilder = func(ctx context.Context) (iamTokenBuilder, error) {
+	awsCfg, err := awsConfig.LoadDefaultConfig(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("load AWS config for RDS IAM auth: %w", err)
 	}
 	if awsCfg.Region == "" {
-		return nil, fmt.Errorf("RDS IAM auth needs an AWS region: set database.postgres.region or AWS_REGION")
+		return nil, fmt.Errorf("RDS IAM auth needs an AWS region: set AWS_REGION")
 	}
 	return func(ctx context.Context, endpoint, user string) (string, error) {
 		return rdsauth.BuildAuthToken(ctx, endpoint, awsCfg.Region, user, awsCfg.Credentials)
