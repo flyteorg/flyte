@@ -1318,6 +1318,7 @@ func MergeBasePodSpecOntoTemplate(templatePodSpec *v1.PodSpec, basePodSpec *v1.P
 
 	mergedPodSpec.InitContainers = mergedInitContainers
 
+	dedupeVolumes(mergedPodSpec)
 	return mergedPodSpec, nil
 }
 
@@ -1371,6 +1372,7 @@ func MergeOverlayPodSpecOntoBase(basePodSpec *v1.PodSpec, overlayPodSpec *v1.Pod
 
 	mergedPodSpec.InitContainers = mergedInitContainers
 
+	dedupeVolumes(mergedPodSpec)
 	return mergedPodSpec, nil
 }
 
@@ -2054,4 +2056,40 @@ func BuildPodLogContext(pod *v1.Pod) *core.PodLogContext {
 
 func isTerminatedWithSigKill(state v1.ContainerState) bool {
 	return state.Terminated != nil && (state.Terminated.ExitCode == SIGKILL || state.Terminated.ExitCode == unsignedSIGKILL)
+}
+
+// dedupeVolumes keeps one pod volume per name, and one volume mount per mount
+// path in each container, after a merge that appends slices (mergo's
+// WithAppendSlice): a volume or mount present in both specs would otherwise be
+// listed twice, which the API server rejects. The later entry, from the spec
+// merged on top, wins, as it does for every other field the merge overrides.
+// Specs without duplicates are returned unchanged.
+func dedupeVolumes(spec *v1.PodSpec) {
+	spec.Volumes = keepLast(spec.Volumes, func(v v1.Volume) string { return v.Name })
+	for i := range spec.Containers {
+		spec.Containers[i].VolumeMounts = keepLast(spec.Containers[i].VolumeMounts, func(m v1.VolumeMount) string { return m.MountPath })
+	}
+	for i := range spec.InitContainers {
+		spec.InitContainers[i].VolumeMounts = keepLast(spec.InitContainers[i].VolumeMounts, func(m v1.VolumeMount) string { return m.MountPath })
+	}
+}
+
+// keepLast drops every element whose key appears again later in items,
+// keeping the remaining elements in order. It returns items itself when no
+// key repeats.
+func keepLast[T any](items []T, key func(T) string) []T {
+	last := make(map[string]int, len(items))
+	for i, item := range items {
+		last[key(item)] = i
+	}
+	if len(last) == len(items) {
+		return items
+	}
+	out := make([]T, 0, len(last))
+	for i, item := range items {
+		if last[key(item)] == i {
+			out = append(out, item)
+		}
+	}
+	return out
 }
