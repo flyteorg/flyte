@@ -25,7 +25,7 @@ func fetchLevels(ctx context.Context, repo interfaces.SettingsRepo, key *setting
 
 	storageKeys := make([]string, 0, len(levelKeys))
 	for _, lk := range levelKeys {
-		storageKeys = append(storageKeys, models.EncodeSettingsKey(lk.GetOrg(), lk.GetDomain(), lk.GetProject()))
+		storageKeys = append(storageKeys, models.EncodeSettingsKey(lk.GetDomain(), lk.GetProject()))
 	}
 
 	rows, err := repo.GetSettingsByKeys(ctx, storageKeys)

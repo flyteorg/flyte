@@ -2,11 +2,14 @@ package service
 
 import (
 	"context"
+	crand "crypto/rand"
 	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/big"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -14,11 +17,11 @@ import (
 
 	"connectrpc.com/connect"
 	semver "github.com/Masterminds/semver/v3"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
-	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
@@ -40,6 +43,7 @@ import (
 // RunService implements the RunServiceHandler interface
 type RunService struct {
 	repo            interfaces.Repository
+	settingsRepo    interfaces.SettingsRepo
 	actionsClient   actionsconnect.ActionsServiceClient
 	projectClient   projectconnect.ProjectServiceClient
 	storagePrefix   string
@@ -58,9 +62,25 @@ const (
 	RootActionName  = "a0"
 )
 
-func generateRunName(seed int64) string {
-	rand.Seed(seed)
-	return fmt.Sprintf(runStringFormat, rand.String(runIDLength-1))
+// runNameAlphabet is k8s.io/apimachinery/pkg/util/rand's: vowels (a, e, i, o, u, y) are left
+// out so a random name cannot spell a word, and 0, 1 and 3 because they read as vowels.
+const runNameAlphabet = "bcdfghjklmnpqrstvwxz2456789"
+
+// generateRunName draws from crypto/rand. A generated name has to be unique, not just varied:
+// CreateRun does not check it for duplicates. Seeding the process-global math/rand source with
+// the time and then drawing from it did not give that, since concurrent creates reseeded it
+// under each other and could draw the same name.
+func generateRunName() string {
+	b := make([]byte, runIDLength-1)
+	n := big.NewInt(int64(len(runNameAlphabet)))
+	for i := range b {
+		k, err := crand.Int(crand.Reader, n)
+		if err != nil {
+			panic(fmt.Sprintf("crypto/rand: %v", err))
+		}
+		b[i] = runNameAlphabet[k.Int64()]
+	}
+	return fmt.Sprintf(runStringFormat, string(b))
 }
 
 // sdkVersionRegex extracts the MAJOR.MINOR.PATCH core from an SDK version string, ignoring any
@@ -143,6 +163,7 @@ func (s *RunService) WatchGroups(ctx context.Context, req *connect.Request[workf
 // NewRunService creates a new RunService instance
 func NewRunService(
 	repo interfaces.Repository,
+	settingsRepo interfaces.SettingsRepo,
 	actionsClient actionsconnect.ActionsServiceClient,
 	projectClient projectconnect.ProjectServiceClient,
 	storagePrefix string,
@@ -154,6 +175,7 @@ func NewRunService(
 ) *RunService {
 	return &RunService{
 		repo:            repo,
+		settingsRepo:    settingsRepo,
 		actionsClient:   actionsClient,
 		projectClient:   projectClient,
 		storagePrefix:   storagePrefix,
@@ -196,7 +218,7 @@ func (s *RunService) CreateRun(
 		runId = &common.RunIdentifier{
 			Project: id.ProjectId.Name,
 			Domain:  id.ProjectId.Domain,
-			Name:    generateRunName(time.Now().UnixNano()),
+			Name:    generateRunName(),
 		}
 		request.Id = &workflow.CreateRunRequest_RunId{
 			RunId: runId,
@@ -276,6 +298,24 @@ func (s *RunService) CreateRun(
 	}
 	request.RunSpec = runSpec
 
+	// Settings sit between an explicit request value and the static config defaults
+	// applied below.
+	resolveSettings, err := resolveSettings(ctx, s.settingsRepo, &settings.SettingsKey{
+		Org:     runId.GetOrg(),
+		Domain:  runId.GetDomain(),
+		Project: runId.GetProject(),
+	})
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+	applyRunSettings(runSpec, resolveSettings)
+	if err := validatePodTemplateName(runSpec.GetDefaultSettings().GetPodTemplateName()); err != nil {
+		return nil, err
+	}
+	if err := impl.ValidateLabels(runSpec.GetLabels().GetValues()); err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+
 	// Stamp the run start time, but only for SDKs that understand it (>= 2.3.6) — older task
 	// templates have no {{.runStartTime}} placeholder, so leaving it unset keeps the executor from
 	// substituting anything. The scheduler sets CreateRunRequest.run_start_time to a trigger's
@@ -289,20 +329,16 @@ func (s *RunService) CreateRun(
 	}
 
 	// Compute storage URIs before DB insert so they're persisted in the ActionSpec.
-	// runSpec.RunBaseDir overrides the configured storagePrefix when set; it must
-	// resolve to the same base UploadInputs used (UploadInputsRequest.base_dir) so the
-	// run reads offloaded inputs from where they were written.
-	// TODO: consult org/project/domain settings (StorageSettings.run_base_dir) here as
-	// the middle tier once settings lookup lands; it must be applied in UploadInputs too.
+	// runSpec.RunBaseDir overrides the configured storagePrefix when set, either by the
+	// request or from settings above; it must resolve to the same base UploadInputs used
+	// (UploadInputsRequest.base_dir) so the run reads offloaded inputs from where they
+	// were written.
 	runBase := s.storagePrefix
 	if rb := runSpec.GetRunBaseDir(); rb != "" {
 		runBase = rb
 	}
 	inputPrefix := buildInputPrefix(runBase, runId.GetProject(), runId.GetDomain(), runId.GetName())
 	runOutputBase := buildRunOutputBase(runBase, runId.GetProject(), runId.GetDomain(), runId.GetName())
-	if runSpec.GetRawDataStorage() == nil || runSpec.GetRawDataStorage().GetRawDataPrefix() == "" {
-		runSpec.RawDataStorage = &task.RawDataStorage{RawDataPrefix: s.storagePrefix}
-	}
 
 	cacheKey := ""
 	switch iw := request.GetInputWrapper().(type) {
@@ -450,6 +486,15 @@ func (s *RunService) persistRunModel(
 		}
 	}
 
+	// An empty object rather than NULL, which marks runs from before the labels column.
+	labels := []byte("{}")
+	if values := runSpec.GetLabels().GetValues(); len(values) > 0 {
+		labels, err = json.Marshal(values)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal run labels: %w", err)
+		}
+	}
+
 	nullStr := func(s string) sql.NullString {
 		return sql.NullString{String: s, Valid: s != ""}
 	}
@@ -487,6 +532,7 @@ func (s *RunService) persistRunModel(
 		ActionDetails:    []byte("{}"),
 		DetailedInfo:     detailedInfo,
 		RunSpec:          runSpecBytes,
+		Labels:           labels,
 		Attempts:         1,
 		RunSource:        source.String(),
 		CreatedBy:        createdByBytes,
@@ -553,20 +599,10 @@ func (s *RunService) GetRunDetails(
 		return nil, connect.NewError(connect.CodeNotFound, err)
 	}
 
-	rootActionID := &common.ActionIdentifier{
-		Run:  req.Msg.RunId,
-		Name: run.Name,
-	}
-
-	actionDetails, err := s.buildActionDetails(ctx, run, rootActionID)
+	details, err := s.buildRunDetails(ctx, run, req.Msg.RunId)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to build run action details: %v", err)
 		return nil, err
-	}
-
-	details := &workflow.RunDetails{
-		RunSpec: extractRunSpecFromActionModel(ctx, run),
-		Action:  actionDetails,
 	}
 
 	logger.Infof(ctx, "Retrieved run details for: %s", run.Name)
@@ -690,9 +726,10 @@ func (s *RunService) buildActionDetails(ctx context.Context, model *models.Actio
 	action.Attempts = attempts
 
 	switch action.GetStatus().GetPhase() {
-	case common.ActionPhase_ACTION_PHASE_FAILED:
+	case common.ActionPhase_ACTION_PHASE_FAILED, common.ActionPhase_ACTION_PHASE_TIMED_OUT:
 		// Get action error from last attempt. Events are eventually consistent, so we may not have
-		// information from the latest attempt yet.
+		// information from the latest attempt yet. A timed-out action carries its
+		// error the same way a failed one does, so it resolves through this path too.
 		numAttempts := len(action.GetAttempts())
 		if numAttempts > 0 && action.GetAttempts()[numAttempts-1].GetAttempt() == action.GetStatus().GetAttempts() {
 			action.Result = &workflow.ActionDetails_ErrorInfo{
@@ -768,8 +805,7 @@ func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.Actio
 	reportURI := ""
 	lastEvent := events[len(events)-1]
 	var logContext *core.LogContext
-	for i := len(events) - 1; i >= 0; i-- {
-		event := events[i]
+	for _, event := range slices.Backward(events) {
 		if event.GetLogContext() != nil && logContext == nil {
 			logContext = event.GetLogContext()
 			streamingLogsAvailable = true
@@ -783,9 +819,9 @@ func mergeEvents(attempt uint32, events []*workflow.ActionEvent) *workflow.Actio
 		if reportURI == "" && event.GetOutputs().GetReportUri() != "" {
 			reportURI = event.GetOutputs().GetReportUri()
 		}
-		phase := events[i].GetPhase()
+		phase := event.GetPhase()
 		if IsTerminalPhase(phase) {
-			lastEvent = events[i]
+			lastEvent = event
 		}
 	}
 
@@ -865,20 +901,28 @@ func IsTerminalPhase(phase common.ActionPhase) bool {
 		phase == common.ActionPhase_ACTION_PHASE_RECOVERED
 }
 
-// lastAttemptIsTerminal returns true when the highest-numbered attempt has reached a
-// terminal phase. Used by WatchActionDetails to close the stream only after action_events
-// reflects the terminal transition, not just the actions table.
-func lastAttemptIsTerminal(attempts []*workflow.ActionAttempt) bool {
+func IsFailedPhase(phase common.ActionPhase) bool {
+	return phase == common.ActionPhase_ACTION_PHASE_FAILED ||
+		phase == common.ActionPhase_ACTION_PHASE_TIMED_OUT
+}
+
+func actionStreamComplete(details *workflow.ActionDetails) bool {
+	attempts := details.GetAttempts()
 	if len(attempts) == 0 {
 		return false
 	}
-	var last *workflow.ActionAttempt
+
+	// Get the last attempt
+	last := attempts[0]
 	for _, a := range attempts {
-		if last == nil || a.GetAttempt() > last.GetAttempt() {
+		if a.GetAttempt() > last.GetAttempt() {
 			last = a
 		}
 	}
-	return IsTerminalPhase(last.GetPhase())
+	status := details.GetStatus()
+	return IsTerminalPhase(status.GetPhase()) && // Make sure the action's retries are all completed
+		IsTerminalPhase(last.GetPhase()) && // Make sure the last attempt is in terminal phase
+		last.GetAttempt() == status.GetAttempts()
 }
 
 // GetActionData is deprecated and no longer implemented. Clients should use
@@ -922,8 +966,32 @@ func (s *RunService) ListRuns(
 		scopeFilter = scopeFilter.And(impl.NewHasPausedActionFilter())
 	}
 
+	// The console's run search box arrives as a filter on the synthetic "search" field
+	// (run name OR task name), and run label filters on "labels.<key>". Resolve them here
+	// and AND them onto the scope filter: the generic parser below validates fields
+	// against the action column allow-list and would reject them.
+	listReq := req.Msg.Request
+	searchFilter, remainingFilters, err := impl.SplitSearchFilters(listReq.GetFilters())
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+	labelFilter, remainingFilters, err := impl.SplitLabelFilters(remainingFilters)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, err)
+	}
+	for _, f := range []interfaces.Filter{searchFilter, labelFilter} {
+		if f != nil {
+			scopeFilter = scopeFilter.And(f)
+		}
+	}
+	if len(remainingFilters) != len(listReq.GetFilters()) {
+		// Clone so the caller's request is not mutated when the filters are stripped.
+		listReq = proto.Clone(listReq).(*common.ListRequest)
+		listReq.Filters = remainingFilters
+	}
+
 	// Parse pagination, sort, and user-supplied filters from the common ListRequest.
-	listInput, err := impl.NewListResourceInputFromProto(req.Msg.Request, models.ActionColumnsSet)
+	listInput, err := impl.NewListResourceInputFromProto(listReq, models.ActionColumnsSet)
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
@@ -967,6 +1035,12 @@ func (s *RunService) ListActions(
 	ctx context.Context,
 	req *connect.Request[workflow.ListActionsRequest],
 ) (*connect.Response[workflow.ListActionsResponse], error) {
+	if req.Msg.GetRunId() == nil && req.Msg.GetQueueId() == nil {
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("a run_id or queue_id scope is required"))
+	}
+	if req.Msg.GetQueueId() != nil {
+		return nil, connect.NewError(connect.CodeUnimplemented, fmt.Errorf("queue-scoped action listing is not supported by this service"))
+	}
 	logger.Infof(ctx, "Received ListActions request")
 
 	if err := req.Msg.Validate(); err != nil {
@@ -977,7 +1051,7 @@ func (s *RunService) ListActions(
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
-	runFilter := interfaces.Filter(impl.NewRunActionsFilter(req.Msg.RunId))
+	runFilter := interfaces.Filter(impl.NewRunActionsFilter(req.Msg.GetRunId()))
 	if listInput.Filter == nil {
 		listInput.Filter = runFilter
 	} else {
@@ -1168,26 +1242,21 @@ func (s *RunService) WatchRunDetails(
 ) error {
 	logger.Infof(ctx, "Received WatchRunDetails request")
 
-	// For now, just send initial state and close
-	// TODO: Implement actual streaming with polling or database triggers
 	run, err := s.repo.ActionRepo().GetRun(ctx, req.Msg.RunId)
 	if err != nil {
 		return connect.NewError(connect.CodeNotFound, err)
 	}
 
-	resp := &workflow.WatchRunDetailsResponse{
-		Details: &workflow.RunDetails{
-			// Would populate from run model
-		},
+	details, err := s.buildRunDetails(ctx, run, req.Msg.RunId)
+	if err != nil {
+		return connect.NewError(connect.CodeInternal, err)
 	}
-
-	if err := stream.Send(resp); err != nil {
+	if err := stream.Send(&workflow.WatchRunDetailsResponse{Details: details}); err != nil {
 		return err
 	}
 
 	logger.Infof(ctx, "Sent initial run details for: %s", run.Name)
 
-	// Keep connection open and send updates (simplified)
 	updates := make(chan *models.Run, 50)
 	errs := make(chan error, 1)
 
@@ -1200,17 +1269,34 @@ func (s *RunService) WatchRunDetails(
 		case err := <-errs:
 			return connect.NewError(connect.CodeInternal, err)
 		case run := <-updates:
-			resp := &workflow.WatchRunDetailsResponse{
-				Details: &workflow.RunDetails{
-					// Would populate from run
-				},
+			details, err := s.buildRunDetails(ctx, run, req.Msg.RunId)
+			if err != nil {
+				if ctx.Err() != nil {
+					return nil
+				}
+				return connect.NewError(connect.CodeInternal, err)
 			}
-			if err := stream.Send(resp); err != nil {
+			if err := stream.Send(&workflow.WatchRunDetailsResponse{Details: details}); err != nil {
 				return err
 			}
 			logger.Infof(ctx, "Sent run update for: %s", run.Name)
 		}
 	}
+}
+
+// buildRunDetails assembles RunDetails for a run model the same way GetRunDetails
+// does: the root action via buildActionDetails (spec, attempts, result) and the
+// RunSpec from the dedicated column with an ActionSpec fallback.
+func (s *RunService) buildRunDetails(ctx context.Context, run *models.Run, runID *common.RunIdentifier) (*workflow.RunDetails, error) {
+	rootActionID := &common.ActionIdentifier{Run: runID, Name: run.Name}
+	action, err := s.buildActionDetails(ctx, run, rootActionID)
+	if err != nil {
+		return nil, err
+	}
+	return &workflow.RunDetails{
+		RunSpec: extractRunSpecFromActionModel(ctx, run),
+		Action:  action,
+	}, nil
 }
 
 // WatchActionDetails streams action details updates from the DB.
@@ -1240,8 +1326,9 @@ func (s *RunService) WatchActionDetails(
 		return err
 	}
 
-	// Close only once action_events reflects the terminal phase, not just actions table.
-	if lastAttemptIsTerminal(details.GetAttempts()) {
+	// Close only once the action is terminal AND action_events reflects it — a
+	// terminal event for a retrying attempt must not end the stream.
+	if actionStreamComplete(details) {
 		return nil
 	}
 
@@ -1269,8 +1356,8 @@ func (s *RunService) WatchActionDetails(
 			}); err != nil {
 				return err
 			}
-			// Close once action_events reflects the terminal phase.
-			if lastAttemptIsTerminal(details.GetAttempts()) {
+			// Close once the action is terminal and action_events reflects it.
+			if actionStreamComplete(details) {
 				return nil
 			}
 		}
@@ -1293,22 +1380,26 @@ func (s *RunService) WatchRuns(
 
 	// Step 2: Send existing runs that match filter
 	listInput := s.convertWatchRequestToListInput(req.Msg)
-
-	runs, err := s.repo.ActionRepo().ListActions(ctx, listInput)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to list runs: %v", err)
-		// Continue even if list fails - still watch for new updates
-	} else if len(runs) > 0 {
+	sendRuns := func() error {
+		runs, err := s.repo.ActionRepo().ListActions(ctx, listInput)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to list runs: %v", err)
+			// Continue even if list fails - still watch for new updates
+			return nil
+		}
+		if len(runs) == 0 {
+			return nil
+		}
 		protoRuns := make([]*workflow.Run, len(runs))
 		for i, run := range runs {
 			protoRuns[i] = s.convertRunToProto(run)
 		}
-
-		if err := stream.Send(&workflow.WatchRunsResponse{
+		return stream.Send(&workflow.WatchRunsResponse{
 			Runs: protoRuns,
-		}); err != nil {
-			return err
-		}
+		})
+	}
+	if err := sendRuns(); err != nil {
+		return err
 	}
 
 	for {
@@ -1319,6 +1410,13 @@ func (s *RunService) WatchRuns(
 			logger.Errorf(ctx, "Error watching runs: %v", err)
 			return err
 		case run := <-updatesCh:
+			if run == nil {
+				// Updates may have been lost; send the list again.
+				if err := sendRuns(); err != nil {
+					return err
+				}
+				continue
+			}
 			// Filter the run based on the watch request criteria
 			if !s.runMatchesFilter(run, req.Msg) {
 				continue
@@ -1369,6 +1467,16 @@ func (s *RunService) WatchActions(
 			if !ok {
 				return nil
 			}
+			if updated == nil {
+				// Updates may have been lost; re-list the run.
+				if err := s.listAndSendAllActions(ctx, runID, rsm, stream); err != nil {
+					if !errors.Is(err, errListActions) {
+						return err
+					}
+					logger.Errorf(ctx, "Failed to re-list actions: %v", err)
+				}
+				continue
+			}
 			updates, err := rsm.upsertActions(ctx, []*models.Action{updated})
 			if err != nil {
 				return err
@@ -1379,6 +1487,9 @@ func (s *RunService) WatchActions(
 		}
 	}
 }
+
+// errListActions marks a failed DB read in listAndSendAllActions, which a re-list can tolerate.
+var errListActions = errors.New("list actions")
 
 func (s *RunService) listAndSendAllActions(
 	ctx context.Context,
@@ -1412,7 +1523,7 @@ func (s *RunService) listAndSendAllActions(
 			},
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("%w: %w", errListActions, err)
 		}
 
 		// ListActions returns up to Limit+1 rows (the extra row is a has-more probe).
@@ -1423,7 +1534,15 @@ func (s *RunService) listAndSendAllActions(
 			batch = batch[:pageSize]
 		}
 
-		updates, err := rsm.upsertActions(ctx, batch)
+		// On a re-list, skip actions the stream already has: upserting an existing one marks it
+		// and its ancestors as changed even when nothing differs.
+		fresh := make([]*models.Action, 0, len(batch))
+		for _, action := range batch {
+			if known := rsm.GetActionTreeNodeByName(action.Name); known == nil || !known.Action.UpdatedAt.Equal(action.UpdatedAt) {
+				fresh = append(fresh, action)
+			}
+		}
+		updates, err := rsm.upsertActions(ctx, fresh)
 		if err != nil {
 			return err
 		}
@@ -1578,6 +1697,8 @@ func (s *RunService) actionModelToDetails(action *models.Action, actionID *commo
 	}
 	if action.EndedAt.Valid {
 		status.EndTime = timestamppb.New(action.EndedAt.Time)
+		durationMs := uint64(status.EndTime.AsTime().Sub(status.StartTime.AsTime()).Milliseconds())
+		status.DurationMs = &durationMs
 	}
 	if action.DurationMs.Valid {
 		durationMs := uint64(action.DurationMs.Int64)
@@ -1837,9 +1958,34 @@ func (s *RunService) convertRunToProto(run *models.Run) *workflow.Run {
 		}
 	}
 
+	spec := runSpec(run)
 	return &workflow.Run{
-		Action: action,
+		Action:      action,
+		Labels:      runLabels(run, spec),
+		Annotations: spec.GetAnnotations().GetValues(),
 	}
+}
+
+// runSpec decodes a run's stored run spec.
+func runSpec(run *models.Run) *task.RunSpec {
+	var spec task.RunSpec
+	if err := proto.Unmarshal(run.RunSpec, &spec); err != nil {
+		logger.Warningf(context.Background(), "failed to unmarshal run spec for run %s: %v", run.RunName, err)
+	}
+	return &spec
+}
+
+// runLabels returns a run's labels. Runs created before the labels column existed have
+// them only in their run spec.
+func runLabels(run *models.Run, spec *task.RunSpec) map[string]string {
+	if run.Labels == nil {
+		return spec.GetLabels().GetValues()
+	}
+	var labels map[string]string
+	if err := json.Unmarshal(run.Labels, &labels); err != nil {
+		logger.Warningf(context.Background(), "failed to unmarshal labels for run %s: %v", run.RunName, err)
+	}
+	return labels
 }
 
 // convertActionToEnrichedProto converts a repository Action to an EnrichedAction proto
@@ -2068,7 +2214,8 @@ func (s *RunService) buildTaskGroups(ctx context.Context, req *workflow.WatchGro
 
 		phase := common.ActionPhase(action.Phase)
 		g.phaseCounts[phase]++
-		if phase == common.ActionPhase_ACTION_PHASE_FAILED {
+
+		if IsFailedPhase(phase) {
 			g.failCount++
 		}
 

@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"connectrpc.com/connect"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -303,4 +304,32 @@ func TestGenerateCacheKeyForTask(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotEmpty(t, key)
 	})
+}
+
+func TestValidatePodTemplateName(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		wantErr bool
+	}{
+		{"empty means no template", "", false},
+		{"plain name", "gpu-template", false},
+		{"dotted subdomain", "team.gpu-template", false},
+		{"uppercase and space", "GPU Template", true},
+		{"leading hyphen", "-gpu", true},
+		{"at the 253 cap", strings.Repeat("a", 253), false},
+		{"over the 253 cap", strings.Repeat("a", 254), true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validatePodTemplateName(tt.input)
+			if tt.wantErr {
+				require.Error(t, err)
+				assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
+				return
+			}
+			assert.NoError(t, err)
+		})
+	}
 }

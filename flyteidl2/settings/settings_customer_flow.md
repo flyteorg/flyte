@@ -26,6 +26,7 @@ than maintained by hand.
 - `GetSettings` resolves inheritance top-down and returns one merged record wrapped in `settingsRecord`, with each resolved setting annotated by the `scopeLevel` it came from. No descriptions. Merged records carry no `version`, since a merged view corresponds to no single stored row; clients that need a version for an update use `GetSettingsForEdit`.
 - `SCOPE_LEVEL_ORG` is the enum zero value and is omitted from JSON, so an absent `scopeLevel` means the value resolved from the org.
 - `GetSettingsForEdit` returns `requestedKey` plus a `levels` array, one entry per scope level covered by the request key, ordered broadest to most specific. Each entry is `{ key, settings, version }` where `key` is a partial key identifying that level. No descriptions and no `scopeLevel`. A level with no stored record has empty settings and version 0; zero versions are omitted from JSON, so a missing `version` field means "no record yet, use `CreateSettings` for this level".
+- The storage key ignores `org`: OSS Flyte has no organization concept, so a record is stored under `v1::{domain}:{project}` whatever org the client sends. A request key's `org` is still echoed back in responses.
 - Map settings (`environmentVariables`) are **additive** on `GetSettings`: parent entries first, child entries merged on top (child wins on key conflict), and a level in state `UNSET` clears everything accumulated above it. `scopeLevel` on a merged map is the most specific level that contributed entries.
 
 ---
@@ -40,8 +41,8 @@ No domain settings exist yet.
 
 | id | key                            | data (JSONB)                                                                                                                                                                                                                                                | version |
 |----|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-| 1  | `v1:acme::`                    | `{"run":{"defaultQueue":{"state":"SETTING_STATE_VALUE","stringValue":"default"}},"taskResource":{"min":{"cpu":{"state":"SETTING_STATE_VALUE","quantityValue":"500m"}}},"environmentVariables":{"state":"SETTING_STATE_VALUE","mapValue":{"entries":{"LOG_LEVEL":"info","REGION":"us-east-1"}}}}` | 1       |
-| 2  | `v1:acme:production:analytics` | `{"taskResource":{"min":{"cpu":{"state":"SETTING_STATE_VALUE","quantityValue":"1000m"}}}}`                                                                                                                                                                  | 1       |
+| 1  | `v1:::`                        | `{"run":{"defaultQueue":{"state":"SETTING_STATE_VALUE","stringValue":"default"}},"taskResource":{"min":{"cpu":{"state":"SETTING_STATE_VALUE","quantityValue":"500m"}}},"environmentVariables":{"state":"SETTING_STATE_VALUE","mapValue":{"entries":{"LOG_LEVEL":"info","REGION":"us-east-1"}}}}` | 1       |
+| 2  | `v1::production:analytics`     | `{"taskResource":{"min":{"cpu":{"state":"SETTING_STATE_VALUE","quantityValue":"1000m"}}}}`                                                                                                                                                                  | 1       |
 
 ---
 
@@ -215,8 +216,8 @@ results. `version` is now `2`.
 
 | id | key                            | data (JSONB)                                                                                                                                                                                                                | version |
 |----|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-| 1  | `v1:acme::`                    | `{"run":{"defaultQueue":{"state":"SETTING_STATE_VALUE","stringValue":"default"}},...}` (unchanged)                                                                                                                            | 1       |
-| 2  | `v1:acme:production:analytics` | `{"taskResource":{"min":{"cpu":{"state":"SETTING_STATE_VALUE","quantityValue":"2000m"}}},"environmentVariables":{"state":"SETTING_STATE_VALUE","mapValue":{"entries":{"LOG_LEVEL":"debug"}}}}` | 2       |
+| 1  | `v1:::`                        | `{"run":{"defaultQueue":{"state":"SETTING_STATE_VALUE","stringValue":"default"}},...}` (unchanged)                                                                                                                            | 1       |
+| 2  | `v1::production:analytics`     | `{"taskResource":{"min":{"cpu":{"state":"SETTING_STATE_VALUE","quantityValue":"2000m"}}},"environmentVariables":{"state":"SETTING_STATE_VALUE","mapValue":{"entries":{"LOG_LEVEL":"debug"}}}}` | 2       |
 
 `run.defaultQueue` is absent from the project row: INHERIT is never written to
 the database, whether the client omitted the field or sent it empty.
@@ -314,9 +315,9 @@ queue.
 
 | id | key                            | data (JSONB)                                                                                                                                                                                       | version |
 |----|--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-| 1  | `v1:acme::`                    | `{"run":{"defaultQueue":{"state":"SETTING_STATE_VALUE","stringValue":"default"}},...}` (unchanged)                                                                                                     | 1       |
-| 3  | `v1:acme:production:`          | `{"run":{"defaultQueue":{"state":"SETTING_STATE_VALUE","stringValue":"fast-queue"}}}`                                                                                                                  | 1       |
-| 2  | `v1:acme:production:analytics` | `{"taskResource":{"min":{"cpu":{"state":"SETTING_STATE_VALUE","quantityValue":"2000m"}}},...}` (unchanged)                                                                                             | 2       |
+| 1  | `v1:::`                        | `{"run":{"defaultQueue":{"state":"SETTING_STATE_VALUE","stringValue":"default"}},...}` (unchanged)                                                                                                     | 1       |
+| 3  | `v1::production:`              | `{"run":{"defaultQueue":{"state":"SETTING_STATE_VALUE","stringValue":"fast-queue"}}}`                                                                                                                  | 1       |
+| 2  | `v1::production:analytics`     | `{"taskResource":{"min":{"cpu":{"state":"SETTING_STATE_VALUE","quantityValue":"2000m"}}},...}` (unchanged)                                                                                             | 2       |
 
 Only `defaultQueue` reaches the domain row: the empty CPU and env-var objects
 were pruned before storing.

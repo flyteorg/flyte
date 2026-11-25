@@ -122,6 +122,66 @@ func (m *Action) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for OverrideApplied
+
+	if all {
+		switch v := interface{}(m.GetCreatedBy()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionValidationError{
+					field:  "CreatedBy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionValidationError{
+					field:  "CreatedBy",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetCreatedBy()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionValidationError{
+				field:  "CreatedBy",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetTrigger()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ActionValidationError{
+					field:  "Trigger",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ActionValidationError{
+					field:  "Trigger",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTrigger()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ActionValidationError{
+				field:  "Trigger",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch v := m.Spec.(type) {
 	case *Action_Task:
 		if v == nil {
@@ -665,6 +725,35 @@ func (m *UpdateRequest) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return UpdateRequestValidationError{
 				field:  "Status",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetAddress()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdateRequestValidationError{
+					field:  "Address",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdateRequestValidationError{
+					field:  "Address",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAddress()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateRequestValidationError{
+				field:  "Address",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

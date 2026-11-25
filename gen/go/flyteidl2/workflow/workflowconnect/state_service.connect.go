@@ -79,12 +79,14 @@ func NewStateServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			httpClient,
 			baseURL+StateServiceGetProcedure,
 			connect.WithSchema(stateServiceGetMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		watch: connect.NewClient[workflow.WatchRequest, workflow.WatchResponse](
 			httpClient,
 			baseURL+StateServiceWatchProcedure,
 			connect.WithSchema(stateServiceWatchMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -138,12 +140,14 @@ func NewStateServiceHandler(svc StateServiceHandler, opts ...connect.HandlerOpti
 		StateServiceGetProcedure,
 		svc.Get,
 		connect.WithSchema(stateServiceGetMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	stateServiceWatchHandler := connect.NewServerStreamHandler(
 		StateServiceWatchProcedure,
 		svc.Watch,
 		connect.WithSchema(stateServiceWatchMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/flyteidl2.workflow.StateService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

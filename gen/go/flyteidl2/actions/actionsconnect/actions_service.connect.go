@@ -98,6 +98,7 @@ func NewActionsServiceClient(httpClient connect.HTTPClient, baseURL string, opts
 			httpClient,
 			baseURL+ActionsServiceWatchForUpdatesProcedure,
 			connect.WithSchema(actionsServiceWatchForUpdatesMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		update: connect.NewClient[actions.UpdateRequest, actions.UpdateResponse](
@@ -193,6 +194,7 @@ func NewActionsServiceHandler(svc ActionsServiceHandler, opts ...connect.Handler
 		ActionsServiceWatchForUpdatesProcedure,
 		svc.WatchForUpdates,
 		connect.WithSchema(actionsServiceWatchForUpdatesMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	actionsServiceUpdateHandler := connect.NewUnaryHandler(

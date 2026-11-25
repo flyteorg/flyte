@@ -83,6 +83,15 @@ func mergeQuantitySettings(levels []*settings.QuantitySetting) *settings.Quantit
 	})
 }
 
+// mergeAcceleratorSettings resolves one accelerator leaf across the level
+// chain, following the same rule as mergeStringSettings: the whole accelerator
+// (device, partition, class) comes from one level, never a mix.
+func mergeAcceleratorSettings(levels []*settings.AcceleratorSetting) *settings.AcceleratorSetting {
+	return mergeScalar(levels, func(s *settings.AcceleratorSetting, level settings.ScopeLevel) {
+		s.ScopeLevel = level
+	})
+}
+
 // mergeStringMapSettings resolves one string-map leaf across the level chain.
 // Unlike scalars, every level contributes: entries accumulate parent first with
 // child entries overwriting on key conflict, and a level in state UNSET clears
@@ -162,20 +171,23 @@ func mergeTaskResourceSettings(levels []*settings.TaskResourceSettings) *setting
 	minLevels := make([]*settings.TaskResourceDefaults, len(levels))
 	maxLevels := make([]*settings.TaskResourceDefaults, len(levels))
 	mirror := make([]*settings.BoolSetting, len(levels))
+	accelerator := make([]*settings.AcceleratorSetting, len(levels))
 
 	for i, l := range levels {
 		minLevels[i] = l.GetMin()
 		maxLevels[i] = l.GetMax()
 		mirror[i] = l.GetMirrorLimitsRequest()
+		accelerator[i] = l.GetDefaultAccelerator()
 	}
 
 	out := &settings.TaskResourceSettings{
 		Min:                 mergeTaskResourceDefaults(minLevels),
 		Max:                 mergeTaskResourceDefaults(maxLevels),
 		MirrorLimitsRequest: mergeBoolSettings(mirror),
+		DefaultAccelerator:  mergeAcceleratorSettings(accelerator),
 	}
 
-	if out.Min == nil && out.Max == nil && out.MirrorLimitsRequest == nil {
+	if out.Min == nil && out.Max == nil && out.MirrorLimitsRequest == nil && out.DefaultAccelerator == nil {
 		return nil
 	}
 	return out
@@ -211,16 +223,19 @@ func mergeRunSettings(levels []*settings.RunSettings) *settings.RunSettings {
 // other group mergers it holds no rules of its own. Returns nil when nothing resolved.
 func mergeSecuritySettings(levels []*settings.SecuritySettings) *settings.SecuritySettings {
 	serviceAccount := make([]*settings.StringSetting, len(levels))
+	kubernetesNamespace := make([]*settings.StringSetting, len(levels))
 
 	for i, l := range levels {
 		serviceAccount[i] = l.GetServiceAccount()
+		kubernetesNamespace[i] = l.GetKubernetesNamespace()
 	}
 
 	out := &settings.SecuritySettings{
-		ServiceAccount: mergeStringSettings(serviceAccount),
+		ServiceAccount:      mergeStringSettings(serviceAccount),
+		KubernetesNamespace: mergeStringSettings(kubernetesNamespace),
 	}
 
-	if out.ServiceAccount == nil {
+	if out.ServiceAccount == nil && out.KubernetesNamespace == nil {
 		return nil
 	}
 	return out
@@ -249,16 +264,38 @@ func mergeStorageSettings(levels []*settings.StorageSettings) *settings.StorageS
 // group mergers it holds no rules of its own. Returns nil when nothing resolved.
 func mergeAppSettings(levels []*settings.AppSettings) *settings.AppSettings {
 	disallowAnonymous := make([]*settings.BoolSetting, len(levels))
+	dnsStrategy := make([]*settings.StringSetting, len(levels))
 
 	for i, l := range levels {
 		disallowAnonymous[i] = l.GetDisallowAnonymous()
+		dnsStrategy[i] = l.GetAppDnsStrategy()
 	}
 
 	out := &settings.AppSettings{
 		DisallowAnonymous: mergeBoolSettings(disallowAnonymous),
+		AppDnsStrategy:    mergeStringSettings(dnsStrategy),
 	}
 
-	if out.DisallowAnonymous == nil {
+	if out.DisallowAnonymous == nil && out.AppDnsStrategy == nil {
+		return nil
+	}
+	return out
+}
+
+// mergeObservabilitySettings resolves the observability group across the level chain. Like the
+// other group mergers it holds no rules of its own. Returns nil when nothing resolved.
+func mergeObservabilitySettings(levels []*settings.ObservabilitySettings) *settings.ObservabilitySettings {
+	logRetentionDays := make([]*settings.Int64Setting, len(levels))
+
+	for i, l := range levels {
+		logRetentionDays[i] = l.GetLogRetentionDays()
+	}
+
+	out := &settings.ObservabilitySettings{
+		LogRetentionDays: mergeInt64Settings(logRetentionDays),
+	}
+
+	if out.LogRetentionDays == nil {
 		return nil
 	}
 	return out
@@ -277,6 +314,7 @@ func mergeSettings(levels []*settings.Settings) *settings.Settings {
 	envVars := make([]*settings.StringMapSetting, len(levels))
 	app := make([]*settings.AppSettings, len(levels))
 	podTemplateName := make([]*settings.StringSetting, len(levels))
+	observability := make([]*settings.ObservabilitySettings, len(levels))
 
 	for i, l := range levels {
 		run[i] = l.GetRun()
@@ -288,6 +326,7 @@ func mergeSettings(levels []*settings.Settings) *settings.Settings {
 		envVars[i] = l.GetEnvironmentVariables()
 		app[i] = l.GetApp()
 		podTemplateName[i] = l.GetPodTemplateName()
+		observability[i] = l.GetObservability()
 	}
 
 	return &settings.Settings{
@@ -300,5 +339,6 @@ func mergeSettings(levels []*settings.Settings) *settings.Settings {
 		EnvironmentVariables: mergeStringMapSettings(envVars),
 		App:                  mergeAppSettings(app),
 		PodTemplateName:      mergeStringSettings(podTemplateName),
+		Observability:        mergeObservabilitySettings(observability),
 	}
 }

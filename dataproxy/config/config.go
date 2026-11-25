@@ -33,6 +33,9 @@ type DataProxyConfig struct {
 	// Server configures the standalone DataProxy service HTTP listener.
 	Server ServerConfig `json:"server"`
 
+	// PprofPort is the port the pprof endpoint binds to. 0 disables profiling.
+	PprofPort int `json:"pprofPort" pflag:",Port the pprof endpoint binds to; 0 disables profiling"`
+
 	Upload   DataProxyUploadConfig   `json:"upload" pflag:",Defines data proxy upload configuration."`
 	Download DataProxyDownloadConfig `json:"download" pflag:",Defines data proxy download configuration."`
 

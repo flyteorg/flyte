@@ -33,6 +33,9 @@ const (
 	daskTaskType                             = "dask"
 	KindDaskJob                              = "DaskJob"
 	defaultDaskJobRunnerPrimaryContainerName = "job-runner"
+
+	// Set by the Dask operator on a DaskCluster's pods; a DaskJob names its cluster after itself.
+	daskClusterNameLabelKey = "dask.org/cluster-name"
 )
 
 func mergeMapInto(src map[string]string, dst map[string]string) {
@@ -483,7 +486,7 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 
 func getDaskSchedulerPodName(ctx context.Context, daskJobName string, pluginContext k8s.PluginContext) (string, error) {
 	podList := &v1.PodList{}
-	err := pluginContext.K8sReader().List(ctx, podList)
+	err := pluginContext.K8sReader().List(ctx, podList, client.MatchingLabels{daskClusterNameLabelKey: daskJobName})
 	if err != nil {
 		return "", fmt.Errorf("failed to list dask execution pods. Error: %w", err)
 	}
@@ -498,7 +501,7 @@ func getDaskSchedulerPodName(ctx context.Context, daskJobName string, pluginCont
 
 func isDaskSchedulerReady(ctx context.Context, daskJobName string, pluginContext k8s.PluginContext) (bool, error) {
 	podList := &v1.PodList{}
-	err := pluginContext.K8sReader().List(ctx, podList)
+	err := pluginContext.K8sReader().List(ctx, podList, client.MatchingLabels{daskClusterNameLabelKey: daskJobName})
 	if err != nil {
 		return false, fmt.Errorf("failed to list dask execution pods. Error: %w", err)
 	}

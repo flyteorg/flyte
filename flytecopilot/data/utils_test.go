@@ -3,6 +3,8 @@ package data
 import (
 	"bytes"
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path"
 	"testing"
@@ -92,6 +94,19 @@ func TestDownloadFromHttp(t *testing.T) {
 
 	_, err = DownloadFileFromHTTP(context.TODO(), badLoc)
 	assert.Error(t, err)
+}
+
+func TestDownloadFromHttpRejectsErrorStatus(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusForbidden)
+		_, _ = w.Write([]byte(`<Error><Code>AccessDenied</Code></Error>`))
+	}))
+	defer srv.Close()
+
+	f, err := DownloadFileFromHTTP(context.TODO(), storage.DataReference(srv.URL+"/bucket/key"))
+	assert.Error(t, err)
+	assert.Nil(t, f)
+	assert.Contains(t, err.Error(), "403")
 }
 
 func TestDownloadFromStorage(t *testing.T) {

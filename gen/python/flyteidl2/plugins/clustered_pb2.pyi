@@ -56,9 +56,11 @@ class TorchRuntime(_message.Message):
     def __init__(self, rdzv_backend: _Optional[_Union[RdzvBackend, str]] = ..., max_restarts: _Optional[int] = ...) -> None: ...
 
 class ClusterFailurePolicy(_message.Message):
-    __slots__ = ["max_restarts", "restart_on_host_maintenance"]
+    __slots__ = ["max_restarts", "restart_on_host_maintenance", "resume_after_preemption"]
     MAX_RESTARTS_FIELD_NUMBER: _ClassVar[int]
     RESTART_ON_HOST_MAINTENANCE_FIELD_NUMBER: _ClassVar[int]
+    RESUME_AFTER_PREEMPTION_FIELD_NUMBER: _ClassVar[int]
     max_restarts: int
     restart_on_host_maintenance: bool
-    def __init__(self, max_restarts: _Optional[int] = ..., restart_on_host_maintenance: bool = ...) -> None: ...
+    resume_after_preemption: bool
+    def __init__(self, max_restarts: _Optional[int] = ..., restart_on_host_maintenance: bool = ..., resume_after_preemption: bool = ...) -> None: ...

@@ -86,6 +86,7 @@ func NewCacheServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			httpClient,
 			baseURL+CacheServiceGetProcedure,
 			connect.WithSchema(cacheServiceGetMethodDescriptor),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		put: connect.NewClient[v2.PutCacheRequest, cacheservice.PutCacheResponse](
@@ -173,6 +174,7 @@ func NewCacheServiceHandler(svc CacheServiceHandler, opts ...connect.HandlerOpti
 		CacheServiceGetProcedure,
 		svc.Get,
 		connect.WithSchema(cacheServiceGetMethodDescriptor),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	cacheServicePutHandler := connect.NewUnaryHandler(

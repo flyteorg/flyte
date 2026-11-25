@@ -45,6 +45,7 @@ import (
 	"github.com/flyteorg/flyte/v2/executor/pkg/plugin"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
@@ -55,12 +56,14 @@ import (
 )
 
 var (
-	ctx           context.Context
-	testEnv       *envtest.Environment
-	k8sClient     client.WithWatch
-	reconciler    *controller.TaskActionReconciler
-	actionsClient *actionsk8s.ActionsClient
-	runClient     *recordingRunClient
+	ctx            context.Context
+	testEnv        *envtest.Environment
+	k8sClient      client.WithWatch
+	reconciler     *controller.TaskActionReconciler
+	actionsClient  *actionsk8s.ActionsClient
+	runClient      *recordingRunClient
+	dataStore      *storage.DataStore
+	pluginRegistry *plugin.Registry
 )
 
 // TestMain stands up one envtest apiserver and wires BOTH halves of the
@@ -115,6 +118,10 @@ func TestMain(m *testing.M) {
 		log.Printf("Failed to create manager: %v", err)
 		return
 	}
+	if err := actionsk8s.RegisterTaskActionIndexes(ctx, mgr.GetCache()); err != nil {
+		log.Printf("Failed to register TaskAction indexes: %v", err)
+		return
+	}
 	go func() {
 		if err := mgr.Start(ctx); err != nil {
 			log.Printf("Manager exited with error: %v", err)
@@ -138,28 +145,33 @@ func TestMain(m *testing.M) {
 		"TaskAction",
 		promutils.NewScope("integration"),
 	)
-	registry := plugin.NewRegistry(setupCtx, pluginmachinery.PluginRegistry())
-	if err := registry.Initialize(ctx); err != nil {
+	pluginRegistry = plugin.NewRegistry(setupCtx, pluginmachinery.PluginRegistry())
+	if err := pluginRegistry.Initialize(ctx); err != nil {
 		log.Printf("Failed to initialize plugin registry: %v", err)
 		return
 	}
 
-	dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewScope("integration_storage"))
+	dataStore, err = storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewScope("integration_storage"))
 	if err != nil {
 		log.Printf("Failed to create data store: %v", err)
 		return
 	}
 
 	reconciler = controller.NewTaskActionReconciler(
-		k8sClient, scheme.Scheme, registry, dataStore,
+		k8sClient, scheme.Scheme, pluginRegistry, dataStore,
 		&fakeEventsClient{}, "", noop.NewMeterProvider(), mgr.GetCache(),
 	)
 	reconciler.Recorder = events.NewFakeRecorder(100)
 
 	// Actions half: the client that Enqueues CRs and watches them back.
 	runClient = &recordingRunClient{}
+	recordedFilter, err := fastcheck.NewOppoBloomFilter(1024, "integration_actions_filter", noop.NewMeterProvider())
+	if err != nil {
+		log.Printf("Failed to create actions dedup filter: %v", err)
+		return
+	}
 	var acErr error
-	actionsClient, acErr = actionsk8s.NewActionsClient(k8sClient, mgr.GetCache(), "flyte", 32, 1, runClient, 1024, promutils.NewScope("integration_actions"))
+	actionsClient, acErr = actionsk8s.NewActionsClient(k8sClient, mgr.GetCache(), "flyte", 32, 1, runClient, recordedFilter)
 	if acErr != nil {
 		log.Printf("Failed to create actions client: %v", acErr)
 		return
@@ -193,6 +205,26 @@ type fakeEventsClient struct{}
 
 func (f *fakeEventsClient) Record(_ context.Context, _ *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
 	return connect.NewResponse(&workflow.RecordResponse{}), nil
+}
+
+type recordingEventsClient struct {
+	mu     sync.Mutex
+	events []*workflow.ActionEvent
+}
+
+func (r *recordingEventsClient) Record(_ context.Context, req *connect.Request[workflow.RecordRequest]) (*connect.Response[workflow.RecordResponse], error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.events = append(r.events, req.Msg.GetEvents()...)
+	return connect.NewResponse(&workflow.RecordResponse{}), nil
+}
+
+func (r *recordingEventsClient) RecordedEvents() []*workflow.ActionEvent {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	out := make([]*workflow.ActionEvent, len(r.events))
+	copy(out, r.events)
+	return out
 }
 
 // recordingRunClient captures what the ActionsClient forwards to the internal

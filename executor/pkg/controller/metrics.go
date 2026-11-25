@@ -27,7 +27,7 @@ const (
 //
 // Reconcile throughput, active workers, and workqueue latency already come from
 // the controller-runtime metrics server, and event-proxy send latency comes from
-// the otelconnect-wrapped events client (rpc_client_duration). This adds what
+// the otelconnect-wrapped events client (rpc.client.call.duration). This adds what
 // none of those provide: TaskAction CRD count by phase, serialized CRD size, and
 // per-operation Kubernetes API read/write latency for the CRD.
 type taskActionMetrics struct {

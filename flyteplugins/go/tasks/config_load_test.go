@@ -57,6 +57,10 @@ func TestLoadConfig(t *testing.T) {
 		expectedMemory := resource.MustParse("1024Mi")
 		assert.True(t, expectedMemory.Equal(k8sConfig.DefaultMemoryRequest))
 		assert.Equal(t, map[string]string{"x/interruptible": "true"}, k8sConfig.InterruptibleNodeSelector)
+		// The configured entry overrides its default and the remaining defaults survive.
+		assert.Equal(t, "custom-t4", k8sConfig.AcceleratorDevices["T4"])
+		assert.Equal(t, "nvidia-tesla-a100", k8sConfig.AcceleratorDevices["A100"])
+		assert.Equal(t, "nvidia-tesla-t4-shared", k8sConfig.AcceleratorDevices["T4 SHARED"])
 		assert.Equal(t, "x/flyte", k8sConfig.InterruptibleTolerations[0].Key)
 		assert.Equal(t, "interruptible", k8sConfig.InterruptibleTolerations[0].Value)
 		assert.NotNil(t, k8sConfig.DefaultPodSecurityContext)

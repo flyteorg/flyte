@@ -146,6 +146,21 @@ func validateRunName(name string) error {
 	return nil
 }
 
+// validatePodTemplateName checks that a run-scoped pod template name is a valid
+// Kubernetes object name. PodTemplates are named by the DNS-1123 subdomain rule,
+// so a name that fails it cannot match any template. Empty means no template.
+func validatePodTemplateName(name string) error {
+	if name == "" {
+		return nil
+	}
+
+	if errs := validation.IsDNS1123Subdomain(name); len(errs) > 0 {
+		return connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid pod template name %q: %s", name, strings.Join(errs, "; ")))
+	}
+
+	return nil
+}
+
 // validateProjectExists checks that the given project ID exists by calling the ProjectService.
 func validateProjectExists(ctx context.Context, projectClient projectconnect.ProjectServiceClient, projectID string) error {
 	if _, err := projectClient.GetProject(ctx, connect.NewRequest(&project.GetProjectRequest{

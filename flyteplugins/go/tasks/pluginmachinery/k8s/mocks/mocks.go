@@ -450,8 +450,8 @@ func (_c *Plugin_BuildIdentityResource_Call) Run(run func(ctx context.Context, t
 	return _c
 }
 
-func (_c *Plugin_BuildIdentityResource_Call) Return(object client.Object, err error) *Plugin_BuildIdentityResource_Call {
-	_c.Call.Return(object, err)
+func (_c *Plugin_BuildIdentityResource_Call) Return(v client.Object, err error) *Plugin_BuildIdentityResource_Call {
+	_c.Call.Return(v, err)
 	return _c
 }
 
@@ -518,8 +518,8 @@ func (_c *Plugin_BuildResource_Call) Run(run func(ctx context.Context, taskCtx c
 	return _c
 }
 
-func (_c *Plugin_BuildResource_Call) Return(object client.Object, err error) *Plugin_BuildResource_Call {
-	_c.Call.Return(object, err)
+func (_c *Plugin_BuildResource_Call) Return(v client.Object, err error) *Plugin_BuildResource_Call {
+	_c.Call.Return(v, err)
 	return _c
 }
 
@@ -855,8 +855,8 @@ func (_c *ClusterPlugin_BuildClusterIdentityResource_Call) Run(run func(ctx cont
 	return _c
 }
 
-func (_c *ClusterPlugin_BuildClusterIdentityResource_Call) Return(object client.Object, err error) *ClusterPlugin_BuildClusterIdentityResource_Call {
-	_c.Call.Return(object, err)
+func (_c *ClusterPlugin_BuildClusterIdentityResource_Call) Return(v client.Object, err error) *ClusterPlugin_BuildClusterIdentityResource_Call {
+	_c.Call.Return(v, err)
 	return _c
 }
 
@@ -923,8 +923,8 @@ func (_c *ClusterPlugin_BuildClusterResource_Call) Run(run func(ctx context.Cont
 	return _c
 }
 
-func (_c *ClusterPlugin_BuildClusterResource_Call) Return(object client.Object, err error) *ClusterPlugin_BuildClusterResource_Call {
-	_c.Call.Return(object, err)
+func (_c *ClusterPlugin_BuildClusterResource_Call) Return(v client.Object, err error) *ClusterPlugin_BuildClusterResource_Call {
+	_c.Call.Return(v, err)
 	return _c
 }
 
@@ -991,8 +991,8 @@ func (_c *ClusterPlugin_BuildJobIdentityResource_Call) Run(run func(ctx context.
 	return _c
 }
 
-func (_c *ClusterPlugin_BuildJobIdentityResource_Call) Return(object client.Object, err error) *ClusterPlugin_BuildJobIdentityResource_Call {
-	_c.Call.Return(object, err)
+func (_c *ClusterPlugin_BuildJobIdentityResource_Call) Return(v client.Object, err error) *ClusterPlugin_BuildJobIdentityResource_Call {
+	_c.Call.Return(v, err)
 	return _c
 }
 
@@ -1065,8 +1065,8 @@ func (_c *ClusterPlugin_BuildJobResource_Call) Run(run func(ctx context.Context,
 	return _c
 }
 
-func (_c *ClusterPlugin_BuildJobResource_Call) Return(object client.Object, err error) *ClusterPlugin_BuildJobResource_Call {
-	_c.Call.Return(object, err)
+func (_c *ClusterPlugin_BuildJobResource_Call) Return(v client.Object, err error) *ClusterPlugin_BuildJobResource_Call {
+	_c.Call.Return(v, err)
 	return _c
 }
 

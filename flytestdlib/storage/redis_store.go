@@ -135,19 +135,32 @@ func (s *RedisStore) List(ctx context.Context, reference DataReference, maxItems
 	}
 
 	var keys []string
-	var scanCursor uint64
-	for {
-		batch, next, err := s.client.Scan(ctx, scanCursor, match, listScanBatchSize).Result()
-		if err != nil {
-			return nil, NewCursorAtEnd(), err
+	var keysMu sync.Mutex
+	scan := func(ctx context.Context, client redis.Cmdable) error {
+		var scanCursor uint64
+		for {
+			batch, next, err := client.Scan(ctx, scanCursor, match, listScanBatchSize).Result()
+			if err != nil {
+				return err
+			}
+			keysMu.Lock()
+			keys = append(keys, batch...)
+			keysMu.Unlock()
+			if next == 0 {
+				return nil
+			}
+			scanCursor = next
 		}
-
-		keys = append(keys, batch...)
-		if next == 0 {
-			break
-		}
-
-		scanCursor = next
+	}
+	if cluster, ok := s.client.(*redis.ClusterClient); ok {
+		err = cluster.ForEachMaster(ctx, func(ctx context.Context, client *redis.Client) error {
+			return scan(ctx, client)
+		})
+	} else {
+		err = scan(ctx, s.client)
+	}
+	if err != nil {
+		return nil, NewCursorAtEnd(), err
 	}
 
 	// SCAN may return duplicates across batches; sort + compact yields a stable, unique listing.
@@ -261,30 +274,29 @@ func (s *RedisStore) Delete(ctx context.Context, reference DataReference) error 
 }
 
 // NewRedisRawStore creates a RawStore backed by the Redis server configured in cfg.Redis. It is the
-// primary-scheme builder (type: redis) and requires redis.addr to be set.
-func NewRedisRawStore(_ context.Context, cfg *Config, metrics *dataStoreMetrics) (RawStore, error) {
-	if len(cfg.Redis.Addr) == 0 {
-		return nil, fmt.Errorf("storage type [%v] requires redis.addr to be set", TypeRedis)
+// primary-scheme builder (type: redis) and requires redis.addr or redis.addrs to be set.
+func NewRedisRawStore(ctx context.Context, cfg *Config, metrics *dataStoreMetrics) (RawStore, error) {
+	if len(cfg.Redis.Addresses()) == 0 {
+		return nil, fmt.Errorf("storage type [%v] requires redis.addr or redis.addrs to be set", TypeRedis)
 	}
 
-	return buildRedisStore(cfg.Redis, metrics), nil
+	return buildRedisStore(ctx, cfg.Redis, metrics)
 }
 
 // buildRedisStore constructs a RedisStore from a resolved RedisConfig.
-func buildRedisStore(cfg RedisConfig, metrics *dataStoreMetrics) *RedisStore {
+func buildRedisStore(ctx context.Context, cfg RedisConfig, metrics *dataStoreMetrics) (*RedisStore, error) {
+	client, err := cfg.NewClient(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get redis options: %w", err)
+	}
 	self := &RedisStore{
-		client: redis.NewClient(&redis.Options{
-			Addr:     cfg.Addr,
-			Username: cfg.Username,
-			Password: cfg.Password,
-			DB:       cfg.DB,
-		}),
-		baseRef: DataReference(fmt.Sprintf("%s://%s", TypeRedis, cfg.Addr)),
-		addr:    cfg.Addr,
+		client:  client,
+		baseRef: DataReference(fmt.Sprintf("%s://%s", TypeRedis, cfg.Addresses()[0])),
+		addr:    cfg.Addresses()[0],
 	}
 
 	self.copyImpl = newCopyImpl(self, metrics.copyMetrics)
-	return self
+	return self, nil
 }
 
 // redisFactory lazily builds a redis-backed RawStore for a secondary redis:// scheme. The address is
@@ -292,16 +304,16 @@ func buildRedisStore(cfg RedisConfig, metrics *dataStoreMetrics) *RedisStore {
 // config, and finally the host portion of the triggering reference. The last step is what lets a
 // bare redis:// reference "just work" — the DataStore instantiates a client pointed at the reference
 // host on demand. It satisfies backendFactory.
-func redisFactory(_ context.Context, _ string, ref DataReference, cfg *Config, _ *http.Client, metrics *dataStoreMetrics) (RawStore, error) {
+func redisFactory(ctx context.Context, _ string, ref DataReference, cfg *Config, _ *http.Client, metrics *dataStoreMetrics) (RawStore, error) {
 	var redisCfg RedisConfig
 	switch {
 	case cfg.Schemes[TypeRedis].Redis != nil:
 		redisCfg = *cfg.Schemes[TypeRedis].Redis
-	case len(cfg.Redis.Addr) > 0:
+	case len(cfg.Redis.Addresses()) > 0:
 		redisCfg = cfg.Redis
 	}
 
-	if redisCfg.Addr == "" {
+	if len(redisCfg.Addresses()) == 0 {
 		_, host, _, err := ref.Split()
 		if err != nil {
 			return nil, err
@@ -312,7 +324,7 @@ func redisFactory(_ context.Context, _ string, ref DataReference, cfg *Config, _
 		redisCfg.Addr = host
 	}
 
-	return buildRedisStore(redisCfg, metrics), nil
+	return buildRedisStore(ctx, redisCfg, metrics)
 }
 
 // redisAddrConfigured reports whether a redis address is configured, meaning redisFactory will NOT
@@ -322,7 +334,7 @@ func redisFactory(_ context.Context, _ string, ref DataReference, cfg *Config, _
 // own server).
 func redisAddrConfigured(cfg *Config) bool {
 	if rc := cfg.Schemes[TypeRedis].Redis; rc != nil {
-		return rc.Addr != ""
+		return len(rc.Addresses()) > 0
 	}
-	return cfg.Redis.Addr != ""
+	return len(cfg.Redis.Addresses()) > 0
 }

@@ -3,6 +3,8 @@ plugins:
   # All k8s plugins default configuration
   k8s:
     inject-finalizer: true
+    accelerator-devices:
+      T4: custom-t4
     default-annotations:
       - annotationKey1: annotationValue1
       - annotationKey2: annotationValue2

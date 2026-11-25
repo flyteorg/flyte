@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"connectrpc.com/connect"
-	"connectrpc.com/otelconnect"
 
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	otelInterceptor, err := otelconnect.NewInterceptor()
+	otelInterceptor, err := otelutils.NewConnectInterceptor()
 	if err != nil {
 		log.Fatalf("Failed to create otel interceptor: %v", err)
 	}
@@ -140,12 +140,12 @@ func main() {
 	// Test 5: List actions for a run
 	fmt.Println("Test 5: Listing actions for the run...")
 	listActionsReq := &workflow.ListActionsRequest{
-		RunId: &common.RunIdentifier{
+		ScopeBy: &workflow.ListActionsRequest_RunId{RunId: &common.RunIdentifier{
 			Org:     "my-org",
 			Project: "my-project",
 			Domain:  "development",
 			Name:    "test-run-001",
-		},
+		}},
 		Request: &common.ListRequest{
 			Limit: 10,
 		},

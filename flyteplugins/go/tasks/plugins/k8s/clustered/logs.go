@@ -6,6 +6,7 @@ import (
 	"time"
 
 	v1 "k8s.io/api/core/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	jobsetv1alpha2 "sigs.k8s.io/jobset/api/jobset/v1alpha2"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/logs"
@@ -90,10 +91,9 @@ func getTaskLogs(ctx context.Context, pluginContext k8s.PluginContext, jobSet *j
 // of log-template config. Best-effort: returns nil on list error or when no pods are
 // ready yet, leaving the templated Logs path as the fallback.
 func getLogContext(ctx context.Context, pluginContext k8s.PluginContext, jobSet *jobsetv1alpha2.JobSet) *core.LogContext {
-	// The plugin's K8sReader already scopes List calls to this node execution's
-	// namespace and execution-id/node-id labels, so no extra filters are needed.
+	// The JobSet controller labels every pod it creates with the JobSet name.
 	podList := &v1.PodList{}
-	if err := pluginContext.K8sReader().List(ctx, podList); err != nil {
+	if err := pluginContext.K8sReader().List(ctx, podList, client.MatchingLabels{jobsetv1alpha2.JobSetNameKey: jobSet.Name}); err != nil {
 		logger.Warnf(ctx, "failed to list pods for JobSet %s/%s log context: %v", jobSet.Namespace, jobSet.Name, err)
 		return nil
 	}

@@ -10,6 +10,9 @@ helmCharts:
     postgresql:
       enabled: false
     flyte-binary:
+      flyte-core-components:
+        runs:
+          notificationBufferLimit: 65000
       deployment:
         waitForDB:
           image:

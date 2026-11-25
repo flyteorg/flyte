@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/app"
 	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
@@ -17,14 +18,17 @@ import (
 
 func main() {
 	a := &app.App{
-		Name:  "cache-service",
+		Name:  cache_service.ServiceName,
 		Short: "Cache Service for Flyte",
 		Setup: func(ctx context.Context, sc *app.SetupContext) error {
 			cfg := cacheserviceconfig.GetConfig()
 			sc.Host = cfg.Server.Host
 			sc.Port = cfg.Server.Port
 
-			db, err := database.GetDB(ctx, database.GetConfig())
+			if err := otelutils.RegisterProvidersWithContext(ctx, cache_service.ServiceName, otelutils.GetConfig()); err != nil {
+				return fmt.Errorf("failed to initialize database telemetry: %w", err)
+			}
+			db, err := database.GetDB(ctx, database.GetConfig(), cache_service.ServiceName)
 			if err != nil {
 				return fmt.Errorf("failed to initialize database: %w", err)
 			}

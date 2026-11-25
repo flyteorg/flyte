@@ -15,6 +15,7 @@ class Granularity(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     HOUR: _ClassVar[Granularity]
     DAY: _ClassVar[Granularity]
     MONTH: _ClassVar[Granularity]
+    WEEK: _ClassVar[Granularity]
 
 class Operator(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
@@ -25,6 +26,7 @@ MINUTE: Granularity
 HOUR: Granularity
 DAY: Granularity
 MONTH: Granularity
+WEEK: Granularity
 MINUS: Operator
 PLUS: Operator
 
@@ -131,12 +133,14 @@ class Partitions(_message.Message):
     def __init__(self, value: _Optional[_Mapping[str, LabelValue]] = ...) -> None: ...
 
 class TimePartition(_message.Message):
-    __slots__ = ["value", "granularity"]
+    __slots__ = ["value", "granularity", "key"]
     VALUE_FIELD_NUMBER: _ClassVar[int]
     GRANULARITY_FIELD_NUMBER: _ClassVar[int]
+    KEY_FIELD_NUMBER: _ClassVar[int]
     value: LabelValue
     granularity: Granularity
-    def __init__(self, value: _Optional[_Union[LabelValue, _Mapping]] = ..., granularity: _Optional[_Union[Granularity, str]] = ...) -> None: ...
+    key: str
+    def __init__(self, value: _Optional[_Union[LabelValue, _Mapping]] = ..., granularity: _Optional[_Union[Granularity, str]] = ..., key: _Optional[str] = ...) -> None: ...
 
 class ArtifactID(_message.Message):
     __slots__ = ["artifact_key", "version", "partitions", "time_partition"]

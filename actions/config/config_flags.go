@@ -50,6 +50,7 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "pprofPort"), defaultConfig.PprofPort, "Port the pprof endpoint binds to; 0 disables profiling")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "server.port"), defaultConfig.Server.Port, "Port to bind the HTTP server")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "server.host"), defaultConfig.Server.Host, "Host to bind the HTTP server")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes.kubeconfig"), defaultConfig.Kubernetes.KubeConfig, "Path to kubeconfig file (optional)")
@@ -68,6 +69,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.clientSecretFile"), defaultConfig.RunService.Auth.ClientSecretFile, "File containing the internal run service OAuth 2.0 client secret")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "runService.auth.scopes"), defaultConfig.RunService.Auth.Scopes, "Internal run service OAuth 2.0 scopes")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "runService.auth.audience"), defaultConfig.RunService.Auth.Audience, "Internal run service OAuth 2.0 token audience")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "runService.http.maxIdleConnsPerHost"), defaultConfig.RunService.HTTP.MaxIdleConnsPerHost, "Internal run service idle connections kept per host; 0 uses Go's default of 2")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "recordFilterSize"), defaultConfig.RecordFilterSize, "Size of the oppo bloom filter for deduplicating RecordAction calls")
 	return cmdFlags
 }

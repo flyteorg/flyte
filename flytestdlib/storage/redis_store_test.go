@@ -250,3 +250,18 @@ func TestRedisStore_ThroughDataStore(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, payload, data)
 }
+
+func TestNewRedisRawStore_Addrs(t *testing.T) {
+	mr := miniredis.RunT(t)
+	cfg := &Config{Type: TypeRedis, Redis: RedisConfig{Addrs: []string{mr.Addr()}}}
+	store, err := NewRedisRawStore(context.Background(), cfg, metrics)
+	require.NoError(t, err)
+	t.Cleanup(func() { require.NoError(t, store.(*RedisStore).client.Close()) })
+	assert.True(t, redisAddrConfigured(cfg))
+	assert.Equal(t, DataReference("redis://"+mr.Addr()), store.GetBaseContainerFQN(context.Background()))
+	ref := redisRef(mr, "test-key")
+	require.NoError(t, store.WriteRaw(context.Background(), ref, 5, Options{}, bytes.NewBufferString("value")))
+	value, err := mr.Get("test-key")
+	require.NoError(t, err)
+	assert.Equal(t, "value", value)
+}

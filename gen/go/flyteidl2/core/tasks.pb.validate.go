@@ -228,6 +228,8 @@ func (m *GPUAccelerator) validate(all bool) error {
 
 	// no validation rules for DeviceClass
 
+	// no validation rules for AcceleratorModel
+
 	switch v := m.PartitionSizeValue.(type) {
 	case *GPUAccelerator_Unpartitioned:
 		if v == nil {
@@ -1198,6 +1200,10 @@ func (m *ReusePolicy) validate(all bool) error {
 
 	// no validation rules for Scope
 
+	// no validation rules for Name
+
+	// no validation rules for Version
+
 	if len(errors) > 0 {
 		return ReusePolicyMultiError(errors)
 	}
@@ -1505,6 +1511,8 @@ func (m *TaskTemplate) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for WorkerKind
 
 	switch v := m.Target.(type) {
 	case *TaskTemplate_Container:

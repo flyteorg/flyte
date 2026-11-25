@@ -5,6 +5,8 @@
 import type { GenEnum, GenExtension, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
 import { enumDesc, extDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
 import { file_buf_validate_validate } from "../../buf/validate/validate_pb.ts";
+import type { GPUAccelerator } from "../core/tasks_pb.ts";
+import { file_flyteidl2_core_tasks } from "../core/tasks_pb.ts";
 import type { FieldOptions } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_descriptor } from "@bufbuild/protobuf/wkt";
 import type { Message } from "@bufbuild/protobuf";
@@ -13,7 +15,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file flyteidl2/settings/settings_definition.proto.
  */
 export const file_flyteidl2_settings_settings_definition: GenFile = /*@__PURE__*/
-  fileDesc("CixmbHl0ZWlkbDIvc2V0dGluZ3Mvc2V0dGluZ3NfZGVmaW5pdGlvbi5wcm90bxISZmx5dGVpZGwyLnNldHRpbmdzIh4KDFN0cmluZ1ZhbHVlcxIOCgZ2YWx1ZXMYASADKAkieAoJU3RyaW5nTWFwEjsKB2VudHJpZXMYASADKAsyKi5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nTWFwLkVudHJpZXNFbnRyeRouCgxFbnRyaWVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJECgtTZXR0aW5nc0tleRIUCgNvcmcYASABKAlCB7pIBHICEAESDgoGZG9tYWluGAIgASgJEg8KB3Byb2plY3QYAyABKAkiiwEKDVN0cmluZ1NldHRpbmcSLwoFc3RhdGUYASABKA4yIC5mbHl0ZWlkbDIuc2V0dGluZ3MuU2V0dGluZ1N0YXRlEhQKDHN0cmluZ192YWx1ZRgCIAEoCRIzCgtzY29wZV9sZXZlbBgDIAEoDjIeLmZseXRlaWRsMi5zZXR0aW5ncy5TY29wZUxldmVsIocBCgxJbnQ2NFNldHRpbmcSLwoFc3RhdGUYASABKA4yIC5mbHl0ZWlkbDIuc2V0dGluZ3MuU2V0dGluZ1N0YXRlEhEKCWludF92YWx1ZRgCIAEoAxIzCgtzY29wZV9sZXZlbBgDIAEoDjIeLmZseXRlaWRsMi5zZXR0aW5ncy5TY29wZUxldmVsIocBCgtCb29sU2V0dGluZxIvCgVzdGF0ZRgBIAEoDjIgLmZseXRlaWRsMi5zZXR0aW5ncy5TZXR0aW5nU3RhdGUSEgoKYm9vbF92YWx1ZRgCIAEoCBIzCgtzY29wZV9sZXZlbBgDIAEoDjIeLmZseXRlaWRsMi5zZXR0aW5ncy5TY29wZUxldmVsIqoBChBTdHJpbmdNYXBTZXR0aW5nEi8KBXN0YXRlGAEgASgOMiAuZmx5dGVpZGwyLnNldHRpbmdzLlNldHRpbmdTdGF0ZRIwCgltYXBfdmFsdWUYAiABKAsyHS5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nTWFwEjMKC3Njb3BlX2xldmVsGAMgASgOMh4uZmx5dGVpZGwyLnNldHRpbmdzLlNjb3BlTGV2ZWwijwEKD1F1YW50aXR5U2V0dGluZxIvCgVzdGF0ZRgBIAEoDjIgLmZseXRlaWRsMi5zZXR0aW5ncy5TZXR0aW5nU3RhdGUSFgoOcXVhbnRpdHlfdmFsdWUYAiABKAkSMwoLc2NvcGVfbGV2ZWwYAyABKA4yHi5mbHl0ZWlkbDIuc2V0dGluZ3MuU2NvcGVMZXZlbCKeAwoLUnVuU2V0dGluZ3MSWAoNZGVmYXVsdF9xdWV1ZRgBIAEoCzIhLmZseXRlaWRsMi5zZXR0aW5ncy5TdHJpbmdTZXR0aW5nQh6iVRtEZWZhdWx0IHF1ZXVlIGZvciB0YXNrIHJ1bnMSogEKFm1heF9hY3Rpb25fY29uY3VycmVuY3kYAiABKAsyIC5mbHl0ZWlkbDIuc2V0dGluZ3MuSW50NjRTZXR0aW5nQmCiVV1NYXhpbXVtIG51bWJlciBvZiBhY3Rpb25zIG9mIGEgcnVuIHRoYXQgbWF5IGV4ZWN1dGUgY29uY3VycmVudGx5LiAwIG9yIHVuc2V0IG1lYW5zIHVubGltaXRlZC4SjwEKDHJ1bl9iYXNlX2RpchgDIAEoCzIhLmZseXRlaWRsMi5zZXR0aW5ncy5TdHJpbmdTZXR0aW5nQlaiVVNCYXNlIGRpcmVjdG9yeSBmb3IgcnVuIG1ldGFkYXRhIHN1Y2ggYXMgaW5wdXRzL291dHB1dHMgKGUuZy4gczM6Ly9teS1idWNrZXQvcHJlZml4KSJ7ChBTZWN1cml0eVNldHRpbmdzEmcKD3NlcnZpY2VfYWNjb3VudBgBIAEoCzIhLmZseXRlaWRsMi5zZXR0aW5ncy5TdHJpbmdTZXR0aW5nQiuiVShLdWJlcm5ldGVzIHNlcnZpY2UgYWNjb3VudCBmb3IgdGFzayBwb2RzIp8BCg9TdG9yYWdlU2V0dGluZ3MSeAoNcmF3X2RhdGFfcGF0aBgBIAEoCzIhLmZseXRlaWRsMi5zZXR0aW5ncy5TdHJpbmdTZXR0aW5nQj6iVTtCYXNlIHBhdGggZm9yIHJhdyBkYXRhIHN0b3JhZ2UgKGUuZy4gczM6Ly9teS1idWNrZXQvcHJlZml4KUoECAIQA1IMcnVuX2Jhc2VfZGlyIpcDChRUYXNrUmVzb3VyY2VEZWZhdWx0cxJdCgNjcHUYASABKAsyIy5mbHl0ZWlkbDIuc2V0dGluZ3MuUXVhbnRpdHlTZXR0aW5nQiuiVShDUFUgcmVzb3VyY2UgcXVhbnRpdHkgKGUuZy4gIjUwMG0iLCAiMiIpElUKA2dwdRgCIAEoCzIjLmZseXRlaWRsMi5zZXR0aW5ncy5RdWFudGl0eVNldHRpbmdCI6JVIEdQVSByZXNvdXJjZSBxdWFudGl0eSAoZS5nLiAiMSIpEmYKBm1lbW9yeRgDIAEoCzIjLmZseXRlaWRsMi5zZXR0aW5ncy5RdWFudGl0eVNldHRpbmdCMaJVLk1lbW9yeSByZXNvdXJjZSBxdWFudGl0eSAoZS5nLiAiMjU2TWkiLCAiNEdpIikSYQoHc3RvcmFnZRgEIAEoCzIjLmZseXRlaWRsMi5zZXR0aW5ncy5RdWFudGl0eVNldHRpbmdCK6JVKEVwaGVtZXJhbCBzdG9yYWdlIHF1YW50aXR5IChlLmcuICIxMEdpIiki1wIKFFRhc2tSZXNvdXJjZVNldHRpbmdzEmgKA21pbhgBIAEoCzIoLmZseXRlaWRsMi5zZXR0aW5ncy5UYXNrUmVzb3VyY2VEZWZhdWx0c0IxolUuTWluaW11bSByZXNvdXJjZSByZXF1ZXN0cyBhcHBsaWVkIHRvIHRhc2sgcG9kcxJmCgNtYXgYAiABKAsyKC5mbHl0ZWlkbDIuc2V0dGluZ3MuVGFza1Jlc291cmNlRGVmYXVsdHNCL6JVLE1heGltdW0gcmVzb3VyY2UgbGltaXRzIGFwcGxpZWQgdG8gdGFzayBwb2RzEm0KFW1pcnJvcl9saW1pdHNfcmVxdWVzdBgDIAEoCzIfLmZseXRlaWRsMi5zZXR0aW5ncy5Cb29sU2V0dGluZ0ItolUqV2hlbiB0cnVlLCByZXNvdXJjZSBsaW1pdHMgbWlycm9yIHJlcXVlc3RzIosBCgtBcHBTZXR0aW5ncxJ8ChJkaXNhbGxvd19hbm9ueW1vdXMYASABKAsyHy5mbHl0ZWlkbDIuc2V0dGluZ3MuQm9vbFNldHRpbmdCP6JVPERpc2FsbG93IGFub255bW91cyAodW5hdXRoZW50aWNhdGVkKSBhY2Nlc3MgdG8gYXBwcyBvcmctd2lkZSL2BgoIU2V0dGluZ3MSLAoDcnVuGAEgASgLMh8uZmx5dGVpZGwyLnNldHRpbmdzLlJ1blNldHRpbmdzEjYKCHNlY3VyaXR5GAIgASgLMiQuZmx5dGVpZGwyLnNldHRpbmdzLlNlY3VyaXR5U2V0dGluZ3MSNAoHc3RvcmFnZRgDIAEoCzIjLmZseXRlaWRsMi5zZXR0aW5ncy5TdG9yYWdlU2V0dGluZ3MSPwoNdGFza19yZXNvdXJjZRgEIAEoCzIoLmZseXRlaWRsMi5zZXR0aW5ncy5UYXNrUmVzb3VyY2VTZXR0aW5ncxKIAQoGbGFiZWxzGAUgASgLMiQuZmx5dGVpZGwyLnNldHRpbmdzLlN0cmluZ01hcFNldHRpbmdCUqJVT0t1YmVybmV0ZXMgbGFiZWxzIGFwcGxpZWQgdG8gdGFzayBwb2RzLiBDaGlsZCBvdmVycmlkZXMgcGFyZW50IG9uIGtleSBjb25mbGljdC4SkgEKC2Fubm90YXRpb25zGAYgASgLMiQuZmx5dGVpZGwyLnNldHRpbmdzLlN0cmluZ01hcFNldHRpbmdCV6JVVEt1YmVybmV0ZXMgYW5ub3RhdGlvbnMgYXBwbGllZCB0byB0YXNrIHBvZHMuIENoaWxkIG92ZXJyaWRlcyBwYXJlbnQgb24ga2V5IGNvbmZsaWN0LhKeAQoVZW52aXJvbm1lbnRfdmFyaWFibGVzGAcgASgLMiQuZmx5dGVpZGwyLnNldHRpbmdzLlN0cmluZ01hcFNldHRpbmdCWaJVVkVudmlyb25tZW50IHZhcmlhYmxlcyBpbmplY3RlZCBpbnRvIHRhc2sgcG9kcy4gQ2hpbGQgb3ZlcnJpZGVzIHBhcmVudCBvbiBrZXkgY29uZmxpY3QuEkcKA2FwcBgIIAEoCzIfLmZseXRlaWRsMi5zZXR0aW5ncy5BcHBTZXR0aW5nc0IZolUWVW5pb24gQXBwcyBhdXRoIHBvbGljeRKCAQoRcG9kX3RlbXBsYXRlX25hbWUYCSABKAsyIS5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nU2V0dGluZ0JEolVBTmFtZSBvZiB0aGUgS3ViZXJuZXRlcyBQb2RUZW1wbGF0ZSB1c2VkIGFzIHRoZSBiYXNlIGZvciB0YXNrIHBvZHMqWwoMU2V0dGluZ1N0YXRlEhkKFVNFVFRJTkdfU1RBVEVfSU5IRVJJVBAAEhcKE1NFVFRJTkdfU1RBVEVfVU5TRVQQARIXChNTRVRUSU5HX1NUQVRFX1ZBTFVFEAIqUgoKU2NvcGVMZXZlbBITCg9TQ09QRV9MRVZFTF9PUkcQABIWChJTQ09QRV9MRVZFTF9ET01BSU4QARIXChNTQ09QRV9MRVZFTF9QUk9KRUNUEAI6MgoEZGVzYxIdLmdvb2dsZS5wcm90b2J1Zi5GaWVsZE9wdGlvbnMY1AogASgJUgRkZXNjQtQBChZjb20uZmx5dGVpZGwyLnNldHRpbmdzQhdTZXR0aW5nc0RlZmluaXRpb25Qcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9zZXR0aW5nc6ICA0ZTWKoCEkZseXRlaWRsMi5TZXR0aW5nc8oCEkZseXRlaWRsMlxTZXR0aW5nc+ICHkZseXRlaWRsMlxTZXR0aW5nc1xHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6U2V0dGluZ3NiBnByb3RvMw", [file_buf_validate_validate, file_google_protobuf_descriptor]);
+  fileDesc("CixmbHl0ZWlkbDIvc2V0dGluZ3Mvc2V0dGluZ3NfZGVmaW5pdGlvbi5wcm90bxISZmx5dGVpZGwyLnNldHRpbmdzIh4KDFN0cmluZ1ZhbHVlcxIOCgZ2YWx1ZXMYASADKAkieAoJU3RyaW5nTWFwEjsKB2VudHJpZXMYASADKAsyKi5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nTWFwLkVudHJpZXNFbnRyeRouCgxFbnRyaWVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJECgtTZXR0aW5nc0tleRIUCgNvcmcYASABKAlCB7pIBHICEAESDgoGZG9tYWluGAIgASgJEg8KB3Byb2plY3QYAyABKAkiiwEKDVN0cmluZ1NldHRpbmcSLwoFc3RhdGUYASABKA4yIC5mbHl0ZWlkbDIuc2V0dGluZ3MuU2V0dGluZ1N0YXRlEhQKDHN0cmluZ192YWx1ZRgCIAEoCRIzCgtzY29wZV9sZXZlbBgDIAEoDjIeLmZseXRlaWRsMi5zZXR0aW5ncy5TY29wZUxldmVsIocBCgxJbnQ2NFNldHRpbmcSLwoFc3RhdGUYASABKA4yIC5mbHl0ZWlkbDIuc2V0dGluZ3MuU2V0dGluZ1N0YXRlEhEKCWludF92YWx1ZRgCIAEoAxIzCgtzY29wZV9sZXZlbBgDIAEoDjIeLmZseXRlaWRsMi5zZXR0aW5ncy5TY29wZUxldmVsIocBCgtCb29sU2V0dGluZxIvCgVzdGF0ZRgBIAEoDjIgLmZseXRlaWRsMi5zZXR0aW5ncy5TZXR0aW5nU3RhdGUSEgoKYm9vbF92YWx1ZRgCIAEoCBIzCgtzY29wZV9sZXZlbBgDIAEoDjIeLmZseXRlaWRsMi5zZXR0aW5ncy5TY29wZUxldmVsIqoBChBTdHJpbmdNYXBTZXR0aW5nEi8KBXN0YXRlGAEgASgOMiAuZmx5dGVpZGwyLnNldHRpbmdzLlNldHRpbmdTdGF0ZRIwCgltYXBfdmFsdWUYAiABKAsyHS5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nTWFwEjMKC3Njb3BlX2xldmVsGAMgASgOMh4uZmx5dGVpZGwyLnNldHRpbmdzLlNjb3BlTGV2ZWwijwEKD1F1YW50aXR5U2V0dGluZxIvCgVzdGF0ZRgBIAEoDjIgLmZseXRlaWRsMi5zZXR0aW5ncy5TZXR0aW5nU3RhdGUSFgoOcXVhbnRpdHlfdmFsdWUYAiABKAkSMwoLc2NvcGVfbGV2ZWwYAyABKA4yHi5mbHl0ZWlkbDIuc2V0dGluZ3MuU2NvcGVMZXZlbCK1AQoSQWNjZWxlcmF0b3JTZXR0aW5nEi8KBXN0YXRlGAEgASgOMiAuZmx5dGVpZGwyLnNldHRpbmdzLlNldHRpbmdTdGF0ZRI5ChFhY2NlbGVyYXRvcl92YWx1ZRgCIAEoCzIeLmZseXRlaWRsMi5jb3JlLkdQVUFjY2VsZXJhdG9yEjMKC3Njb3BlX2xldmVsGAMgASgOMh4uZmx5dGVpZGwyLnNldHRpbmdzLlNjb3BlTGV2ZWwingMKC1J1blNldHRpbmdzElgKDWRlZmF1bHRfcXVldWUYASABKAsyIS5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nU2V0dGluZ0IeolUbRGVmYXVsdCBxdWV1ZSBmb3IgdGFzayBydW5zEqIBChZtYXhfYWN0aW9uX2NvbmN1cnJlbmN5GAIgASgLMiAuZmx5dGVpZGwyLnNldHRpbmdzLkludDY0U2V0dGluZ0JgolVdTWF4aW11bSBudW1iZXIgb2YgYWN0aW9ucyBvZiBhIHJ1biB0aGF0IG1heSBleGVjdXRlIGNvbmN1cnJlbnRseS4gMCBvciB1bnNldCBtZWFucyB1bmxpbWl0ZWQuEo8BCgxydW5fYmFzZV9kaXIYAyABKAsyIS5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nU2V0dGluZ0JWolVTQmFzZSBkaXJlY3RvcnkgZm9yIHJ1biBtZXRhZGF0YSBzdWNoIGFzIGlucHV0cy9vdXRwdXRzIChlLmcuIHMzOi8vbXktYnVja2V0L3ByZWZpeCki9AEKEFNlY3VyaXR5U2V0dGluZ3MSZwoPc2VydmljZV9hY2NvdW50GAEgASgLMiEuZmx5dGVpZGwyLnNldHRpbmdzLlN0cmluZ1NldHRpbmdCK6JVKEt1YmVybmV0ZXMgc2VydmljZSBhY2NvdW50IGZvciB0YXNrIHBvZHMSdwoUa3ViZXJuZXRlc19uYW1lc3BhY2UYAiABKAsyIS5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nU2V0dGluZ0I2olUzS3ViZXJuZXRlcyBuYW1lc3BhY2UgdGhhdCB0YXNrIHBvZHMgYW5kIGFwcHMgcnVuIGluIp8BCg9TdG9yYWdlU2V0dGluZ3MSeAoNcmF3X2RhdGFfcGF0aBgBIAEoCzIhLmZseXRlaWRsMi5zZXR0aW5ncy5TdHJpbmdTZXR0aW5nQj6iVTtCYXNlIHBhdGggZm9yIHJhdyBkYXRhIHN0b3JhZ2UgKGUuZy4gczM6Ly9teS1idWNrZXQvcHJlZml4KUoECAIQA1IMcnVuX2Jhc2VfZGlyIpcDChRUYXNrUmVzb3VyY2VEZWZhdWx0cxJdCgNjcHUYASABKAsyIy5mbHl0ZWlkbDIuc2V0dGluZ3MuUXVhbnRpdHlTZXR0aW5nQiuiVShDUFUgcmVzb3VyY2UgcXVhbnRpdHkgKGUuZy4gIjUwMG0iLCAiMiIpElUKA2dwdRgCIAEoCzIjLmZseXRlaWRsMi5zZXR0aW5ncy5RdWFudGl0eVNldHRpbmdCI6JVIEdQVSByZXNvdXJjZSBxdWFudGl0eSAoZS5nLiAiMSIpEmYKBm1lbW9yeRgDIAEoCzIjLmZseXRlaWRsMi5zZXR0aW5ncy5RdWFudGl0eVNldHRpbmdCMaJVLk1lbW9yeSByZXNvdXJjZSBxdWFudGl0eSAoZS5nLiAiMjU2TWkiLCAiNEdpIikSYQoHc3RvcmFnZRgEIAEoCzIjLmZseXRlaWRsMi5zZXR0aW5ncy5RdWFudGl0eVNldHRpbmdCK6JVKEVwaGVtZXJhbCBzdG9yYWdlIHF1YW50aXR5IChlLmcuICIxMEdpIiki4QMKFFRhc2tSZXNvdXJjZVNldHRpbmdzEmgKA21pbhgBIAEoCzIoLmZseXRlaWRsMi5zZXR0aW5ncy5UYXNrUmVzb3VyY2VEZWZhdWx0c0IxolUuTWluaW11bSByZXNvdXJjZSByZXF1ZXN0cyBhcHBsaWVkIHRvIHRhc2sgcG9kcxJmCgNtYXgYAiABKAsyKC5mbHl0ZWlkbDIuc2V0dGluZ3MuVGFza1Jlc291cmNlRGVmYXVsdHNCL6JVLE1heGltdW0gcmVzb3VyY2UgbGltaXRzIGFwcGxpZWQgdG8gdGFzayBwb2RzEm0KFW1pcnJvcl9saW1pdHNfcmVxdWVzdBgDIAEoCzIfLmZseXRlaWRsMi5zZXR0aW5ncy5Cb29sU2V0dGluZ0ItolUqV2hlbiB0cnVlLCByZXNvdXJjZSBsaW1pdHMgbWlycm9yIHJlcXVlc3RzEocBChNkZWZhdWx0X2FjY2VsZXJhdG9yGAQgASgLMiYuZmx5dGVpZGwyLnNldHRpbmdzLkFjY2VsZXJhdG9yU2V0dGluZ0JColU/QWNjZWxlcmF0b3IgYXBwbGllZCB0byBhIHRhc2sgdGhhdCByZXF1ZXN0cyBHUFVzIGJ1dCBuYW1lcyBub25lIpUCCgtBcHBTZXR0aW5ncxJ8ChJkaXNhbGxvd19hbm9ueW1vdXMYASABKAsyHy5mbHl0ZWlkbDIuc2V0dGluZ3MuQm9vbFNldHRpbmdCP6JVPERpc2FsbG93IGFub255bW91cyAodW5hdXRoZW50aWNhdGVkKSBhY2Nlc3MgdG8gYXBwcyBvcmctd2lkZRKHAQoQYXBwX2Ruc19zdHJhdGVneRgCIAEoCzIhLmZseXRlaWRsMi5zZXR0aW5ncy5TdHJpbmdTZXR0aW5nQkqiVUdBcHAgcHVibGljLVVSTCBETlMgc3RyYXRlZ3k6ICdzaGFyZWQnIChkZWZhdWx0KSBvciAnZGF0YXBsYW5lX3NwZWNpZmljJyKxAQoVT2JzZXJ2YWJpbGl0eVNldHRpbmdzEpcBChJsb2dfcmV0ZW50aW9uX2RheXMYASABKAsyIC5mbHl0ZWlkbDIuc2V0dGluZ3MuSW50NjRTZXR0aW5nQlmiVVZEYXlzIHRhc2sgbG9ncyBzdGF5IHZpc2libGUgYWZ0ZXIgYW4gYXR0ZW1wdCBlbmRzLiAwIG9yIHVuc2V0IGxlYXZlcyBpdCB0byB0aGUgc2VydmVyLiLcBwoIU2V0dGluZ3MSLAoDcnVuGAEgASgLMh8uZmx5dGVpZGwyLnNldHRpbmdzLlJ1blNldHRpbmdzEjYKCHNlY3VyaXR5GAIgASgLMiQuZmx5dGVpZGwyLnNldHRpbmdzLlNlY3VyaXR5U2V0dGluZ3MSNAoHc3RvcmFnZRgDIAEoCzIjLmZseXRlaWRsMi5zZXR0aW5ncy5TdG9yYWdlU2V0dGluZ3MSPwoNdGFza19yZXNvdXJjZRgEIAEoCzIoLmZseXRlaWRsMi5zZXR0aW5ncy5UYXNrUmVzb3VyY2VTZXR0aW5ncxKIAQoGbGFiZWxzGAUgASgLMiQuZmx5dGVpZGwyLnNldHRpbmdzLlN0cmluZ01hcFNldHRpbmdCUqJVT0t1YmVybmV0ZXMgbGFiZWxzIGFwcGxpZWQgdG8gdGFzayBwb2RzLiBDaGlsZCBvdmVycmlkZXMgcGFyZW50IG9uIGtleSBjb25mbGljdC4SkgEKC2Fubm90YXRpb25zGAYgASgLMiQuZmx5dGVpZGwyLnNldHRpbmdzLlN0cmluZ01hcFNldHRpbmdCV6JVVEt1YmVybmV0ZXMgYW5ub3RhdGlvbnMgYXBwbGllZCB0byB0YXNrIHBvZHMuIENoaWxkIG92ZXJyaWRlcyBwYXJlbnQgb24ga2V5IGNvbmZsaWN0LhKeAQoVZW52aXJvbm1lbnRfdmFyaWFibGVzGAcgASgLMiQuZmx5dGVpZGwyLnNldHRpbmdzLlN0cmluZ01hcFNldHRpbmdCWaJVVkVudmlyb25tZW50IHZhcmlhYmxlcyBpbmplY3RlZCBpbnRvIHRhc2sgcG9kcy4gQ2hpbGQgb3ZlcnJpZGVzIHBhcmVudCBvbiBrZXkgY29uZmxpY3QuEkcKA2FwcBgIIAEoCzIfLmZseXRlaWRsMi5zZXR0aW5ncy5BcHBTZXR0aW5nc0IZolUWVW5pb24gQXBwcyBhdXRoIHBvbGljeRKCAQoRcG9kX3RlbXBsYXRlX25hbWUYCSABKAsyIS5mbHl0ZWlkbDIuc2V0dGluZ3MuU3RyaW5nU2V0dGluZ0JEolVBTmFtZSBvZiB0aGUgS3ViZXJuZXRlcyBQb2RUZW1wbGF0ZSB1c2VkIGFzIHRoZSBiYXNlIGZvciB0YXNrIHBvZHMSZAoNb2JzZXJ2YWJpbGl0eRgKIAEoCzIpLmZseXRlaWRsMi5zZXR0aW5ncy5PYnNlcnZhYmlsaXR5U2V0dGluZ3NCIqJVH0xvZyBhbmQgb2JzZXJ2YWJpbGl0eSByZXRlbnRpb24qWwoMU2V0dGluZ1N0YXRlEhkKFVNFVFRJTkdfU1RBVEVfSU5IRVJJVBAAEhcKE1NFVFRJTkdfU1RBVEVfVU5TRVQQARIXChNTRVRUSU5HX1NUQVRFX1ZBTFVFEAIqUgoKU2NvcGVMZXZlbBITCg9TQ09QRV9MRVZFTF9PUkcQABIWChJTQ09QRV9MRVZFTF9ET01BSU4QARIXChNTQ09QRV9MRVZFTF9QUk9KRUNUEAI6MgoEZGVzYxIdLmdvb2dsZS5wcm90b2J1Zi5GaWVsZE9wdGlvbnMY1AogASgJUgRkZXNjQtQBChZjb20uZmx5dGVpZGwyLnNldHRpbmdzQhdTZXR0aW5nc0RlZmluaXRpb25Qcm90b0gCUAFaNmdpdGh1Yi5jb20vZmx5dGVvcmcvZmx5dGUvdjIvZ2VuL2dvL2ZseXRlaWRsMi9zZXR0aW5nc6ICA0ZTWKoCEkZseXRlaWRsMi5TZXR0aW5nc8oCEkZseXRlaWRsMlxTZXR0aW5nc+ICHkZseXRlaWRsMlxTZXR0aW5nc1xHUEJNZXRhZGF0YeoCE0ZseXRlaWRsMjo6U2V0dGluZ3NiBnByb3RvMw", [file_buf_validate_validate, file_flyteidl2_core_tasks, file_google_protobuf_descriptor]);
 
 /**
  * StringValues is a wrapper for a list of strings.
@@ -251,6 +253,39 @@ export const QuantitySettingSchema: GenMessage<QuantitySetting> = /*@__PURE__*/
   messageDesc(file_flyteidl2_settings_settings_definition, 7);
 
 /**
+ * A setting that holds an accelerator: a device from the AcceleratorModel
+ * list (GPUAccelerator.device is that value's accelerator_name string), an
+ * optional partition size, and a device class.
+ *
+ * @generated from message flyteidl2.settings.AcceleratorSetting
+ */
+export type AcceleratorSetting = Message<"flyteidl2.settings.AcceleratorSetting"> & {
+  /**
+   * @generated from field: flyteidl2.settings.SettingState state = 1;
+   */
+  state: SettingState;
+
+  /**
+   * Meaningful only when state = VALUE.
+   *
+   * @generated from field: flyteidl2.core.GPUAccelerator accelerator_value = 2;
+   */
+  acceleratorValue?: GPUAccelerator;
+
+  /**
+   * @generated from field: flyteidl2.settings.ScopeLevel scope_level = 3;
+   */
+  scopeLevel: ScopeLevel;
+};
+
+/**
+ * Describes the message flyteidl2.settings.AcceleratorSetting.
+ * Use `create(AcceleratorSettingSchema)` to create a new message.
+ */
+export const AcceleratorSettingSchema: GenMessage<AcceleratorSetting> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_settings_settings_definition, 8);
+
+/**
  * RunSettings controls workflow execution behavior.
  *
  * @generated from message flyteidl2.settings.RunSettings
@@ -277,7 +312,7 @@ export type RunSettings = Message<"flyteidl2.settings.RunSettings"> & {
  * Use `create(RunSettingsSchema)` to create a new message.
  */
 export const RunSettingsSchema: GenMessage<RunSettings> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_settings_settings_definition, 8);
+  messageDesc(file_flyteidl2_settings_settings_definition, 9);
 
 /**
  * SecuritySettings controls security-related configuration.
@@ -289,6 +324,13 @@ export type SecuritySettings = Message<"flyteidl2.settings.SecuritySettings"> & 
    * @generated from field: flyteidl2.settings.StringSetting service_account = 1;
    */
   serviceAccount?: StringSetting;
+
+  /**
+   * A server may restrict which values are allowed, and who may set this.
+   *
+   * @generated from field: flyteidl2.settings.StringSetting kubernetes_namespace = 2;
+   */
+  kubernetesNamespace?: StringSetting;
 };
 
 /**
@@ -296,7 +338,7 @@ export type SecuritySettings = Message<"flyteidl2.settings.SecuritySettings"> & 
  * Use `create(SecuritySettingsSchema)` to create a new message.
  */
 export const SecuritySettingsSchema: GenMessage<SecuritySettings> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_settings_settings_definition, 9);
+  messageDesc(file_flyteidl2_settings_settings_definition, 10);
 
 /**
  * StorageSettings controls data storage configuration.
@@ -315,7 +357,7 @@ export type StorageSettings = Message<"flyteidl2.settings.StorageSettings"> & {
  * Use `create(StorageSettingsSchema)` to create a new message.
  */
 export const StorageSettingsSchema: GenMessage<StorageSettings> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_settings_settings_definition, 10);
+  messageDesc(file_flyteidl2_settings_settings_definition, 11);
 
 /**
  * TaskResourceDefaults holds resource quantity settings for a single bound
@@ -350,7 +392,7 @@ export type TaskResourceDefaults = Message<"flyteidl2.settings.TaskResourceDefau
  * Use `create(TaskResourceDefaultsSchema)` to create a new message.
  */
 export const TaskResourceDefaultsSchema: GenMessage<TaskResourceDefaults> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_settings_settings_definition, 11);
+  messageDesc(file_flyteidl2_settings_settings_definition, 12);
 
 /**
  * TaskResourceSettings controls task resource configuration.
@@ -372,6 +414,11 @@ export type TaskResourceSettings = Message<"flyteidl2.settings.TaskResourceSetti
    * @generated from field: flyteidl2.settings.BoolSetting mirror_limits_request = 3;
    */
   mirrorLimitsRequest?: BoolSetting;
+
+  /**
+   * @generated from field: flyteidl2.settings.AcceleratorSetting default_accelerator = 4;
+   */
+  defaultAccelerator?: AcceleratorSetting;
 };
 
 /**
@@ -379,7 +426,7 @@ export type TaskResourceSettings = Message<"flyteidl2.settings.TaskResourceSetti
  * Use `create(TaskResourceSettingsSchema)` to create a new message.
  */
 export const TaskResourceSettingsSchema: GenMessage<TaskResourceSettings> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_settings_settings_definition, 12);
+  messageDesc(file_flyteidl2_settings_settings_definition, 13);
 
 /**
  * AppSettings controls policy for Union Apps.
@@ -396,6 +443,19 @@ export type AppSettings = Message<"flyteidl2.settings.AppSettings"> & {
    * @generated from field: flyteidl2.settings.BoolSetting disallow_anonymous = 1;
    */
   disallowAnonymous?: BoolSetting;
+
+  /**
+   * Selects how an app's public URL is composed. Tokens:
+   *   "shared" (default, or any unrecognized/empty value) — one tenant-wide DNS
+   *     name for the app regardless of which data plane serves it (today's behavior).
+   *   "dataplane_specific" — a per-data-plane DNS name, so the same app can run on
+   *     more than one data plane at distinct URLs.
+   * "edge_proxy" is reserved for a future single-balanced-DNS strategy and is not
+   * yet a valid value. Unset delegates to the parent scope, then defaults to shared.
+   *
+   * @generated from field: flyteidl2.settings.StringSetting app_dns_strategy = 2;
+   */
+  appDnsStrategy?: StringSetting;
 };
 
 /**
@@ -403,7 +463,29 @@ export type AppSettings = Message<"flyteidl2.settings.AppSettings"> & {
  * Use `create(AppSettingsSchema)` to create a new message.
  */
 export const AppSettingsSchema: GenMessage<AppSettings> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_settings_settings_definition, 13);
+  messageDesc(file_flyteidl2_settings_settings_definition, 14);
+
+/**
+ * ObservabilitySettings controls how long observability data stays visible.
+ *
+ * @generated from message flyteidl2.settings.ObservabilitySettings
+ */
+export type ObservabilitySettings = Message<"flyteidl2.settings.ObservabilitySettings"> & {
+  /**
+   * How many days after an action attempt ends its logs stay visible. 0 or unset leaves it
+   * to the server, which may also cap how high it can be set.
+   *
+   * @generated from field: flyteidl2.settings.Int64Setting log_retention_days = 1;
+   */
+  logRetentionDays?: Int64Setting;
+};
+
+/**
+ * Describes the message flyteidl2.settings.ObservabilitySettings.
+ * Use `create(ObservabilitySettingsSchema)` to create a new message.
+ */
+export const ObservabilitySettingsSchema: GenMessage<ObservabilitySettings> = /*@__PURE__*/
+  messageDesc(file_flyteidl2_settings_settings_definition, 15);
 
 /**
  * Settings holds all configurable settings for a scope.
@@ -455,6 +537,11 @@ export type Settings = Message<"flyteidl2.settings.Settings"> & {
    * @generated from field: flyteidl2.settings.StringSetting pod_template_name = 9;
    */
   podTemplateName?: StringSetting;
+
+  /**
+   * @generated from field: flyteidl2.settings.ObservabilitySettings observability = 10;
+   */
+  observability?: ObservabilitySettings;
 };
 
 /**
@@ -462,7 +549,7 @@ export type Settings = Message<"flyteidl2.settings.Settings"> & {
  * Use `create(SettingsSchema)` to create a new message.
  */
 export const SettingsSchema: GenMessage<Settings> = /*@__PURE__*/
-  messageDesc(file_flyteidl2_settings_settings_definition, 14);
+  messageDesc(file_flyteidl2_settings_settings_definition, 16);
 
 /**
  * SettingState controls how a setting at a given scope behaves.

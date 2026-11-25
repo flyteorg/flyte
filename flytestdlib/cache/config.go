@@ -1,15 +1,12 @@
 package cache
 
 import (
-	"context"
-	"crypto/tls"
 	"time"
 
-	"github.com/pkg/errors"
-	"github.com/redis/go-redis/v9"
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
+	redisconfig "github.com/flyteorg/flyte/v2/flytestdlib/redis"
 )
 
 //go:generate enumer --type=Type -json -yaml -trimprefix=Type
@@ -63,166 +60,9 @@ type RedisConfig struct {
 	DefaultExpiration config.Duration `json:"defaultExpiration" pflag:",Default expiration time for items."`
 }
 
-// RedisOptions is a copy of redis.Options that can be used in config files (removed func references)
-type RedisOptions struct {
-	// The network type, either tcp or unix.
-	// Default is tcp.
-	Network string
-	// host:port address.
-	Addr string
-
-	// ClientName will execute the `CLIENT SETNAME ClientName` command for each conn.
-	ClientName string
-
-	// Protocol 2 or 3. Use the version to negotiate RESP version with redis-server.
-	// Default is 3.
-	Protocol int
-	// Use the specified Username to authenticate the current connection
-	// with one of the connections defined in the ACL list when connecting
-	// to a Redis 6.0 instance, or greater, that is using the Redis ACL system.
-	Username string
-	// Optional password. Must match the password specified in the
-	// requirepass server configuration option (if connecting to a Redis 5.0 instance, or lower),
-	// or the User Password when connecting to a Redis 6.0 instance, or greater,
-	// that is using the Redis ACL system.
-	Password string
-
-	// PasswordSecretName is the name of the secret that contains the password.
-	PasswordSecretName string
-
-	// Database to be selected after connecting to the server.
-	DB int
-
-	// Maximum number of retries before giving up.
-	// Default is 3 retries; -1 (not 0) disables retries.
-	MaxRetries int
-	// Minimum backoff between each retry.
-	// Default is 8 milliseconds; -1 disables backoff.
-	MinRetryBackoff config.Duration
-	// Maximum backoff between each retry.
-	// Default is 512 milliseconds; -1 disables backoff.
-	MaxRetryBackoff config.Duration
-
-	// Dial timeout for establishing new connections.
-	// Default is 5 seconds.
-	DialTimeout config.Duration
-	// Timeout for socket reads. If reached, commands will fail
-	// with a timeout instead of blocking. Supported values:
-	//   - `0` - default timeout (3 seconds).
-	//   - `-1` - no timeout (block indefinitely).
-	//   - `-2` - disables SetReadDeadline calls completely.
-	ReadTimeout config.Duration
-	// Timeout for socket writes. If reached, commands will fail
-	// with a timeout instead of blocking.  Supported values:
-	//   - `0` - default timeout (3 seconds).
-	//   - `-1` - no timeout (block indefinitely).
-	//   - `-2` - disables SetWriteDeadline calls completely.
-	WriteTimeout config.Duration
-	// ContextTimeoutEnabled controls whether the client respects context timeouts and deadlines.
-	// See https://redis.uptrace.dev/guide/go-redis-debugging.html#timeouts
-	ContextTimeoutEnabled bool
-
-	// Type of connection pool.
-	// true for FIFO pool, false for LIFO pool.
-	// Note that FIFO has slightly higher overhead compared to LIFO,
-	// but it helps closing idle connections faster reducing the pool size.
-	PoolFIFO bool
-	// Base number of socket connections.
-	// Default is 10 connections per every available CPU as reported by runtime.GOMAXPROCS.
-	// If there is not enough connections in the pool, new connections will be allocated in excess of PoolSize,
-	// you can limit it through MaxActiveConns
-	PoolSize int
-	// Amount of time client waits for connection if all connections
-	// are busy before returning an error.
-	// Default is ReadTimeout + 1 second.
-	PoolTimeout config.Duration
-	// Minimum number of idle connections which is useful when establishing
-	// new connection is slow.
-	// Default is 0. the idle connections are not closed by default.
-	MinIdleConns int
-	// Maximum number of idle connections.
-	// Default is 0. the idle connections are not closed by default.
-	MaxIdleConns int
-	// Maximum number of connections allocated by the pool at a given time.
-	// When zero, there is no limit on the number of connections in the pool.
-	MaxActiveConns int
-	// ConnMaxIdleTime is the maximum amount of time a connection may be idle.
-	// Should be less than server's timeout.
-	//
-	// Expired connections may be closed lazily before reuse.
-	// If d <= 0, connections are not closed due to a connection's idle time.
-	//
-	// Default is 30 minutes. -1 disables idle timeout check.
-	ConnMaxIdleTime config.Duration
-	// ConnMaxLifetime is the maximum amount of time a connection may be reused.
-	//
-	// Expired connections may be closed lazily before reuse.
-	// If <= 0, connections are not closed due to a connection's age.
-	//
-	// Default is to not close idle connections.
-	ConnMaxLifetime config.Duration
-
-	// TLS Config to use. When set, TLS will be negotiated. Not settable from a
-	// config file; use UseTLS for config-driven TLS.
-	TLSConfig *tls.Config
-
-	// UseTLS negotiates TLS using the system certificate pool. Prefer this over
-	// TLSConfig when configuring from YAML/JSON, where TLSConfig cannot be set.
-	// Ignored when TLSConfig is already provided.
-	UseTLS bool
-
-	// TLSInsecureSkipVerify disables server certificate verification. Only set
-	// this for testing against self-signed certificates.
-	TLSInsecureSkipVerify bool
-
-	// // Disable set-lib on connect. Default is false.
-	DisableIndentity bool
-}
-
-func (r *RedisOptions) GetOptions(ctx context.Context, secretManager SecretManager) (*redis.Options, error) {
-	if len(r.PasswordSecretName) > 0 {
-		password, err := secretManager.Get(ctx, r.PasswordSecretName)
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed to get password from secret manager for secret %s", r.PasswordSecretName)
-		}
-
-		r.Password = password
-	}
-
-	tlsConfig := r.TLSConfig
-	if tlsConfig == nil && r.UseTLS {
-		tlsConfig = &tls.Config{
-			MinVersion:         tls.VersionTLS12,
-			InsecureSkipVerify: r.TLSInsecureSkipVerify, //nolint:gosec // gated behind explicit UseTLS/TLSInsecureSkipVerify config
-		}
-	}
-
-	return &redis.Options{
-		Network:               r.Network,
-		Addr:                  r.Addr,
-		ClientName:            r.ClientName,
-		Password:              r.Password,
-		DB:                    r.DB,
-		MaxRetries:            r.MaxRetries,
-		MinRetryBackoff:       r.MinRetryBackoff.Duration,
-		MaxRetryBackoff:       r.MaxRetryBackoff.Duration,
-		DialTimeout:           r.DialTimeout.Duration,
-		ReadTimeout:           r.ReadTimeout.Duration,
-		WriteTimeout:          r.WriteTimeout.Duration,
-		ContextTimeoutEnabled: r.ContextTimeoutEnabled,
-		PoolFIFO:              r.PoolFIFO,
-		PoolSize:              r.PoolSize,
-		PoolTimeout:           r.PoolTimeout.Duration,
-		MinIdleConns:          r.MinIdleConns,
-		MaxIdleConns:          r.MaxIdleConns,
-		MaxActiveConns:        r.MaxActiveConns,
-		ConnMaxIdleTime:       r.ConnMaxIdleTime.Duration,
-		ConnMaxLifetime:       r.ConnMaxLifetime.Duration,
-		TLSConfig:             tlsConfig,
-		DisableIndentity:      r.DisableIndentity,
-		Username:              r.Username,
-	}, nil
-}
+// RedisOptions is the shared Redis client configuration.
+// Kept as an alias for callers using the cache package.
+type RedisOptions = redisconfig.Config
 
 func GetConfig() *Config {
 	return configSection.GetConfig().(*Config)

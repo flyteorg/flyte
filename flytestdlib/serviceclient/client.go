@@ -4,6 +4,7 @@ package serviceclient
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -17,13 +18,24 @@ import (
 
 const (
 	oauthAuthorizationServerMetadataPath = "/.well-known/oauth-authorization-server"
+	openIDConfigurationPath              = "/.well-known/openid-configuration"
 	defaultDiscoveryTimeout              = 10 * time.Second
 )
+
+var errMetadataNotFound = errors.New("service client oauth2: metadata endpoint returned status 404")
 
 // ServiceConfig describes a downstream service and how to authenticate to it.
 type ServiceConfig struct {
 	URL  string     `json:"url" pflag:",Service base URL"`
 	Auth AuthConfig `json:"auth" pflag:",Service authentication"`
+	HTTP HTTPConfig `json:"http" pflag:",Service HTTP client"`
+}
+
+// HTTPConfig tunes the transport NewHTTPClient sets when the base client has none.
+type HTTPConfig struct {
+	// MaxIdleConnsPerHost should cover the caller's request concurrency, or bursts
+	// open fresh connections and exhaust ephemeral ports in TIME_WAIT.
+	MaxIdleConnsPerHost int `json:"maxIdleConnsPerHost" pflag:",Idle connections kept per host; 0 uses Go's default of 2"`
 }
 
 // AuthType identifies the authentication mechanism used for service requests.
@@ -54,9 +66,14 @@ func (c AuthConfig) hasSettings() bool {
 
 // NewHTTPClient returns an HTTP client configured for the service.
 func NewHTTPClient(ctx context.Context, base *http.Client, cfg ServiceConfig) (*http.Client, error) {
-	if base == nil {
-		base = http.DefaultClient
+	client := http.Client{}
+	if base != nil {
+		client = *base
 	}
+	if client.Transport == nil {
+		client.Transport = newTransport(cfg.HTTP)
+	}
+	base = &client
 	if cfg.URL == "" {
 		return nil, fmt.Errorf("service client: url is required")
 	}
@@ -71,6 +88,15 @@ func NewHTTPClient(ctx context.Context, base *http.Client, cfg ServiceConfig) (*
 	default:
 		return nil, fmt.Errorf("service client auth: unsupported type %q", cfg.Auth.Type)
 	}
+}
+
+func newTransport(cfg HTTPConfig) *http.Transport {
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	if cfg.MaxIdleConnsPerHost > 0 {
+		transport.MaxIdleConns = 0
+		transport.MaxIdleConnsPerHost = cfg.MaxIdleConnsPerHost
+	}
+	return transport
 }
 
 func newOAuth2ClientCredentialsClient(ctx context.Context, base *http.Client, authCfg AuthConfig) (*http.Client, error) {
@@ -139,11 +165,23 @@ func discoverTokenURL(ctx context.Context, httpClient *http.Client, issuerURL st
 	if err != nil || issuer.Scheme == "" || issuer.Host == "" {
 		return "", fmt.Errorf("service client oauth2: invalid issuerUrl %q", issuerURL)
 	}
-	issuer.Path = strings.TrimRight(issuer.Path, "/") + oauthAuthorizationServerMetadataPath
 	issuer.RawQuery = ""
 	issuer.Fragment = ""
+	issuerPath := strings.TrimRight(issuer.Path, "/")
 
-	req, err := http.NewRequestWithContext(discoveryCtx, http.MethodGet, issuer.String(), nil)
+	issuer.Path = issuerPath + oauthAuthorizationServerMetadataPath
+	tokenEndpoint, err := fetchTokenEndpoint(discoveryCtx, httpClient, issuer.String())
+	if errors.Is(err, errMetadataNotFound) {
+		// RFC 8414 section 5 lets clients fall back to OpenID Connect discovery. Some servers, such as
+		// Microsoft Entra ID, serve only that.
+		issuer.Path = issuerPath + openIDConfigurationPath
+		tokenEndpoint, err = fetchTokenEndpoint(discoveryCtx, httpClient, issuer.String())
+	}
+	return tokenEndpoint, err
+}
+
+func fetchTokenEndpoint(ctx context.Context, httpClient *http.Client, metadataURL string) (string, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, metadataURL, nil)
 	if err != nil {
 		return "", fmt.Errorf("service client oauth2: create metadata request: %w", err)
 	}
@@ -152,6 +190,9 @@ func discoverTokenURL(ctx context.Context, httpClient *http.Client, issuerURL st
 		return "", fmt.Errorf("service client oauth2: discover token endpoint: %w", err)
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return "", errMetadataNotFound
+	}
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
 		return "", fmt.Errorf("service client oauth2: metadata endpoint returned status %d", resp.StatusCode)
 	}

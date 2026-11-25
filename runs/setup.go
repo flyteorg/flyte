@@ -34,12 +34,37 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/service"
 )
 
-const otelServiceName = "runs-service"
+// ServiceName identifies telemetry emitted by this service and its clients.
+const ServiceName = "runs-service"
 
 var sentryOperations = map[string]string{
 	workflowconnect.RunServiceCreateRunProcedure:        "create_run",
 	taskconnect.TaskServiceDeployTaskProcedure:          "deploy_task",
 	triggerconnect.TriggerServiceDeployTriggerProcedure: "deploy_trigger",
+}
+
+// The Sentry gauges this service reports, and how often it samples them.
+const (
+	activeRunsGauge      = "flyte.active_runs"    // root actions in an active phase
+	activeActionsGauge   = "flyte.active_actions" // all actions in an active phase
+	activeGaugesInterval = time.Minute            // one count query per sample
+)
+
+// activeGauges turns the counts from ActionRepo.CountActiveActionsByPhase into
+// the active runs and actions gauges. Both are always present, so an idle
+// cluster reports zeros rather than nothing.
+func activeGauges(counts map[interfaces.PhaseKey]int64) map[string]float64 {
+	var runs, actions int64
+	for key, n := range counts {
+		actions += n
+		if key.IsRoot {
+			runs += n
+		}
+	}
+	return map[string]float64{
+		activeRunsGauge:    float64(runs),
+		activeActionsGauge: float64(actions),
+	}
 }
 
 // deployTriggerInterceptor counts the triggers that ride along inside a
@@ -65,25 +90,27 @@ func deployTriggerInterceptor() connect.UnaryInterceptorFunc {
 // Requires sc.DB and sc.DataStore to be set.
 func Setup(ctx context.Context, sc *app.SetupContext) error {
 	cfg := config.GetConfig()
+	sc.AddProfilingServer("runs", cfg.PprofPort)
 	if err := migrations.RunMigrations(ctx, sc.DB); err != nil {
 		return fmt.Errorf("runs: failed to run migrations: %w", err)
 	}
 
 	otelCfg := otelutils.GetConfig()
-	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
+	if err := otelutils.RegisterProvidersWithContext(ctx, ServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
-	otelInterceptor, err := otelconnect.NewInterceptor(
-		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
-		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
-		otelconnect.WithoutServerPeerAttributes(),
+	meterProvider := otelutils.GetMeterProvider(ServiceName)
+	otelInterceptor, err := otelutils.NewConnectInterceptor(
+		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(ServiceName)),
+		otelconnect.WithMeterProvider(meterProvider),
 	)
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
 	}
 
 	interceptors := []connect.Interceptor{otelInterceptor}
-	if sentryutils.Init(ctx, otelServiceName) {
+	sentryEnabled := sentryutils.Init(ctx, ServiceName)
+	if sentryEnabled {
 		interceptors = append(interceptors, sentryutils.Interceptor(sentryOperations), deployTriggerInterceptor())
 		sc.AddWorker("sentry-flush", func(ctx context.Context) error {
 			<-ctx.Done()
@@ -92,10 +119,35 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		})
 	}
 
-	repo, err := repository.NewRepository(sc.DB, cfg.Database)
+	repo, err := repository.NewRepository(
+		sc.DB,
+		cfg.Database,
+		repository.NewNotificationConfig(
+			cfg.NotificationBufferLimit,
+			cfg.NotifyRetryMinBackoff.Duration,
+			cfg.NotifyRetryMaxBackoff.Duration,
+			cfg.WatchBufferSize,
+			cfg.NotifyBatchSize,
+		),
+		meterProvider,
+	)
 	if err != nil {
 		return fmt.Errorf("runs: failed to create repository: %w", err)
 	}
+
+	if sentryEnabled {
+		sc.AddWorker("sentry-active-gauges", func(ctx context.Context) error {
+			return sentryutils.SampleGauges(ctx, activeGaugesInterval, func(ctx context.Context) (map[string]float64, error) {
+				counts, err := repo.ActionRepo().CountActiveActionsByPhase(ctx)
+				if err != nil {
+					return nil, err
+				}
+				return activeGauges(counts), nil
+			})
+		})
+	}
+
+	settingsRepo := impl.NewSettingsRepo(sc.DB)
 
 	// In unified mode, intra-service calls go through the same mux.
 	actionsServiceCfg := cfg.ActionsService
@@ -129,7 +181,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 		return abortReconciler.Run(ctx)
 	})
 
-	runsSvc := service.NewRunService(repo, actionsClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
+	runsSvc := service.NewRunService(repo, settingsRepo, actionsClient, projectClient, cfg.StoragePrefix, sc.DataStore, abortReconciler, cfg.AuthMetadata.ExternalAuthServerBaseURL, cfg.TrustForwardedIdentityHeaders, cfg.IdentityHeaders)
 	taskSvc := service.NewTaskService(repo, projectClient)
 
 	runsPath, runsHandler := workflowconnect.NewRunServiceHandler(runsSvc, connect.WithInterceptors(interceptors...))
@@ -178,7 +230,7 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	sc.Mux.Handle(projectPath, projectHandler)
 	logger.Infof(ctx, "Mounted ProjectService at %s", projectPath)
 
-	settingsSvc := service.NewSettingsService(impl.NewSettingsRepo(sc.DB))
+	settingsSvc := service.NewSettingsService(settingsRepo)
 	settingsPath, settingsHandler := settingsconnect.NewSettingsServiceHandler(settingsSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(settingsPath, settingsHandler)
 	logger.Infof(ctx, "Mounted SettingsService at %s", settingsPath)

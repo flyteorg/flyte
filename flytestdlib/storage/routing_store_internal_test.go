@@ -20,6 +20,7 @@ type fakeRawStore struct {
 	scheme   string
 	mu       sync.Mutex
 	lastHead DataReference
+	copies   int32
 }
 
 func (f *fakeRawStore) GetBaseContainerFQN(context.Context) DataReference {
@@ -44,6 +45,10 @@ func (f *fakeRawStore) WriteRaw(context.Context, DataReference, int64, Options, 
 	return nil
 }
 func (f *fakeRawStore) Delete(context.Context, DataReference) error { return nil }
+func (f *fakeRawStore) CopyRaw(context.Context, DataReference, DataReference, Options) error {
+	atomic.AddInt32(&f.copies, 1)
+	return nil
+}
 
 // newTestRoutingStore builds a routingStore with fake factories so creation is observable and free
 // of any network/credential dependency.
@@ -187,4 +192,17 @@ func TestRoutingStore_RedisSharedWhenAddrConfigured(t *testing.T) {
 		require.NoError(t, err)
 	}
 	assert.Equal(t, int32(1), atomic.LoadInt32(count))
+}
+
+func TestRoutingStore_CopyWithinBackendIsDelegated(t *testing.T) {
+	rs, _ := newTestRoutingStore(t, "foo", "bar")
+
+	// Both references are served by the "bar" backend, so the copy is its to make (a stow backend
+	// copies on the server side) instead of a ReadRaw/WriteRaw round trip through the router.
+	require.NoError(t, rs.CopyRaw(context.TODO(), "bar://c/src", "bar://other/dst", Options{}))
+
+	store, ok := rs.live.Load("bar")
+	require.True(t, ok)
+	assert.Equal(t, int32(1), atomic.LoadInt32(&store.(*fakeRawStore).copies))
+	assert.Equal(t, int32(0), atomic.LoadInt32(&rs.primaryStore.(*fakeRawStore).copies))
 }

@@ -359,3 +359,10 @@ Get the Flyte ClusterRole name.
 {{- define "flyte-binary.rbac.clusterRoleName" -}}
 {{- printf "%s-cluster-role" (include "flyte-binary.fullname" .) -}}
 {{- end -}}
+
+{{/*
+Non-empty when telemetry.enabled is false: the deployment opted out of telemetry.
+*/}}
+{{- define "flyte-binary.telemetryDisabled" -}}
+{{- if not (dig "enabled" true (.Values.telemetry | default dict)) }}true{{- end }}
+{{- end -}}

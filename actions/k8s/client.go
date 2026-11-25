@@ -11,6 +11,7 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"k8s.io/apimachinery/pkg/api/equality"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
@@ -25,7 +26,6 @@ import (
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
 	k8sutil "github.com/flyteorg/flyte/v2/flytestdlib/k8s"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
-	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -48,10 +48,14 @@ type ActionUpdate struct {
 	// SignalValue is the resolved signal payload of a condition action, carried
 	// inline (never an outputs.pb). Nil for tasks and unsignalled conditions.
 	SignalValue *core.Literal
+	// Address is where the running task can be reached (UpdateRequest.address).
+	// Nil when it reported none, and once the task is terminal.
+	Address *common.ActionAddress
 }
 
 const (
 	labelTerminalStatusRecorded = "flyte.org/terminal-status-recorded"
+	parentActionIndex           = "taskAction.parent"
 )
 
 // ActionsClient handles all etcd/K8s TaskAction CR operations for the Actions service.
@@ -90,37 +94,25 @@ type ActionsClient struct {
 	getLatest func(ctx context.Context, name string) (*executorv1.TaskAction, bool, error)
 }
 
-// NewActionsClient creates a new Kubernetes-based actions client.
-func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordFilterSize int, scope promutils.Scope) (*ActionsClient, error) {
+// NewActionsClient creates a new Kubernetes-based actions client. recordedFilter
+// is required to deduplicate RecordAction calls across watch reconnects.
+func NewActionsClient(k8sClient client.WithWatch, sharedCache ctrlcache.Cache, namespace string, bufferSize int, numWorkers int, runClient workflowconnect.InternalRunServiceClient, recordedFilter fastcheck.Filter) (*ActionsClient, error) {
 	if numWorkers <= 0 {
 		numWorkers = 1
 	}
-	// The dedup filter is mandatory, so its size must be a positive value.
-	if recordFilterSize <= 0 {
-		return nil, fmt.Errorf("actions: recordFilterSize must be positive, got %d", recordFilterSize)
+	if recordedFilter == nil {
+		return nil, fmt.Errorf("actions: RecordAction dedup filter is required")
 	}
-	if scope == nil {
-		return nil, fmt.Errorf("actions: metrics scope is required")
-	}
-	c := &ActionsClient{
-		k8sClient:   k8sClient,
-		sharedCache: sharedCache,
-		namespace:   namespace,
-		bufferSize:  bufferSize,
-		numWorkers:  numWorkers,
-		runClient:   runClient,
-		subscribers: make(map[string]map[chan *ActionUpdate]struct{}),
-	}
-
-	// The dedup filter is mandatory: notifyRunService records on every event type
-	// and relies on the filter to keep RecordAction idempotent.
-	filter, err := fastcheck.NewOppoBloomFilter(recordFilterSize, scope.NewSubScope("actions_filter"))
-	if err != nil {
-		return nil, fmt.Errorf("actions: failed to create RecordAction dedup filter (size=%d): %w", recordFilterSize, err)
-	}
-	c.recordedFilter = filter
-
-	return c, nil
+	return &ActionsClient{
+		k8sClient:      k8sClient,
+		sharedCache:    sharedCache,
+		namespace:      namespace,
+		bufferSize:     bufferSize,
+		numWorkers:     numWorkers,
+		runClient:      runClient,
+		recordedFilter: recordedFilter,
+		subscribers:    make(map[string]map[chan *ActionUpdate]struct{}),
+	}, nil
 }
 
 // Enqueue creates a TaskAction CR in etcd (via the K8s API).
@@ -159,11 +151,17 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 		taskAction.Spec.CacheKey = extractTaskCacheKey(action)
 
 		// Embed the inline TaskTemplate if present.
-		if err := embedTaskTemplate(action, taskAction, runSpec); err != nil {
+		if err := embedTaskTemplate(action, taskAction); err != nil {
 			return fmt.Errorf("failed to embed task template: %w", err)
 		}
 
 		if err := c.k8sClient.Create(ctx, taskAction); err != nil {
+			// Surface AlreadyExists so callers can treat a re-enqueue (e.g. from
+			// a restarted parent) as already launched.
+			if apierrors.IsAlreadyExists(err) {
+				return connect.NewError(connect.CodeAlreadyExists,
+					fmt.Errorf("TaskAction CR %s already exists: %w", taskAction.Name, err))
+			}
 			return fmt.Errorf("failed to create TaskAction CR %s: %w", taskAction.Name, err)
 		}
 
@@ -201,8 +199,8 @@ func (c *ActionsClient) Enqueue(ctx context.Context, action *actions.Action, run
 
 		if err := c.k8sClient.Create(ctx, taskAction); err != nil {
 			if apierrors.IsAlreadyExists(err) {
-				logger.Infof(ctx, "TaskAction CR %s already exists, skipping create", taskAction.Name)
-				return nil
+				return connect.NewError(connect.CodeAlreadyExists,
+					fmt.Errorf("condition TaskAction CR %s already exists: %w", taskAction.Name, err))
 			}
 			return fmt.Errorf("failed to create condition TaskAction CR %s: %w", taskAction.Name, err)
 		}
@@ -257,8 +255,14 @@ func (c *ActionsClient) AbortAction(ctx context.Context, actionID *common.Action
 	return nil
 }
 
-// PutStatus updates the latest attempt metadata for a TaskAction.
-func (c *ActionsClient) PutStatus(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus) error {
+// PutStatus updates the latest attempt metadata for a TaskAction, and where the
+// running task can be reached (UpdateRequest.address). An address replaces the
+// current one, a nil address keeps it within the same attempt, an empty one
+// withdraws it, and a new attempt clears it. The address is recorded with the
+// reporting attempt and the TaskAction's system-retry count, and is delivered
+// only while both are current (AddressFromStatus). A report from an attempt
+// older than the current one changes neither the attempts nor the address.
+func (c *ActionsClient) PutStatus(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus, address *common.ActionAddress) error {
 	taskActionName := buildTaskActionName(actionID)
 
 	// Get current TaskAction
@@ -274,14 +278,25 @@ func (c *ActionsClient) PutStatus(ctx context.Context, actionID *common.ActionId
 		return nil
 	}
 
-	// Skip update if the attempts and cache status do not change
-	if taskAction.Status.Attempts == status.GetAttempts() &&
-		taskAction.Status.CacheStatus == status.GetCacheStatus() {
+	attempts := status.GetAttempts()
+	next := taskAction.Status.Address
+	if stale := attempt != 0 && attempt < taskAction.Status.Attempts; stale {
+		// A late report from an older attempt: keep the current attempt and address.
+		attempts = taskAction.Status.Attempts
+	} else {
+		next = nextAddress(taskAction.Status.Address, taskAction.Status.Attempts, attempts, taskAction.Status.SystemRetries, address)
+	}
+
+	// Skip update if the attempts, cache status and address do not change
+	if taskAction.Status.Attempts == attempts &&
+		taskAction.Status.CacheStatus == status.GetCacheStatus() &&
+		equality.Semantic.DeepEqual(taskAction.Status.Address, next) {
 		return nil
 	}
 
-	taskAction.Status.Attempts = status.GetAttempts()
+	taskAction.Status.Attempts = attempts
 	taskAction.Status.CacheStatus = status.GetCacheStatus()
+	taskAction.Status.Address = next
 
 	// Update status subresource
 	if err := c.k8sClient.Status().Update(ctx, taskAction); err != nil {
@@ -327,7 +342,7 @@ func (c *ActionsClient) Signal(ctx context.Context, actionID *common.ActionIdent
 			return connect.NewError(connect.CodeFailedPrecondition,
 				fmt.Errorf("condition %s already signalled with a different value", taskActionName))
 		}
-		if isTerminalPhase(GetPhaseFromConditions(taskAction)) {
+		if IsTerminalPhase(GetPhaseFromConditions(taskAction)) {
 			return connect.NewError(connect.CodeFailedPrecondition,
 				fmt.Errorf("condition %s already completed", taskActionName))
 		}
@@ -393,38 +408,32 @@ func (c *ActionsClient) ListRunActions(ctx context.Context, runID *common.RunIde
 	return result, nil
 }
 
-// ListChildActions lists all TaskActions that are children of the given parent action
+// ListChildActions lists the parent and its direct children from the shared
+// informer cache. Cache reads wait for initial sync but may lag subsequent writes.
 func (c *ActionsClient) ListChildActions(ctx context.Context, parentActionID *common.ActionIdentifier) ([]*executorv1.TaskAction, error) {
-	// List all TaskActions in the same run
-	taskActionList := &executorv1.TaskActionList{}
-	listOpts := []client.ListOption{
-		client.InNamespace(c.namespace),
-		client.MatchingLabels{
-			"flyte.org/project": parentActionID.Run.Project,
-			"flyte.org/domain":  parentActionID.Run.Domain,
-			"flyte.org/run":     parentActionID.Run.Name,
-		},
+	items := &executorv1.TaskActionList{}
+	key := parentActionIndexKey(parentActionID.Run.Project, parentActionID.Run.Domain,
+		parentActionID.Run.Name, parentActionID.Name)
+	if err := c.sharedCache.List(ctx, items, client.InNamespace(c.namespace),
+		client.MatchingFields{parentActionIndex: key}); err != nil {
+		return nil, fmt.Errorf("failed to list cached child TaskActions: %w", err)
 	}
 
-	if err := c.k8sClient.List(ctx, taskActionList, listOpts...); err != nil {
-		return nil, fmt.Errorf("failed to list TaskActions: %w", err)
-	}
-
-	// Filter for the parent and its children
 	var result []*executorv1.TaskAction
-	for i := range taskActionList.Items {
-		action := &taskActionList.Items[i]
-		// Include the parent action itself
-		if action.Spec.ActionName == parentActionID.Name {
-			result = append(result, action)
-			continue
-		}
-		// Include direct children
-		if action.Spec.ParentActionName != nil && *action.Spec.ParentActionName == parentActionID.Name {
-			result = append(result, action)
+	parent := &executorv1.TaskAction{}
+	parentName := buildTaskActionName(parentActionID)
+	err := c.sharedCache.Get(ctx, client.ObjectKey{Namespace: c.namespace, Name: parentName}, parent)
+	if err != nil && !apierrors.IsNotFound(err) {
+		return nil, fmt.Errorf("failed to get cached parent TaskAction: %w", err)
+	}
+	if err == nil {
+		result = append(result, parent)
+	}
+	for i := range items.Items {
+		if items.Items[i].Name != parentName {
+			result = append(result, &items.Items[i])
 		}
 	}
-
 	return result, nil
 }
 
@@ -505,11 +514,29 @@ func (c *ActionsClient) StartWatching(ctx context.Context) error {
 
 	logger.Infof(ctx, "Starting TaskAction watcher for namespace: %s (workers: %d)", c.namespace, c.numWorkers)
 
-	if c.sharedCache == nil {
-		return fmt.Errorf("shared cache is required for TaskAction informer")
-	}
-
 	return c.setupInformer(ctx)
+}
+
+// parentActionIndexKey scopes action names, which are only unique within a run.
+func parentActionIndexKey(project, domain, run, parent string) string {
+	return strings.Join([]string{project, domain, run, parent}, "/")
+}
+
+func indexTaskActionParent(obj client.Object) []string {
+	ta := obj.(*executorv1.TaskAction)
+	if ta.Spec.ParentActionName == nil || *ta.Spec.ParentActionName == "" {
+		return nil
+	}
+	return []string{parentActionIndexKey(ta.Spec.Project, ta.Spec.Domain, ta.Spec.RunName, *ta.Spec.ParentActionName)}
+}
+
+// RegisterTaskActionIndexes must be called before starting the shared cache.
+// StartWatching may subsequently attach to an already-running informer.
+func RegisterTaskActionIndexes(ctx context.Context, indexer client.FieldIndexer) error {
+	if err := indexer.IndexField(ctx, &executorv1.TaskAction{}, parentActionIndex, indexTaskActionParent); err != nil {
+		return fmt.Errorf("failed to index TaskAction parents: %w", err)
+	}
+	return nil
 }
 
 func (c *ActionsClient) setupInformer(ctx context.Context) error {
@@ -540,7 +567,7 @@ func (c *ActionsClient) setupInformer(ctx context.Context) error {
 				obj = tombstone.Obj
 			}
 			taskAction, ok := obj.(*executorv1.TaskAction)
-			if !ok || c.shouldSkipTaskAction(taskAction) {
+			if !ok {
 				return
 			}
 			c.dispatchEvent(taskAction, watch.Deleted)
@@ -627,9 +654,6 @@ func (c *ActionsClient) handleWatchEvent(ctx context.Context, event watch.Event)
 	if !found {
 		return // object already gone; a delete event (if any) handles the terminal state
 	}
-	if c.shouldSkipTaskAction(latest) {
-		return
-	}
 	c.handleTaskActionEvent(ctx, latest, event.Type)
 }
 
@@ -650,8 +674,21 @@ func (c *ActionsClient) handleTaskActionEvent(ctx context.Context, taskAction *e
 	if update == nil {
 		return
 	}
+	if eventType == watch.Deleted {
+		// Preserve deduplication through the final update, then forget the action,
+		// including when its terminal status has already been recorded.
+		defer c.recordedFilter.Remove(ctx, []byte(buildTaskActionName(update.ActionID)))
+		// Already-recorded deletions only need filter cleanup, not notifications.
+		if c.shouldSkipTaskAction(taskAction) {
+			return
+		}
+	}
 
+	// Notify before the skip: subscribers still need the update when another replica recorded it.
 	c.notifySubscribers(ctx, update)
+	if c.shouldSkipTaskAction(taskAction) {
+		return
+	}
 	c.notifyRunService(ctx, taskAction, update, eventType)
 }
 
@@ -668,7 +705,7 @@ func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, e
 	}
 
 	phase := GetPhaseFromConditions(taskAction)
-	if eventType == watch.Deleted && !isTerminalPhase(phase) {
+	if eventType == watch.Deleted && !IsTerminalPhase(phase) {
 		// Only force ABORTED if the action wasn't already in a terminal phase.
 		// Otherwise a missed-delete tombstone or post-terminal CR cleanup would
 		// overwrite a recorded Succeeded/Failed status with Aborted.
@@ -693,7 +730,61 @@ func buildActionUpdate(ctx context.Context, taskAction *executorv1.TaskAction, e
 		ShortName:        shortName,
 		ErrorState:       taskAction.Status.ErrorState,
 		SignalValue:      SignalValueFromStatus(ctx, taskAction),
+		Address:          AddressFromStatus(taskAction),
 	}
+}
+
+// nextAddress returns the address a task holds after an update for attempt
+// `attempts`: a new address replaces the held one (recorded with the attempt and
+// the TaskAction's system-retry count), an empty one withdraws it, none keeps it
+// within the attempt, and a new attempt clears it.
+func nextAddress(held *executorv1.ActionAddress, heldAttempts, attempts, systemRetries uint32, address *common.ActionAddress) *executorv1.ActionAddress {
+	if address != nil {
+		if isEmptyAddress(address) {
+			return nil
+		}
+		return addressToStatus(address, attempts, systemRetries)
+	}
+	if attempts != heldAttempts {
+		return nil
+	}
+	return held
+}
+
+// isEmptyAddress reports an address with nothing set: a withdrawal.
+func isEmptyAddress(a *common.ActionAddress) bool {
+	p := a.GetPod()
+	return a.GetPath() == "" && a.GetUrl() == "" && a.GetCluster() == "" &&
+		(p == nil || (p.GetNamespace() == "" && p.GetName() == "" && p.GetIp() == "" && p.GetPort() == 0))
+}
+
+func addressToStatus(a *common.ActionAddress, attempt, systemRetries uint32) *executorv1.ActionAddress {
+	out := &executorv1.ActionAddress{
+		Path: a.GetPath(), URL: a.GetUrl(), Cluster: a.GetCluster(),
+		Attempt: attempt, SystemRetries: systemRetries,
+	}
+	if p := a.GetPod(); p != nil {
+		out.Pod = &executorv1.PodAddress{Namespace: p.GetNamespace(), Name: p.GetName(), IP: p.GetIp(), Port: p.GetPort()}
+	}
+	return out
+}
+
+// AddressFromStatus is where the running task can be reached, or nil when it
+// reported none, is terminal, or has moved on from the attempt or pod that
+// reported it (a retry, or a system-retry relaunch, the controller started).
+func AddressFromStatus(taskAction *executorv1.TaskAction) *common.ActionAddress {
+	a := taskAction.Status.Address
+	if a == nil || IsTerminalPhase(GetPhaseFromConditions(taskAction)) {
+		return nil
+	}
+	if a.Attempt != taskAction.Status.Attempts || a.SystemRetries != taskAction.Status.SystemRetries {
+		return nil
+	}
+	out := &common.ActionAddress{Path: a.Path, Url: a.URL, Cluster: a.Cluster}
+	if a.Pod != nil {
+		out.Pod = &common.PodAddress{Namespace: a.Pod.Namespace, Name: a.Pod.Name, Ip: a.Pod.IP, Port: a.Pod.Port}
+	}
+	return out
 }
 
 // SignalValueFromStatus unmarshals the condition signal value persisted on the
@@ -789,28 +880,6 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		}
 	}
 
-	// When a child action first appears, the parent must already be running (it
-	// created the child). Promote the parent to RUNNING so the UI doesn't
-	// stay stuck on INITIALIZING while children are executing.
-	if !isDuplicate && eventType != watch.Deleted && update.ParentActionName != "" {
-		parentID := &common.ActionIdentifier{
-			Run:  update.ActionID.Run,
-			Name: update.ParentActionName,
-		}
-		parentStatusReq := &workflow.UpdateActionStatusRequest{
-			ActionId: parentID,
-			Status: &workflow.ActionStatus{
-				Phase: common.ActionPhase_ACTION_PHASE_RUNNING,
-			},
-		}
-		if resp, err := c.runClient.UpdateActionStatus(ctx, connect.NewRequest(parentStatusReq)); err != nil {
-			logger.Warnf(ctx, "Failed to promote parent action %s to RUNNING: %v", update.ParentActionName, err)
-		} else if code := resp.Msg.GetStatus().GetCode(); code != 0 {
-			logger.Warnf(ctx, "Run service rejected promoting parent action %s to RUNNING: code=%d message=%s",
-				update.ParentActionName, code, resp.Msg.GetStatus().GetMessage())
-		}
-	}
-
 	if update.Phase != common.ActionPhase_ACTION_PHASE_UNSPECIFIED {
 		status := &workflow.ActionStatus{
 			Phase:       update.Phase,
@@ -845,7 +914,7 @@ func (c *ActionsClient) notifyRunService(ctx context.Context, taskAction *execut
 		} else if code := resp.Msg.GetStatus().GetCode(); code != 0 {
 			logger.Warnf(ctx, "Run service rejected action status update for %s: code=%d message=%s",
 				update.ActionID.Name, code, resp.Msg.GetStatus().GetMessage())
-		} else if isTerminalPhase(update.Phase) && !update.IsDeleted {
+		} else if IsTerminalPhase(update.Phase) && !update.IsDeleted {
 			// Skip label patching for deleted CRs — the patch would always fail
 			// with "not found" since the object is already gone.
 			if err := c.markTerminalStatusRecorded(ctx, taskAction); err != nil {
@@ -899,7 +968,8 @@ func GetPhaseFromConditions(taskAction *executorv1.TaskAction) common.ActionPhas
 	return common.ActionPhase_ACTION_PHASE_UNSPECIFIED
 }
 
-func isTerminalPhase(phase common.ActionPhase) bool {
+// IsTerminalPhase reports whether phase ends an action attempt.
+func IsTerminalPhase(phase common.ActionPhase) bool {
 	return phase == common.ActionPhase_ACTION_PHASE_SUCCEEDED ||
 		phase == common.ActionPhase_ACTION_PHASE_FAILED ||
 		phase == common.ActionPhase_ACTION_PHASE_ABORTED ||
@@ -1047,10 +1117,21 @@ func applyRunSpecToTaskAction(taskAction *executorv1.TaskAction, runSpec *task.R
 	if runSpec == nil {
 		taskAction.Spec.EnvVars = nil
 		taskAction.Spec.Interruptible = nil
+		taskAction.Spec.PodTemplateName = ""
+		taskAction.Spec.ServiceAccount = ""
+		taskAction.Spec.RawDataPrefix = ""
+		taskAction.Spec.RunStartTime = ""
 		return
 	}
 
+	taskAction.Spec.RunStartTime = ""
+	if ts := runSpec.GetRunStartTime(); ts != nil {
+		taskAction.Spec.RunStartTime = ts.AsTime().UTC().Format(time.RFC3339)
+	}
 	taskAction.Spec.EnvVars = keyValuePairsToMap(runSpec.GetEnvs().GetValues())
+	taskAction.Spec.PodTemplateName = runSpec.GetDefaultSettings().GetPodTemplateName()
+	taskAction.Spec.ServiceAccount = runSpec.GetSecurityContext().GetRunAs().GetK8SServiceAccount()
+	taskAction.Spec.RawDataPrefix = runSpec.GetRawDataStorage().GetRawDataPrefix()
 	if runSpec.GetInterruptible() != nil {
 		value := runSpec.GetInterruptible().GetValue()
 		taskAction.Spec.Interruptible = &value
@@ -1079,6 +1160,10 @@ func inheritRunContextFromParentTaskAction(taskAction *executorv1.TaskAction, pa
 		return
 	}
 	taskAction.Spec.EnvVars = cloneStringMap(parentTaskAction.Spec.EnvVars)
+	taskAction.Spec.PodTemplateName = parentTaskAction.Spec.PodTemplateName
+	taskAction.Spec.ServiceAccount = parentTaskAction.Spec.ServiceAccount
+	taskAction.Spec.RawDataPrefix = parentTaskAction.Spec.RawDataPrefix
+	taskAction.Spec.RunStartTime = parentTaskAction.Spec.RunStartTime
 	if len(parentTaskAction.Annotations) > 0 {
 		if taskAction.Annotations == nil {
 			taskAction.Annotations = map[string]string{}
@@ -1154,9 +1239,9 @@ func extractTaskCacheKey(action *actions.Action) string {
 const runStartTimeTemplateVar = "{{.runStartTime}}"
 
 // embedTaskTemplate serializes the inline TaskTemplate from the Action into the CR spec,
-// substituting the {{.runStartTime}} container-arg placeholder with runSpec.run_start_time when
+// substituting the {{.runStartTime}} container-arg placeholder with the TaskAction's inherited run start time when
 // set. Templates produced by older SDKs omit the placeholder, so the substitution is a no-op.
-func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction, runSpec *task.RunSpec) error {
+func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction) error {
 	taskSpec, ok := action.Spec.(*actions.Action_Task)
 	if !ok || taskSpec.Task == nil || taskSpec.Task.Spec == nil || taskSpec.Task.Spec.TaskTemplate == nil {
 		// Non-task actions do not carry an inline template.
@@ -1167,7 +1252,9 @@ func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction
 	taskAction.Spec.TaskType = tmpl.Type
 	taskAction.Spec.ShortName = taskSpec.Task.Spec.ShortName
 
-	tmpl = substituteRunStartTime(tmpl, runSpec.GetRunStartTime())
+	tmpl = substituteRunStartTime(tmpl, taskAction.Spec.RunStartTime)
+	tmpl = applyPodTemplateName(tmpl, taskAction.Spec.PodTemplateName)
+	tmpl = applyServiceAccount(tmpl, taskAction.Spec.ServiceAccount)
 
 	data, err := proto.Marshal(tmpl)
 	if err != nil {
@@ -1178,22 +1265,65 @@ func embedTaskTemplate(action *actions.Action, taskAction *executorv1.TaskAction
 }
 
 // substituteRunStartTime returns a TaskTemplate whose container args have the {{.runStartTime}}
-// placeholder replaced with ts formatted as RFC3339 UTC. It returns the input unchanged when ts is
-// nil or the template has no container args. The template is cloned before mutation so the caller's
+// placeholder replaced with the RFC3339 UTC run start time. It returns the input unchanged when value is
+// empty or the template has no container args. The template is cloned before mutation so the caller's
 // proto — which may be persisted separately as the registered task spec — is not affected.
-func substituteRunStartTime(tmpl *core.TaskTemplate, ts *timestamppb.Timestamp) *core.TaskTemplate {
-	if ts == nil {
+func substituteRunStartTime(tmpl *core.TaskTemplate, value string) *core.TaskTemplate {
+	if value == "" {
 		return tmpl
 	}
 	if tmpl.GetContainer() == nil || len(tmpl.GetContainer().GetArgs()) == 0 {
 		return tmpl
 	}
-	value := ts.AsTime().UTC().Format(time.RFC3339)
 	cloned := proto.Clone(tmpl).(*core.TaskTemplate)
 	args := cloned.GetContainer().GetArgs()
 	for i, arg := range args {
 		args[i] = strings.ReplaceAll(arg, runStartTimeTemplateVar, value)
 	}
+	return cloned
+}
+
+// applyPodTemplateName returns a TaskTemplate whose metadata names the given pod template.
+// It returns the input unchanged when the name is empty or the task already named one itself,
+// so an explicit choice always wins. The template is cloned before mutation so the caller's
+// proto - which may be persisted separately as the registered task spec - is not affected.
+func applyPodTemplateName(tmpl *core.TaskTemplate, name string) *core.TaskTemplate {
+	if name == "" {
+		return tmpl
+	}
+	if tmpl.GetMetadata().GetPodTemplateName() != "" {
+		return tmpl
+	}
+
+	cloned := proto.Clone(tmpl).(*core.TaskTemplate)
+	if cloned.Metadata == nil {
+		cloned.Metadata = &core.TaskMetadata{}
+	}
+	cloned.Metadata.PodTemplateName = name
+	return cloned
+}
+
+// applyServiceAccount returns a TaskTemplate whose security context names the given Kubernetes
+// service account. It returns the input unchanged when the name is empty or the task already set
+// one itself, so an explicit choice always wins. Other security context fields are kept. The
+// template is cloned before mutation so the caller's proto - which may be persisted separately as
+// the registered task spec - is not affected.
+func applyServiceAccount(tmpl *core.TaskTemplate, name string) *core.TaskTemplate {
+	if name == "" {
+		return tmpl
+	}
+	if tmpl.GetSecurityContext().GetRunAs().GetK8SServiceAccount() != "" {
+		return tmpl
+	}
+
+	cloned := proto.Clone(tmpl).(*core.TaskTemplate)
+	if cloned.SecurityContext == nil {
+		cloned.SecurityContext = &core.SecurityContext{}
+	}
+	if cloned.SecurityContext.RunAs == nil {
+		cloned.SecurityContext.RunAs = &core.Identity{}
+	}
+	cloned.SecurityContext.RunAs.K8SServiceAccount = name
 	return cloned
 }
 

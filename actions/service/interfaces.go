@@ -19,7 +19,7 @@ type ActionsClientInterface interface {
 	Enqueue(ctx context.Context, action *actions.Action, runSpec *task.RunSpec) error
 
 	// PutStatus updates the status of a TaskAction.
-	PutStatus(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus) error
+	PutStatus(ctx context.Context, actionID *common.ActionIdentifier, attempt uint32, status *workflow.ActionStatus, address *common.ActionAddress) error
 
 	// AbortAction aborts a queued or running action, cascading to descendants.
 	AbortAction(ctx context.Context, actionID *common.ActionIdentifier, reason *string) error

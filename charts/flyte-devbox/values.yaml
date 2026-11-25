@@ -77,6 +77,14 @@ flyte-binary:
             - _U_EP_OVERRIDE: 'flyte-binary-http.{{ .Release.Namespace }}:8090'
             - _U_INSECURE: "true"
             - _U_USE_ACTIONS: "1"
+          # Devbox-local Apple Silicon accelerator: the host-side Apple Silicon bridge that
+          # `flyte start devbox --apple-silicon` runs on an Apple Silicon Mac. The devbox bootstrap fills
+          # these in from the FLYTE_DEVBOX_APPLE_SILICON_* container env; left empty, a workload that
+          # requests gpu="AppleSilicon" fails with APPLE_SILICON_NOT_AVAILABLE.
+          apple-silicon-bridge:
+            endpoint: '%{APPLE_SILICON_BRIDGE_ENDPOINT}%'
+            token-secret: '%{APPLE_SILICON_BRIDGE_TOKEN_SECRET}%'
+            host-platform: '%{DEVBOX_HOST_PLATFORM}%'
       runs:
         database:
           postgres:

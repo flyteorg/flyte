@@ -17,9 +17,14 @@ var defaultConfig = &Config{
 		Port: 8090,
 		Host: "0.0.0.0",
 	},
-	WatchBufferSize: 100,
+	WatchBufferSize:         100,
+	NotificationBufferLimit: 65_000,
+	NotifyRetryMinBackoff:   config.Duration{Duration: 50 * time.Millisecond},
+	NotifyRetryMaxBackoff:   config.Duration{Duration: 5 * time.Second},
+	NotifyBatchSize:         100,
 	ActionsService: serviceclient.ServiceConfig{
-		URL: "http://localhost:8090",
+		URL:  "http://localhost:8090",
+		HTTP: serviceclient.HTTPConfig{MaxIdleConnsPerHost: 512},
 	},
 	StoragePrefix: "file:///tmp/flyte/data",
 	SeedProjects:  []string{"flytesnacks"},
@@ -55,11 +60,28 @@ type Config struct {
 	// HTTP server configuration
 	Server ServerConfig `json:"server"`
 
+	// PprofPort is the port the pprof endpoint binds to. 0 disables profiling.
+	PprofPort int `json:"pprofPort" pflag:",Port the pprof endpoint binds to; 0 disables profiling"`
+
 	// Database configuration
 	Database database.DbConfig `json:"database"`
 
-	// Watch/streaming settings
+	// WatchBufferSize is the capacity of each watch stream's notification channel. A notification for a stream
+	// whose channel is full is dropped, so a client watching many busy actions needs it larger.
 	WatchBufferSize int `json:"watchBufferSize" pflag:",Buffer size for watch streams"`
+
+	// NotificationBufferLimit is the maximum number of pending entries in each action or run queue.
+	NotificationBufferLimit int `json:"notificationBufferLimit" pflag:",Maximum pending entries in each notification queue"`
+
+	// NotifyRetryMinBackoff is the initial delay after notification delivery fails.
+	NotifyRetryMinBackoff config.Duration `json:"notifyRetryMinBackoff" pflag:",Initial notification retry delay"`
+
+	// NotifyRetryMaxBackoff caps the notification retry delay.
+	NotifyRetryMaxBackoff config.Duration `json:"notifyRetryMaxBackoff" pflag:",Maximum notification retry delay"`
+
+	// NotifyBatchSize is the maximum number of notifications sent in one pg_notify statement.
+	// Values <= 0 fall back to 100; values above 10000 are capped at 10000.
+	NotifyBatchSize int `json:"notifyBatchSize" pflag:",Maximum notifications sent per pg_notify statement"`
 
 	// ActionsService configures the actions service client.
 	ActionsService serviceclient.ServiceConfig `json:"actionsService" pflag:",Actions service client configuration"`

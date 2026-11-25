@@ -13,21 +13,29 @@ const configSectionKey = "executor"
 
 var (
 	defaultConfig = &Config{
-		MetricsBindAddress:      ":10254",
-		HealthProbeBindAddress:  ":8081",
-		LeaderElect:             false,
-		MetricsSecure:           true,
-		WebhookCertName:         "tls.crt",
-		WebhookCertKey:          "tls.key",
-		MetricsCertName:         "tls.crt",
-		MetricsCertKey:          "tls.key",
-		EnableHTTP2:             false,
-		EventsService:           serviceclient.ServiceConfig{URL: "http://localhost:8090"},
-		CacheService:            serviceclient.ServiceConfig{URL: "http://localhost:8094"},
+		MetricsBindAddress:     ":10254",
+		HealthProbeBindAddress: ":8081",
+		LeaderElect:            false,
+		MetricsSecure:          true,
+		WebhookCertName:        "tls.crt",
+		WebhookCertKey:         "tls.key",
+		MetricsCertName:        "tls.crt",
+		MetricsCertKey:         "tls.key",
+		EnableHTTP2:            false,
+		// An idle connection per concurrent reconcile (MaxConcurrentReconciles).
+		EventsService: serviceclient.ServiceConfig{
+			URL:  "http://localhost:8090",
+			HTTP: serviceclient.HTTPConfig{MaxIdleConnsPerHost: 512},
+		},
+		CacheService: serviceclient.ServiceConfig{
+			URL:  "http://localhost:8094",
+			HTTP: serviceclient.HTTPConfig{MaxIdleConnsPerHost: 512},
+		},
 		Cluster:                 "",
 		MaxSystemFailures:       3,
 		MaxConcurrentReconciles: 512,
 		RequeueDuration:         stdconfig.Duration{Duration: 10 * time.Second},
+		K8sEventMode:            "off",
 		GC: GCConfig{
 			Interval: stdconfig.Duration{Duration: 30 * time.Minute},
 			MaxTTL:   stdconfig.Duration{Duration: 1 * time.Hour},
@@ -42,6 +50,9 @@ type Config struct {
 	// MetricsBindAddress is the address the metrics endpoint binds to.
 	// Use :8443 for HTTPS or :8080 for HTTP, or leave as 0 to disable.
 	MetricsBindAddress string `json:"metricsBindAddress" pflag:",Address the metrics endpoint binds to"`
+
+	// PprofBindAddress is the address the pprof endpoint binds to. Empty or "0" disables profiling.
+	PprofBindAddress string `json:"pprofBindAddress" pflag:",Address the pprof endpoint binds to; empty or 0 disables profiling"`
 
 	// HealthProbeBindAddress is the address the probe endpoint binds to.
 	HealthProbeBindAddress string `json:"healthProbeBindAddress" pflag:",Address the probe endpoint binds to"`
@@ -87,10 +98,10 @@ type Config struct {
 	// assigns the `default` ServiceAccount of the pod's own namespace.
 	DefaultK8sServiceAccount string `json:"defaultK8sServiceAccount" pflag:",Default Kubernetes service account for task pods when the task does not set one"`
 
-	// MaxSystemFailures bounds consecutive system-level failures (Plugin.Handle Go
-	// errors and plugin-reported system-retryable failures) before a TaskAction is
-	// converted to a permanent failure.
-	MaxSystemFailures int32 `json:"maxSystemFailures" pflag:",Max consecutive system-level failures before forcing permanent failure"`
+	// MaxSystemFailures bounds the system-level failures (Plugin.Handle Go errors and
+	// plugin-reported system-retryable failures) one attempt may take before the
+	// TaskAction is converted to a permanent failure.
+	MaxSystemFailures int32 `json:"maxSystemFailures" pflag:",Max system-level failures per attempt before forcing permanent failure"`
 
 	// MaxConcurrentReconciles is the maximum number of concurrent reconcile loops for TaskActions.
 	MaxConcurrentReconciles int `json:"maxConcurrentReconciles" pflag:",Max concurrent reconcile loops for TaskActions"`
@@ -100,6 +111,11 @@ type Config struct {
 	// more reconciles and more load on the plugin backends. 0 or unset means the
 	// built-in default of 10s.
 	RequeueDuration stdconfig.Duration `json:"requeueDuration" pflag:",How long to wait before reconciling a running TaskAction again. 0 means the default of 10s"`
+
+	// K8sEventMode selects which action events are also emitted as Kubernetes Events:
+	// off emits none, terminal emits terminal phases and system retries, all emits
+	// every phase change.
+	K8sEventMode string `json:"k8sEventMode" pflag:",Action events to emit as k8s Events: off, terminal or all"`
 
 	// GC configures the garbage collector for terminal TaskActions.
 	GC GCConfig `json:"gc" pflag:",Garbage collector configuration for terminal TaskActions"`

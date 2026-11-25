@@ -88,14 +88,23 @@ func (i *EmbeddedSecretManagerInjector) Type() config.SecretManagerType {
 // from the fetchers. lookUpSecret caches under whichever cascade scope the fetcher resolved the
 // secret at (project+domain, domain, or org), and the caller has no way to know which one that
 // was, so all three keys are cleared.
+//
+// For a cluster-scoped key (see ClusterScopedSecretKeys) the cluster-qualified storage name is
+// cleared as well, since that is the name lookUpSecretWithClusterScope resolves first.
 func (i *EmbeddedSecretManagerInjector) InvalidateCache(ctx context.Context, org, domain, project, secretName string) {
-	for _, cacheKey := range []string{
-		EncodeSecretName(org, domain, project, secretName),
-		EncodeSecretName(org, domain, EmptySecretScope, secretName),
-		EncodeSecretName(org, EmptySecretScope, EmptySecretScope, secretName),
-	} {
-		if err := i.secretCache.Delete(ctx, cacheKey); err != nil {
-			logger.Debugf(ctx, "Failed to delete cache entry [%s]: %v", cacheKey, err)
+	names := []string{secretName}
+	if i.cfg.ClusterName != "" && IsClusterScopedSecretKey(secretName) {
+		names = append(names, ClusterScopedSecretName(secretName, i.cfg.ClusterName))
+	}
+	for _, name := range names {
+		for _, cacheKey := range []string{
+			EncodeSecretName(org, domain, project, name),
+			EncodeSecretName(org, domain, EmptySecretScope, name),
+			EncodeSecretName(org, EmptySecretScope, EmptySecretScope, name),
+		} {
+			if err := i.secretCache.Delete(ctx, cacheKey); err != nil {
+				logger.Debugf(ctx, "Failed to delete cache entry [%s]: %v", cacheKey, err)
+			}
 		}
 	}
 
@@ -210,6 +219,29 @@ func (i *EmbeddedSecretManagerInjector) lookUpSecret(ctx context.Context, compon
 	return nil, "", stdlibErrors.Errorf(ErrCodeSecretNotFoundAcrossAllScopes, SecretSecretNotFoundAcrossAllScopes)
 }
 
+// lookUpSecretWithClusterScope resolves the secret for a pod-facing key. For keys provisioned per
+// cluster (see ClusterScopedSecretKeys) and a configured ClusterName, it first resolves the
+// cluster-qualified storage name (ClusterScopedSecretName), then falls back to the unqualified
+// name so secrets written before cluster scoping, or by clusters without a configured name, keep
+// resolving. The pod-facing key, and so the injected env var name, is unchanged either way.
+func (i *EmbeddedSecretManagerInjector) lookUpSecretWithClusterScope(
+	ctx context.Context, components *SecretNameComponents,
+) (*resolvedUserSecret, string, error) {
+	if i.cfg.ClusterName != "" && IsClusterScopedSecretKey(components.Name) {
+		scoped := *components
+		scoped.Name = ClusterScopedSecretName(components.Name, i.cfg.ClusterName)
+		resolved, imagePullSecretName, err := i.lookUpSecret(ctx, &scoped)
+		if err == nil {
+			return resolved, imagePullSecretName, nil
+		}
+		if !stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFoundAcrossAllScopes) {
+			return nil, "", err
+		}
+		logger.Infof(ctx, "cluster-scoped secret [%s] not found; falling back to [%s]", scoped.Name, components.Name)
+	}
+	return i.lookUpSecret(ctx, components)
+}
+
 // addImagePullSecretToPod adds an image pull secret to a pod if it doesn't already exist
 func (i *EmbeddedSecretManagerInjector) addImagePullSecretToPod(
 	ctx context.Context,
@@ -317,14 +349,16 @@ func (i *EmbeddedSecretManagerInjector) Inject(
 	}
 
 	// A SecretKeyRef can only reference a Secret in the same namespace as the pod, so the pod
-	// must be running in the same namespace the Kubernetes-native secret manager stores into.
-	if (secret.MountRequirement == core.Secret_ANY || secret.MountRequirement == core.Secret_ENV_VAR) && pod.GetNamespace() != i.cfg.K8sConfig.Namespace {
+	// must be running in the same namespace the Kubernetes-native secret manager stores into,
+	// unless env vars may carry the value itself (EnvVarsFromValues).
+	envFromRef := pod.GetNamespace() == i.cfg.K8sConfig.Namespace
+	if (secret.MountRequirement == core.Secret_ANY || secret.MountRequirement == core.Secret_ENV_VAR) && !envFromRef && !i.cfg.EnvVarsFromValues {
 		return pod, false, fmt.Errorf(
 			"cannot mount secret [%s]: pod namespace [%s] does not match the Kubernetes secret manager namespace [%s]",
 			secret.Key, pod.GetNamespace(), i.cfg.K8sConfig.Namespace)
 	}
 
-	resolved, imagePullSecretName, err := i.lookUpSecret(ctx, secretNameComponents)
+	resolved, imagePullSecretName, err := i.lookUpSecretWithClusterScope(ctx, secretNameComponents)
 	if err != nil {
 		return pod, false, err
 	}
@@ -344,16 +378,24 @@ func (i *EmbeddedSecretManagerInjector) Inject(
 					"but has a binary value that is not a valid UTF-8 string; mount "+
 					"as a file instead", secret.Key)
 		}
-		if !resolved.isK8sSecret {
+		switch {
+		case resolved.isK8sSecret && envFromRef:
+			i.injectAsEnvVar(secret, &corev1.SecretKeySelector{
+				LocalObjectReference: corev1.LocalObjectReference{Name: EncodeK8sSecretName(resolved.secretID)},
+				Key:                  resolved.secretID,
+			}, pod)
+		case i.cfg.EnvVarsFromValues:
+			value := secretValue.StringValue
+			if value == "" {
+				value = string(secretValue.BinaryValue)
+			}
+
+			i.injectAsEnvVarValue(secret, value, pod)
+		default:
 			return pod, false, fmt.Errorf(
 				"secret %q cannot be mounted as an environment variable: "+
 					"it is not stored in a Kubernetes secret", secret.Key)
 		}
-
-		i.injectAsEnvVar(secret, &corev1.SecretKeySelector{
-			LocalObjectReference: corev1.LocalObjectReference{Name: EncodeK8sSecretName(resolved.secretID)},
-			Key:                  resolved.secretID,
-		}, pod)
 	case core.Secret_FILE:
 		secretBytes := secretValue.BinaryValue
 		if len(secretValue.StringValue) > 0 {
@@ -393,6 +435,21 @@ func (i *EmbeddedSecretManagerInjector) injectAsEnvVar(secret *core.Secret, secr
 				SecretKeyRef: secretRef,
 			},
 		},
+	}
+	pod.Spec.InitContainers = AppendEnvVars(pod.Spec.InitContainers, envVars...)
+	pod.Spec.Containers = AppendEnvVars(pod.Spec.Containers, envVars...)
+}
+
+// injectAsEnvVarValue sets the secret's environment variable to its value (EnvVarsFromValues).
+func (i *EmbeddedSecretManagerInjector) injectAsEnvVarValue(secret *core.Secret, value string, pod *corev1.Pod) {
+	valueEnvVarName := i.parentCfg.SecretEnvVarPrefix + strings.ToUpper(secret.GetKey())
+	if secret.GetEnvVar() != "" {
+		valueEnvVarName = secret.EnvVar
+	}
+
+	envVars := []corev1.EnvVar{
+		{Name: SecretEnvVarPrefix, Value: i.parentCfg.SecretEnvVarPrefix},
+		{Name: valueEnvVarName, Value: value},
 	}
 	pod.Spec.InitContainers = AppendEnvVars(pod.Spec.InitContainers, envVars...)
 	pod.Spec.Containers = AppendEnvVars(pod.Spec.Containers, envVars...)

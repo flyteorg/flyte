@@ -26,10 +26,9 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	if err := otelutils.RegisterProvidersWithContext(ctx, otelServiceName, otelCfg); err != nil {
 		return fmt.Errorf("registering otel providers: %w", err)
 	}
-	otelInterceptor, err := otelconnect.NewInterceptor(
+	otelInterceptor, err := otelutils.NewConnectInterceptor(
 		otelconnect.WithTracerProvider(otelutils.GetTracerProvider(otelServiceName)),
 		otelconnect.WithMeterProvider(otelutils.GetMeterProvider(otelServiceName)),
-		otelconnect.WithoutServerPeerAttributes(),
 	)
 	if err != nil {
 		return fmt.Errorf("creating otel interceptor: %w", err)
@@ -50,6 +49,8 @@ func Setup(ctx context.Context, sc *app.SetupContext) error {
 	path, handler := workflowconnect.NewEventsProxyServiceHandler(eventsSvc, connect.WithInterceptors(otelInterceptor))
 	sc.Mux.Handle(path, handler)
 	logger.Infof(ctx, "Mounted EventsProxyService at %s", path)
+
+	sc.AddProfilingServer("events", cfg.PprofPort)
 
 	return nil
 }

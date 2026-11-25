@@ -8,12 +8,14 @@ import (
 
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	flyteerr "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
@@ -28,6 +30,10 @@ type mpiOperatorResourceHandler struct {
 
 // Sanity test that the plugin implements method of k8s.Plugin
 var _ k8s.Plugin = mpiOperatorResourceHandler{}
+
+// The job's replica pods are where a node daemon records what the hardware did, so the
+// framework has to be able to find them from the CR this plugin tracks.
+var _ k8s.ChildPodDiscovery = mpiOperatorResourceHandler{}
 
 func (mpiOperatorResourceHandler) GetProperties() k8s.PluginProperties {
 	return k8s.PluginProperties{}
@@ -141,12 +147,20 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 		},
 	}
 
+	// Propagate the task's pod metadata (k8s_pod / pod_template labels and annotations) onto the CR
+	// itself, as the pytorch plugin does. Otherwise only the replica pod templates carry it.
+	_, objectMeta, _, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
+	if err != nil {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
+	}
+
 	job := &kubeflowv1.MPIJob{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       kubeflowv1.MPIJobKind,
 			APIVersion: kubeflowv1.SchemeGroupVersion.String(),
 		},
-		Spec: jobSpec,
+		ObjectMeta: *objectMeta,
+		Spec:       jobSpec,
 	}
 
 	return job, nil
@@ -175,7 +189,9 @@ func (mpiOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginContex
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
-	if app.Status.StartTime == nil && app.CreationTimestamp.Add(common.GetConfig().Timeout.Duration).Before(time.Now()) {
+
+	isSuspended := app.Spec.RunPolicy.Suspend != nil && *app.Spec.RunPolicy.Suspend
+	if !isSuspended && app.Status.StartTime == nil && app.CreationTimestamp.Add(common.GetConfig().Timeout.Duration).Before(time.Now()) {
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("kubeflow operator hasn't updated the mpi custom resource since creation time %v", app.CreationTimestamp)
 	}
 	currentCondition, err := common.ExtractCurrentCondition(app.Status.Conditions)
@@ -214,6 +230,20 @@ func (mpiOperatorResourceHandler) IsTerminal(_ context.Context, resource client.
 		}
 	}
 	return false, nil
+}
+
+// ChildPods implements k8s.ChildPodDiscovery. The pods that run the task are the launcher
+// and worker pods the training operator expands from the templates this plugin built,
+// which the framework tracks nothing of, since it tracks the MPIJob.
+func (mpiOperatorResourceHandler) ChildPods(
+	ctx context.Context,
+	taskCtx pluginsCore.TaskExecutionMetadata,
+	resource client.Object,
+) (labels.Selector, error) {
+	if _, ok := resource.(*kubeflowv1.MPIJob); !ok {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "expected an MPIJob, got %T", resource)
+	}
+	return common.ChildPods(ctx, taskCtx, resource)
 }
 
 // GetCompletionTime returns the completion time of the MPIJob

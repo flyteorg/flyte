@@ -9,9 +9,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/otel/metric/noop"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
@@ -19,7 +21,6 @@ import (
 
 	executorv1 "github.com/flyteorg/flyte/v2/executor/api/v1"
 	"github.com/flyteorg/flyte/v2/flytestdlib/fastcheck"
-	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/actions"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/common"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
@@ -109,13 +110,24 @@ func TestEnqueueCondition_InvalidDeclaredType(t *testing.T) {
 	assert.Equal(t, connect.CodeInvalidArgument, connect.CodeOf(err))
 }
 
-func TestEnqueueCondition_AlreadyExistsIsIdempotent(t *testing.T) {
+// A restarted parent re-enqueues the same condition; the second Enqueue must
+// return AlreadyExists and leave the existing CR untouched.
+func TestEnqueueCondition_AlreadyExists(t *testing.T) {
 	ctx := context.Background()
 	c := newConditionClient(t)
 	action := newConditionAction(core.SimpleType_BOOLEAN)
 
 	require.NoError(t, c.Enqueue(ctx, action, nil))
-	assert.NoError(t, c.Enqueue(ctx, action, nil))
+	created, err := c.GetTaskAction(ctx, action.ActionId)
+	require.NoError(t, err)
+
+	err = c.Enqueue(ctx, action, nil)
+	assert.Equal(t, connect.CodeAlreadyExists, connect.CodeOf(err))
+	assert.True(t, apierrors.IsAlreadyExists(err), "expected wrapped AlreadyExists error, got %v", err)
+
+	existing, err := c.GetTaskAction(ctx, action.ActionId)
+	require.NoError(t, err)
+	assert.Equal(t, created.ResourceVersion, existing.ResourceVersion)
 }
 
 func TestBuildActionUpdate_SignalValue(t *testing.T) {
@@ -247,7 +259,7 @@ func TestNotifyRunService_Condition(t *testing.T) {
 		// the dedup filter so notifyRunService skips RecordAction and only issues
 		// the status update (the coalescing gate records on first sight of any
 		// non-delete event, deduped via this filter).
-		filter, err := fastcheck.NewOppoBloomFilter(128, promutils.NewTestScope())
+		filter, err := fastcheck.NewOppoBloomFilter(128, "test", noop.NewMeterProvider())
 		require.NoError(t, err)
 		c.recordedFilter = filter
 		c.recordedFilter.Add(ctx, []byte(buildTaskActionName(update.ActionID)))

@@ -34,13 +34,10 @@ func (URLPathConstructor) ConstructReference(ctx context.Context, reference Data
 		return "", errors.Wrap(err, fmt.Sprintf("Reference is of an invalid format [%v]", reference))
 	}
 
-	rel, err := url.Parse(strings.Join(MapStrings(func(s string) string {
+	// The nested keys are object-key segments, not a URL: keep characters such as '#', '?' and '%' in the path.
+	rel := &url.URL{Path: strings.Join(MapStrings(func(s string) string {
 		return strings.Trim(s, separator)
-	}, nestedKeys...), separator))
-	if err != nil {
-		logger.Errorf(ctx, "Failed to parse nested keys: %v", reference)
-		return "", errors.Wrap(err, fmt.Sprintf("Reference is of an invalid format [%v]", reference))
-	}
+	}, nestedKeys...), separator)}
 
 	u = u.ResolveReference(rel)
 

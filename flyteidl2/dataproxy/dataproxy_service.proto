@@ -40,7 +40,9 @@ service DataProxyService {
   }
 
   // Stream logs for an action attempt.
-  rpc TailLogs(TailLogsRequest) returns (stream TailLogsResponse) {}
+  rpc TailLogs(TailLogsRequest) returns (stream TailLogsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 // CreateUploadLocationRequest specifies the request for the CreateUploadLocation API.
@@ -91,6 +93,10 @@ message CreateUploadLocationRequest {
   // This is validated against the platform's maximum upload size if provided.
   // +optional
   int64 content_length = 9;
+
+  // Queue whose cluster pool must hold this upload. Empty uses the project's
+  // default queue for compatibility with older clients.
+  string queue = 10;
 }
 
 // CreateUploadLocationResponse specifies the response for the CreateUploadLocation API.
@@ -143,6 +149,18 @@ message UploadInputsRequest {
   // When empty, the server resolves the base from org/project/domain settings,
   // then the dataplane cluster default.
   string base_dir = 7;
+
+  // Optional name of the queue the run will be placed on, resolved in the run's
+  // project/domain scope like RunSpec.queue. When set, the inputs are written to
+  // the object store of that queue's cluster pool; when empty, the project/domain
+  // default queue's pool is used. Single-cluster deployments may ignore it.
+  string queue = 8;
+
+  // Set when the inputs are registered with a trigger rather than used by a
+  // single run. Every run the trigger creates reads them, so the server may
+  // store them separately from per-run data and keep them for as long as the
+  // trigger exists.
+  bool for_trigger = 9;
 }
 
 message UploadInputsResponse {

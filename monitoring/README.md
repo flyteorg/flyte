@@ -8,9 +8,14 @@ dashboards/flyte-execution.json   RPC latency, throughput and error rates per se
 
 ## What it charts
 
-The `rpc_*` metric family that flyte2 emits over OTLP (`rpc_server_duration_milliseconds`,
-`rpc_client_duration_milliseconds`, request/response sizes), broken down by
-`service_name`, `rpc_method` and `rpc_service`. It expects a Prometheus
+The RPC call duration histograms emitted by otelconnect v0.10.0 over OTLP
+(`rpc.server.call.duration` and `rpc.client.call.duration`) are exported to Prometheus
+as `rpc_server_call_duration_seconds` and `rpc_client_call_duration_seconds`.
+Durations and histogram buckets are in seconds; `_count` supplies call rates.
+The dashboard groups by `service_name` and the fully-qualified `rpc_method`
+(e.g. `flyteidl2.workflow.EventsProxyService/Record`), and selects failures with
+`error_type!=""`. The former request/response size metrics and `rpc_service`
+label are no longer emitted. It expects a Prometheus
 datasource with **uid `prometheus`** — the default that kube-prometheus-stack
 creates. Point it elsewhere by editing the datasource uid, or by importing
 through the Grafana UI and picking a datasource.

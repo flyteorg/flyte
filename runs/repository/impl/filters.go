@@ -1,7 +1,9 @@
 package impl
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/lib/pq"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -50,6 +52,7 @@ func (f *basicFilter) QueryExpression(table string) (interfaces.QueryExpr, error
 		column = table + "." + f.field
 	}
 
+	arg := f.value
 	switch f.expression {
 	case interfaces.FilterExpressionEqual:
 		query = fmt.Sprintf("%s = ?", column)
@@ -65,27 +68,36 @@ func (f *basicFilter) QueryExpression(table string) (interfaces.QueryExpr, error
 		query = fmt.Sprintf("%s <= ?", column)
 	case interfaces.FilterExpressionContains:
 		query = fmt.Sprintf("%s LIKE ?", column)
-		f.value = fmt.Sprintf("%%%v%%", f.value)
+		arg = "%" + escapeLikePattern(f.value) + "%"
 	case interfaces.FilterExpressionValueIn:
 		query = fmt.Sprintf("%s = ANY(?)", column)
-		f.value = pq.Array(f.value)
+		arg = pq.Array(f.value)
 	case interfaces.FilterExpressionEndsWith:
 		query = fmt.Sprintf("%s LIKE ?", column)
-		f.value = fmt.Sprintf("%%%v", f.value)
+		arg = "%" + escapeLikePattern(f.value)
 	case interfaces.FilterExpressionNotEndsWith:
 		query = fmt.Sprintf("%s NOT LIKE ?", column)
-		f.value = fmt.Sprintf("%%%v", f.value)
+		arg = "%" + escapeLikePattern(f.value)
 	case interfaces.FilterExpressionContainsCaseInsensitive:
 		query = fmt.Sprintf("LOWER(%s) LIKE LOWER(?)", column)
-		f.value = fmt.Sprintf("%%%v%%", f.value)
+		arg = "%" + escapeLikePattern(f.value) + "%"
 	default:
 		return interfaces.QueryExpr{}, fmt.Errorf("unsupported filter expression: %d", f.expression)
 	}
 
 	return interfaces.QueryExpr{
 		Query: query,
-		Args:  []interface{}{f.value},
+		Args:  []interface{}{arg},
 	}, nil
+}
+
+// likePatternEscaper escapes the LIKE wildcards % and _ and the escape character itself, so
+// a user-supplied filter value matches literally. Backslash is the default LIKE escape
+// character in PostgreSQL.
+var likePatternEscaper = strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
+
+func escapeLikePattern(value interface{}) string {
+	return likePatternEscaper.Replace(fmt.Sprintf("%v", value))
 }
 
 func (f *basicFilter) And(filter interfaces.Filter) interfaces.Filter {
@@ -263,6 +275,144 @@ func NewDeployedByFilter(deployedBy string) interfaces.Filter {
 	return NewEqualFilter("deployed_by", deployedBy)
 }
 
+// SearchField is the synthetic filter field behind the console's run search box. A filter
+// on it matches runs whose run name OR task name satisfies the predicate, which the flat,
+// AND-ed common.Filter list cannot express on its own. It is not a column: the run service
+// resolves it with SplitSearchFilters before the generic allow-list conversion
+// (ConvertProtoFilters) sees the request. The Union cloud run service accepts the same
+// field, so one console request works against both backends.
+const SearchField = "search"
+
+// searchFunctions maps the proto filter functions accepted on SearchField to their SQL
+// expression. Contains (case-sensitive or not) is what the search box sends; EQUAL lets a
+// caller holding a full run name match it exactly instead of with a wildcard scan.
+var searchFunctions = map[common.Filter_Function]interfaces.FilterExpression{
+	common.Filter_EQUAL:                     interfaces.FilterExpressionEqual,
+	common.Filter_CONTAINS:                  interfaces.FilterExpressionContains,
+	common.Filter_CONTAINS_CASE_INSENSITIVE: interfaces.FilterExpressionContainsCaseInsensitive,
+}
+
+// NewSearchFilter builds the `run_name <op> ? OR task_name <op> ?` predicate for a
+// SearchField filter. The OR is parenthesized by compositeFilter, so it composes safely
+// with the AND-ed scope filters callers add around it.
+func NewSearchFilter(fn common.Filter_Function, values []string) (interfaces.Filter, error) {
+	expression, ok := searchFunctions[fn]
+	if !ok {
+		return nil, fmt.Errorf("unsupported filter function %s for field %q; expected EQUAL, CONTAINS or CONTAINS_CASE_INSENSITIVE", fn, SearchField)
+	}
+	if len(values) != 1 {
+		return nil, fmt.Errorf("filter on field %q expects a single value, got %d", SearchField, len(values))
+	}
+	term := values[0]
+	if term == "" {
+		return nil, fmt.Errorf("filter on field %q requires a non-empty value", SearchField)
+	}
+	runName := &basicFilter{field: "run_name", expression: expression, value: term}
+	taskName := &basicFilter{field: "task_name", expression: expression, value: term}
+	return runName.Or(taskName), nil
+}
+
+// SplitSearchFilters partitions proto filters into a single combined SearchField predicate
+// (nil when there is none; several are AND-ed) and the remaining plain column filters.
+// Callers pass the remaining filters to ConvertProtoFilters, which validates fields against
+// the column allow-list and would otherwise reject the synthetic field, and AND the returned
+// predicate in separately.
+func SplitSearchFilters(filters []*common.Filter) (interfaces.Filter, []*common.Filter, error) {
+	return splitFilters(filters, func(f *common.Filter) (interfaces.Filter, error) {
+		if f.GetField() != SearchField {
+			return nil, nil
+		}
+		return NewSearchFilter(f.GetFunction(), f.GetValues())
+	})
+}
+
+// splitFilters partitions proto filters into the AND of those resolve turns into a
+// predicate (nil when there are none) and the rest, for which resolve returns nil.
+func splitFilters(filters []*common.Filter, resolve func(*common.Filter) (interfaces.Filter, error)) (interfaces.Filter, []*common.Filter, error) {
+	var combined interfaces.Filter
+	remaining := make([]*common.Filter, 0, len(filters))
+	for _, f := range filters {
+		resolved, err := resolve(f)
+		if err != nil {
+			return nil, nil, err
+		}
+		switch {
+		case resolved == nil:
+			remaining = append(remaining, f)
+		case combined == nil:
+			combined = resolved
+		default:
+			combined = combined.And(resolved)
+		}
+	}
+	return combined, remaining, nil
+}
+
+// LabelFieldPrefix marks a filter on a run label: field "labels.<key>" matches runs by the
+// label <key>. The SDK's Run.listall(with_labels=..., with_label_keys=...) sends these.
+const LabelFieldPrefix = "labels."
+
+// NewLabelFilter builds the predicate for a filter on the run label key: EQUAL matches
+// runs carrying the label with that value, EXISTS runs carrying the label at all.
+func NewLabelFilter(fn common.Filter_Function, key string, values []string) (interfaces.Filter, error) {
+	if key == "" {
+		return nil, fmt.Errorf("filter on %q requires a label key", LabelFieldPrefix)
+	}
+	if hasNUL(append([]string{key}, values...)...) {
+		return nil, fmt.Errorf("filter on label %q contains a NUL character", key)
+	}
+	switch fn {
+	case common.Filter_EQUAL:
+		if len(values) != 1 {
+			return nil, fmt.Errorf("EQUAL filter on label %q expects a single value, got %d", key, len(values))
+		}
+		// A map[string]string always marshals.
+		labels, _ := json.Marshal(map[string]string{key: values[0]})
+		// Containment is what the GIN index on labels serves.
+		return NewRawFilter("labels @> ?::jsonb", string(labels)), nil
+	case common.Filter_EXISTS:
+		// The GIN index (jsonb_path_ops) serves only containment, so no key-existence test
+		// is index-backed; the jsonb ? operator would also clash with sqlx.Rebind's
+		// placeholders.
+		return NewRawFilter("labels -> ?::text IS NOT NULL", key), nil
+	default:
+		return nil, fmt.Errorf("unsupported filter function %s for label %q; expected EQUAL or EXISTS", fn, key)
+	}
+}
+
+// SplitLabelFilters partitions proto filters into a single combined label predicate (nil
+// when there is none; several are AND-ed) and the remaining plain column filters, like
+// SplitSearchFilters.
+func SplitLabelFilters(filters []*common.Filter) (interfaces.Filter, []*common.Filter, error) {
+	return splitFilters(filters, func(f *common.Filter) (interfaces.Filter, error) {
+		key, ok := strings.CutPrefix(f.GetField(), LabelFieldPrefix)
+		if !ok {
+			return nil, nil
+		}
+		return NewLabelFilter(f.GetFunction(), key, f.GetValues())
+	})
+}
+
+// ValidateLabels rejects labels that the labels JSONB column cannot hold: Postgres jsonb
+// has no representation for the NUL character.
+func ValidateLabels(labels map[string]string) error {
+	for k, v := range labels {
+		if hasNUL(k, v) {
+			return fmt.Errorf("label %q contains a NUL character", k)
+		}
+	}
+	return nil
+}
+
+func hasNUL(strs ...string) bool {
+	for _, s := range strs {
+		if strings.ContainsRune(s, 0) {
+			return true
+		}
+	}
+	return false
+}
+
 // ConvertProtoFilters converts proto filters to our Filter interfaces.
 // allowedColumns is checked to prevent SQL injection via user-supplied field names.
 func ConvertProtoFilters(protoFilters []*common.Filter, allowedColumns sets.Set[string]) (interfaces.Filter, error) {
@@ -307,10 +457,10 @@ func ConvertProtoFilters(protoFilters []*common.Filter, allowedColumns sets.Set[
 
 		// Get filter value(s)
 		var value interface{}
-		if len(protoFilter.Values) == 1 {
+		if len(protoFilter.Values) == 1 && expression != interfaces.FilterExpressionValueIn {
 			value = protoFilter.Values[0]
-		} else if len(protoFilter.Values) > 1 {
-			// For VALUE_IN, pass the array
+		} else if len(protoFilter.Values) >= 1 {
+			// Several values, or one value for VALUE_IN, which binds an array
 			value = protoFilter.Values
 		} else {
 			return nil, fmt.Errorf("filter %s has no values", protoFilter.Field)

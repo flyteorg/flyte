@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
-	"connectrpc.com/otelconnect"
 	"google.golang.org/grpc/codes"
 	grpcstatus "google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -18,6 +17,7 @@ import (
 	catalog "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/v2/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/pbhash"
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	cacheservicepb "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/cacheservice"
@@ -47,7 +47,7 @@ var _ catalog.Client = (*Client)(nil)
 
 func NewClient(httpClient connect.HTTPClient, store *storage.DataStore, baseURL string, maxCacheAge time.Duration, opts ...connect.ClientOption) *Client {
 	if len(opts) == 0 {
-		if otelInterceptor, err := otelconnect.NewInterceptor(); err == nil {
+		if otelInterceptor, err := otelutils.NewConnectInterceptor(); err == nil {
 			opts = []connect.ClientOption{connect.WithInterceptors(otelInterceptor)}
 		}
 	}
@@ -199,6 +199,13 @@ func (c *Client) put(ctx context.Context, key catalog.Key, reader io.OutputReade
 		return catalog.NewPutFailureStatus(&key), err
 	}
 
+	overwriteOutput := &cacheservicepb.OverwriteOutput{Overwrite: overwrite}
+	if c.maxCacheAge > 0 {
+		// Without max_age the cache service rejects a Put over an existing entry even when that
+		// entry is older than maxCacheAge, so an expired entry would never be replaced.
+		overwriteOutput.MaxAge = durationpb.New(c.maxCacheAge)
+	}
+
 	_, err = c.service.Put(ctx, connect.NewRequest(&cacheservicev2.PutCacheRequest{
 		BaseRequest: &cacheservicepb.PutCacheRequest{
 			Key: cacheKey,
@@ -206,9 +213,7 @@ func (c *Client) put(ctx context.Context, key catalog.Key, reader io.OutputReade
 				Output:   &cacheservicepb.CachedOutput_OutputUri{OutputUri: outputURI},
 				Metadata: newCacheMetadata(key, metadata),
 			},
-			Overwrite: &cacheservicepb.OverwriteOutput{
-				Overwrite: overwrite,
-			},
+			Overwrite: overwriteOutput,
 		},
 		Identifier: newIdentifier(key.Identifier),
 	}))

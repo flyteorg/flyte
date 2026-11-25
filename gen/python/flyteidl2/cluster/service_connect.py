@@ -32,7 +32,7 @@ class ClusterServiceASGIApplication(ConnectASGIApplication[ClusterService]):
                         service_name="flyteidl2.cluster.ClusterService",
                         input=flyteidl2_dot_cluster_dot_payload__pb2.SelectClusterRequest,
                         output=flyteidl2_dot_cluster_dot_payload__pb2.SelectClusterResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=svc.select_cluster,
                 ),
@@ -55,6 +55,7 @@ class ClusterServiceClient(ConnectClient):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_cluster_dot_payload__pb2.SelectClusterResponse:
         return await self.execute_unary(
             request=request,
@@ -63,10 +64,11 @@ class ClusterServiceClient(ConnectClient):
                 service_name="flyteidl2.cluster.ClusterService",
                 input=flyteidl2_dot_cluster_dot_payload__pb2.SelectClusterRequest,
                 output=flyteidl2_dot_cluster_dot_payload__pb2.SelectClusterResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )
 
 
@@ -85,7 +87,7 @@ class ClusterServiceWSGIApplication(ConnectWSGIApplication):
                         service_name="flyteidl2.cluster.ClusterService",
                         input=flyteidl2_dot_cluster_dot_payload__pb2.SelectClusterRequest,
                         output=flyteidl2_dot_cluster_dot_payload__pb2.SelectClusterResponse,
-                        idempotency_level=IdempotencyLevel.UNKNOWN,
+                        idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
                     ),
                     function=service.select_cluster,
                 ),
@@ -108,6 +110,7 @@ class ClusterServiceClientSync(ConnectClientSync):
         *,
         headers: Headers | Mapping[str, str] | None = None,
         timeout_ms: int | None = None,
+        use_get: bool = False,
     ) -> flyteidl2_dot_cluster_dot_payload__pb2.SelectClusterResponse:
         return self.execute_unary(
             request=request,
@@ -116,8 +119,9 @@ class ClusterServiceClientSync(ConnectClientSync):
                 service_name="flyteidl2.cluster.ClusterService",
                 input=flyteidl2_dot_cluster_dot_payload__pb2.SelectClusterRequest,
                 output=flyteidl2_dot_cluster_dot_payload__pb2.SelectClusterResponse,
-                idempotency_level=IdempotencyLevel.UNKNOWN,
+                idempotency_level=IdempotencyLevel.NO_SIDE_EFFECTS,
             ),
             headers=headers,
             timeout_ms=timeout_ms,
+            use_get=use_get,
         )

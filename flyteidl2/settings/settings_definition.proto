@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.settings;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/core/tasks.proto";
 import "google/protobuf/descriptor.proto";
 
 option go_package = "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings";
@@ -142,6 +143,16 @@ message QuantitySetting {
   ScopeLevel scope_level = 3;
 }
 
+// A setting that holds an accelerator: a device from the AcceleratorModel
+// list (GPUAccelerator.device is that value's accelerator_name string), an
+// optional partition size, and a device class.
+message AcceleratorSetting {
+  SettingState state = 1;
+  // Meaningful only when state = VALUE.
+  flyteidl2.core.GPUAccelerator accelerator_value = 2;
+  ScopeLevel scope_level = 3;
+}
+
 // ---------------------------------------------------------------------------
 // Domain messages
 // ---------------------------------------------------------------------------
@@ -156,6 +167,8 @@ message RunSettings {
 // SecuritySettings controls security-related configuration.
 message SecuritySettings {
   StringSetting service_account = 1 [(flyteidl2.settings.desc) = "Kubernetes service account for task pods"];
+  // A server may restrict which values are allowed, and who may set this.
+  StringSetting kubernetes_namespace = 2 [(flyteidl2.settings.desc) = "Kubernetes namespace that task pods and apps run in"];
 }
 
 // StorageSettings controls data storage configuration.
@@ -180,6 +193,7 @@ message TaskResourceSettings {
   TaskResourceDefaults min = 1 [(flyteidl2.settings.desc) = "Minimum resource requests applied to task pods"];
   TaskResourceDefaults max = 2 [(flyteidl2.settings.desc) = "Maximum resource limits applied to task pods"];
   BoolSetting mirror_limits_request = 3 [(flyteidl2.settings.desc) = "When true, resource limits mirror requests"];
+  AcceleratorSetting default_accelerator = 4 [(flyteidl2.settings.desc) = "Accelerator applied to a task that requests GPUs but names none"];
 }
 
 // AppSettings controls policy for Union Apps.
@@ -189,6 +203,22 @@ message AppSettings {
   // and the operator forces authentication on at reconcile time. This is the
   // org-level override of the per-app SecurityContext.allow_anonymous field.
   BoolSetting disallow_anonymous = 1 [(flyteidl2.settings.desc) = "Disallow anonymous (unauthenticated) access to apps org-wide"];
+
+  // Selects how an app's public URL is composed. Tokens:
+  //   "shared" (default, or any unrecognized/empty value) — one tenant-wide DNS
+  //     name for the app regardless of which data plane serves it (today's behavior).
+  //   "dataplane_specific" — a per-data-plane DNS name, so the same app can run on
+  //     more than one data plane at distinct URLs.
+  // "edge_proxy" is reserved for a future single-balanced-DNS strategy and is not
+  // yet a valid value. Unset delegates to the parent scope, then defaults to shared.
+  StringSetting app_dns_strategy = 2 [(flyteidl2.settings.desc) = "App public-URL DNS strategy: 'shared' (default) or 'dataplane_specific'"];
+}
+
+// ObservabilitySettings controls how long observability data stays visible.
+message ObservabilitySettings {
+  // How many days after an action attempt ends its logs stay visible. 0 or unset leaves it
+  // to the server, which may also cap how high it can be set.
+  Int64Setting log_retention_days = 1 [(flyteidl2.settings.desc) = "Days task logs stay visible after an attempt ends. 0 or unset leaves it to the server."];
 }
 
 // Settings holds all configurable settings for a scope.
@@ -202,4 +232,5 @@ message Settings {
   StringMapSetting environment_variables = 7 [(flyteidl2.settings.desc) = "Environment variables injected into task pods. Child overrides parent on key conflict."];
   AppSettings app = 8 [(flyteidl2.settings.desc) = "Union Apps auth policy"];
   StringSetting pod_template_name = 9 [(flyteidl2.settings.desc) = "Name of the Kubernetes PodTemplate used as the base for task pods"];
+  ObservabilitySettings observability = 10 [(flyteidl2.settings.desc) = "Log and observability retention"];
 }

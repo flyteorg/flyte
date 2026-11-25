@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -38,6 +39,7 @@ type ConnectorService struct {
 	mu                 sync.RWMutex
 	supportedTaskTypes []string
 	CorePlugin         core.Plugin
+	TracerProvider     trace.TracerProvider
 }
 
 // ContainTaskType check if connector supports this task type.
@@ -481,7 +483,7 @@ func newConnectorPlugin(connectorService *ConnectorService) webapi.PluginEntry {
 		ID:                 ID,
 		SupportedTaskTypes: cfg.SupportedTaskTypes,
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
-			clientSet := getConnectorClientSets(ctx)
+			clientSet := getConnectorClientSets(ctx, connectorService.TracerProvider)
 			connectorRegistry := getConnectorRegistry(ctx, clientSet)
 			connectorService.SetSupportedTaskType(ctx, connectorRegistry.getSupportedTaskTypes())
 			scope := iCtx.MetricsScope()

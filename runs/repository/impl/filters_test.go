@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -34,6 +35,28 @@ func TestBasicFilter_Contains(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "name LIKE ?", expr.Query)
 	assert.Equal(t, []interface{}{"%test%"}, expr.Args)
+}
+
+func TestBasicFilter_EscapesLikeWildcards(t *testing.T) {
+	tests := []struct {
+		expression interfaces.FilterExpression
+		want       string
+	}{
+		{interfaces.FilterExpressionContains, `%my\_task\%\\%`},
+		{interfaces.FilterExpressionContainsCaseInsensitive, `%my\_task\%\\%`},
+		{interfaces.FilterExpressionEndsWith, `%my\_task\%\\`},
+		{interfaces.FilterExpressionNotEndsWith, `%my\_task\%\\`},
+	}
+	for _, tt := range tests {
+		filter := &basicFilter{field: "name", expression: tt.expression, value: `my_task%\`}
+
+		// Building the expression twice must not escape the value twice.
+		for i := 0; i < 2; i++ {
+			expr, err := filter.QueryExpression("")
+			require.NoError(t, err)
+			assert.Equal(t, []interface{}{tt.want}, expr.Args)
+		}
+	}
 }
 
 func TestBasicFilter_ValueIn(t *testing.T) {
@@ -156,6 +179,19 @@ func TestConvertProtoFilters_ActionTypeColumn(t *testing.T) {
 	assert.Equal(t, []interface{}{"3"}, expr.Args)
 }
 
+// A VALUE_IN filter with one value must bind the same Postgres array as one with several.
+func TestConvertProtoFilters_ValueInSingleValue(t *testing.T) {
+	filter, err := ConvertProtoFilters([]*common.Filter{
+		{Field: "phase", Function: common.Filter_VALUE_IN, Values: []string{"3"}},
+	}, models.ActionColumnsSet)
+	require.NoError(t, err)
+
+	expr, err := filter.QueryExpression("")
+	require.NoError(t, err)
+	assert.Equal(t, "phase = ANY(?)", expr.Query)
+	assert.Equal(t, []interface{}{pq.Array([]string{"3"})}, expr.Args)
+}
+
 func TestConvertProtoFilters_EmptyList(t *testing.T) {
 	filter, err := ConvertProtoFilters([]*common.Filter{}, sets.New[string]())
 	require.NoError(t, err)
@@ -184,4 +220,226 @@ func TestParseStringFilters_ValueInState(t *testing.T) {
 	assert.Contains(t, fmt.Sprintf("%v", expr.Args[0]), "0")
 	assert.Contains(t, fmt.Sprintf("%v", expr.Args[0]), "1")
 	assert.Contains(t, fmt.Sprintf("%v", expr.Args[0]), "2")
+}
+
+// TestNewSearchFilter verifies the run search predicate matches the term against the run
+// name OR the task name, using the SQL operator selected by the proto function.
+func TestNewSearchFilter(t *testing.T) {
+	cases := []struct {
+		name     string
+		fn       common.Filter_Function
+		query    string
+		wantArgs []interface{}
+	}{
+		{
+			name:     "contains case insensitive",
+			fn:       common.Filter_CONTAINS_CASE_INSENSITIVE,
+			query:    "(LOWER(run_name) LIKE LOWER(?)) OR (LOWER(task_name) LIKE LOWER(?))",
+			wantArgs: []interface{}{"%abc%", "%abc%"},
+		},
+		{
+			name:     "contains case sensitive",
+			fn:       common.Filter_CONTAINS,
+			query:    "(run_name LIKE ?) OR (task_name LIKE ?)",
+			wantArgs: []interface{}{"%abc%", "%abc%"},
+		},
+		{
+			name:     "equal",
+			fn:       common.Filter_EQUAL,
+			query:    "(run_name = ?) OR (task_name = ?)",
+			wantArgs: []interface{}{"abc", "abc"},
+		},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			filter, err := NewSearchFilter(tt.fn, []string{"abc"})
+			require.NoError(t, err)
+
+			expr, err := filter.QueryExpression("")
+			require.NoError(t, err)
+			assert.Equal(t, tt.query, expr.Query)
+			assert.Equal(t, tt.wantArgs, expr.Args)
+		})
+	}
+}
+
+// TestNewSearchFilter_WithTablePrefix verifies both columns are table-qualified when the
+// predicate is rendered for a query that aliases the actions table.
+func TestNewSearchFilter_WithTablePrefix(t *testing.T) {
+	filter, err := NewSearchFilter(common.Filter_EQUAL, []string{"abc"})
+	require.NoError(t, err)
+
+	expr, err := filter.QueryExpression("actions")
+	require.NoError(t, err)
+	assert.Equal(t, "(actions.run_name = ?) OR (actions.task_name = ?)", expr.Query)
+}
+
+// TestNewSearchFilter_Errors verifies the search field rejects operators that make no sense
+// for a free-text search and malformed value lists, so a bad request fails loudly instead
+// of silently matching everything.
+func TestNewSearchFilter_Errors(t *testing.T) {
+	cases := []struct {
+		name   string
+		fn     common.Filter_Function
+		values []string
+	}{
+		{name: "unsupported function", fn: common.Filter_GREATER_THAN, values: []string{"abc"}},
+		{name: "value in is not a search", fn: common.Filter_VALUE_IN, values: []string{"a", "b"}},
+		{name: "no values", fn: common.Filter_CONTAINS_CASE_INSENSITIVE, values: nil},
+		{name: "multiple values", fn: common.Filter_CONTAINS_CASE_INSENSITIVE, values: []string{"a", "b"}},
+		{name: "empty term", fn: common.Filter_CONTAINS_CASE_INSENSITIVE, values: []string{""}},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			filter, err := NewSearchFilter(tt.fn, tt.values)
+			require.Error(t, err)
+			assert.Nil(t, filter)
+		})
+	}
+}
+
+// TestSplitSearchFilters verifies the "search" field is pulled out of the filter list and
+// resolved to the run-name-or-task-name predicate, while plain column filters pass through
+// for ConvertProtoFilters.
+func TestSplitSearchFilters(t *testing.T) {
+	filters := []*common.Filter{
+		{Function: common.Filter_EQUAL, Field: "phase", Values: []string{"2"}},
+		{Function: common.Filter_CONTAINS_CASE_INSENSITIVE, Field: SearchField, Values: []string{"abc"}},
+	}
+
+	search, remaining, err := SplitSearchFilters(filters)
+	require.NoError(t, err)
+
+	require.Len(t, remaining, 1)
+	assert.Equal(t, "phase", remaining[0].GetField())
+
+	require.NotNil(t, search)
+	expr, err := search.QueryExpression("")
+	require.NoError(t, err)
+	assert.Equal(t, "(LOWER(run_name) LIKE LOWER(?)) OR (LOWER(task_name) LIKE LOWER(?))", expr.Query)
+	assert.Equal(t, []interface{}{"%abc%", "%abc%"}, expr.Args)
+}
+
+// TestSplitSearchFilters_NoSearch verifies a nil predicate is returned when there is no
+// search filter, so the caller skips the extra AND and leaves the request untouched.
+func TestSplitSearchFilters_NoSearch(t *testing.T) {
+	filters := []*common.Filter{
+		{Function: common.Filter_EQUAL, Field: "phase", Values: []string{"2"}},
+	}
+
+	search, remaining, err := SplitSearchFilters(filters)
+	require.NoError(t, err)
+	assert.Nil(t, search)
+	assert.Len(t, remaining, 1)
+}
+
+// TestSplitSearchFilters_Error verifies a malformed search filter fails the whole split, so
+// the handler returns InvalidArgument instead of dropping the predicate.
+func TestSplitSearchFilters_Error(t *testing.T) {
+	filters := []*common.Filter{
+		{Function: common.Filter_GREATER_THAN, Field: SearchField, Values: []string{"abc"}},
+	}
+
+	search, remaining, err := SplitSearchFilters(filters)
+	require.Error(t, err)
+	assert.Nil(t, search)
+	assert.Nil(t, remaining)
+}
+
+func TestNewLabelFilter(t *testing.T) {
+	cases := []struct {
+		name     string
+		fn       common.Filter_Function
+		values   []string
+		query    string
+		wantArgs []interface{}
+	}{
+		{
+			name:     "equal",
+			fn:       common.Filter_EQUAL,
+			values:   []string{"j-1"},
+			query:    "labels @> ?::jsonb",
+			wantArgs: []interface{}{`{"example.com/job-id":"j-1"}`},
+		},
+		{
+			name:     "exists",
+			fn:       common.Filter_EXISTS,
+			query:    "labels -> ?::text IS NOT NULL",
+			wantArgs: []interface{}{"example.com/job-id"},
+		},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			filter, err := NewLabelFilter(tt.fn, "example.com/job-id", tt.values)
+			require.NoError(t, err)
+
+			expr, err := filter.QueryExpression("")
+			require.NoError(t, err)
+			assert.Equal(t, tt.query, expr.Query)
+			assert.Equal(t, tt.wantArgs, expr.Args)
+		})
+	}
+}
+
+func TestNewLabelFilter_Errors(t *testing.T) {
+	cases := []struct {
+		name   string
+		fn     common.Filter_Function
+		key    string
+		values []string
+	}{
+		{name: "unsupported function", fn: common.Filter_CONTAINS, key: "k", values: []string{"v"}},
+		{name: "no key", fn: common.Filter_EQUAL, key: "", values: []string{"v"}},
+		{name: "equal without a value", fn: common.Filter_EQUAL, key: "k", values: nil},
+		{name: "equal with several values", fn: common.Filter_EQUAL, key: "k", values: []string{"a", "b"}},
+		{name: "NUL in the key", fn: common.Filter_EXISTS, key: "k\x00"},
+		{name: "NUL in the value", fn: common.Filter_EQUAL, key: "k", values: []string{"a\x00b"}},
+	}
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			filter, err := NewLabelFilter(tt.fn, tt.key, tt.values)
+			require.Error(t, err)
+			assert.Nil(t, filter)
+		})
+	}
+}
+
+// TestSplitLabelFilters verifies "labels.<key>" filters are pulled out of the filter list and
+// AND-ed, while plain column filters pass through for ConvertProtoFilters.
+func TestSplitLabelFilters(t *testing.T) {
+	filters := []*common.Filter{
+		{Function: common.Filter_EQUAL, Field: "phase", Values: []string{"2"}},
+		{Function: common.Filter_EQUAL, Field: "labels.team", Values: []string{"a"}},
+		{Function: common.Filter_EXISTS, Field: "labels.job-id"},
+	}
+
+	labels, remaining, err := SplitLabelFilters(filters)
+	require.NoError(t, err)
+
+	require.Len(t, remaining, 1)
+	assert.Equal(t, "phase", remaining[0].GetField())
+
+	require.NotNil(t, labels)
+	expr, err := labels.QueryExpression("")
+	require.NoError(t, err)
+	assert.Equal(t, "(labels @> ?::jsonb) AND (labels -> ?::text IS NOT NULL)", expr.Query)
+	assert.Equal(t, []interface{}{`{"team":"a"}`, "job-id"}, expr.Args)
+}
+
+// TestValidateLabels verifies labels the jsonb column cannot store are rejected.
+func TestValidateLabels(t *testing.T) {
+	assert.NoError(t, ValidateLabels(map[string]string{"example.com/job-id": "j-1"}))
+	assert.Error(t, ValidateLabels(map[string]string{"k": "a\x00b"}))
+	assert.Error(t, ValidateLabels(map[string]string{"k\x00": "v"}))
+}
+
+func TestSplitLabelFilters_Error(t *testing.T) {
+	filters := []*common.Filter{
+		{Function: common.Filter_CONTAINS, Field: "labels.team", Values: []string{"a"}},
+	}
+
+	labels, remaining, err := SplitLabelFilters(filters)
+	require.Error(t, err)
+	assert.Nil(t, labels)
+	assert.Nil(t, remaining)
 }

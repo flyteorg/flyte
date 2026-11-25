@@ -17,6 +17,8 @@ import (
 	"unicode/utf8"
 
 	"google.golang.org/protobuf/types/known/anypb"
+
+	core "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
 
 // ensure the imports are used
@@ -33,6 +35,8 @@ var (
 	_ = (*mail.Address)(nil)
 	_ = anypb.Any{}
 	_ = sort.Sort
+
+	_ = core.Granularity(0)
 )
 
 // Validate checks the field values on ArtifactName with the rules defined in
@@ -274,6 +278,403 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ArtifactIdentifierValidationError{}
+
+// Validate checks the field values on TimePartitionKey with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *TimePartitionKey) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TimePartitionKey with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TimePartitionKeyMultiError, or nil if none found.
+func (m *TimePartitionKey) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TimePartitionKey) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Key
+
+	// no validation rules for Granularity
+
+	if len(errors) > 0 {
+		return TimePartitionKeyMultiError(errors)
+	}
+
+	return nil
+}
+
+// TimePartitionKeyMultiError is an error wrapping multiple validation errors
+// returned by TimePartitionKey.ValidateAll() if the designated constraints
+// aren't met.
+type TimePartitionKeyMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TimePartitionKeyMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TimePartitionKeyMultiError) AllErrors() []error { return m }
+
+// TimePartitionKeyValidationError is the validation error returned by
+// TimePartitionKey.Validate if the designated constraints aren't met.
+type TimePartitionKeyValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TimePartitionKeyValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TimePartitionKeyValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TimePartitionKeyValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TimePartitionKeyValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TimePartitionKeyValidationError) ErrorName() string { return "TimePartitionKeyValidationError" }
+
+// Error satisfies the builtin error interface
+func (e TimePartitionKeyValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTimePartitionKey.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TimePartitionKeyValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TimePartitionKeyValidationError{}
+
+// Validate checks the field values on ArtifactPartitionSchema with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ArtifactPartitionSchema) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ArtifactPartitionSchema with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ArtifactPartitionSchemaMultiError, or nil if none found.
+func (m *ArtifactPartitionSchema) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ArtifactPartitionSchema) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetTimePartition()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ArtifactPartitionSchemaValidationError{
+					field:  "TimePartition",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ArtifactPartitionSchemaValidationError{
+					field:  "TimePartition",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTimePartition()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ArtifactPartitionSchemaValidationError{
+				field:  "TimePartition",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ArtifactPartitionSchemaMultiError(errors)
+	}
+
+	return nil
+}
+
+// ArtifactPartitionSchemaMultiError is an error wrapping multiple validation
+// errors returned by ArtifactPartitionSchema.ValidateAll() if the designated
+// constraints aren't met.
+type ArtifactPartitionSchemaMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ArtifactPartitionSchemaMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ArtifactPartitionSchemaMultiError) AllErrors() []error { return m }
+
+// ArtifactPartitionSchemaValidationError is the validation error returned by
+// ArtifactPartitionSchema.Validate if the designated constraints aren't met.
+type ArtifactPartitionSchemaValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ArtifactPartitionSchemaValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ArtifactPartitionSchemaValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ArtifactPartitionSchemaValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ArtifactPartitionSchemaValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ArtifactPartitionSchemaValidationError) ErrorName() string {
+	return "ArtifactPartitionSchemaValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ArtifactPartitionSchemaValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sArtifactPartitionSchema.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ArtifactPartitionSchemaValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ArtifactPartitionSchemaValidationError{}
+
+// Validate checks the field values on PartitionSchemaMismatch with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *PartitionSchemaMismatch) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PartitionSchemaMismatch with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// PartitionSchemaMismatchMultiError, or nil if none found.
+func (m *PartitionSchemaMismatch) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PartitionSchemaMismatch) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetExpected()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PartitionSchemaMismatchValidationError{
+					field:  "Expected",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PartitionSchemaMismatchValidationError{
+					field:  "Expected",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetExpected()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PartitionSchemaMismatchValidationError{
+				field:  "Expected",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetActual()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, PartitionSchemaMismatchValidationError{
+					field:  "Actual",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, PartitionSchemaMismatchValidationError{
+					field:  "Actual",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetActual()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return PartitionSchemaMismatchValidationError{
+				field:  "Actual",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Message
+
+	if len(errors) > 0 {
+		return PartitionSchemaMismatchMultiError(errors)
+	}
+
+	return nil
+}
+
+// PartitionSchemaMismatchMultiError is an error wrapping multiple validation
+// errors returned by PartitionSchemaMismatch.ValidateAll() if the designated
+// constraints aren't met.
+type PartitionSchemaMismatchMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PartitionSchemaMismatchMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PartitionSchemaMismatchMultiError) AllErrors() []error { return m }
+
+// PartitionSchemaMismatchValidationError is the validation error returned by
+// PartitionSchemaMismatch.Validate if the designated constraints aren't met.
+type PartitionSchemaMismatchValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PartitionSchemaMismatchValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PartitionSchemaMismatchValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PartitionSchemaMismatchValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PartitionSchemaMismatchValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PartitionSchemaMismatchValidationError) ErrorName() string {
+	return "PartitionSchemaMismatchValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PartitionSchemaMismatchValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPartitionSchemaMismatch.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PartitionSchemaMismatchValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PartitionSchemaMismatchValidationError{}
 
 // Validate checks the field values on TaskActionSource with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -736,6 +1137,64 @@ func (m *ArtifactSpec) validate(all bool) error {
 
 	}
 
+	if all {
+		switch v := interface{}(m.GetPartitions()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ArtifactSpecValidationError{
+					field:  "Partitions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ArtifactSpecValidationError{
+					field:  "Partitions",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPartitions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ArtifactSpecValidationError{
+				field:  "Partitions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetTimePartition()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ArtifactSpecValidationError{
+					field:  "TimePartition",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ArtifactSpecValidationError{
+					field:  "TimePartition",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetTimePartition()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ArtifactSpecValidationError{
+				field:  "TimePartition",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return ArtifactSpecMultiError(errors)
 	}
@@ -945,6 +1404,35 @@ func (m *Artifact) validate(all bool) error {
 		if err := v.Validate(); err != nil {
 			return ArtifactValidationError{
 				field:  "CreatedBy",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if all {
+		switch v := interface{}(m.GetPartitionSchemaMismatch()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ArtifactValidationError{
+					field:  "PartitionSchemaMismatch",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ArtifactValidationError{
+					field:  "PartitionSchemaMismatch",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPartitionSchemaMismatch()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ArtifactValidationError{
+				field:  "PartitionSchemaMismatch",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl2.workflow;
 
 import "buf/validate/validate.proto";
+import "flyteidl2/common/address.proto";
 import "flyteidl2/common/identifier.proto";
 import "flyteidl2/common/phase.proto";
 import "flyteidl2/core/execution.proto";
@@ -17,10 +18,14 @@ service StateService {
   rpc Put(PutRequest) returns (PutResponse) {}
 
   // get the state of an action.
-  rpc Get(GetRequest) returns (GetResponse) {}
+  rpc Get(GetRequest) returns (GetResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 
   // watch for updates to the state of actions. this api guarantees at-least-once delivery semantics.
-  rpc Watch(WatchRequest) returns (stream WatchResponse) {}
+  rpc Watch(WatchRequest) returns (stream WatchResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
 }
 
 // request message to put the state of an action.
@@ -108,4 +113,9 @@ message ActionUpdate {
 
   // The value literal for the action (used by condition actions).
   optional flyteidl2.core.Literal value = 5;
+
+  // Where the running action can be reached, as reported by its worker (`UpdateRequest.address`).
+  // Set while the current attempt serves traffic; absent once a newer attempt starts, the action's
+  // pod is relaunched, or the action is terminal.
+  flyteidl2.common.ActionAddress address = 6;
 }

@@ -5,6 +5,8 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -19,10 +21,15 @@ import (
 	k8swatch "k8s.io/apimachinery/pkg/watch"
 	duckv1 "knative.dev/pkg/apis/duck/v1"
 	servingv1 "knative.dev/serving/pkg/apis/serving/v1"
+	"sigs.k8s.io/controller-runtime/pkg/cache/informertest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/flyteorg/flyte/v2/app/internal/config"
+	pluginserrors "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	k8sconfig "github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	stdErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
 	flyteapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/app"
 	flytecoreapp "github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 )
@@ -530,6 +537,141 @@ func TestList(t *testing.T) {
 	require.Len(t, apps, 1)
 	assert.Equal(t, "proj", apps[0].Metadata.Id.Project)
 	assert.Equal(t, "app1", apps[0].Metadata.Id.Name)
+}
+
+// listCache is a ctrlcache.Cache whose List reads from a fake client, since
+// informertest.FakeInformers.List returns nothing. A non-nil err fails List.
+type listCache struct {
+	*informertest.FakeInformers
+	reader client.Reader
+	err    error
+}
+
+func (c *listCache) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
+	if c.err != nil {
+		return c.err
+	}
+	return c.reader.List(ctx, list, opts...)
+}
+
+// testReadyKService builds a managed KService in AppNamespace whose Ready
+// condition has the given status. An empty status leaves Ready unset.
+func testReadyKService(name string, ready corev1.ConditionStatus) *servingv1.Service {
+	ksvc := &servingv1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: AppNamespace,
+			Labels:    map[string]string{labelAppManaged: "true"},
+		},
+	}
+	if ready != "" {
+		ksvc.Status.Status = duckv1.Status{
+			Conditions: duckv1.Conditions{{Type: servingv1.ServiceConditionReady, Status: ready}},
+		}
+	}
+	return ksvc
+}
+
+func TestCountActiveApps(t *testing.T) {
+	stopped := func(ksvc *servingv1.Service) *servingv1.Service {
+		ksvc.Labels[labelAppStopped] = "true"
+		return ksvc
+	}
+	unmanaged := func(ksvc *servingv1.Service) *servingv1.Service {
+		delete(ksvc.Labels, labelAppManaged)
+		return ksvc
+	}
+	inNamespace := func(ns string, ksvc *servingv1.Service) *servingv1.Service {
+		ksvc.Namespace = ns
+		return ksvc
+	}
+
+	for _, tc := range []struct {
+		desc  string
+		ksvcs []client.Object
+		want  int64
+	}{
+		{
+			desc: "counts ready managed apps",
+			ksvcs: []client.Object{
+				testReadyKService("app1", corev1.ConditionTrue),
+				testReadyKService("app2", corev1.ConditionTrue),
+			},
+			want: 2,
+		},
+		{
+			desc: "counts only the active apps in a mixed set",
+			ksvcs: []client.Object{
+				testReadyKService("active", corev1.ConditionTrue),
+				stopped(testReadyKService("stopped", corev1.ConditionTrue)),
+				testReadyKService("failed", corev1.ConditionFalse),
+				testReadyKService("deploying", corev1.ConditionUnknown),
+				unmanaged(testReadyKService("unmanaged", corev1.ConditionTrue)),
+			},
+			want: 1,
+		},
+		{
+			desc:  "no apps",
+			ksvcs: nil,
+			want:  0,
+		},
+		{
+			desc:  "skips a stopped app",
+			ksvcs: []client.Object{stopped(testReadyKService("app1", corev1.ConditionTrue))},
+			want:  0,
+		},
+		{
+			desc:  "skips an app whose Ready is False",
+			ksvcs: []client.Object{testReadyKService("app1", corev1.ConditionFalse)},
+			want:  0,
+		},
+		{
+			desc:  "skips an app whose Ready is Unknown",
+			ksvcs: []client.Object{testReadyKService("app1", corev1.ConditionUnknown)},
+			want:  0,
+		},
+		{
+			desc:  "skips an app with no Ready condition",
+			ksvcs: []client.Object{testReadyKService("app1", "")},
+			want:  0,
+		},
+		{
+			desc:  "skips a service Flyte doesn't manage",
+			ksvcs: []client.Object{unmanaged(testReadyKService("app1", corev1.ConditionTrue))},
+			want:  0,
+		},
+		{
+			desc:  "skips an app in another namespace",
+			ksvcs: []client.Object{inNamespace("other", testReadyKService("app1", corev1.ConditionTrue))},
+			want:  0,
+		},
+	} {
+		t.Run(tc.desc, func(t *testing.T) {
+			fc := fake.NewClientBuilder().WithScheme(testScheme(t)).WithObjects(tc.ksvcs...).Build()
+			c := &AppK8sClient{
+				cache:     &listCache{FakeInformers: &informertest.FakeInformers{}, reader: fc},
+				namespace: AppNamespace,
+			}
+
+			n, err := c.CountActiveApps(context.Background())
+
+			require.NoError(t, err)
+			assert.Equal(t, tc.want, n)
+		})
+	}
+
+	t.Run("returns the cache error", func(t *testing.T) {
+		cacheErr := errors.New("cache not synced")
+		c := &AppK8sClient{
+			cache:     &listCache{FakeInformers: &informertest.FakeInformers{}, err: cacheErr},
+			namespace: AppNamespace,
+		}
+
+		n, err := c.CountActiveApps(context.Background())
+
+		require.ErrorIs(t, err, cacheErr)
+		assert.Zero(t, n)
+	})
 }
 
 func TestGetReplicas(t *testing.T) {
@@ -1125,4 +1267,103 @@ func TestBuildPodSpec_NoPayload(t *testing.T) {
 	_, err := buildPodSpec(spec)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "app spec has no payload")
+}
+
+func TestDeploy_TelemetryOptOutReachesApps(t *testing.T) {
+	for _, disabled := range []bool{true, false} {
+		t.Run(fmt.Sprintf("disabled=%v", disabled), func(t *testing.T) {
+			for _, name := range []string{"FLYTE_DISABLE_TELEMETRY", "DO_NOT_TRACK", "FLYTE_DISABLE_SENTRY"} {
+				t.Setenv(name, "")
+			}
+			if disabled {
+				t.Setenv("DO_NOT_TRACK", "1")
+			}
+			c := testClient(t)
+			app := testApp("proj", "dev", "myapp", "nginx:latest")
+			require.NoError(t, c.Deploy(context.Background(), app))
+
+			ksvc := &servingv1.Service{}
+			require.NoError(t, c.k8sClient.Get(context.Background(),
+				client.ObjectKey{Name: "myapp-proj-dev", Namespace: AppNamespace}, ksvc))
+
+			var got []string
+			for _, e := range ksvc.Spec.Template.Spec.Containers[0].Env {
+				if e.Name == "DO_NOT_TRACK" {
+					got = append(got, e.Value)
+				}
+			}
+			if disabled {
+				assert.Equal(t, []string{"1"}, got)
+			} else {
+				assert.Empty(t, got)
+			}
+		})
+	}
+}
+
+// setK8sConfig swaps in cfg for the rest of the test and restores the previous plugin config after.
+func setK8sConfig(t *testing.T, cfg *k8sconfig.K8sPluginConfig) {
+	t.Helper()
+	previous := *k8sconfig.GetK8sPluginConfig()
+	t.Cleanup(func() { require.NoError(t, k8sconfig.SetK8sPluginConfig(&previous)) })
+	require.NoError(t, k8sconfig.SetK8sPluginConfig(cfg))
+}
+
+func appleSiliconApp() *flyteapp.App {
+	app := testApp("proj", "dev", "llm", "ghcr.io/example/llm:latest")
+	app.Spec.ExtendedResources = &flytecoreapp.ExtendedResources{
+		GpuAccelerator: &flytecoreapp.GPUAccelerator{
+			Device:      "AppleSilicon",
+			DeviceClass: flytecoreapp.GPUAccelerator_APPLE_SILICON,
+		},
+	}
+	return app
+}
+
+func TestDeploy_AppleSiliconInjectsBridge(t *testing.T) {
+	setK8sConfig(t, &k8sconfig.K8sPluginConfig{
+		AppleSiliconBridge: k8sconfig.AppleSiliconBridgeConfig{
+			Endpoint: "http://192.168.65.254:30090", TokenSecret: "s3cret",
+		},
+	})
+
+	c := testClient(t)
+	require.NoError(t, c.Deploy(context.Background(), appleSiliconApp()))
+
+	ksvc := &servingv1.Service{}
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "llm-proj-dev", Namespace: AppNamespace}, ksvc))
+	env := map[string]string{}
+	for _, e := range ksvc.Spec.Template.Spec.Containers[0].Env {
+		env[e.Name] = e.Value
+	}
+	assert.Equal(t, "http://192.168.65.254:30090/v1", env[flytek8s.OpenAIBaseURLEnvVar])
+	workload := AppleSiliconWorkloadID("llm-proj-dev", ksvc.Annotations[annotationSpecSHA])
+	assert.Equal(t, workload, env[flytek8s.AppleSiliconWorkloadEnvVar])
+	assert.Equal(t, flytek8s.MintAppleSiliconToken("s3cret", workload), env[flytek8s.AppleSiliconTokenEnvVar])
+
+	// A new revision gets its own host workload, so a rollout's old pods can't share or tear down the new one's.
+	updated := appleSiliconApp()
+	updated.Spec.GetContainer().Image = "ghcr.io/example/llm:v2"
+	require.NoError(t, c.Deploy(context.Background(), updated))
+	require.NoError(t, c.k8sClient.Get(context.Background(),
+		client.ObjectKey{Name: "llm-proj-dev", Namespace: AppNamespace}, ksvc))
+	next := ""
+	for _, e := range ksvc.Spec.Template.Spec.Containers[0].Env {
+		if e.Name == flytek8s.AppleSiliconWorkloadEnvVar {
+			next = e.Value
+		}
+	}
+	assert.NotEqual(t, workload, next)
+	assert.Equal(t, AppleSiliconWorkloadID("llm-proj-dev", ksvc.Annotations[annotationSpecSHA]), next)
+}
+
+func TestDeploy_AppleSiliconWithoutBridgeFails(t *testing.T) {
+	setK8sConfig(t, &k8sconfig.K8sPluginConfig{})
+
+	c := testClient(t)
+	err := c.Deploy(context.Background(), appleSiliconApp())
+	require.Error(t, err)
+	assert.True(t, stdErrors.IsCausedBy(err, pluginserrors.AppleSiliconNotAvailable))
+	assert.Contains(t, err.Error(), "requires an Apple Silicon devbox")
 }

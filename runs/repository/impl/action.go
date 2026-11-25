@@ -14,6 +14,9 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/metric"
+	metricnoop "go.opentelemetry.io/otel/metric/noop"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/database"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -23,7 +26,215 @@ import (
 	"github.com/flyteorg/flyte/v2/runs/repository/models"
 )
 
-const rootActionName = "a0"
+const (
+	rootActionName                                   = "a0"
+	defaultNotificationBufferSize                    = 256
+	defaultWatchBufferSize                           = 100
+	notifyRetryMinBackoff                            = 50 * time.Millisecond
+	notifyRetryMaxBackoff                            = 5 * time.Second
+	defaultNotifyBatchSize                           = 100
+	maxNotifyBatchSize                               = 10_000
+	notificationMeterName                            = "runs-repository"
+	notificationDeletedMetricName                    = "runs.notification.evictions"
+	notificationDroppedMetricName                    = "runs.notification.subscriber_drops"
+	notificationSentMetricName                       = "runs.notification.sent"
+	notificationBufferAction      notificationBuffer = "action"
+	notificationBufferRun         notificationBuffer = "run"
+	activeRunsMetricName                             = "runs.active"
+	activeRunsQueryTimeout                           = 5 * time.Second
+)
+
+// Defaults for the pq.Listener behind LISTEN/NOTIFY.
+const (
+	defaultListenerPingInterval         = 90 * time.Second
+	defaultListenerMinReconnectInterval = 10 * time.Second
+)
+
+// terminalPhases are the phases an action ends in. FAILED and TIMED_OUT can
+// still move on when the action is retried (see UpdateActionPhase).
+var terminalPhases = []int32{
+	int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+	int32(common.ActionPhase_ACTION_PHASE_FAILED),
+	int32(common.ActionPhase_ACTION_PHASE_ABORTED),
+	int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
+	int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
+}
+
+// activePhases is every ActionPhase not in terminalPhases.
+var activePhases = []int32{
+	int32(common.ActionPhase_ACTION_PHASE_UNSPECIFIED),
+	int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+	int32(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES),
+	int32(common.ActionPhase_ACTION_PHASE_INITIALIZING),
+	int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+	int32(common.ActionPhase_ACTION_PHASE_PAUSED),
+}
+
+type notificationBuffer string
+
+// NotificationConfig configures the pending notification queues and delivery retries.
+type NotificationConfig struct {
+	bufferLimit     int
+	retryMinBackoff time.Duration
+	retryMaxBackoff time.Duration
+	// watchBufferSize is the capacity of each watch subscriber's notification channel. A notification for a
+	// subscriber whose channel is full is dropped.
+	watchBufferSize int
+	// batchSize is the maximum number of notifications sent in one pg_notify statement.
+	batchSize int
+}
+
+type notificationMetrics struct {
+	notifyDeletedCount           metric.Int64Counter
+	subscriberDroppedNotifyCount metric.Int64Counter
+	notifySentCount              metric.Int64Counter
+}
+
+func newNotificationMetrics(provider metric.MeterProvider) (*notificationMetrics, error) {
+	if provider == nil {
+		return nil, nil
+	}
+	if _, ok := provider.(metricnoop.MeterProvider); ok {
+		return nil, nil
+	}
+
+	notifyDeletedCount, err := provider.Meter(notificationMeterName).Int64Counter(
+		notificationDeletedMetricName,
+		metric.WithDescription("Pending notifications evicted because the notification queue reached its limit"),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	subscriberDroppedNotifyCount, err := provider.Meter(notificationMeterName).Int64Counter(
+		notificationDroppedMetricName,
+		metric.WithDescription("Notifications dropped because a subscriber channel was full"),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	notifySentCount, err := provider.Meter(notificationMeterName).Int64Counter(
+		notificationSentMetricName,
+		metric.WithDescription("Notifications successfully sent by batched pg_notify"),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &notificationMetrics{
+		notifyDeletedCount:           notifyDeletedCount,
+		subscriberDroppedNotifyCount: subscriberDroppedNotifyCount,
+		notifySentCount:              notifySentCount,
+	}, nil
+}
+
+// phaseLabel turns ACTION_PHASE_RUNNING into RUNNING for the metric label.
+func phaseLabel(phase int32) string {
+	return strings.TrimPrefix(common.ActionPhase(phase).String(), "ACTION_PHASE_")
+}
+
+func registerActiveRunsGauge(
+	provider metric.MeterProvider,
+	countByPhase func(ctx context.Context) (map[interfaces.PhaseKey]int64, error),
+) error {
+	if provider == nil {
+		return nil
+	}
+	if _, ok := provider.(metricnoop.MeterProvider); ok {
+		return nil
+	}
+
+	meter := provider.Meter(notificationMeterName)
+
+	active, err := meter.Int64ObservableGauge(
+		activeRunsMetricName,
+		metric.WithDescription("Number of runs in each active phase"),
+	)
+	if err != nil {
+		return err
+	}
+
+	_, err = meter.RegisterCallback(func(ctx context.Context, o metric.Observer) error {
+		ctx, cancel := context.WithTimeout(ctx, activeRunsQueryTimeout)
+		defer cancel()
+
+		counts, err := countByPhase(ctx)
+		if err != nil {
+			// Returning an error makes the SDK skip exporting every runs-service
+			// metric for this interval, so log and skip only this observation.
+			logger.Warnf(ctx, "skipping %s observation: %v", activeRunsMetricName, err)
+			return nil
+		}
+		// Report every active phase, including zeros, so a phase that empties
+		// drops to 0 instead of disappearing.
+		for _, phase := range activePhases {
+			// UNSPECIFIED is a placeholder, not a phase a run sits in.
+			if phase == int32(common.ActionPhase_ACTION_PHASE_UNSPECIFIED) {
+				continue
+			}
+			n := counts[interfaces.PhaseKey{Phase: phase, IsRoot: true}]
+			o.ObserveInt64(active, n, metric.WithAttributes(attribute.String("phase", phaseLabel(phase))))
+		}
+		return nil
+	}, active)
+	return err
+}
+
+func (m *notificationMetrics) recordDeleted(ctx context.Context, bufferFrom notificationBuffer, count int64) {
+	if m == nil || m.notifyDeletedCount == nil || count == 0 {
+		return
+	}
+	m.notifyDeletedCount.Add(ctx, count, metric.WithAttributes(attribute.String("buffer_from", string(bufferFrom))))
+}
+
+func (m *notificationMetrics) recordSubscriberDropped(ctx context.Context, bufferFrom notificationBuffer, count int64) {
+	if m == nil || m.subscriberDroppedNotifyCount == nil || count == 0 {
+		return
+	}
+	m.subscriberDroppedNotifyCount.Add(ctx, count, metric.WithAttributes(attribute.String("buffer_from", string(bufferFrom))))
+}
+
+func (m *notificationMetrics) recordSent(ctx context.Context, bufferFrom notificationBuffer, count int64) {
+	if m == nil || m.notifySentCount == nil || count == 0 {
+		return
+	}
+	m.notifySentCount.Add(ctx, count, metric.WithAttributes(attribute.String("buffer_from", string(bufferFrom))))
+}
+
+// NewNotificationConfig creates a notification config, normalizing invalid values.
+func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff time.Duration, watchBufferSize, batchSize int) NotificationConfig {
+	if bufferLimit < defaultNotificationBufferSize {
+		bufferLimit = defaultNotificationBufferSize
+	}
+	if retryMinBackoff <= 0 {
+		retryMinBackoff = notifyRetryMinBackoff
+	}
+	if retryMaxBackoff <= 0 {
+		retryMaxBackoff = notifyRetryMaxBackoff
+	}
+	if retryMaxBackoff < retryMinBackoff {
+		retryMinBackoff = notifyRetryMinBackoff
+		retryMaxBackoff = notifyRetryMaxBackoff
+	}
+	if watchBufferSize <= 0 {
+		watchBufferSize = defaultWatchBufferSize
+	}
+	if batchSize <= 0 {
+		batchSize = defaultNotifyBatchSize
+	}
+	if batchSize > maxNotifyBatchSize {
+		batchSize = maxNotifyBatchSize
+	}
+
+	return NotificationConfig{
+		bufferLimit:     bufferLimit,
+		retryMinBackoff: retryMinBackoff,
+		retryMaxBackoff: retryMaxBackoff,
+		watchBufferSize: watchBufferSize,
+		batchSize:       batchSize,
+	}
+}
 
 // actionRepo implements actionRepo interface using PostgreSQL
 type actionRepo struct {
@@ -31,28 +242,60 @@ type actionRepo struct {
 	dsn      string // stored for pq.Listener
 	listener *pq.Listener
 
+	// Idle ping interval and pq's first reconnect delay; zero means the defaults above.
+	listenerPingInterval         time.Duration
+	listenerMinReconnectInterval time.Duration
+
 	// Subscriber management for LISTEN/NOTIFY
-	runSubscribers    map[chan string]bool
-	actionSubscribers map[chan string]bool
+	runSubscribers    map[*subscription]struct{}
+	actionSubscribers map[*subscription]struct{}
 	mu                sync.RWMutex
 
-	// Dedicated channels for async NOTIFY to avoid pool contention
-	actionNotifyCh chan string
-	runNotifyCh    chan string
+	notifyMu            sync.Mutex
+	pendingActions      map[string]struct{}
+	pendingActionQueue  []string
+	pendingRuns         map[string]struct{}
+	pendingRunQueue     []string
+	pendingCh           chan struct{}
+	notificationConfig  NotificationConfig
+	notificationMetrics *notificationMetrics
 }
 
 // NewActionRepo creates a new PostgreSQL repository
-func NewActionRepo(db *sqlx.DB, dbConfig database.DbConfig) (interfaces.ActionRepo, error) {
-	dsn := database.GetPostgresDsn(context.Background(), dbConfig.Postgres)
-	repo := &actionRepo{
-		db:                db,
-		dsn:               dsn,
-		runSubscribers:    make(map[chan string]bool),
-		actionSubscribers: make(map[chan string]bool),
+func NewActionRepo(
+	db *sqlx.DB,
+	dbConfig database.DbConfig,
+	notificationConfig NotificationConfig,
+	meterProviders ...metric.MeterProvider,
+) (interfaces.ActionRepo, error) {
+	var meterProvider metric.MeterProvider
+	if len(meterProviders) > 0 {
+		meterProvider = meterProviders[0]
+	}
+	notificationMetrics, err := newNotificationMetrics(meterProvider)
+	if err != nil {
+		return nil, fmt.Errorf("register notification metrics: %w", err)
 	}
 
-	repo.actionNotifyCh = make(chan string, 256)
-	repo.runNotifyCh = make(chan string, 256)
+	dsn := database.GetPostgresDsn(context.Background(), dbConfig.Postgres)
+	repo := &actionRepo{
+		db:                  db,
+		dsn:                 dsn,
+		runSubscribers:      make(map[*subscription]struct{}),
+		actionSubscribers:   make(map[*subscription]struct{}),
+		notificationConfig:  notificationConfig,
+		notificationMetrics: notificationMetrics,
+	}
+
+	repo.pendingActions = make(map[string]struct{}, defaultNotificationBufferSize)
+	repo.pendingActionQueue = make([]string, 0, defaultNotificationBufferSize)
+	repo.pendingRuns = make(map[string]struct{}, defaultNotificationBufferSize)
+	repo.pendingRunQueue = make([]string, 0, defaultNotificationBufferSize)
+	repo.pendingCh = make(chan struct{}, 1)
+
+	if err := registerActiveRunsGauge(meterProvider, repo.CountActiveActionsByPhase); err != nil {
+		return nil, fmt.Errorf("register active runs gauge: %w", err)
+	}
 
 	if err := repo.startPostgresListener(); err != nil {
 		return nil, fmt.Errorf("failed to start postgres listener: %w", err)
@@ -221,7 +464,8 @@ func (r *actionRepo) GetLatestEventByAttempt(ctx context.Context, actionID *comm
 	return &event, nil
 }
 
-// CreateAction inserts an Action model into the database.
+// CreateAction inserts an Action model and promotes its parent to RUNNING in the
+// same transaction only from QUEUED, INITIALIZING, or WAITING_FOR_RESOURCES.
 // When updateTriggeredAt is true and the action has a TriggerName set, triggered_at on the
 // corresponding trigger row is updated to now() in the same transaction.
 func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, updateTriggeredAt bool) (*models.Action, error) {
@@ -239,13 +483,13 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, up
 	}
 
 	result, err := tx.ExecContext(ctx,
-		`INSERT INTO actions (project, domain, run_name, name, parent_action_name, phase, run_source, action_type, action_group, task_project, task_domain, task_name, task_version, task_type, task_short_name, function_name, environment_name, action_spec, action_details, detailed_info, run_spec, attempts, cache_status, trigger_name, trigger_task_name, trigger_revision, created_at, ended_at, created_by, created_by_subject, duration_ms)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, CASE WHEN $28::timestamptz IS NOT NULL THEN EXTRACT(EPOCH FROM (GREATEST($28::timestamptz, $27) - $27)) * 1000 ELSE NULL END)
+		`INSERT INTO actions (project, domain, run_name, name, parent_action_name, phase, run_source, action_type, action_group, task_project, task_domain, task_name, task_version, task_type, task_short_name, function_name, environment_name, action_spec, action_details, detailed_info, run_spec, attempts, cache_status, trigger_name, trigger_task_name, trigger_revision, created_at, ended_at, created_by, created_by_subject, labels, duration_ms)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, CASE WHEN $28::timestamptz IS NOT NULL THEN EXTRACT(EPOCH FROM (GREATEST($28::timestamptz, $27) - $27)) * 1000 ELSE NULL END)
 		 ON CONFLICT DO NOTHING`,
 		action.Project, action.Domain, action.RunName, action.Name, action.ParentActionName, action.Phase, action.RunSource, action.ActionType, action.ActionGroup,
 		action.TaskProject, action.TaskDomain, action.TaskName, action.TaskVersion, action.TaskType, action.TaskShortName, action.FunctionName, action.EnvironmentName,
 		action.ActionSpec, action.ActionDetails, action.DetailedInfo, action.RunSpec, action.Attempts, action.CacheStatus,
-		action.TriggerName, action.TriggerTaskName, action.TriggerRevision, createdAt, action.EndedAt, action.CreatedBy, action.CreatedBySubject)
+		action.TriggerName, action.TriggerTaskName, action.TriggerRevision, createdAt, action.EndedAt, action.CreatedBy, action.CreatedBySubject, action.Labels)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create action: %w", err)
 	}
@@ -260,6 +504,32 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, up
 		}
 	}
 
+	// Creating a child proves its parent started executing. Check and update
+	// the parent in one statement so a concurrent terminal update cannot be
+	// overwritten by this inferred RUNNING status.
+	var parentUpdated bool
+	if rowsAffected > 0 && action.ParentActionName.Valid && action.ParentActionName.String != "" {
+		result, err := tx.ExecContext(ctx,
+			`UPDATE actions SET phase = $5, updated_at = NOW()
+			 WHERE project = $1 AND domain = $2 AND run_name = $3 AND name = $4
+			 AND phase = ANY($6)`,
+			action.Project, action.Domain, action.RunName, action.ParentActionName.String,
+			int32(common.ActionPhase_ACTION_PHASE_RUNNING),
+			pq.Array([]int32{
+				int32(common.ActionPhase_ACTION_PHASE_QUEUED),
+				int32(common.ActionPhase_ACTION_PHASE_WAITING_FOR_RESOURCES),
+				int32(common.ActionPhase_ACTION_PHASE_INITIALIZING),
+			}))
+		if err != nil {
+			return nil, fmt.Errorf("failed to promote parent action: %w", err)
+		}
+		updated, err := result.RowsAffected()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get parent update count: %w", err)
+		}
+		parentUpdated = updated > 0
+	}
+
 	if err := tx.Commit(); err != nil {
 		return nil, fmt.Errorf("failed to commit tx: %w", err)
 	}
@@ -271,6 +541,12 @@ func (r *actionRepo) CreateAction(ctx context.Context, action *models.Action, up
 			Domain:  action.Domain,
 			Name:    action.RunName,
 		},
+	}
+
+	if parentUpdated {
+		r.notifyActionUpdate(ctx, &common.ActionIdentifier{
+			Run: actionID.Run, Name: action.ParentActionName.String,
+		})
 	}
 
 	// If no rows were affected, the action already exists — fetch and return it.
@@ -439,13 +715,6 @@ func (r *actionRepo) UpdateActionPhase(
 	retryablePhases := []int32{
 		int32(common.ActionPhase_ACTION_PHASE_FAILED),
 		int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
-	}
-	terminalPhases := []int32{
-		int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
-		int32(common.ActionPhase_ACTION_PHASE_FAILED),
-		int32(common.ActionPhase_ACTION_PHASE_ABORTED),
-		int32(common.ActionPhase_ACTION_PHASE_TIMED_OUT),
-		int32(common.ActionPhase_ACTION_PHASE_RECOVERED),
 	}
 
 	var queryBuilder strings.Builder
@@ -664,66 +933,88 @@ func (r *actionRepo) WatchStateUpdates(ctx context.Context, updates chan<- *comm
 	<-ctx.Done()
 }
 
+// subscription is one Watch* subscriber.
+type subscription struct {
+	notify chan string
+	// resync asks the subscriber to re-read its state from the DB after the listener reconnects.
+	resync chan struct{}
+}
+
+// requestResync never blocks, and repeated requests coalesce into one re-read.
+func (s *subscription) requestResync() {
+	select {
+	case s.resync <- struct{}{}:
+	default:
+	}
+}
+
+func (r *actionRepo) subscribe(subs map[*subscription]struct{}) *subscription {
+	sub := &subscription{
+		notify: make(chan string, r.notificationConfig.watchBufferSize),
+		resync: make(chan struct{}, 1),
+	}
+	r.mu.Lock()
+	subs[sub] = struct{}{}
+	r.mu.Unlock()
+	return sub
+}
+
+func (r *actionRepo) unsubscribe(subs map[*subscription]struct{}, sub *subscription) {
+	r.mu.Lock()
+	delete(subs, sub)
+	close(sub.notify)
+	r.mu.Unlock()
+}
+
 // WatchRunUpdates watches for run updates via LISTEN/NOTIFY
 func (r *actionRepo) WatchRunUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Run, errs chan<- error) {
 	runKey := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
-	notifCh := make(chan string, 100)
-
-	r.mu.Lock()
-	r.runSubscribers[notifCh] = true
-	r.mu.Unlock()
-
-	defer func() {
-		r.mu.Lock()
-		delete(r.runSubscribers, notifCh)
-		close(notifCh)
-		r.mu.Unlock()
-	}()
+	sub := r.subscribe(r.runSubscribers)
+	defer r.unsubscribe(r.runSubscribers, sub)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case notifPayload := <-notifCh:
-			if notifPayload == runKey {
-				run, err := r.GetRun(ctx, runID)
-				if err != nil {
-					if ctx.Err() != nil {
-						return
-					}
-					errs <- err
-					return
-				}
-				select {
-				case updates <- run:
-				case <-ctx.Done():
-					return
-				}
+		case <-sub.resync:
+		case notifPayload := <-sub.notify:
+			if notifPayload != runKey {
+				continue
 			}
+		}
+
+		run, err := r.GetRun(ctx, runID)
+		if err != nil {
+			if ctx.Err() != nil {
+				return
+			}
+			errs <- err
+			return
+		}
+		select {
+		case updates <- run:
+		case <-ctx.Done():
+			return
 		}
 	}
 }
 
 // WatchAllRunUpdates watches for all run updates via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *models.Run, errs chan<- error) {
-	notifCh := make(chan string, 100)
-
-	r.mu.Lock()
-	r.runSubscribers[notifCh] = true
-	r.mu.Unlock()
-
-	defer func() {
-		r.mu.Lock()
-		delete(r.runSubscribers, notifCh)
-		close(notifCh)
-		r.mu.Unlock()
-	}()
+	sub := r.subscribe(r.runSubscribers)
+	defer r.unsubscribe(r.runSubscribers, sub)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case notifPayload := <-notifCh:
+		case <-sub.resync:
+			select {
+			case updates <- nil:
+			case <-ctx.Done():
+				return
+			}
+		case notifPayload := <-sub.notify:
 			parts := strings.Split(notifPayload, "/")
 			if len(parts) != 3 {
 				logger.Warnf(ctx, "Invalid run notification payload: %s", notifPayload)
@@ -759,24 +1050,20 @@ func (r *actionRepo) WatchAllRunUpdates(ctx context.Context, updates chan<- *mod
 // WatchAllActionUpdates watches for all action updates for a run via LISTEN/NOTIFY
 func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.RunIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	runPrefix := fmt.Sprintf("%s/%s/%s/", runID.Project, runID.Domain, runID.Name)
-	notifCh := make(chan string, 100)
-
-	r.mu.Lock()
-	r.actionSubscribers[notifCh] = true
-	r.mu.Unlock()
-
-	defer func() {
-		r.mu.Lock()
-		delete(r.actionSubscribers, notifCh)
-		close(notifCh)
-		r.mu.Unlock()
-	}()
+	sub := r.subscribe(r.actionSubscribers)
+	defer r.unsubscribe(r.actionSubscribers, sub)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case notifPayload := <-notifCh:
+		case <-sub.resync:
+			select {
+			case updates <- nil:
+			case <-ctx.Done():
+				return
+			}
+		case notifPayload := <-sub.notify:
 			// Collect this notification plus any others already queued,
 			// deduplicating by action name so we only query the DB once
 			// per action during a burst of updates.
@@ -788,7 +1075,7 @@ func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.Ru
 		drain:
 			for {
 				select {
-				case extra := <-notifCh:
+				case extra := <-sub.notify:
 					if len(extra) > len(runPrefix) && extra[:len(runPrefix)] == runPrefix {
 						pending[extra[len(runPrefix):]] = true
 					}
@@ -827,24 +1114,15 @@ func (r *actionRepo) WatchAllActionUpdates(ctx context.Context, runID *common.Ru
 func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.ActionIdentifier, updates chan<- *models.Action, errs chan<- error) {
 	targetPayload := fmt.Sprintf("%s/%s/%s/%s",
 		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
-	notifCh := make(chan string, 100)
-
-	r.mu.Lock()
-	r.actionSubscribers[notifCh] = true
-	r.mu.Unlock()
-
-	defer func() {
-		r.mu.Lock()
-		delete(r.actionSubscribers, notifCh)
-		close(notifCh)
-		r.mu.Unlock()
-	}()
+	sub := r.subscribe(r.actionSubscribers)
+	defer r.unsubscribe(r.actionSubscribers, sub)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case notifPayload := <-notifCh:
+		case <-sub.resync:
+		case notifPayload := <-sub.notify:
 			if notifPayload != targetPayload {
 				continue
 			}
@@ -853,7 +1131,7 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.Ac
 			for {
 				// Prevent continuous update from the action
 				select {
-				case extra := <-notifCh:
+				case extra := <-sub.notify:
 					if extra != targetPayload {
 						continue
 					}
@@ -861,21 +1139,21 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.Ac
 					break drain
 				}
 			}
+		}
 
-			action, err := r.GetAction(ctx, actionID)
-			if err != nil {
-				if ctx.Err() != nil {
-					return
-				}
-				logger.Errorf(ctx, "Failed to get action from notification: %v", err)
-				continue
-			}
-
-			select {
-			case updates <- action:
-			case <-ctx.Done():
+		action, err := r.GetAction(ctx, actionID)
+		if err != nil {
+			if ctx.Err() != nil {
 				return
 			}
+			logger.Errorf(ctx, "Failed to get action from notification: %v", err)
+			continue
+		}
+
+		select {
+		case updates <- action:
+		case <-ctx.Done():
+			return
 		}
 	}
 }
@@ -885,7 +1163,12 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.Ac
 func (r *actionRepo) startPostgresListener() error {
 	connStr := r.dsn
 
-	r.listener = pq.NewListener(connStr, 10*time.Second, time.Minute, func(ev pq.ListenerEventType, err error) {
+	minReconnectInterval := r.listenerMinReconnectInterval
+	if minReconnectInterval <= 0 {
+		minReconnectInterval = defaultListenerMinReconnectInterval
+	}
+
+	r.listener = pq.NewListener(connStr, minReconnectInterval, time.Minute, func(ev pq.ListenerEventType, err error) {
 		if err != nil {
 			logger.Errorf(context.Background(), "Listener error: %v", err)
 		}
@@ -910,11 +1193,31 @@ func (r *actionRepo) startPostgresListener() error {
 func (r *actionRepo) processNotifications() {
 	logger.Infof(context.Background(), "PostgreSQL LISTEN/NOTIFY started")
 
+	pingInterval := r.listenerPingInterval
+	if pingInterval <= 0 {
+		pingInterval = defaultListenerPingInterval
+	}
+
 	// Process notifications
 	for {
 		select {
-		case notif := <-r.listener.Notify:
+		case notif, ok := <-r.listener.Notify:
+			if !ok {
+				// pq closes Notify only after Listener.Close().
+				logger.Infof(context.Background(), "PostgreSQL listener closed, stopping notification processing")
+				return
+			}
 			if notif == nil {
+				// pq sends nil after it reconnects; notifications sent while it was down may be lost.
+				logger.Infof(context.Background(), "PostgreSQL listener reconnected, resyncing subscribers")
+				r.mu.RLock()
+				for sub := range r.runSubscribers {
+					sub.requestResync()
+				}
+				for sub := range r.actionSubscribers {
+					sub.requestResync()
+				}
+				r.mu.RUnlock()
 				continue
 			}
 
@@ -922,12 +1225,13 @@ func (r *actionRepo) processNotifications() {
 			case "run_updates":
 				// Broadcast to all run subscribers
 				r.mu.RLock()
-				for ch := range r.runSubscribers {
+				for sub := range r.runSubscribers {
 					select {
-					case ch <- notif.Extra:
+					case sub.notify <- notif.Extra:
 					default:
 						// Channel full, skip this subscriber
 						logger.Warnf(context.Background(), "Run subscriber channel full, dropping notification")
+						r.notificationMetrics.recordSubscriberDropped(context.Background(), notificationBufferRun, 1)
 					}
 				}
 				r.mu.RUnlock()
@@ -935,37 +1239,120 @@ func (r *actionRepo) processNotifications() {
 			case "action_updates":
 				// Broadcast to all action subscribers
 				r.mu.RLock()
-				for ch := range r.actionSubscribers {
+				for sub := range r.actionSubscribers {
 					select {
-					case ch <- notif.Extra:
+					case sub.notify <- notif.Extra:
 					default:
 						logger.Warnf(context.Background(), "Action subscriber channel full, dropping notification payload=%s", notif.Extra)
+						r.notificationMetrics.recordSubscriberDropped(context.Background(), notificationBufferAction, 1)
 					}
 				}
 				r.mu.RUnlock()
 
 			}
 
-		case <-time.After(90 * time.Second):
-			// Ping to keep connection alive
+		case <-time.After(pingInterval):
+			// Ping to keep connection alive. Ping fails while pq is reconnecting in the background, so keep
+			// reading Notify instead of returning; nothing would restart this goroutine.
 			if err := r.listener.Ping(); err != nil {
-				logger.Errorf(context.Background(), "Listener ping failed: %v", err)
-				return
+				logger.Warnf(context.Background(), "Listener ping failed, waiting for reconnect: %v", err)
 			}
 		}
 	}
 }
 
-// notifyRunUpdate sends a notification about a run update via the
-// dedicated notify channel, avoiding connection pool contention.
-func (r *actionRepo) notifyRunUpdate(ctx context.Context, runID *common.RunIdentifier) {
+func (r *actionRepo) notifyRunUpdate(_ context.Context, runID *common.RunIdentifier) {
 	payload := fmt.Sprintf("%s/%s/%s", runID.Project, runID.Domain, runID.Name)
+	r.markRunPending(payload)
+}
 
+func (r *actionRepo) markRunPending(payload string) {
+	r.notifyMu.Lock()
+	enqueuePending(
+		r.pendingRuns, &r.pendingRunQueue, payload, r.notificationConfig.bufferLimit,
+		r.notificationMetrics, notificationBufferRun,
+	)
+	r.notifyMu.Unlock()
+	r.signalPending()
+}
+
+func (r *actionRepo) signalPending() {
 	select {
-	case r.runNotifyCh <- payload:
-	case <-ctx.Done():
-		logger.Warnf(ctx, "Run NOTIFY send cancelled for %s: %v", payload, ctx.Err())
+	case r.pendingCh <- struct{}{}:
+	default:
 	}
+}
+
+func (r *actionRepo) takePendingNotifications() (actions, runs []string) {
+	r.notifyMu.Lock()
+	defer r.notifyMu.Unlock()
+
+	actions, runs = r.pendingActionQueue, r.pendingRunQueue
+	r.pendingActions = make(map[string]struct{}, defaultNotificationBufferSize)
+	r.pendingActionQueue = make([]string, 0, defaultNotificationBufferSize)
+	r.pendingRuns = make(map[string]struct{}, defaultNotificationBufferSize)
+	r.pendingRunQueue = make([]string, 0, defaultNotificationBufferSize)
+	return actions, runs
+}
+
+func (r *actionRepo) mergePendingActions(actions []string) {
+	if len(actions) == 0 {
+		return
+	}
+	r.notifyMu.Lock()
+	r.pendingActions, r.pendingActionQueue = mergePending(
+		actions, r.pendingActionQueue, r.notificationConfig.bufferLimit,
+		r.notificationMetrics, notificationBufferAction,
+	)
+	r.notifyMu.Unlock()
+}
+
+func (r *actionRepo) mergePendingRuns(runs []string) {
+	if len(runs) == 0 {
+		return
+	}
+	r.notifyMu.Lock()
+	r.pendingRuns, r.pendingRunQueue = mergePending(
+		runs, r.pendingRunQueue, r.notificationConfig.bufferLimit,
+		r.notificationMetrics, notificationBufferRun,
+	)
+	r.notifyMu.Unlock()
+}
+
+func mergePending(
+	retry, queued []string,
+	limit int,
+	metrics *notificationMetrics,
+	bufferFrom notificationBuffer,
+) (map[string]struct{}, []string) {
+	pending := make(map[string]struct{}, len(retry)+len(queued))
+	queue := make([]string, 0, len(retry)+len(queued))
+	for _, payload := range append(retry, queued...) {
+		enqueuePending(pending, &queue, payload, limit, metrics, bufferFrom)
+	}
+	return pending, queue
+}
+
+func enqueuePending(
+	pending map[string]struct{},
+	queue *[]string,
+	payload string,
+	limit int,
+	metrics *notificationMetrics,
+	bufferFrom notificationBuffer,
+) {
+	if _, exists := pending[payload]; exists {
+		return
+	}
+	if len(pending) >= limit {
+		logger.Warnf(context.Background(), "Notification buffer full, dropping buffer=%s payload=%s", bufferFrom, (*queue)[0])
+		delete(pending, (*queue)[0])
+		(*queue)[0] = ""
+		*queue = (*queue)[1:]
+		metrics.recordDeleted(context.Background(), bufferFrom, 1)
+	}
+	pending[payload] = struct{}{}
+	*queue = append(*queue, payload)
 }
 
 // ListRootActions lists root actions (runs) matching scope and date filters.
@@ -1010,6 +1397,28 @@ func (r *actionRepo) ListRootActions(ctx context.Context, project, domain string
 	return actions, nil
 }
 
+// CountActiveActionsByPhase counts the actions in an active phase, split by phase
+// and by whether the action is a root (a run).
+func (r *actionRepo) CountActiveActionsByPhase(ctx context.Context) (map[interfaces.PhaseKey]int64, error) {
+	var rows []struct {
+		Phase  int32 `db:"phase"`
+		IsRoot bool  `db:"is_root"`
+		Count  int64 `db:"count"`
+	}
+	err := sqlx.SelectContext(ctx, r.db, &rows,
+		`SELECT phase, parent_action_name IS NULL AS is_root, COUNT(*) AS count
+		FROM actions WHERE phase = ANY($1) GROUP BY 1, 2`,
+		pq.Array(activePhases))
+	if err != nil {
+		return nil, fmt.Errorf("failed to count actions by phase: %w", err)
+	}
+	counts := make(map[interfaces.PhaseKey]int64, len(rows))
+	for _, row := range rows {
+		counts[interfaces.PhaseKey{Phase: row.Phase, IsRoot: row.IsRoot}] = row.Count
+	}
+	return counts, nil
+}
+
 // startNotifyLoop acquires a dedicated DB connection for NOTIFY commands and
 // starts processing in the background. Returns an error if the initial
 // connection cannot be established.
@@ -1021,7 +1430,7 @@ func (r *actionRepo) startNotifyLoop() error {
 		return fmt.Errorf("acquire dedicated NOTIFY connection: %w", err)
 	}
 
-	go r.runNotifyLoop(sqlDB, conn)
+	go r.runNotifyLoop(context.Background(), sqlDB, conn)
 	return nil
 }
 
@@ -1042,10 +1451,7 @@ func isConnError(err error) bool {
 	return false
 }
 
-// runNotifyLoop processes notify channels using the given connection.
-// On connection errors it attempts to reconnect; if reconnection fails
-// the error is logged and the notification is skipped.
-func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
+func (r *actionRepo) runNotifyLoop(ctx context.Context, sqlDB *sql.DB, conn *sql.Conn) {
 	defer func() {
 		if conn != nil {
 			conn.Close() //nolint:errcheck
@@ -1061,69 +1467,99 @@ func (r *actionRepo) runNotifyLoop(sqlDB *sql.DB, conn *sql.Conn) {
 			return
 		}
 		var err error
-		conn, err = sqlDB.Conn(context.Background())
+		conn, err = sqlDB.Conn(ctx)
 		if err != nil {
-			logger.Errorf(context.Background(), "Failed to re-acquire NOTIFY connection: %v", err)
+			logger.Errorf(ctx, "Failed to re-acquire NOTIFY connection: %v", err)
 			conn = nil
 		}
 	}
 
-	execNotify := func(channel, payload string) {
+	execNotify := func(channel, query string, args []any) bool {
 		if conn == nil {
 			reconnect()
 		}
 		if conn == nil {
-			logger.Errorf(context.Background(), "No NOTIFY connection available, dropping %s notification", channel)
-			return
+			logger.Errorf(ctx, "No NOTIFY connection available, keeping %s notifications pending", channel)
+			return false
 		}
-		if _, err := conn.ExecContext(context.Background(), "SELECT pg_notify($1, $2)", channel, payload); err != nil {
-			logger.Errorf(context.Background(), "Failed to NOTIFY %s: %v", channel, err)
+		if _, err := conn.ExecContext(ctx, query, args...); err != nil {
+			logger.Errorf(ctx, "Failed to NOTIFY %s notifications: %v", channel, err)
 			if isConnError(err) {
 				reconnect()
 			}
+			return false
 		}
+		return true
 	}
 
-	drainAndExec := func(channel, firstPayload string, ch <-chan string) {
-		execNotify(channel, firstPayload)
-		for {
-			select {
-			case payload, ok := <-ch:
-				if !ok {
-					return
+	emit := func(channel string, bufferFrom notificationBuffer, payloads []string) []string {
+		batchSize := r.notificationConfig.batchSize
+		for start := 0; start < len(payloads); start += batchSize {
+			chunk := payloads[start:min(start+batchSize, len(payloads))]
+			var query strings.Builder
+			query.WriteString("SELECT ")
+			args := make([]any, 0, len(chunk)+1)
+			args = append(args, channel)
+			for i, payload := range chunk {
+				if i > 0 {
+					query.WriteString(", ")
 				}
-				execNotify(channel, payload)
-			default:
-				return
+				fmt.Fprintf(&query, "pg_notify($1, $%d)", i+2)
+				args = append(args, payload)
 			}
+			if !execNotify(channel, query.String(), args) {
+				return payloads[start:]
+			}
+			r.notificationMetrics.recordSent(ctx, bufferFrom, int64(len(chunk)))
 		}
+		return nil
 	}
 
+	backoff := r.notificationConfig.retryMinBackoff
 	for {
 		select {
-		case payload, ok := <-r.actionNotifyCh:
-			if !ok {
-				return
-			}
-			drainAndExec("action_updates", payload, r.actionNotifyCh)
-		case payload, ok := <-r.runNotifyCh:
-			if !ok {
-				return
-			}
-			drainAndExec("run_updates", payload, r.runNotifyCh)
+		case <-ctx.Done():
+			return
+		case <-r.pendingCh:
+		}
+
+		actions, runs := r.takePendingNotifications()
+		retryActions := emit("action_updates", notificationBufferAction, actions)
+		retryRuns := emit("run_updates", notificationBufferRun, runs)
+
+		if len(retryActions) == 0 && len(retryRuns) == 0 {
+			backoff = r.notificationConfig.retryMinBackoff
+			continue
+		}
+
+		r.mergePendingActions(retryActions)
+		r.mergePendingRuns(retryRuns)
+		r.signalPending()
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(backoff):
+		}
+		backoff *= 2
+		if backoff > r.notificationConfig.retryMaxBackoff {
+			backoff = r.notificationConfig.retryMaxBackoff
 		}
 	}
 }
 
-// notifyActionUpdate sends a notification about an action update via the
-// dedicated notify channel, avoiding connection pool contention.
-func (r *actionRepo) notifyActionUpdate(ctx context.Context, actionID *common.ActionIdentifier) {
+func (r *actionRepo) notifyActionUpdate(_ context.Context, actionID *common.ActionIdentifier) {
 	payload := fmt.Sprintf("%s/%s/%s/%s",
 		actionID.Run.Project, actionID.Run.Domain, actionID.Run.Name, actionID.Name)
 
-	select {
-	case r.actionNotifyCh <- payload:
-	case <-ctx.Done():
-		logger.Errorf(ctx, "Action NOTIFY send cancelled for %s: %v", payload, ctx.Err())
-	}
+	r.markActionPending(payload)
+}
+
+func (r *actionRepo) markActionPending(payload string) {
+	r.notifyMu.Lock()
+	enqueuePending(
+		r.pendingActions, &r.pendingActionQueue, payload, r.notificationConfig.bufferLimit,
+		r.notificationMetrics, notificationBufferAction,
+	)
+	r.notifyMu.Unlock()
+	r.signalPending()
 }
