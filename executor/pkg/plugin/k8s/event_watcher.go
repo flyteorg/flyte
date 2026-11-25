@@ -57,11 +57,8 @@ type controllerRuntimeEventWatcher struct {
 type eventObjects struct {
 	mu         sync.RWMutex
 	eventInfos map[k8stypes.NamespacedName]*eventInfo
-	// evicted marks a bucket that has been taken out of objectCache because its last
-	// event was deleted. A writer that loaded the bucket before it was removed must not
-	// add to it: the bucket is no longer reachable, so the event would be dropped. It
-	// sees this flag under the same lock the eviction is done under and retries against
-	// a fresh bucket instead.
+	// evicted is set, under mu, when the bucket is removed from objectCache. A writer
+	// that loaded it before then must retry rather than write into an unreachable bucket.
 	evicted bool
 }
 
@@ -124,10 +121,7 @@ func (w *controllerRuntimeEventWatcher) store(obj interface{}) {
 		LastObservedAt:  lastObservedTime(event),
 	}
 
-	// A bucket can be evicted between the load and the lock, so the store is retried
-	// until it lands in one that is still reachable. The loop turns at most once per
-	// concurrent eviction of this object's bucket, and an eviction only happens when the
-	// bucket is empty, so it cannot spin.
+	// Retry if the bucket was evicted between the load and the lock.
 	for {
 		value, _ := w.objectCache.LoadOrStore(objectKey, &eventObjects{
 			eventInfos: make(map[k8stypes.NamespacedName]*eventInfo),
@@ -242,17 +236,10 @@ func (w *controllerRuntimeEventWatcher) OnDelete(obj interface{}) {
 	}
 	delete(eventInfos.eventInfos, eventKey)
 
-	// The bucket goes when its last event does, so objectCache holds an entry only for
-	// objects with a live event rather than for every object seen since startup.
-	//
-	// Removing it is safe against a concurrent store because both the flag and the
-	// removal happen under this bucket's write lock: a writer that already loaded this
-	// bucket blocks here, then sees evicted and retries against a fresh one, and a writer
-	// that has not loaded it yet cannot reach it once it is out of the map. The removal
-	// is conditional on the map still holding this bucket, so a deleter that loaded it
-	// before it was evicted cannot take out the fresh bucket that replaced it. Taking the
-	// map's lock while holding the bucket's cannot deadlock, because every other path
-	// releases the map's lock before it takes a bucket's.
+	// Drop the bucket with its last event so objectCache does not grow with every object
+	// seen since startup. Flag and removal happen under mu, so a writer that already
+	// loaded this bucket sees evicted and retries; CompareAndDelete keeps a stale deleter
+	// from removing the bucket that replaced this one.
 	if len(eventInfos.eventInfos) == 0 {
 		eventInfos.evicted = true
 		w.objectCache.CompareAndDelete(objectKey, value)
