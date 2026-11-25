@@ -100,7 +100,7 @@ require (
 	k8s.io/utils v0.0.0-20260707023825-cf1189d6abe3
 	knative.dev/pkg v0.0.0-20261026113028-cfa0ac991c5a
 	knative.dev/serving v0.51.0
-	sigs.k8s.io/controller-runtime v0.25.2
+	sigs.k8s.io/controller-runtime v0.25.3
 	sigs.k8s.io/jobset v0.13.1
 )
 
