@@ -37,6 +37,9 @@ type taskCacheConfig struct {
 	key          catalog.Key
 	ownerID      string
 	serializable bool
+	// overwrite skips the lookup and replaces the cached entry, as v1 propeller does for an
+	// execution with overwrite_cache.
+	overwrite bool
 }
 
 func (r *TaskActionReconciler) evaluateCacheBeforeExecution(
@@ -50,7 +53,7 @@ func (r *TaskActionReconciler) evaluateCacheBeforeExecution(
 		return pluginsCore.UnknownTransition, false, err
 	}
 
-	if !alreadyRunning {
+	if !alreadyRunning && !cacheCfg.overwrite {
 		entry, err := r.Catalog.Get(ctx, cacheCfg.key)
 		if err == nil {
 			if err := tCtx.OutputWriter().Put(ctx, entry.GetOutputs()); err != nil {
@@ -104,7 +107,7 @@ func (r *TaskActionReconciler) finalizeCacheAfterExecution(
 	phase := transition.Info().Phase()
 	if phase.IsSuccess() {
 		status := corepb.CatalogCacheStatus_CACHE_POPULATED
-		if err := r.writeTaskOutputsToCache(ctx, tCtx, cacheCfg.key); err != nil {
+		if err := r.writeTaskOutputsToCache(ctx, tCtx, cacheCfg.key, cacheCfg.overwrite); err != nil {
 			if grpcstatus.Code(err) == codes.AlreadyExists {
 				status = corepb.CatalogCacheStatus_CACHE_POPULATED
 			} else {
@@ -156,10 +159,13 @@ func buildTaskCacheConfig(
 		InputReader:          tCtx.InputReader(),
 	}
 
+	overwrite := taskAction.Spec.OverwriteCache
 	return &taskCacheConfig{
-		key:          key,
-		ownerID:      cacheReservationOwnerID(taskAction),
-		serializable: metadata.GetCacheSerializable(),
+		key:     key,
+		ownerID: cacheReservationOwnerID(taskAction),
+		// An overwriting task never waits on another owner's reservation, nor holds one.
+		serializable: metadata.GetCacheSerializable() && !overwrite,
+		overwrite:    overwrite,
 	}, true, nil
 }
 
@@ -167,10 +173,16 @@ func cacheReservationOwnerID(taskAction *flyteorgv1.TaskAction) string {
 	return types.NamespacedName{Name: taskAction.Name, Namespace: taskAction.Namespace}.String()
 }
 
-func (r *TaskActionReconciler) writeTaskOutputsToCache(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, key catalog.Key) error {
+func (r *TaskActionReconciler) writeTaskOutputsToCache(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, key catalog.Key, overwrite bool) error {
 	outputPaths := ioutils.NewReadOnlyOutputFilePaths(ctx, r.DataStore, tCtx.OutputWriter().GetOutputPrefixPath())
 	outputReader := ioutils.NewRemoteFileOutputReader(ctx, r.DataStore, outputPaths, 0)
-	_, err := r.Catalog.Put(ctx, key, outputReader, cacheMetadataForUpload(tCtx, key.Identifier))
+	metadata := cacheMetadataForUpload(tCtx, key.Identifier)
+	var err error
+	if overwrite {
+		_, err = r.Catalog.Update(ctx, key, outputReader, metadata)
+	} else {
+		_, err = r.Catalog.Put(ctx, key, outputReader, metadata)
+	}
 	return err
 }
 

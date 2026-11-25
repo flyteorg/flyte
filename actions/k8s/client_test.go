@@ -402,6 +402,41 @@ func TestApplyRunSpecToTaskAction_RawDataPrefix(t *testing.T) {
 	})
 }
 
+func TestApplyRunSpecToTaskAction_OverwriteCache(t *testing.T) {
+	t.Run("run spec flag", func(t *testing.T) {
+		ta := &executorv1.TaskAction{}
+		applyRunSpecToTaskAction(ta, &task.RunSpec{OverwriteCache: true})
+		assert.True(t, ta.Spec.OverwriteCache)
+	})
+
+	t.Run("cache config flag", func(t *testing.T) {
+		ta := &executorv1.TaskAction{}
+		applyRunSpecToTaskAction(ta, &task.RunSpec{CacheConfig: &task.CacheConfig{OverwriteCache: true}})
+		assert.True(t, ta.Spec.OverwriteCache)
+	})
+
+	t.Run("unset stays off", func(t *testing.T) {
+		ta := &executorv1.TaskAction{}
+		applyRunSpecToTaskAction(ta, &task.RunSpec{})
+		assert.False(t, ta.Spec.OverwriteCache)
+	})
+
+	t.Run("nil run spec clears a stale flag", func(t *testing.T) {
+		ta := &executorv1.TaskAction{Spec: executorv1.TaskActionSpec{OverwriteCache: true}}
+		applyRunSpecToTaskAction(ta, nil)
+		assert.False(t, ta.Spec.OverwriteCache)
+	})
+}
+
+func TestInheritRunContextFromParentTaskAction_OverwriteCache(t *testing.T) {
+	parent := &executorv1.TaskAction{Spec: executorv1.TaskActionSpec{OverwriteCache: true}}
+	child := &executorv1.TaskAction{}
+
+	inheritRunContextFromParentTaskAction(child, parent)
+
+	assert.True(t, child.Spec.OverwriteCache)
+}
+
 func TestInheritRunContextFromParentTaskAction(t *testing.T) {
 	interruptible := true
 	parent := &executorv1.TaskAction{

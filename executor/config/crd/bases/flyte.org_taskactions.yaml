@@ -118,6 +118,11 @@ spec:
                 description: Interruptible is the run-scoped interruptibility override
                   projected from RunSpec.
                 type: boolean
+              overwriteCache:
+                description: |-
+                  OverwriteCache is the run-scoped cache overwrite flag projected from RunSpec. A cacheable
+                  task then skips the cache lookup and reservation, runs, and replaces the cached entry.
+                type: boolean
               parentActionName:
                 description: ParentActionName is the optional name of the parent action
                 maxLength: 30
@@ -139,9 +144,6 @@ spec:
                   RawDataPrefix is the run-scoped raw data base projected from RunSpec.RawDataStorage.
                   Empty writes raw data under RunOutputBase.
                 type: string
-              runStartTime:
-                description: RunStartTime is the run-scoped start time in RFC3339 UTC, inherited by child tasks.
-                type: string
               runName:
                 description: RunName is the name of the run this action belongs to
                 maxLength: 30
@@ -151,6 +153,10 @@ spec:
                 description: |-
                   RunOutputBase is the base path where this action should write its output.
                   Empty for conditions; the reconciler validates presence for tasks.
+                type: string
+              runStartTime:
+                description: RunStartTime is the run-scoped start time in RFC3339
+                  UTC, inherited by child tasks.
                 type: string
               serviceAccount:
                 description: |-

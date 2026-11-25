@@ -165,6 +165,11 @@ type TaskActionSpec struct {
 	// +kubebuilder:validation:MaxLength=256
 	CacheKey string `json:"cacheKey,omitempty"`
 
+	// OverwriteCache is the run-scoped cache overwrite flag projected from RunSpec. A cacheable
+	// task then skips the cache lookup and reservation, runs, and replaces the cached entry.
+	// +optional
+	OverwriteCache bool `json:"overwriteCache,omitempty"`
+
 	// TaskType identifies which plugin handles this task (e.g. "container", "spark", "ray").
 	// Empty for conditions; the reconciler validates presence for tasks.
 	// +optional
