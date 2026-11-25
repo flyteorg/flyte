@@ -43,7 +43,7 @@ require (
 	github.com/imdario/mergo v0.3.16
 	github.com/jackc/pgx/v5 v5.12.0
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/kubeflow/spark-operator/v2 v2.5.2
+	github.com/kubeflow/spark-operator/v2 v2.6.0
 	github.com/kubeflow/training-operator v1.9.4
 	github.com/lib/pq v1.12.3
 	github.com/magiconair/properties v1.18.13
