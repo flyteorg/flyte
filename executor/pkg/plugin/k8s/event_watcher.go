@@ -57,6 +57,9 @@ type controllerRuntimeEventWatcher struct {
 type eventObjects struct {
 	mu         sync.RWMutex
 	eventInfos map[k8stypes.NamespacedName]*eventInfo
+	// evicted is set, under mu, when the bucket is removed from objectCache. A writer
+	// that loaded it before then must retry rather than write into an unreachable bucket.
+	evicted bool
 }
 
 func newControllerRuntimeEventWatcher(ctx context.Context, cache ctrlcache.Cache) (*controllerRuntimeEventWatcher, error) {
@@ -107,11 +110,6 @@ func (w *controllerRuntimeEventWatcher) store(obj interface{}) {
 
 	eventKey := k8stypes.NamespacedName{Namespace: event.Namespace, Name: event.Name}
 
-	value, _ := w.objectCache.LoadOrStore(objectKey, &eventObjects{
-		eventInfos: make(map[k8stypes.NamespacedName]*eventInfo),
-	})
-	eventInfos := value.(*eventObjects)
-
 	info := &eventInfo{
 		Message:         event.Note,
 		CreatedAt:       event.CreationTimestamp.Time,
@@ -123,22 +121,36 @@ func (w *controllerRuntimeEventWatcher) store(obj interface{}) {
 		LastObservedAt:  lastObservedTime(event),
 	}
 
-	eventInfos.mu.Lock()
-	defer eventInfos.mu.Unlock()
+	// Retry if the bucket was evicted between the load and the lock.
+	for {
+		value, _ := w.objectCache.LoadOrStore(objectKey, &eventObjects{
+			eventInfos: make(map[k8stypes.NamespacedName]*eventInfo),
+		})
+		eventInfos := value.(*eventObjects)
 
-	if existing, ok := eventInfos.eventInfos[eventKey]; ok {
-		info.CreatedAt = existing.CreatedAt
-		info.RecordedAt = existing.RecordedAt
-		if !existing.FirstObservedAt.IsZero() && existing.FirstObservedAt.Before(info.FirstObservedAt) {
-			info.FirstObservedAt = existing.FirstObservedAt
+		eventInfos.mu.Lock()
+		if eventInfos.evicted {
+			eventInfos.mu.Unlock()
+			continue
 		}
-		if existing.LastObservedAt.After(info.LastObservedAt) {
-			info.LastObservedAt = existing.LastObservedAt
+
+		stored := *info
+		if existing, ok := eventInfos.eventInfos[eventKey]; ok {
+			stored.CreatedAt = existing.CreatedAt
+			stored.RecordedAt = existing.RecordedAt
+			if !existing.FirstObservedAt.IsZero() && existing.FirstObservedAt.Before(stored.FirstObservedAt) {
+				stored.FirstObservedAt = existing.FirstObservedAt
+			}
+			if existing.LastObservedAt.After(stored.LastObservedAt) {
+				stored.LastObservedAt = existing.LastObservedAt
+			}
 		}
+		// The entry is replaced rather than mutated: List hands out these pointers, and a
+		// reader may still be looking at the one it got.
+		eventInfos.eventInfos[eventKey] = &stored
+		eventInfos.mu.Unlock()
+		return
 	}
-	// The entry is replaced rather than mutated: List hands out these pointers, and a
-	// reader may still be looking at the one it got.
-	eventInfos.eventInfos[eventKey] = info
 }
 
 // reportingNode is the node the event says it was reported from. Recorders on the
@@ -219,9 +231,19 @@ func (w *controllerRuntimeEventWatcher) OnDelete(obj interface{}) {
 	eventInfos.mu.Lock()
 	defer eventInfos.mu.Unlock()
 
+	if eventInfos.evicted {
+		return
+	}
 	delete(eventInfos.eventInfos, eventKey)
-	// We intentionally do not delete empty buckets from objectCache. This avoids races where
-	// a new event is being added to the bucket while the top-level map entry is concurrently removed.
+
+	// Drop the bucket with its last event so objectCache does not grow with every object
+	// seen since startup. Flag and removal happen under mu, so a writer that already
+	// loaded this bucket sees evicted and retries; CompareAndDelete keeps a stale deleter
+	// from removing the bucket that replaced this one.
+	if len(eventInfos.eventInfos) == 0 {
+		eventInfos.evicted = true
+		w.objectCache.CompareAndDelete(objectKey, value)
+	}
 }
 
 // List returns the cached events for an object, ordered by when they were created. The
