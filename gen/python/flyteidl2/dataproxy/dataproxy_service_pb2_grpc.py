@@ -40,6 +40,11 @@ class DataProxyServiceStub(object):
                 request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest.SerializeToString,
                 response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse.FromString,
                 )
+        self.GetCloudCredentials = channel.unary_unary(
+                '/flyteidl2.dataproxy.DataProxyService/GetCloudCredentials',
+                request_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsRequest.SerializeToString,
+                response_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsResponse.FromString,
+                )
 
 
 class DataProxyServiceServicer(object):
@@ -80,6 +85,26 @@ class DataProxyServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetCloudCredentials(self, request, context):
+        """GetCloudCredentials vends short-lived, prefix-scoped object-store credentials
+        for one resource inside the caller's project/domain.
+
+        This is the capability form of CreateUploadLocation. A signed URL is a
+        capability for ONE object with conditions attached; these credentials are a
+        capability over a PREFIX, for as long as they last. Which to use is a
+        per-call-site choice and both are supported:
+
+        * Credentials when a client touches many objects it discovers as it goes
+        -- a mounted Volume reads and writes thousands of chunk keys, so a
+        signed URL per object is not a workable shape.
+        * A signed URL when the platform must constrain the write (it binds
+        content_md5 and a size, which credentials cannot), or when the consumer
+        is a browser with no cloud SDK (see CreateDownloadLink).
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_DataProxyServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -107,6 +132,11 @@ def add_DataProxyServiceServicer_to_server(servicer, server):
                     servicer.TailLogs,
                     request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest.FromString,
                     response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse.SerializeToString,
+            ),
+            'GetCloudCredentials': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetCloudCredentials,
+                    request_deserializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsRequest.FromString,
+                    response_serializer=flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -201,5 +231,22 @@ class DataProxyService(object):
         return grpc.experimental.unary_stream(request, target, '/flyteidl2.dataproxy.DataProxyService/TailLogs',
             flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsRequest.SerializeToString,
             flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.TailLogsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetCloudCredentials(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl2.dataproxy.DataProxyService/GetCloudCredentials',
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsRequest.SerializeToString,
+            flyteidl2_dot_dataproxy_dot_dataproxy__service__pb2.GetCloudCredentialsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
