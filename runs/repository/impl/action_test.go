@@ -43,6 +43,13 @@ var testDbConfig = database.DbConfig{
 	},
 }
 
+// pgConfigWithAppName tags connections with application_name so a test can find and terminate them.
+func pgConfigWithAppName(appName string) database.PostgresConfig {
+	cfg := testDbConfig.Postgres
+	cfg.ExtraOptions += " application_name=" + appName
+	return cfg
+}
+
 // Recommended value based on 50K-scale performance testing.
 const testNotificationBufferLimit = 65_000
 
@@ -86,7 +93,7 @@ func newNotifyRepoWithDB(t *testing.T) (*actionRepo, *sql.DB, *sql.Conn) {
 
 	r := &actionRepo{
 		db:                 db,
-		dsn:                database.GetPostgresDsn(context.Background(), testDbConfig.Postgres),
+		pgConfig:           testDbConfig.Postgres,
 		runSubscribers:     make(map[*subscription]struct{}),
 		actionSubscribers:  make(map[*subscription]struct{}),
 		pendingActions:     make(map[string]struct{}, defaultNotificationBufferSize),
@@ -1543,7 +1550,7 @@ func TestProcessNotifications_SurvivesPingFailureDuringOutage(t *testing.T) {
 
 	r := &actionRepo{
 		db:                           db,
-		dsn:                          database.GetPostgresDsn(ctx, testDbConfig.Postgres) + " application_name=" + appName,
+		pgConfig:                     pgConfigWithAppName(appName),
 		listenerPingInterval:         100 * time.Millisecond,
 		listenerMinReconnectInterval: 100 * time.Millisecond,
 		runSubscribers:               make(map[*subscription]struct{}),
@@ -1684,7 +1691,7 @@ func TestWatchActionUpdates_RecoversNotificationLostDuringOutage(t *testing.T) {
 
 	r := &actionRepo{
 		db:                           db,
-		dsn:                          database.GetPostgresDsn(ctx, testDbConfig.Postgres) + " application_name=" + appName,
+		pgConfig:                     pgConfigWithAppName(appName),
 		listenerPingInterval:         100 * time.Millisecond,
 		listenerMinReconnectInterval: 100 * time.Millisecond,
 		runSubscribers:               make(map[*subscription]struct{}),
@@ -2036,7 +2043,7 @@ func TestNotifyPump_OneRoundTripPerBatch(t *testing.T) {
 	)
 	delivered := subscribeActions(t, r, total)
 
-	pqConnector, err := pq.NewConnector(r.dsn)
+	pqConnector, err := pq.NewConnector(database.GetPostgresDsn(context.Background(), r.pgConfig))
 	require.NoError(t, err)
 	connector := &notifyCountingConnector{Connector: pqConnector}
 	sqlDB := sql.OpenDB(connector)

@@ -411,6 +411,7 @@ Distributed Flyte 2 core services
 | configuration.database.connMaxLifeTime | string | `"1h"` |  |
 | configuration.database.maxIdleConnections | int | `10` |  |
 | configuration.database.maxOpenConnections | int | `100` |  |
+| configuration.database.postgres.authType | string | `"password"` |  |
 | configuration.database.postgres.dbname | string | `"flyte"` |  |
 | configuration.database.postgres.debug | bool | `false` |  |
 | configuration.database.postgres.host | string | `"127.0.0.1"` |  |
@@ -419,6 +420,7 @@ Distributed Flyte 2 core services
 | configuration.database.postgres.passwordPath | string | `""` |  |
 | configuration.database.postgres.port | int | `5432` |  |
 | configuration.database.postgres.readReplicaHost | string | `""` |  |
+| configuration.database.postgres.region | string | `""` |  |
 | configuration.database.postgres.username | string | `"postgres"` |  |
 | configuration.dataproxy.download.maxExpiresIn | string | `"1h"` |  |
 | configuration.dataproxy.pprofPort | int | `0` | Port for the separate pprof HTTP listener. 0 disables profiling. Access via pod port-forwarding; not exposed by the Service. |

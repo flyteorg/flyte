@@ -37,3 +37,66 @@ func TestParseDatabaseConfig(t *testing.T) {
 	assert.Equal(t, true, GetConfig().Postgres.Debug)
 
 }
+
+func TestPostgresConfigValidate(t *testing.T) {
+	iam := PostgresConfig{AuthType: AuthTypeIAM, ExtraOptions: "sslmode=require"}
+	withPassword := iam
+	withPassword.Password = "secret"
+	withPasswordPath := iam
+	withPasswordPath.PasswordPath = "/etc/db/password"
+	withSSLDisabled := iam
+	withSSLDisabled.ExtraOptions = "sslmode=disable"
+
+	for _, tc := range []struct {
+		name    string
+		cfg     PostgresConfig
+		wantErr string
+	}{
+		{name: "empty auth type is password auth", cfg: PostgresConfig{Password: "secret", ExtraOptions: "sslmode=disable"}},
+		{name: "password auth", cfg: PostgresConfig{AuthType: AuthTypePassword, PasswordPath: "/etc/db/password"}},
+		{name: "iam auth", cfg: iam},
+		{name: "iam auth with password", cfg: withPassword, wantErr: "cannot be combined with password or passwordPath"},
+		{name: "iam auth with password path", cfg: withPasswordPath, wantErr: "cannot be combined with password or passwordPath"},
+		{name: "iam auth with ssl disabled", cfg: withSSLDisabled, wantErr: "requires SSL"},
+		{name: "unknown auth type", cfg: PostgresConfig{AuthType: "iamm"}, wantErr: `unknown database postgres authType "iamm"`},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.cfg.Validate()
+			if tc.wantErr == "" {
+				assert.NoError(t, err)
+			} else {
+				assert.ErrorContains(t, err, tc.wantErr)
+			}
+		})
+	}
+}
+
+// IAM config loaded through the real config loader, as the flyte-core chart renders it.
+func TestParseIAMDatabaseConfig(t *testing.T) {
+	load := func(t *testing.T, file string) PostgresConfig {
+		t.Helper()
+		// Sections are process-wide; start from the defaults as a fresh process would.
+		defaults := *defaultConfig
+		assert.NoError(t, configSection.SetConfig(&defaults))
+		accessor := viper.NewAccessor(config.Options{
+			RootSection: configSection,
+			SearchPaths: []string{filepath.Join("testdata", file)},
+		})
+		assert.NoError(t, accessor.UpdateConfig(context.Background()))
+		return GetConfig().Postgres
+	}
+
+	t.Run("explicitly empty password", func(t *testing.T) {
+		pg := load(t, "iam_config.yaml")
+		assert.True(t, pg.IsIAMAuth())
+		assert.Equal(t, "us-east-1", pg.Region)
+		assert.Empty(t, pg.Password)
+		assert.NoError(t, pg.Validate())
+	})
+
+	t.Run("omitted password keeps the built-in default and is rejected", func(t *testing.T) {
+		pg := load(t, "iam_config_default_password.yaml")
+		assert.Equal(t, defaultConfig.Postgres.Password, pg.Password)
+		assert.ErrorContains(t, pg.Validate(), "cannot be combined with password or passwordPath")
+	})
+}

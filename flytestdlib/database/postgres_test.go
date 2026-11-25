@@ -63,6 +63,19 @@ func TestGetPostgresDsn(t *testing.T) {
 		dsn := GetPostgresDsn(context.TODO(), pgConfig)
 		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres password=123abc ", dsn)
 	})
+	t.Run("iam auth omits password", func(t *testing.T) {
+		iamConfig := PostgresConfig{
+			Host:         "localhost",
+			Port:         5432,
+			DbName:       "postgres",
+			User:         "postgres",
+			ExtraOptions: "sslmode=require",
+			AuthType:     AuthTypeIAM,
+			Region:       "us-east-1",
+		}
+		dsn := GetPostgresDsn(context.TODO(), iamConfig)
+		assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres sslmode=require", dsn)
+	})
 }
 
 func TestGetPostgresReadDsn(t *testing.T) {
@@ -103,6 +116,20 @@ func TestGetPostgresReadDsn(t *testing.T) {
 		pgConfig.PasswordPath = tmpFile.Name()
 		dsn := getPostgresReadDsn(context.TODO(), pgConfig)
 		assert.Equal(t, "host=readReplicaHost port=5432 dbname=postgres user=postgres password=1234abc ", dsn)
+	})
+	t.Run("iam auth omits password", func(t *testing.T) {
+		iamConfig := PostgresConfig{
+			Host:            "localhost",
+			ReadReplicaHost: "readReplicaHost",
+			Port:            5432,
+			DbName:          "postgres",
+			User:            "postgres",
+			ExtraOptions:    "sslmode=require",
+			AuthType:        AuthTypeIAM,
+			Region:          "us-east-1",
+		}
+		dsn := getPostgresReadDsn(context.TODO(), iamConfig)
+		assert.Equal(t, "host=readReplicaHost port=5432 dbname=postgres user=postgres sslmode=require", dsn)
 	})
 }
 

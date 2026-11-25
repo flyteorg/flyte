@@ -23,7 +23,7 @@ func TestPostgresTelemetry(t *testing.T) {
 	reader := sdkmetric.NewManualReader()
 	mp := sdkmetric.NewMeterProvider(sdkmetric.WithReader(reader))
 	t.Cleanup(func() { require.NoError(t, mp.Shutdown(ctx)) })
-	db, err := openPostgres("host=127.0.0.1 port=1 dbname=telemetry_test user=test password=secret sslmode=disable connect_timeout=1",
+	db, err := openPostgres("host=127.0.0.1 port=1 dbname=telemetry_test user=test password=secret sslmode=disable connect_timeout=1", nil,
 		otelsql.WithTracerProvider(tp), otelsql.WithMeterProvider(mp))
 	require.NoError(t, err)
 	t.Cleanup(func() { require.NoError(t, db.Close()) })
@@ -70,7 +70,7 @@ func metricNames(data metricdata.ResourceMetrics) []string {
 }
 
 func TestOpenPostgresInvalidDSN(t *testing.T) {
-	db, err := openPostgres("invalid dsn")
+	db, err := openPostgres("invalid dsn", nil)
 	require.Error(t, err)
 	assert.Nil(t, db)
 }

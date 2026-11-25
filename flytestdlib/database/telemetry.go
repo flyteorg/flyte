@@ -43,7 +43,8 @@ func (c *metricsConnector) Close() error {
 	return err
 }
 
-func openPostgres(dsn string, options ...otelsql.Option) (*sqlx.DB, error) {
+// openPostgres opens a pool for dsn. connOpts are pgx connector options, such as the IAM auth BeforeConnect hook.
+func openPostgres(dsn string, connOpts []stdlib.OptionOpenDB, options ...otelsql.Option) (*sqlx.DB, error) {
 	cfg, err := pgx.ParseConfig(dsn)
 	if err != nil {
 		return nil, err
@@ -52,7 +53,7 @@ func openPostgres(dsn string, options ...otelsql.Option) (*sqlx.DB, error) {
 		otelsql.WithAttributes(semconv.DBSystemNamePostgreSQL, semconv.DBNamespace(cfg.Database)),
 	}
 	opts = append(opts, options...)
-	connector := &metricsConnector{Connector: stdlib.GetConnector(*cfg)}
+	connector := &metricsConnector{Connector: stdlib.GetConnector(*cfg, connOpts...)}
 	db := otelsql.OpenDB(connector, opts...)
 	connector.registration, err = otelsql.RegisterDBStatsMetrics(db, opts...)
 	if err != nil {

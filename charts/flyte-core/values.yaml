@@ -518,6 +518,12 @@ configuration:
       passwordPath: ""
       options: sslmode=disable
       debug: false
+      # authType is "password" (default) or "iam". With "iam", each new connection authenticates with a
+      # fresh AWS RDS IAM auth token from the pod's AWS credentials (e.g. EKS Pod Identity or IRSA).
+      # IAM auth needs password and passwordPath unset and SSL, e.g. options: sslmode=require.
+      authType: password
+      # region signs IAM auth tokens. Defaults to the region the AWS SDK resolves, e.g. from AWS_REGION.
+      region: ""
 
   storage:
     metadataContainer: my-organization-flyte-container

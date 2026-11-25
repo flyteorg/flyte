@@ -7,10 +7,9 @@ import (
 	"os"
 	"strings"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
-
 	"github.com/XSAM/otelsql"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
@@ -43,33 +42,58 @@ func resolvePassword(ctx context.Context, passwordVal, passwordPath string) stri
 }
 
 // Produces the DSN (data source name) for opening a postgres db connection.
+// With IAM auth the DSN carries no password; a token is attached to each new connection instead.
 func GetPostgresDsn(ctx context.Context, pgConfig PostgresConfig) string {
-	password := resolvePassword(ctx, pgConfig.Password, pgConfig.PasswordPath)
-	if len(password) == 0 {
-		// The password-less case is included for development environments.
-		return fmt.Sprintf("host=%s port=%d dbname=%s user=%s sslmode=disable",
-			pgConfig.Host, pgConfig.Port, pgConfig.DbName, pgConfig.User)
-	}
-	return fmt.Sprintf("host=%s port=%d dbname=%s user=%s password=%s %s",
-		pgConfig.Host, pgConfig.Port, pgConfig.DbName, pgConfig.User, password, pgConfig.ExtraOptions)
+	return postgresDsn(ctx, pgConfig, pgConfig.Host)
 }
 
 // Produces the DSN (data source name) for the read replica for opening a postgres db connection.
 func getPostgresReadDsn(ctx context.Context, pgConfig PostgresConfig) string {
+	return postgresDsn(ctx, pgConfig, pgConfig.ReadReplicaHost)
+}
+
+func postgresDsn(ctx context.Context, pgConfig PostgresConfig, host string) string {
+	if pgConfig.IsIAMAuth() {
+		// Checked before the password lookup so IAM never takes the password-less branch below,
+		// which forces sslmode=disable and drops ExtraOptions.
+		return fmt.Sprintf("host=%s port=%d dbname=%s user=%s %s",
+			host, pgConfig.Port, pgConfig.DbName, pgConfig.User, pgConfig.ExtraOptions)
+	}
 	password := resolvePassword(ctx, pgConfig.Password, pgConfig.PasswordPath)
 	if len(password) == 0 {
 		// The password-less case is included for development environments.
 		return fmt.Sprintf("host=%s port=%d dbname=%s user=%s sslmode=disable",
-			pgConfig.ReadReplicaHost, pgConfig.Port, pgConfig.DbName, pgConfig.User)
+			host, pgConfig.Port, pgConfig.DbName, pgConfig.User)
 	}
 	return fmt.Sprintf("host=%s port=%d dbname=%s user=%s password=%s %s",
-		pgConfig.ReadReplicaHost, pgConfig.Port, pgConfig.DbName, pgConfig.User, password, pgConfig.ExtraOptions)
+		host, pgConfig.Port, pgConfig.DbName, pgConfig.User, password, pgConfig.ExtraOptions)
+}
+
+// connectorOptions validates pgConfig and returns the pgx connector options it needs. With IAM auth
+// that is a BeforeConnect hook that attaches a fresh token to every new physical connection.
+func connectorOptions(ctx context.Context, pgConfig PostgresConfig) ([]stdlib.OptionOpenDB, error) {
+	if err := pgConfig.Validate(); err != nil {
+		return nil, err
+	}
+	if !pgConfig.IsIAMAuth() {
+		return nil, nil
+	}
+	buildToken, err := newIAMTokenBuilder(ctx, pgConfig.Region)
+	if err != nil {
+		return nil, err
+	}
+	return []stdlib.OptionOpenDB{stdlib.OptionBeforeConnect(iamBeforeConnect(buildToken))}, nil
 }
 
 // CreatePostgresDbIfNotExists creates DB if it doesn't exist for the passed in config
 func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig, options ...otelsql.Option) (*sqlx.DB, error) {
+	connOpts, err := connectorOptions(ctx, pgConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	dsn := GetPostgresDsn(ctx, pgConfig)
-	db, err := openPostgres(dsn, options...)
+	db, err := openPostgres(dsn, connOpts, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +116,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig, o
 	defaultDbPgConfig := pgConfig
 	defaultDbPgConfig.DbName = defaultDB
 	defaultDsn := GetPostgresDsn(ctx, defaultDbPgConfig)
-	defaultDb, err := openPostgres(defaultDsn, options...)
+	defaultDb, err := openPostgres(defaultDsn, connOpts, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +141,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig, o
 	}
 
 	// Now try connecting to the db again
-	db, err = openPostgres(dsn, options...)
+	db, err = openPostgres(dsn, connOpts, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -132,8 +156,13 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig, o
 
 // CreatePostgresReadOnlyDbConnection creates readonly DB connection and returns the sqlx.DB object and error
 func CreatePostgresReadOnlyDbConnection(ctx context.Context, pgConfig PostgresConfig, options ...otelsql.Option) (*sqlx.DB, error) {
+	connOpts, err := connectorOptions(ctx, pgConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	dsn := getPostgresReadDsn(ctx, pgConfig)
-	db, err := openPostgres(dsn, options...)
+	db, err := openPostgres(dsn, connOpts, options...)
 	if err != nil {
 		return nil, err
 	}

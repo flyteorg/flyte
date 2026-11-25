@@ -18,7 +18,10 @@ data:
   002-database.yaml: |
     {{- include "flyte-core.config.database" . | nindent 4 }}
     {{- $database := deepCopy .Values.configuration.database }}
-    {{- if $database.postgres }}{{- $_ := unset $database.postgres "password" }}{{- end }}
+    {{- if $database.postgres }}
+    {{- if eq "iam" (toString $database.postgres.authType) }}{{- $_ := set $database.postgres "password" "" }}
+    {{- else }}{{- $_ := unset $database.postgres "password" }}{{- end }}
+    {{- end }}
     runs:
       database:
         {{- tpl (toYaml $database) . | nindent 8 }}
