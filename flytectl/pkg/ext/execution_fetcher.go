@@ -8,6 +8,13 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
+const (
+	executionPageSize = 100
+	// Offset-based pages need a stable order even when execution timestamps tie.
+	// https://github.com/flyteorg/flyte/blob/ebb536a047facf32efb28cc02555a013874a0170/flyteadmin/pkg/repositories/models/base_model.go#L10-L17
+	executionRowID = "id"
+)
+
 func (a *AdminFetcherExtClient) FetchExecution(ctx context.Context, name, project, domain string) (*admin.Execution, error) {
 	e, err := a.AdminServiceClient().GetExecution(ctx, &admin.WorkflowExecutionGetRequest{
 		Id: &core.WorkflowExecutionIdentifier{
@@ -40,23 +47,32 @@ func (a *AdminFetcherExtClient) FetchNodeExecutionData(ctx context.Context, node
 }
 
 func (a *AdminFetcherExtClient) FetchNodeExecutionDetails(ctx context.Context, name, project, domain, uniqueParentID string) (*admin.NodeExecutionList, error) {
-	ne, err := a.AdminServiceClient().ListNodeExecutions(ctx, &admin.NodeExecutionListRequest{
+	req := &admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: project,
 			Domain:  domain,
 			Name:    name,
 		},
 		UniqueParentId: uniqueParentID,
-		Limit:          100,
-	})
-	if err != nil {
-		return nil, err
+		Limit:          executionPageSize,
+		SortBy:         &admin.Sort{Key: executionRowID, Direction: admin.Sort_ASCENDING},
 	}
-	return ne, nil
+	var nodes admin.NodeExecutionList
+	for {
+		page, err := a.AdminServiceClient().ListNodeExecutions(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+		nodes.NodeExecutions = append(nodes.NodeExecutions, page.GetNodeExecutions()...)
+		req.Token = page.GetToken()
+		if req.GetToken() == "" {
+			return &nodes, nil
+		}
+	}
 }
 
 func (a *AdminFetcherExtClient) FetchTaskExecutionsOnNode(ctx context.Context, nodeID, execName, project, domain string) (*admin.TaskExecutionList, error) {
-	te, err := a.AdminServiceClient().ListTaskExecutions(ctx, &admin.TaskExecutionListRequest{
+	req := &admin.TaskExecutionListRequest{
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			NodeId: nodeID,
 			ExecutionId: &core.WorkflowExecutionIdentifier{
@@ -65,12 +81,21 @@ func (a *AdminFetcherExtClient) FetchTaskExecutionsOnNode(ctx context.Context, n
 				Name:    execName,
 			},
 		},
-		Limit: 100,
-	})
-	if err != nil {
-		return nil, err
+		Limit:  executionPageSize,
+		SortBy: &admin.Sort{Key: executionRowID, Direction: admin.Sort_ASCENDING},
 	}
-	return te, nil
+	var tasks admin.TaskExecutionList
+	for {
+		page, err := a.AdminServiceClient().ListTaskExecutions(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+		tasks.TaskExecutions = append(tasks.TaskExecutions, page.GetTaskExecutions()...)
+		req.Token = page.GetToken()
+		if req.GetToken() == "" {
+			return &tasks, nil
+		}
+	}
 }
 
 func (a *AdminFetcherExtClient) ListExecution(ctx context.Context, project, domain string, filter filters.Filters) (*admin.ExecutionList, error) {
