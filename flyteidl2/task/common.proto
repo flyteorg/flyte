@@ -70,7 +70,8 @@ enum TriggerAutomationSpecType {
 
 // Fires a run when a new version of the named artifact is created.
 message ArtifactTrigger {
-  // Name of the artifact to watch, scoped to the trigger's org/project/domain.
+  // Name of the artifact to watch, scoped to the trigger's organization and the
+  // artifact project/domain below.
   string artifact_name = 1 [(buf.validate.field).string.min_len = 1];
 
   // Optional: fire only when exactly this version is created. Empty means any new version.
@@ -89,6 +90,14 @@ message ArtifactTrigger {
   // triggering version's value of that partition: a datetime for the time partition, a string
   // for a string partition. A version flagged with a partition schema mismatch never fires.
   map<string, string> partition_input_args = 5;
+
+  // Project containing the watched artifact. Empty inherits the trigger's project.
+  // This does not change the project in which the triggered task runs.
+  string project = 6;
+
+  // Domain containing the watched artifact. Empty inherits the trigger's domain,
+  // independently of project. This does not change the triggered task's domain.
+  string domain = 7;
 }
 
 message TriggerAutomationSpec {
