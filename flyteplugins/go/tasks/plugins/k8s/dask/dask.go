@@ -24,6 +24,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/plugins/k8s/pod"
+	"github.com/flyteorg/flyte/v2/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/plugins"
@@ -420,6 +421,7 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		PrimaryPodName: job.Status.JobRunnerPodName,
 		Pods: []*core.PodLogContext{
 			{
+				Cluster:              contextutils.ClusterName(ctx),
 				Namespace:            job.Namespace,
 				PodName:              job.Status.JobRunnerPodName,
 				PrimaryContainerName: defaultDaskJobRunnerPrimaryContainerName,

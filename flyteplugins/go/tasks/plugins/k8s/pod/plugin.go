@@ -218,7 +218,7 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 		info.Logs = taskLogs
 		info.LogContext = &core.LogContext{
 			PrimaryPodName: pod.Name,
-			Pods:           []*core.PodLogContext{flytek8s.BuildPodLogContext(pod)},
+			Pods:           []*core.PodLogContext{flytek8s.BuildPodLogContextWithContext(ctx, pod)},
 		}
 	}
 
