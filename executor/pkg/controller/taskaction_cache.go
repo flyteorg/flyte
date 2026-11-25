@@ -155,6 +155,10 @@ func buildTaskCacheConfig(
 		TypedInterface:       taskTemplate.GetInterface(),
 		InputReader:          tCtx.InputReader(),
 	}
+	if maxAge := metadata.GetCacheMaxAge(); maxAge != nil {
+		age := maxAge.AsDuration()
+		key.MaxCacheAge = &age
+	}
 
 	return &taskCacheConfig{
 		key:          key,

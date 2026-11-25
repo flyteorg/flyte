@@ -30,6 +30,8 @@ type Key struct {
 	TypedInterface       *core.TypedInterface
 	InputReader          io.InputReader
 	CacheKey             string
+	// MaxCacheAge overrides the client's default max cache age when non-nil; zero disables age-based expiry.
+	MaxCacheAge *time.Duration
 }
 
 type ReservationCache struct {
