@@ -4,13 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"os"
+	"path/filepath"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/XSAM/otelsql"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
@@ -173,6 +178,55 @@ func CreatePostgresReadOnlyDbConnection(ctx context.Context, pgConfig PostgresCo
 	}
 
 	return db, nil
+}
+
+// NewPostgresListener returns a lib/pq LISTEN/NOTIFY listener for pgConfig's primary host.
+//
+// pq.Listener redials with a fixed DSN and has no per-connection hook, so with IAM auth the token is kept in
+// a private pgpass file instead, which lib/pq reads on every dial. The file is rewritten before the first
+// connection and on every disconnect or failed attempt, which pq.Listener reports synchronously just before
+// it redials. The file stays in a private temp directory for the life of the process.
+func NewPostgresListener(ctx context.Context, pgConfig PostgresConfig, minReconnect, maxReconnect time.Duration,
+	callback pq.EventCallbackType) (*pq.Listener, error) {
+
+	if err := pgConfig.Validate(); err != nil {
+		return nil, err
+	}
+	dsn := GetPostgresDsn(ctx, pgConfig)
+	if !pgConfig.IsIAMAuth() {
+		return pq.NewListener(dsn, minReconnect, maxReconnect, callback), nil
+	}
+
+	buildToken, err := newIAMTokenBuilder(ctx, pgConfig.Region)
+	if err != nil {
+		return nil, err
+	}
+	dir, err := os.MkdirTemp("", "flyte-pgpass-")
+	if err != nil {
+		return nil, fmt.Errorf("create pgpass directory for RDS IAM auth: %w", err)
+	}
+	passfile := &iamPassfile{
+		path:       filepath.Join(dir, "pgpass"),
+		endpoint:   net.JoinHostPort(pgConfig.Host, strconv.Itoa(pgConfig.Port)),
+		user:       pgConfig.User,
+		buildToken: buildToken,
+	}
+	if err := passfile.refresh(ctx); err != nil {
+		_ = os.RemoveAll(dir)
+		return nil, err
+	}
+
+	dsn += " passfile=" + quoteDsnValue(passfile.path)
+	return pq.NewListener(dsn, minReconnect, maxReconnect, func(ev pq.ListenerEventType, err error) {
+		if ev == pq.ListenerEventDisconnected || ev == pq.ListenerEventConnectionAttemptFailed {
+			if refreshErr := passfile.refresh(context.Background()); refreshErr != nil {
+				logger.Errorf(context.Background(), "Failed to refresh the listener's RDS IAM auth token: %v", refreshErr)
+			}
+		}
+		if callback != nil {
+			callback(ev, err)
+		}
+	}), nil
 }
 
 func IsPgErrorWithCode(err error, code string) bool {

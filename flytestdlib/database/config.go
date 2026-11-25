@@ -2,8 +2,9 @@ package database
 
 import (
 	"fmt"
-	"strings"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgconn"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/config"
 )
@@ -57,8 +58,11 @@ type PostgresConfig struct {
 	PasswordPath string `json:"passwordPath" pflag:",Points to the file containing the database password."`
 	ExtraOptions string `json:"options" pflag:",See http://gorm.io/docs/connecting_to_the_database.html for available options passed, in addition to the above."`
 	Debug        bool   `json:"debug" pflag:" Whether or not to start the database connection with debug mode enabled."`
-	AuthType     string `json:"authType" pflag:",Either 'password' (default) or 'iam'. With 'iam', each new connection authenticates with a fresh AWS RDS IAM auth token instead of Password/PasswordPath."`
-	Region       string `json:"region" pflag:",The AWS region of the RDS instance, used to sign IAM auth tokens. Defaults to the region the AWS SDK resolves."`
+	// With AuthType 'iam', Host and ReadReplicaHost must be RDS/Aurora endpoints: tokens are signed for
+	// the configured host, and AWS rejects tokens signed for a custom DNS name such as a Route 53 CNAME.
+	// Only the first host of a multi-host value gets a token.
+	AuthType string `json:"authType" pflag:",Either 'password' (default) or 'iam'. With 'iam', each new connection authenticates with a fresh AWS RDS IAM auth token instead of Password/PasswordPath."`
+	Region   string `json:"region" pflag:",The AWS region of the RDS instance, used to sign IAM auth tokens. Defaults to the region the AWS SDK resolves."`
 }
 
 var emptyPostgresConfig = PostgresConfig{}
@@ -73,7 +77,7 @@ func (s PostgresConfig) IsIAMAuth() bool {
 }
 
 // Validate rejects unknown auth types, and IAM auth combined with a static password,
-// a password file or sslmode=disable (RDS only accepts IAM auth over SSL).
+// a password file or options that connect without SSL first (RDS only accepts IAM auth over SSL).
 // An empty AuthType means password auth.
 func (s PostgresConfig) Validate() error {
 	switch s.AuthType {
@@ -84,8 +88,15 @@ func (s PostgresConfig) Validate() error {
 			return fmt.Errorf("database postgres authType %q cannot be combined with password or passwordPath "+
 				"(password defaults to %q; set it to \"\" explicitly)", AuthTypeIAM, postgresStr)
 		}
-		if strings.Contains(s.ExtraOptions, "sslmode=disable") {
-			return fmt.Errorf("database postgres authType %q requires SSL, but options contain sslmode=disable", AuthTypeIAM)
+		// Parse options the way pgx will, so spacing and PGSSLMODE are honoured. A nil TLSConfig means the
+		// first attempt is plaintext (sslmode=disable or allow). The placeholder TCP host stops pgconn
+		// defaulting to a Unix socket, which never uses TLS.
+		opts, err := pgconn.ParseConfig("host=rds.invalid " + s.ExtraOptions)
+		if err != nil {
+			return fmt.Errorf("parse database postgres options: %w", err)
+		}
+		if opts.TLSConfig == nil {
+			return fmt.Errorf("database postgres authType %q requires SSL; set options to sslmode=require or stricter", AuthTypeIAM)
 		}
 		return nil
 	default:

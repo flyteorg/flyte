@@ -46,6 +46,14 @@ func TestPostgresConfigValidate(t *testing.T) {
 	withPasswordPath.PasswordPath = "/etc/db/password"
 	withSSLDisabled := iam
 	withSSLDisabled.ExtraOptions = "sslmode=disable"
+	withSSLDisabledSpaced := iam
+	withSSLDisabledSpaced.ExtraOptions = "connect_timeout=5 sslmode = disable"
+	withSSLAllow := iam
+	withSSLAllow.ExtraOptions = "sslmode=allow"
+	withSSLPrefer := iam
+	withSSLPrefer.ExtraOptions = "sslmode=prefer"
+	withBadOptions := iam
+	withBadOptions.ExtraOptions = "sslmode=bogus"
 
 	for _, tc := range []struct {
 		name    string
@@ -58,6 +66,10 @@ func TestPostgresConfigValidate(t *testing.T) {
 		{name: "iam auth with password", cfg: withPassword, wantErr: "cannot be combined with password or passwordPath"},
 		{name: "iam auth with password path", cfg: withPasswordPath, wantErr: "cannot be combined with password or passwordPath"},
 		{name: "iam auth with ssl disabled", cfg: withSSLDisabled, wantErr: "requires SSL"},
+		{name: "iam auth with ssl disabled and spaces", cfg: withSSLDisabledSpaced, wantErr: "requires SSL"},
+		{name: "iam auth with ssl allow", cfg: withSSLAllow, wantErr: "requires SSL"},
+		{name: "iam auth with ssl prefer", cfg: withSSLPrefer},
+		{name: "iam auth with invalid options", cfg: withBadOptions, wantErr: "parse database postgres options"},
 		{name: "unknown auth type", cfg: PostgresConfig{AuthType: "iamm"}, wantErr: `unknown database postgres authType "iamm"`},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
