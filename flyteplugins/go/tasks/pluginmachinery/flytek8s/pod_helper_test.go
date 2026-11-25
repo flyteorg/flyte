@@ -5020,3 +5020,51 @@ func TestGetTerminationTargetDisruptionTiming(t *testing.T) {
 	kueue.Conditions[0].Type = TerminationTargetCondition
 	assert.NotNil(t, GetTerminationTarget(kueue, "primary"))
 }
+
+// A volume or mount that both specs define is kept once, from the spec merged
+// on top; appending both would give the pod duplicate volume names and mount
+// paths, which the API server rejects.
+func TestMergePodSpecs_KeepOneVolumePerNameAndMountPerPath(t *testing.T) {
+	tokenVolume := func(audience string) v1.Volume {
+		return v1.Volume{Name: "token", VolumeSource: v1.VolumeSource{Projected: &v1.ProjectedVolumeSource{
+			Sources: []v1.VolumeProjection{{ServiceAccountToken: &v1.ServiceAccountTokenProjection{Audience: audience, Path: "token"}}},
+		}}}
+	}
+	mount := v1.VolumeMount{Name: "token", MountPath: "/var/run/token", ReadOnly: true}
+	shared := v1.Volume{Name: "shared", VolumeSource: v1.VolumeSource{EmptyDir: &v1.EmptyDirVolumeSource{}}}
+
+	t.Run("base onto template", func(t *testing.T) {
+		template := &v1.PodSpec{
+			Volumes:    []v1.Volume{tokenVolume("from-template"), shared},
+			Containers: []v1.Container{{Name: defaultContainerTemplateName, VolumeMounts: []v1.VolumeMount{mount}}},
+		}
+		base := &v1.PodSpec{
+			Volumes:    []v1.Volume{tokenVolume("from-base")},
+			Containers: []v1.Container{{Name: "main", VolumeMounts: []v1.VolumeMount{mount}}},
+		}
+		merged, err := MergeBasePodSpecOntoTemplate(template, base, "main", "")
+		assert.NoError(t, err)
+		assert.Equal(t, []v1.Volume{shared, tokenVolume("from-base")}, merged.Volumes)
+		assert.Equal(t, []v1.VolumeMount{mount}, merged.Containers[0].VolumeMounts)
+	})
+
+	t.Run("overlay onto base", func(t *testing.T) {
+		base := &v1.PodSpec{
+			Volumes:    []v1.Volume{tokenVolume("from-base")},
+			Containers: []v1.Container{{Name: "main", VolumeMounts: []v1.VolumeMount{mount}}},
+		}
+		overlay := &v1.PodSpec{
+			Volumes:    []v1.Volume{tokenVolume("from-overlay")},
+			Containers: []v1.Container{{Name: "main", VolumeMounts: []v1.VolumeMount{mount}}},
+		}
+		merged, err := MergeOverlayPodSpecOntoBase(base, overlay)
+		assert.NoError(t, err)
+		assert.Equal(t, []v1.Volume{tokenVolume("from-overlay")}, merged.Volumes)
+		assert.Equal(t, []v1.VolumeMount{mount}, merged.Containers[0].VolumeMounts)
+	})
+
+	t.Run("no duplicates: unchanged", func(t *testing.T) {
+		vols := []v1.Volume{tokenVolume("a"), shared}
+		assert.Equal(t, vols, keepLast(vols, func(v v1.Volume) string { return v.Name }))
+	})
+}
