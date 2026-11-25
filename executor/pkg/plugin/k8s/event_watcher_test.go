@@ -313,3 +313,35 @@ func TestEventWatcherOnUpdateTakesTheReportingNodeAsItIsNow(t *testing.T) {
 	assert.Equal(t, otherNodeName, events[0].ReportingNode)
 	assert.Equal(t, createdAt.UTC(), events[0].CreatedAt.UTC())
 }
+
+func TestEventWatcherStaleDeleteKeepsReplacementBucket(t *testing.T) {
+	watcher := &controllerRuntimeEventWatcher{}
+	createdAt := time.Now()
+	objectKey := watchedObjectKey{Namespace: "ns", Name: "pod", Kind: "Pod"}
+
+	watcher.OnAdd(testEvent("event-1", "pod-uid", createdAt), false)
+	value, ok := watcher.objectCache.Load(objectKey)
+	require.True(t, ok)
+	stale := value.(*eventObjects)
+
+	// Park a deleter that has loaded the bucket but not yet locked it.
+	stale.mu.Lock()
+	done := make(chan struct{})
+	go func() {
+		watcher.OnDelete(testEvent("event-1", "pod-uid", createdAt))
+		close(done)
+	}()
+	time.Sleep(50 * time.Millisecond)
+
+	// Meanwhile the bucket is drained and evicted, and a new event lands in a fresh one.
+	delete(stale.eventInfos, k8stypes.NamespacedName{Namespace: "ns", Name: "event-1"})
+	stale.evicted = true
+	watcher.objectCache.Delete(objectKey)
+	watcher.OnAdd(testEvent("event-2", "pod-uid", createdAt), false)
+	stale.mu.Unlock()
+	<-done
+
+	// The parked deleter must not have removed the fresh bucket.
+	require.Len(t, watcher.List(objectKey, time.Time{}, time.Time{}), 1)
+	assert.Equal(t, 1, cachedBuckets(watcher))
+}

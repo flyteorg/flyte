@@ -237,6 +237,9 @@ func (w *controllerRuntimeEventWatcher) OnDelete(obj interface{}) {
 	eventInfos.mu.Lock()
 	defer eventInfos.mu.Unlock()
 
+	if eventInfos.evicted {
+		return
+	}
 	delete(eventInfos.eventInfos, eventKey)
 
 	// The bucket goes when its last event does, so objectCache holds an entry only for
@@ -245,12 +248,14 @@ func (w *controllerRuntimeEventWatcher) OnDelete(obj interface{}) {
 	// Removing it is safe against a concurrent store because both the flag and the
 	// removal happen under this bucket's write lock: a writer that already loaded this
 	// bucket blocks here, then sees evicted and retries against a fresh one, and a writer
-	// that has not loaded it yet cannot reach it once it is out of the map. Taking the
+	// that has not loaded it yet cannot reach it once it is out of the map. The removal
+	// is conditional on the map still holding this bucket, so a deleter that loaded it
+	// before it was evicted cannot take out the fresh bucket that replaced it. Taking the
 	// map's lock while holding the bucket's cannot deadlock, because every other path
 	// releases the map's lock before it takes a bucket's.
 	if len(eventInfos.eventInfos) == 0 {
 		eventInfos.evicted = true
-		w.objectCache.Delete(objectKey)
+		w.objectCache.CompareAndDelete(objectKey, value)
 	}
 }
 
