@@ -239,7 +239,7 @@ func NewNotificationConfig(bufferLimit int, retryMinBackoff, retryMaxBackoff tim
 // actionRepo implements actionRepo interface using PostgreSQL
 type actionRepo struct {
 	db       *sqlx.DB
-	dsn      string // stored for pq.Listener
+	pgConfig database.PostgresConfig // used to open the pq.Listener connection
 	listener *pq.Listener
 
 	// Idle ping interval and pq's first reconnect delay; zero means the defaults above.
@@ -277,10 +277,9 @@ func NewActionRepo(
 		return nil, fmt.Errorf("register notification metrics: %w", err)
 	}
 
-	dsn := database.GetPostgresDsn(context.Background(), dbConfig.Postgres)
 	repo := &actionRepo{
 		db:                  db,
-		dsn:                 dsn,
+		pgConfig:            dbConfig.Postgres,
 		runSubscribers:      make(map[*subscription]struct{}),
 		actionSubscribers:   make(map[*subscription]struct{}),
 		notificationConfig:  notificationConfig,
@@ -1161,18 +1160,21 @@ func (r *actionRepo) WatchActionUpdates(ctx context.Context, actionID *common.Ac
 // startPostgresListener starts the PostgreSQL LISTEN/NOTIFY listener.
 // Returns an error if the connection or LISTEN setup fails.
 func (r *actionRepo) startPostgresListener() error {
-	connStr := r.dsn
-
 	minReconnectInterval := r.listenerMinReconnectInterval
 	if minReconnectInterval <= 0 {
 		minReconnectInterval = defaultListenerMinReconnectInterval
 	}
 
-	r.listener = pq.NewListener(connStr, minReconnectInterval, time.Minute, func(ev pq.ListenerEventType, err error) {
-		if err != nil {
-			logger.Errorf(context.Background(), "Listener error: %v", err)
-		}
-	})
+	listener, err := database.NewPostgresListener(context.Background(), r.pgConfig, minReconnectInterval, time.Minute,
+		func(ev pq.ListenerEventType, err error) {
+			if err != nil {
+				logger.Errorf(context.Background(), "Listener error: %v", err)
+			}
+		})
+	if err != nil {
+		return fmt.Errorf("create postgres listener: %w", err)
+	}
+	r.listener = listener
 
 	// Listen to channels
 	if err := r.listener.Listen("run_updates"); err != nil {

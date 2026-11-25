@@ -62,5 +62,6 @@ func (cfg DbConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "postgres.passwordPath"), defaultConfig.Postgres.PasswordPath, "Points to the file containing the database password.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "postgres.options"), defaultConfig.Postgres.ExtraOptions, "See http://gorm.io/docs/connecting_to_the_database.html for available options passed,  in addition to the above.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "postgres.debug"), defaultConfig.Postgres.Debug, "")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "postgres.authType"), defaultConfig.Postgres.AuthType, "Either 'password' (default) or 'iam'. With 'iam',  each new connection authenticates with a fresh AWS RDS IAM auth token instead of Password/PasswordPath.")
 	return cmdFlags
 }

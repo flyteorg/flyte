@@ -1,0 +1,10 @@
+postgres:
+  host: flyte.cluster-abc.us-east-1.rds.amazonaws.com
+  port: 5432
+  dbname: flyte
+  username: flyte
+  # Explicitly empty so it replaces the built-in default password, which IAM auth rejects.
+  password: ""
+  passwordPath: ""
+  options: sslmode=require
+  authType: iam

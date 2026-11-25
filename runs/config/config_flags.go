@@ -65,6 +65,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "database.postgres.passwordPath"), defaultConfig.Database.Postgres.PasswordPath, "Points to the file containing the database password.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "database.postgres.options"), defaultConfig.Database.Postgres.ExtraOptions, "See http://gorm.io/docs/connecting_to_the_database.html for available options passed,  in addition to the above.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "database.postgres.debug"), defaultConfig.Database.Postgres.Debug, "")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "database.postgres.authType"), defaultConfig.Database.Postgres.AuthType, "Either 'password' (default) or 'iam'. With 'iam',  each new connection authenticates with a fresh AWS RDS IAM auth token instead of Password/PasswordPath.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "watchBufferSize"), defaultConfig.WatchBufferSize, "Buffer size for watch streams")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "notificationBufferLimit"), defaultConfig.NotificationBufferLimit, "Maximum pending entries in each notification queue")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "notifyRetryMinBackoff"), defaultConfig.NotifyRetryMinBackoff.String(), "Initial notification retry delay")

@@ -411,6 +411,7 @@ Distributed Flyte 2 core services
 | configuration.database.connMaxLifeTime | string | `"1h"` |  |
 | configuration.database.maxIdleConnections | int | `10` |  |
 | configuration.database.maxOpenConnections | int | `100` |  |
+| configuration.database.postgres.authType | string | `"password"` |  |
 | configuration.database.postgres.dbname | string | `"flyte"` |  |
 | configuration.database.postgres.debug | bool | `false` |  |
 | configuration.database.postgres.host | string | `"127.0.0.1"` |  |

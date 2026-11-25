@@ -4,14 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"os"
+	"path/filepath"
+	"strconv"
 	"strings"
-
-	_ "github.com/jackc/pgx/v5/stdlib"
+	"time"
 
 	"github.com/XSAM/otelsql"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
 )
@@ -43,33 +47,58 @@ func resolvePassword(ctx context.Context, passwordVal, passwordPath string) stri
 }
 
 // Produces the DSN (data source name) for opening a postgres db connection.
+// With IAM auth the DSN carries no password; a token is attached to each new connection instead.
 func GetPostgresDsn(ctx context.Context, pgConfig PostgresConfig) string {
-	password := resolvePassword(ctx, pgConfig.Password, pgConfig.PasswordPath)
-	if len(password) == 0 {
-		// The password-less case is included for development environments.
-		return fmt.Sprintf("host=%s port=%d dbname=%s user=%s sslmode=disable",
-			pgConfig.Host, pgConfig.Port, pgConfig.DbName, pgConfig.User)
-	}
-	return fmt.Sprintf("host=%s port=%d dbname=%s user=%s password=%s %s",
-		pgConfig.Host, pgConfig.Port, pgConfig.DbName, pgConfig.User, password, pgConfig.ExtraOptions)
+	return postgresDsn(ctx, pgConfig, pgConfig.Host)
 }
 
 // Produces the DSN (data source name) for the read replica for opening a postgres db connection.
 func getPostgresReadDsn(ctx context.Context, pgConfig PostgresConfig) string {
+	return postgresDsn(ctx, pgConfig, pgConfig.ReadReplicaHost)
+}
+
+func postgresDsn(ctx context.Context, pgConfig PostgresConfig, host string) string {
+	if pgConfig.IsIAMAuth() {
+		// Checked before the password lookup so IAM never takes the password-less branch below,
+		// which forces sslmode=disable and drops ExtraOptions.
+		return fmt.Sprintf("host=%s port=%d dbname=%s user=%s %s",
+			host, pgConfig.Port, pgConfig.DbName, pgConfig.User, pgConfig.ExtraOptions)
+	}
 	password := resolvePassword(ctx, pgConfig.Password, pgConfig.PasswordPath)
 	if len(password) == 0 {
 		// The password-less case is included for development environments.
 		return fmt.Sprintf("host=%s port=%d dbname=%s user=%s sslmode=disable",
-			pgConfig.ReadReplicaHost, pgConfig.Port, pgConfig.DbName, pgConfig.User)
+			host, pgConfig.Port, pgConfig.DbName, pgConfig.User)
 	}
 	return fmt.Sprintf("host=%s port=%d dbname=%s user=%s password=%s %s",
-		pgConfig.ReadReplicaHost, pgConfig.Port, pgConfig.DbName, pgConfig.User, password, pgConfig.ExtraOptions)
+		host, pgConfig.Port, pgConfig.DbName, pgConfig.User, password, pgConfig.ExtraOptions)
+}
+
+// connectorOptions validates pgConfig and returns the pgx connector options it needs. With IAM auth
+// that is a BeforeConnect hook that attaches a fresh token to every new physical connection.
+func connectorOptions(ctx context.Context, pgConfig PostgresConfig) ([]stdlib.OptionOpenDB, error) {
+	if err := pgConfig.Validate(); err != nil {
+		return nil, err
+	}
+	if !pgConfig.IsIAMAuth() {
+		return nil, nil
+	}
+	buildToken, err := newIAMTokenBuilder(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return []stdlib.OptionOpenDB{stdlib.OptionBeforeConnect(iamBeforeConnect(buildToken))}, nil
 }
 
 // CreatePostgresDbIfNotExists creates DB if it doesn't exist for the passed in config
 func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig, options ...otelsql.Option) (*sqlx.DB, error) {
+	connOpts, err := connectorOptions(ctx, pgConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	dsn := GetPostgresDsn(ctx, pgConfig)
-	db, err := openPostgres(dsn, options...)
+	db, err := openPostgres(dsn, connOpts, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +121,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig, o
 	defaultDbPgConfig := pgConfig
 	defaultDbPgConfig.DbName = defaultDB
 	defaultDsn := GetPostgresDsn(ctx, defaultDbPgConfig)
-	defaultDb, err := openPostgres(defaultDsn, options...)
+	defaultDb, err := openPostgres(defaultDsn, connOpts, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +146,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig, o
 	}
 
 	// Now try connecting to the db again
-	db, err = openPostgres(dsn, options...)
+	db, err = openPostgres(dsn, connOpts, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -132,8 +161,13 @@ func CreatePostgresDbIfNotExists(ctx context.Context, pgConfig PostgresConfig, o
 
 // CreatePostgresReadOnlyDbConnection creates readonly DB connection and returns the sqlx.DB object and error
 func CreatePostgresReadOnlyDbConnection(ctx context.Context, pgConfig PostgresConfig, options ...otelsql.Option) (*sqlx.DB, error) {
+	connOpts, err := connectorOptions(ctx, pgConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	dsn := getPostgresReadDsn(ctx, pgConfig)
-	db, err := openPostgres(dsn, options...)
+	db, err := openPostgres(dsn, connOpts, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -144,6 +178,55 @@ func CreatePostgresReadOnlyDbConnection(ctx context.Context, pgConfig PostgresCo
 	}
 
 	return db, nil
+}
+
+// NewPostgresListener returns a lib/pq LISTEN/NOTIFY listener for pgConfig's primary host.
+//
+// pq.Listener redials with a fixed DSN and has no per-connection hook, so with IAM auth the token is kept in
+// a private pgpass file instead, which lib/pq reads on every dial. The file is rewritten before the first
+// connection and on every disconnect or failed attempt, which pq.Listener reports synchronously just before
+// it redials. The file stays in a private temp directory for the life of the process.
+func NewPostgresListener(ctx context.Context, pgConfig PostgresConfig, minReconnect, maxReconnect time.Duration,
+	callback pq.EventCallbackType) (*pq.Listener, error) {
+
+	if err := pgConfig.Validate(); err != nil {
+		return nil, err
+	}
+	dsn := GetPostgresDsn(ctx, pgConfig)
+	if !pgConfig.IsIAMAuth() {
+		return pq.NewListener(dsn, minReconnect, maxReconnect, callback), nil
+	}
+
+	buildToken, err := newIAMTokenBuilder(ctx)
+	if err != nil {
+		return nil, err
+	}
+	dir, err := os.MkdirTemp("", "flyte-pgpass-")
+	if err != nil {
+		return nil, fmt.Errorf("create pgpass directory for RDS IAM auth: %w", err)
+	}
+	passfile := &iamPassfile{
+		path:       filepath.Join(dir, "pgpass"),
+		endpoint:   net.JoinHostPort(pgConfig.Host, strconv.Itoa(pgConfig.Port)),
+		user:       pgConfig.User,
+		buildToken: buildToken,
+	}
+	if err := passfile.refresh(ctx); err != nil {
+		_ = os.RemoveAll(dir)
+		return nil, err
+	}
+
+	dsn += " passfile=" + quoteDsnValue(passfile.path)
+	return pq.NewListener(dsn, minReconnect, maxReconnect, func(ev pq.ListenerEventType, err error) {
+		if ev == pq.ListenerEventDisconnected || ev == pq.ListenerEventConnectionAttemptFailed {
+			if refreshErr := passfile.refresh(context.Background()); refreshErr != nil {
+				logger.Errorf(context.Background(), "Failed to refresh the listener's RDS IAM auth token: %v", refreshErr)
+			}
+		}
+		if callback != nil {
+			callback(ev, err)
+		}
+	}), nil
 }
 
 func IsPgErrorWithCode(err error, code string) bool {

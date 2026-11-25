@@ -116,7 +116,12 @@ logger:
 
 {{- define "flyte-core.config.database" -}}
 {{- $database := deepCopy .Values.configuration.database }}
-{{- if $database.postgres }}{{- $_ := unset $database.postgres "password" }}{{- end }}
+{{- if $database.postgres }}
+{{- /* The password lives in the config Secret. With IAM auth, render it explicitly empty so it
+       replaces the binary's built-in default ("postgres"), which IAM auth rejects. */}}
+{{- if eq "iam" (toString $database.postgres.authType) }}{{- $_ := set $database.postgres "password" "" }}
+{{- else }}{{- $_ := unset $database.postgres "password" }}{{- end }}
+{{- end }}
 database:
   {{- tpl (toYaml $database) . | nindent 2 }}
 {{- end -}}
