@@ -8,6 +8,7 @@ package config
 import (
 	"maps"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -525,27 +526,53 @@ type AcceleratorDeviceClassConfig struct {
 	PodTemplate *v1.PodTemplate `json:"pod-template" pflag:"-,PodTemplate providing defaults for this accelerator device class."`
 }
 
+type cachedK8sPluginConfig struct {
+	source     *K8sPluginConfig
+	normalized *K8sPluginConfig
+}
+
+var normalizedK8sConfig atomic.Pointer[cachedK8sPluginConfig]
+
 // GetK8sPluginConfig retrieves the current k8s plugin config or default.
+// Callers must treat the returned config and its maps as read-only.
 func GetK8sPluginConfig() *K8sPluginConfig {
-	cfg := K8sPluginConfigSection.GetConfig().(*K8sPluginConfig)
+	raw := K8sPluginConfigSection.GetConfig().(*K8sPluginConfig)
+	if raw == nil {
+		return nil
+	}
+	cached := normalizedK8sConfig.Load()
+	if cached != nil && cached.source == raw {
+		return cached.normalized
+	}
+
+	normalized := normalizeK8sPluginConfig(raw)
+	normalizedK8sConfig.CompareAndSwap(cached, &cachedK8sPluginConfig{
+		source:     raw,
+		normalized: normalized,
+	})
+	return normalized
+}
+
+func normalizeK8sPluginConfig(raw *K8sPluginConfig) *K8sPluginConfig {
+	normalized := *raw
 
 	// Viper casts all keys in YAML configs to lowercase, but all the accelerator device classes should be uppercase.
 	// See: https://github.com/spf13/viper/issues/260
-	acceleratorDeviceClasses := make(map[string]AcceleratorDeviceClassConfig)
-	for key, value := range cfg.AcceleratorDeviceClasses {
+	acceleratorDeviceClasses := make(map[string]AcceleratorDeviceClassConfig, len(raw.AcceleratorDeviceClasses))
+	for key, value := range raw.AcceleratorDeviceClasses {
 		acceleratorDeviceClasses[strings.ToUpper(key)] = value
 	}
-	cfg.AcceleratorDeviceClasses = acceleratorDeviceClasses
+	normalized.AcceleratorDeviceClasses = acceleratorDeviceClasses
 
 	// The config loader replaces the default accelerator device map instead of merging into it, and viper lowercases
 	// its keys. Merge the configured entries over the defaults with upper-cased keys to match the lookup.
 	acceleratorDevices := maps.Clone(defaultAcceleratorDevices)
-	for name, label := range cfg.AcceleratorDevices {
+	for name, label := range raw.AcceleratorDevices {
 		acceleratorDevices[strings.ToUpper(name)] = label
 	}
-	cfg.AcceleratorDevices = acceleratorDevices
+	normalized.AcceleratorDevices = acceleratorDevices
 
-	return cfg
+	return &normalized
 }
 
 func upperCaseKeys(m map[string]string) map[string]string {
