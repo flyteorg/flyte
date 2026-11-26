@@ -64,7 +64,7 @@ func TestAddObjectMetadata_GeneratedNameMaxLength(t *testing.T) {
 		taskMetadata.EXPECT().GetTaskExecutionID().Return(tID)
 
 		pod := &v1.Pod{}
-		pm.addObjectMetadata(taskMetadata, pod, &config.K8sPluginConfig{})
+		pm.addObjectMetadata(taskMetadata, pod, &config.K8sPluginConfig{}, nil)
 
 		assert.Equal(t, longName, pod.GetName())
 		assert.Equal(t, "test-ns", pod.GetNamespace())
@@ -91,7 +91,7 @@ func TestAddObjectMetadata_GeneratedNameMaxLength(t *testing.T) {
 		taskMetadata.EXPECT().GetTaskExecutionID().Return(tID)
 
 		pod := &v1.Pod{}
-		pm.addObjectMetadata(taskMetadata, pod, &config.K8sPluginConfig{})
+		pm.addObjectMetadata(taskMetadata, pod, &config.K8sPluginConfig{}, nil)
 
 		expectedName, err := encoding.FixedLengthUniqueID(longName, maxLength)
 		require.NoError(t, err)
@@ -123,7 +123,7 @@ func TestAddObjectMetadata_GeneratedNameMaxLength(t *testing.T) {
 		taskMetadata.EXPECT().GetTaskExecutionID().Return(tID)
 
 		pod := &v1.Pod{}
-		pm.addObjectMetadata(taskMetadata, pod, &config.K8sPluginConfig{})
+		pm.addObjectMetadata(taskMetadata, pod, &config.K8sPluginConfig{}, nil)
 
 		assert.Equal(t, shortName, pod.GetName())
 	})
@@ -142,6 +142,31 @@ func metadataMock(generatedName string) *pluginsCoreMock.TaskExecutionMetadata {
 	meta.EXPECT().GetLabels().Return(nil)
 	meta.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{})
 	return meta
+}
+
+func taskReaderMock(taskTemplate *core.TaskTemplate) *pluginsCoreMock.TaskReader {
+	reader := &pluginsCoreMock.TaskReader{}
+	reader.EXPECT().Read(mock.Anything).Return(taskTemplate, nil)
+	return reader
+}
+
+// TestGetResource_DoesNotReadTaskTemplate verifies that resolving the resource identity does not
+// depend on the task template, so Abort and Finalize can still clean up when it cannot be read.
+func TestGetResource_DoesNotReadTaskTemplate(t *testing.T) {
+	plugin := &k8sMocks.Plugin{}
+	plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+	plugin.EXPECT().BuildIdentityResource(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+
+	// No TaskReader expectation: reading the template would panic the mock.
+	tCtx := &pluginsCoreMock.TaskExecutionContext{}
+	tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("name"))
+
+	pm := NewPluginManager("test", plugin, nil)
+
+	o, err := pm.getResource(context.Background(), tCtx)
+	assert.NoError(t, err)
+	assert.Equal(t, "name", o.GetName())
+	assert.Equal(t, "ns", o.GetNamespace())
 }
 
 // TestLaunchResource_InvalidCreateFastFails verifies that a deterministic admission/validation
@@ -170,6 +195,7 @@ func TestLaunchResource_InvalidCreateFastFails(t *testing.T) {
 
 	tCtx := &pluginsCoreMock.TaskExecutionContext{}
 	tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("too-long-name"))
+	tCtx.EXPECT().TaskReader().Return(taskReaderMock(nil))
 
 	pm := NewPluginManager("test", plugin, kubeClient)
 
@@ -250,6 +276,7 @@ func TestLaunchResourceErrors(t *testing.T) {
 
 			tCtx := &pluginsCoreMock.TaskExecutionContext{}
 			tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("name"))
+			tCtx.EXPECT().TaskReader().Return(taskReaderMock(nil))
 
 			pm := NewPluginManager("test", plugin, kubeClient)
 
@@ -326,6 +353,7 @@ func TestLaunchResource_AlreadyExists(t *testing.T) {
 
 			tCtx := &pluginsCoreMock.TaskExecutionContext{}
 			tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("name"))
+			tCtx.EXPECT().TaskReader().Return(taskReaderMock(nil))
 
 			pm := NewPluginManager("test", plugin, kubeClient)
 
@@ -390,6 +418,7 @@ func TestHandle_WaitsForPreviousResourceToDrain(t *testing.T) {
 	tCtx.EXPECT().PluginStateReader().Return(stateReader)
 	tCtx.EXPECT().PluginStateWriter().Return(stateWriter)
 	tCtx.EXPECT().TaskExecutionMetadata().Return(metadataMock("name"))
+	tCtx.EXPECT().TaskReader().Return(taskReaderMock(nil))
 
 	plugin := &k8sMocks.Plugin{}
 	plugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
@@ -1036,14 +1065,14 @@ func TestAddObjectMetadata_ManagedLabel(t *testing.T) {
 
 	t.Run("propagates to the object", func(t *testing.T) {
 		pod := &v1.Pod{}
-		newManager(t).addObjectMetadata(newMeta(managedLabels), pod, &config.K8sPluginConfig{})
+		newManager(t).addObjectMetadata(newMeta(managedLabels), pod, &config.K8sPluginConfig{}, nil)
 
 		assert.Equal(t, flytek8s.ManagedLabelValue, pod.GetLabels()[flytek8s.ManagedLabelKey])
 	})
 
 	t.Run("matches the selector the manager cache is configured with", func(t *testing.T) {
 		pod := &v1.Pod{}
-		newManager(t).addObjectMetadata(newMeta(managedLabels), pod, &config.K8sPluginConfig{})
+		newManager(t).addObjectMetadata(newMeta(managedLabels), pod, &config.K8sPluginConfig{}, nil)
 
 		selector := labels.SelectorFromSet(labels.Set{
 			flytek8s.ManagedLabelKey: flytek8s.ManagedLabelValue,
@@ -1051,17 +1080,65 @@ func TestAddObjectMetadata_ManagedLabel(t *testing.T) {
 		assert.True(t, selector.Matches(labels.Set(pod.GetLabels())))
 	})
 
-	t.Run("not dropped by platform defaults or labels already on the object", func(t *testing.T) {
+	t.Run("not dropped by platform defaults, task metadata or labels already on the object", func(t *testing.T) {
 		pod := &v1.Pod{ObjectMeta: metav1.ObjectMeta{
 			Labels: map[string]string{flytek8s.ManagedLabelKey: "object-value"},
 		}}
 		cfg := &config.K8sPluginConfig{
 			DefaultLabels: map[string]string{flytek8s.ManagedLabelKey: "default-value"},
 		}
-		newManager(t).addObjectMetadata(newMeta(managedLabels), pod, cfg)
+		taskTemplate := &core.TaskTemplate{Metadata: &core.TaskMetadata{Metadata: &core.K8SObjectMetadata{
+			Labels: map[string]string{flytek8s.ManagedLabelKey: "task-value"},
+		}}}
+		newManager(t).addObjectMetadata(newMeta(managedLabels), pod, cfg, taskTemplate)
 
 		assert.Equal(t, flytek8s.ManagedLabelValue, pod.GetLabels()[flytek8s.ManagedLabelKey])
 	})
+}
+
+// TestAddObjectMetadata_TaskMetadata verifies that TaskMetadata.metadata lands on the object
+// itself, so a CRD-backed task can annotate its CR without annotating the CR's pods.
+func TestAddObjectMetadata_TaskMetadata(t *testing.T) {
+	mockPlugin := k8sMocks.NewPlugin(t)
+	mockPlugin.EXPECT().GetProperties().Return(k8s.PluginProperties{})
+	pm := NewPluginManager("test-plugin", mockPlugin, nil)
+
+	tID := &pluginsCoreMock.TaskExecutionID{}
+	tID.EXPECT().GetGeneratedName().Return("name")
+	meta := &pluginsCoreMock.TaskExecutionMetadata{}
+	meta.EXPECT().GetTaskExecutionID().Return(tID)
+	meta.EXPECT().GetNamespace().Return("ns")
+	meta.EXPECT().GetAnnotations().Return(map[string]string{"shared-annotation": "execution"})
+	meta.EXPECT().GetLabels().Return(map[string]string{"shared-label": "execution"})
+	meta.EXPECT().GetOwnerReference().Return(metav1.OwnerReference{})
+
+	cfg := &config.K8sPluginConfig{
+		DefaultAnnotations: map[string]string{"default-annotation": "default", "elastic": "default"},
+		DefaultLabels:      map[string]string{"default-label": "default"},
+	}
+	// What a plugin may have copied onto the CR from its pod template.
+	obj := &v1.Pod{ObjectMeta: metav1.ObjectMeta{
+		Annotations: map[string]string{"elastic": "pod-template"},
+		Labels:      map[string]string{"pod-template-label": "pod-template"},
+	}}
+	taskTemplate := &core.TaskTemplate{Metadata: &core.TaskMetadata{Metadata: &core.K8SObjectMetadata{
+		Annotations: map[string]string{"elastic": "task", "shared-annotation": "task"},
+		Labels:      map[string]string{"task-label": "task", "shared-label": "task"},
+	}}}
+
+	pm.addObjectMetadata(meta, obj, cfg, taskTemplate)
+
+	assert.Equal(t, map[string]string{
+		"default-annotation": "default",
+		"elastic":            "task",
+		"shared-annotation":  "execution",
+	}, obj.GetAnnotations())
+	assert.Equal(t, map[string]string{
+		"default-label":      "default",
+		"pod-template-label": "pod-template",
+		"task-label":         "task",
+		"shared-label":       "execution",
+	}, obj.GetLabels())
 }
 
 func TestClassifyExternalTermination(t *testing.T) {
