@@ -102,6 +102,22 @@ func (s *TestStruct) TearDownAndVerifyContains(t *testing.T, expectedLog string)
 	assert.Contains(t, sanitizeString(buf.String()), sanitizeString(expectedLog))
 }
 
+func (s *TestStruct) TearDownAndVerifyContainsSpecificCount(t *testing.T, expectedLog string, expectedCount int) {
+	if err := s.Writer.Close(); err != nil {
+		panic(fmt.Errorf("could not close test context writer: %w", err))
+	}
+
+	var buf bytes.Buffer
+	if _, err := io.Copy(&buf, s.Reader); err != nil {
+		panic(fmt.Errorf("could not read from test context reader: %w", err))
+	}
+
+	assert.Contains(t, sanitizeString(buf.String()), sanitizeString(expectedLog))
+
+	count := strings.Count(sanitizeString(buf.String()), sanitizeString(expectedLog))
+	assert.Equal(t, expectedCount, count)
+}
+
 // RandomName returns a string composed of random lowercase English letters of specified length.
 func RandomName(length int) string {
 	if length < 0 {
