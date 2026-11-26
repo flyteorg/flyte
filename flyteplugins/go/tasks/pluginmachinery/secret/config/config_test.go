@@ -101,3 +101,72 @@ func TestConfig_ImageBuilderConfig(t *testing.T) {
 	})
 
 }
+
+func TestConfig_EnvVarMountMode(t *testing.T) {
+	t.Run("defaults to FlyteManagedReference", func(t *testing.T) {
+		assert.Equal(t, EnvVarMountModeFlyteManagedReference, DefaultConfig.EmbeddedSecretManagerConfig.EnvVarMountMode)
+	})
+
+	t.Run("loads from JSON", func(t *testing.T) {
+		for _, mode := range []EnvVarMountMode{EnvVarMountModeReference, EnvVarMountModeInline, EnvVarMountModeFlyteManagedReference} {
+			var config Config
+			err := json.Unmarshal([]byte(`{"embeddedSecretManagerConfig": {"envVarMountMode": "`+string(mode)+`"}}`), &config)
+			assert.NoError(t, err)
+			assert.Equal(t, mode, config.EmbeddedSecretManagerConfig.EnvVarMountMode)
+		}
+	})
+
+	t.Run("loads case-insensitively", func(t *testing.T) {
+		for input, want := range map[string]EnvVarMountMode{
+			"inline":                EnvVarMountModeInline,
+			"INLINE":                EnvVarMountModeInline,
+			"reference":             EnvVarMountModeReference,
+			"REFERENCE":             EnvVarMountModeReference,
+			"flytemanagedreference": EnvVarMountModeFlyteManagedReference,
+		} {
+			var config Config
+			err := json.Unmarshal([]byte(`{"embeddedSecretManagerConfig": {"envVarMountMode": "`+input+`"}}`), &config)
+			assert.NoError(t, err, input)
+			assert.Equal(t, want, config.EmbeddedSecretManagerConfig.EnvVarMountMode, input)
+		}
+	})
+
+	t.Run("loads an empty value as FlyteManagedReference", func(t *testing.T) {
+		var config Config
+		err := json.Unmarshal([]byte(`{"embeddedSecretManagerConfig": {"envVarMountMode": ""}}`), &config)
+		assert.NoError(t, err)
+		assert.Equal(t, EnvVarMountModeFlyteManagedReference, config.EmbeddedSecretManagerConfig.EnvVarMountMode)
+	})
+
+	t.Run("loads invalid values as Inline", func(t *testing.T) {
+		for _, input := range []string{`"inlined"`, `1`} {
+			var config Config
+			err := json.Unmarshal([]byte(`{"embeddedSecretManagerConfig": {"envVarMountMode": `+input+`}}`), &config)
+			assert.NoError(t, err, input)
+			assert.Equal(t, EnvVarMountModeInline, config.EmbeddedSecretManagerConfig.EnvVarMountMode, input)
+		}
+	})
+
+	t.Run("ParseEnvVarMountMode", func(t *testing.T) {
+		for input, want := range map[string]EnvVarMountMode{
+			"":                      EnvVarMountModeFlyteManagedReference,
+			"Reference":             EnvVarMountModeReference,
+			"reference":             EnvVarMountModeReference,
+			"Inline":                EnvVarMountModeInline,
+			"INLINE":                EnvVarMountModeInline,
+			"FlyteManagedReference": EnvVarMountModeFlyteManagedReference,
+		} {
+			got, err := ParseEnvVarMountMode(input)
+			assert.NoError(t, err, input)
+			assert.Equal(t, want, got, input)
+		}
+	})
+
+	t.Run("ParseEnvVarMountMode falls back to Inline", func(t *testing.T) {
+		for _, input := range []string{"inlined", "1"} {
+			got, err := ParseEnvVarMountMode(input)
+			assert.ErrorContains(t, err, "invalid envVarMountMode", input)
+			assert.Equal(t, EnvVarMountModeInline, got, input)
+		}
+	})
+}

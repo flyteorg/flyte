@@ -16,6 +16,7 @@ import (
 	k8sError "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/mocks"
@@ -725,7 +726,7 @@ func TestEmbeddedSecretManagerInjector_InjectAsEnvVar_FailsWithoutNamespace(t *t
 	)
 
 	pod, injected, err := injector.Inject(ctx, &core.Secret{Key: "secret1"}, pod)
-	assert.ErrorContains(t, err, "pod namespace [] does not match the Kubernetes secret manager namespace")
+	assert.ErrorContains(t, err, "pod has no namespace")
 	assert.False(t, injected)
 	assert.Empty(t, pod.Spec.Containers[0].Env)
 }
@@ -1192,12 +1193,19 @@ func TestEmbeddedSecretManagerInjector_FetcherOrder(t *testing.T) {
 	assert.ErrorContains(t, err, "control plane unreachable", "any other error is not masked by a later fetcher")
 }
 
-// With EnvVarsFromValues, a secret no Kubernetes secret in the pod's namespace holds is injected as
-// its value when mounted as an environment variable: one a fetcher resolved, or a pod outside the
-// Kubernetes store's namespace. Off, such a mount still fails.
-func TestEmbeddedSecretManagerInjector_EnvVarsFromValues(t *testing.T) {
+// EnvVarMountMode decides how an ENV_VAR secret reaches the pod: Inline references the Secret when
+// the pod shares its namespace and otherwise writes the value into the pod spec; Reference skips
+// the Flyte lookup and references a user-managed Secret named as Flyte names it, in the pod's
+// namespace; FlyteManagedReference only references the Flyte-managed Secret and fails for pods
+// outside its namespace.
+func TestEmbeddedSecretManagerInjector_EnvVarMountMode(t *testing.T) {
 	ctx := context.Background()
-	holds := fetcherFunc(func(context.Context, string) (*SecretValue, error) { return &SecretValue{StringValue: "s3cr3t"}, nil })
+	const (
+		secretsNS = "secrets-ns"
+		otherNS   = "o-apple"
+		secretID  = "u__org__o-apple__domain__d__project__p__key__token" //nolint:gosec
+	)
+
 	newPod := func(ns string) *corev1.Pod {
 		return &corev1.Pod{
 			ObjectMeta: metav1.ObjectMeta{Namespace: ns, Labels: map[string]string{"organization": "o-apple", "domain": "d", "project": "p"}},
@@ -1205,45 +1213,145 @@ func TestEmbeddedSecretManagerInjector_EnvVarsFromValues(t *testing.T) {
 		}
 	}
 
-	envOf := func(pod *corev1.Pod, name string) *corev1.EnvVar {
-		for _, e := range pod.Spec.Containers[0].Env {
-			if e.Name == name {
-				e := e
-				return &e
+	envOf := func(pod *corev1.Pod) *corev1.EnvVar {
+		env, found := lo.Find(pod.Spec.Containers[0].Env, func(env corev1.EnvVar) bool {
+			return env.Name == config.DefaultSecretEnvVarPrefix+"TOKEN"
+		})
+		if !found {
+			return nil
+		}
+		return &env
+	}
+
+	inject := func(t *testing.T, cfg config.EmbeddedSecretManagerConfig, mockClient client.Client, podNS string) (*corev1.Pod, bool, error) {
+		fetcher := secretFetcherMock{Secrets: map[string]SecretValue{secretID: {StringValue: "s3cr3t"}}}
+		injector := NewEmbeddedSecretManagerInjector(cfg, []SecretFetcher{fetcher}, mockClient, testReferenceNamespace,
+			newAlwaysMissCache(t), &config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
+		return injector.Inject(ctx, &core.Secret{Key: "token", MountRequirement: core.Secret_ENV_VAR}, newPod(podNS))
+	}
+
+	k8sCfg := func(mode config.EnvVarMountMode) config.EmbeddedSecretManagerConfig {
+		return config.EmbeddedSecretManagerConfig{
+			Type:            config.EmbeddedSecretManagerTypeK8s,
+			K8sConfig:       config.K8sConfig{Namespace: secretsNS},
+			EnvVarMountMode: mode,
+		}
+	}
+
+	assertReferenced := func(t *testing.T, env *corev1.EnvVar, podNS string) {
+		require.NotNil(t, env, podNS)
+		assert.Empty(t, env.Value, podNS)
+		require.NotNil(t, env.ValueFrom, podNS)
+		assert.Equal(t, EncodeK8sSecretName(secretID), env.ValueFrom.SecretKeyRef.Name, podNS)
+		assert.Equal(t, secretID, env.ValueFrom.SecretKeyRef.Key, podNS)
+	}
+
+	t.Run("Inline references the Secret in its own namespace", func(t *testing.T) {
+		mockClient := &mocks.MockableControllerRuntimeClient{}
+		expectStoredSecret(mockClient, secretID, secretsNS)
+
+		pod, injected, err := inject(t, k8sCfg(config.EnvVarMountModeInline), mockClient, secretsNS)
+		require.NoError(t, err)
+		require.True(t, injected)
+		assertReferenced(t, envOf(pod), secretsNS)
+	})
+
+	t.Run("Inline injects the value in other namespaces", func(t *testing.T) {
+		for _, podNS := range []string{otherNS, ""} {
+			mockClient := &mocks.MockableControllerRuntimeClient{}
+			expectStoredSecret(mockClient, secretID, secretsNS)
+
+			pod, injected, err := inject(t, k8sCfg(config.EnvVarMountModeInline), mockClient, podNS)
+			require.NoError(t, err, podNS)
+			require.True(t, injected, podNS)
+			env := envOf(pod)
+			require.NotNil(t, env, podNS)
+			assert.Equal(t, "s3cr3t", env.Value, podNS)
+			assert.Nil(t, env.ValueFrom, podNS)
+		}
+	})
+
+	t.Run("Inline injects a secret not stored in a Kubernetes secret", func(t *testing.T) {
+		cfg := config.EmbeddedSecretManagerConfig{Type: config.EmbeddedSecretManagerTypeAWS, EnvVarMountMode: config.EnvVarMountModeInline}
+		pod, injected, err := inject(t, cfg, nil, otherNS)
+		require.NoError(t, err)
+		require.True(t, injected)
+		assert.Equal(t, "s3cr3t", envOf(pod).Value)
+	})
+
+	t.Run("Reference references a user-managed Secret in any namespace without a Flyte lookup", func(t *testing.T) {
+		for _, cfg := range []config.EmbeddedSecretManagerConfig{
+			k8sCfg(config.EnvVarMountModeReference),
+			{Type: config.EmbeddedSecretManagerTypeAWS, K8sConfig: config.K8sConfig{Namespace: secretsNS}, EnvVarMountMode: config.EnvVarMountModeReference},
+		} {
+			for _, podNS := range []string{secretsNS, otherNS} {
+				// Flyte holds no such secret, and the client has no expectations: any lookup, Get or
+				// Create would fail the test.
+				mockClient := &mocks.MockableControllerRuntimeClient{}
+				injector := NewEmbeddedSecretManagerInjector(cfg, []SecretFetcher{secretFetcherMock{}}, mockClient, testReferenceNamespace,
+					newAlwaysMissCache(t), &config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
+				pod, injected, err := injector.Inject(ctx, &core.Secret{Key: "token", MountRequirement: core.Secret_ENV_VAR}, newPod(podNS))
+				require.NoError(t, err, podNS)
+				require.True(t, injected, podNS)
+				assertReferenced(t, envOf(pod), podNS)
+				mockClient.AssertExpectations(t)
 			}
 		}
+	})
 
-		return nil
-	}
+	t.Run("Reference uses the group as the Secret name and the key as its key", func(t *testing.T) {
+		for _, podNS := range []string{secretsNS, otherNS} {
+			mockClient := &mocks.MockableControllerRuntimeClient{}
+			injector := NewEmbeddedSecretManagerInjector(k8sCfg(config.EnvVarMountModeReference), []SecretFetcher{secretFetcherMock{}},
+				mockClient, testReferenceNamespace, newAlwaysMissCache(t), &config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
+			pod, injected, err := injector.Inject(ctx,
+				&core.Secret{Group: "my-k8s-secret", Key: "token", MountRequirement: core.Secret_ENV_VAR}, newPod(podNS))
+			require.NoError(t, err, podNS)
+			require.True(t, injected, podNS)
+			env := envOf(pod)
+			require.NotNil(t, env, podNS)
+			require.NotNil(t, env.ValueFrom, podNS)
+			assert.Equal(t, "my-k8s-secret", env.ValueFrom.SecretKeyRef.Name, podNS)
+			assert.Equal(t, "token", env.ValueFrom.SecretKeyRef.Key, podNS)
+			mockClient.AssertExpectations(t)
+		}
+	})
 
-	cases := map[string]config.EmbeddedSecretManagerConfig{
-		"a fetcher's secret":                  {Type: config.EmbeddedSecretManagerTypeAWS, K8sConfig: config.K8sConfig{Namespace: "secrets-ns"}},
-		"a pod outside the store's namespace": {Type: config.EmbeddedSecretManagerTypeAWS, K8sConfig: config.K8sConfig{Namespace: "secrets-ns"}},
-	}
+	t.Run("Reference fails for a pod without a namespace", func(t *testing.T) {
+		pod, injected, err := inject(t, k8sCfg(config.EnvVarMountModeReference), &mocks.MockableControllerRuntimeClient{}, "")
+		assert.ErrorContains(t, err, "pod has no namespace")
+		assert.False(t, injected)
+		assert.Nil(t, envOf(pod))
+	})
 
-	for name, cfg := range cases {
-		t.Run(name, func(t *testing.T) {
-			podNS := "secrets-ns"
-			if name == "a pod outside the store's namespace" {
-				podNS = "o-apple"
-			}
+	t.Run("FlyteManagedReference references the Secret in its own namespace", func(t *testing.T) {
+		mockClient := &mocks.MockableControllerRuntimeClient{}
+		expectStoredSecret(mockClient, secretID, secretsNS)
 
-			cfg.EnvVarsFromValues = true
-			injector := NewEmbeddedSecretManagerInjector(cfg, []SecretFetcher{holds}, nil, testReferenceNamespace, newAlwaysMissCache(t),
-				&config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
-			pod, injected, err := injector.Inject(ctx, &core.Secret{Key: "token", MountRequirement: core.Secret_ENV_VAR}, newPod(podNS))
-			require.NoError(t, err)
-			require.True(t, injected)
-			env := envOf(pod, config.DefaultSecretEnvVarPrefix+"TOKEN")
-			require.NotNil(t, env)
-			assert.Equal(t, "s3cr3t", env.Value)
-			assert.Nil(t, env.ValueFrom)
+		pod, injected, err := inject(t, k8sCfg(config.EnvVarMountModeFlyteManagedReference), mockClient, secretsNS)
+		require.NoError(t, err)
+		require.True(t, injected)
+		assertReferenced(t, envOf(pod), secretsNS)
+	})
 
-			cfg.EnvVarsFromValues = false
-			injector = NewEmbeddedSecretManagerInjector(cfg, []SecretFetcher{holds}, nil, testReferenceNamespace, newAlwaysMissCache(t),
-				&config.Config{SecretEnvVarPrefix: config.DefaultSecretEnvVarPrefix})
-			_, _, err = injector.Inject(ctx, &core.Secret{Key: "token", MountRequirement: core.Secret_ENV_VAR}, newPod(podNS))
-			assert.Error(t, err, "off: an env var only ever references a Kubernetes secret")
-		})
-	}
+	t.Run("FlyteManagedReference fails in other namespaces", func(t *testing.T) {
+		for _, podNS := range []string{otherNS, ""} {
+			pod, injected, err := inject(t, k8sCfg(config.EnvVarMountModeFlyteManagedReference), &mocks.MockableControllerRuntimeClient{}, podNS)
+			assert.ErrorContains(t, err, "does not match the Kubernetes secret manager namespace", podNS)
+			assert.False(t, injected, podNS)
+			assert.Nil(t, envOf(pod), podNS)
+		}
+	})
+
+	t.Run("FlyteManagedReference fails for a secret not stored in a Kubernetes secret", func(t *testing.T) {
+		cfg := config.EmbeddedSecretManagerConfig{
+			Type:            config.EmbeddedSecretManagerTypeAWS,
+			K8sConfig:       config.K8sConfig{Namespace: secretsNS},
+			EnvVarMountMode: config.EnvVarMountModeFlyteManagedReference,
+		}
+		pod, injected, err := inject(t, cfg, nil, secretsNS)
+		assert.ErrorContains(t, err, "not stored in a Kubernetes secret")
+		assert.False(t, injected)
+		assert.Nil(t, envOf(pod))
+	})
 }

@@ -35,6 +35,7 @@ data:
         type: K8s
         k8sConfig:
           namespace: {{ .Release.Namespace }}
+        envVarMountMode: {{ .Values.configuration.webhook.envVarMountMode | default "FlyteManagedReference" }}
 {{ tpl ( index .Values "flyte-core-components" | toYaml ) . | nindent 4 }}
   001-plugins.yaml: |
     tasks:

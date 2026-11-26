@@ -67,6 +67,7 @@ Chart for basic single Flyte executable deployment
 | configuration.storage.providerConfig.s3.secretKey | string | `""` |  |
 | configuration.storage.providerConfig.s3.secretKeyPath | string | `""` |  |
 | configuration.storage.providerConfig.s3.v2Signing | bool | `false` |  |
+| configuration.webhook.envVarMountMode | string | `"FlyteManagedReference"` |  |
 | console.affinity | object | `{}` |  |
 | console.basePath | string | `"/v2"` |  |
 | console.containerPort | int | `8080` |  |

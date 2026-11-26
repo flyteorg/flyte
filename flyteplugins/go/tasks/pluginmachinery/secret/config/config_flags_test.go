@@ -421,14 +421,14 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_embeddedSecretManagerConfig.envVarsFromValues", func(t *testing.T) {
+	t.Run("Test_embeddedSecretManagerConfig.envVarMountMode", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
+			testValue := "Inline"
 
-			cmdFlags.Set("embeddedSecretManagerConfig.envVarsFromValues", testValue)
-			if vBool, err := cmdFlags.GetBool("embeddedSecretManagerConfig.envVarsFromValues"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.EmbeddedSecretManagerConfig.EnvVarsFromValues)
+			cmdFlags.Set("embeddedSecretManagerConfig.envVarMountMode", testValue)
+			if vString, err := cmdFlags.GetString("embeddedSecretManagerConfig.envVarMountMode"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.EmbeddedSecretManagerConfig.EnvVarMountMode)
 
 			} else {
 				assert.FailNow(t, err.Error())
