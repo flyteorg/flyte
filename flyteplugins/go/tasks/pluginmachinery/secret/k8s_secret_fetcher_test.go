@@ -7,12 +7,14 @@ import (
 
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/core/v1"
 	k8sErrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
 	k8sTesting "k8s.io/client-go/testing"
+	clientfake "sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	stdlibErrors "github.com/flyteorg/flyte/v2/flytestdlib/errors"
 )
@@ -112,4 +114,30 @@ func TestGetSecretValue(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetSecretValueFromReader(t *testing.T) {
+	stored := &v1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: EncodeK8sSecretName("test-secret"), Namespace: testNamespace},
+		Data:       map[string][]byte{"test-secret": []byte("value")},
+	}
+	reader := clientfake.NewClientBuilder().WithObjects(stored).Build()
+	fetcher := NewK8sSecretFetcherFromReader(reader, testNamespace)
+
+	t.Run("found", func(t *testing.T) {
+		// When
+		secret, err := fetcher.GetSecretValue(context.TODO(), "test-secret")
+
+		// Then
+		require.NoError(t, err)
+		assert.Equal(t, []byte("value"), secret.BinaryValue)
+	})
+
+	t.Run("not found", func(t *testing.T) {
+		// When
+		_, err := fetcher.GetSecretValue(context.TODO(), "other-secret")
+
+		// Then
+		assert.True(t, stdlibErrors.IsCausedBy(err, ErrCodeSecretNotFound))
+	})
 }

@@ -73,7 +73,8 @@ func newSecretsInjector(
 		// scoped to the namespaces those reads hit. When neither feature is in use the client
 		// is direct and no informer (and no cluster-wide Secret watch) is started.
 		clientOpts := client.Options{Scheme: ctrlRuntimeScheme}
-		if useInformer, namespaces := secretInformerNamespaces(webhookConfig, podNamespace, limitNamespace); useInformer {
+		useInformer, namespaces := secretInformerNamespaces(webhookConfig, podNamespace, limitNamespace)
+		if useInformer {
 			cacheOpts := ctrlcache.Options{Scheme: ctrlRuntimeScheme}
 			if len(namespaces) > 0 {
 				cacheOpts.DefaultNamespaces = make(map[string]ctrlcache.Config, len(namespaces))
@@ -110,7 +111,11 @@ func newSecretsInjector(
 			return nil, fmt.Errorf("failed to create controller-runtime client: %w", err)
 		}
 
-		secretFetcher, err := NewSecretFetcher(ctx, webhookConfig.EmbeddedSecretManagerConfig)
+		var informerReader client.Reader
+		if useInformer {
+			informerReader = ctrlRuntimeClient
+		}
+		secretFetcher, err := newEmbeddedSecretFetcher(ctx, webhookConfig.EmbeddedSecretManagerConfig, informerReader)
 		if err != nil {
 			return nil, err
 		}
@@ -141,6 +146,19 @@ func newSecretsInjector(
 	default:
 		return nil, fmt.Errorf("unrecognized secret manager type [%v]", secretManagerType)
 	}
+}
+
+// newEmbeddedSecretFetcher builds the fetcher for the configured store. Every pod admission looks
+// each requested secret up at up to three scopes, mostly misses that nothing caches, so a K8s
+// store is read through informerReader when there is one: it watches the store's namespace (see
+// secretInformerNamespaces), and lookups then cost no API server request.
+func newEmbeddedSecretFetcher(
+	ctx context.Context, cfg config.EmbeddedSecretManagerConfig, informerReader client.Reader,
+) (SecretFetcher, error) {
+	if cfg.Type == config.EmbeddedSecretManagerTypeK8s && informerReader != nil {
+		return NewK8sSecretFetcherFromReader(informerReader, cfg.K8sConfig.Namespace), nil
+	}
+	return NewSecretFetcher(ctx, cfg)
 }
 
 // AllNamespaces is the limitNamespace value meaning "no namespace limit". An empty

@@ -6,6 +6,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	clientfake "sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/secret/config"
 	"github.com/flyteorg/flyte/v2/flytestdlib/promutils"
@@ -127,4 +130,26 @@ func TestNewSecretsMutatorFromInjectors(t *testing.T) {
 	m := NewSecretsMutatorFromInjectors([]config.SecretManagerType{config.SecretManagerTypeK8s}, injectors)
 	assert.Equal(t, []config.SecretManagerType{config.SecretManagerTypeK8s}, m.enabledSecretManagerTypes)
 	assert.Equal(t, injectors, m.injectors)
+}
+
+func TestEmbeddedK8sSecretFetcherReadsFromTheInformer(t *testing.T) {
+	// Given
+	stored := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: EncodeK8sSecretName("test-secret"), Namespace: "flyte-secrets"},
+		Data:       map[string][]byte{"test-secret": []byte("value")},
+	}
+	informer := clientfake.NewClientBuilder().WithObjects(stored).Build()
+	cfg := config.EmbeddedSecretManagerConfig{
+		Type:      config.EmbeddedSecretManagerTypeK8s,
+		K8sConfig: config.K8sConfig{Namespace: "flyte-secrets"},
+	}
+
+	// When
+	fetcher, err := newEmbeddedSecretFetcher(context.Background(), cfg, informer)
+	require.NoError(t, err)
+	secret, err := fetcher.GetSecretValue(context.Background(), "test-secret")
+
+	// Then
+	require.NoError(t, err)
+	assert.Equal(t, []byte("value"), secret.BinaryValue)
 }
