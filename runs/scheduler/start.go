@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"connectrpc.com/connect"
 	"github.com/flyteorg/flyte/v2/flytestdlib/logger"
+	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/workflow/workflowconnect"
 	"github.com/flyteorg/flyte/v2/runs/config"
 	"github.com/flyteorg/flyte/v2/runs/repository/interfaces"
 	"github.com/flyteorg/flyte/v2/runs/scheduler/core"
@@ -16,20 +16,11 @@ import (
 // that blocks until ctx is cancelled. The caller should register it with
 // sc.AddWorker("trigger-scheduler", ...).
 func Start(
-	ctx context.Context,
 	triggerRepo interfaces.TriggerRepo,
 	cfg config.TriggerSchedulerConfig,
-	httpClient connect.HTTPClient,
-	baseURL string,
-	clientOpts ...connect.ClientOption,
+	runs workflowconnect.RunServiceHandler,
 ) func(ctx context.Context) error {
-	exec := executor.NewTriggerExecutor(executor.TriggerExecutorConfig{
-		BaseURL:    baseURL,
-		HTTPClient: httpClient,
-		QPS:        cfg.ExecutionQPS,
-		Burst:      cfg.ExecutionBurst,
-		ClientOpts: clientOpts,
-	})
+	exec := executor.NewTriggerExecutor(runs, cfg.ExecutionQPS, cfg.ExecutionBurst)
 
 	sched := core.NewGoCronScheduler(exec)
 	sched.Start()

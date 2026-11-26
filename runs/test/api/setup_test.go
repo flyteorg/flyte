@@ -134,12 +134,11 @@ func TestMain(m *testing.M) {
 	// real ProjectService on the same mux (mirrors production unified mode in setup.go).
 	endpointURL := fmt.Sprintf("http://localhost:%d", testPort)
 	projectSvc := service.NewProjectService(impl.NewProjectRepo(testDB), nil)
-	projectClient := projectconnect.NewProjectServiceClient(http.DefaultClient, endpointURL)
-	taskSvc := service.NewTaskService(repo, projectClient)
+	taskSvc := service.NewTaskService(repo, projectSvc)
 
 	// Create RunService with a no-op actions client (points at test server; not used by watch tests)
 	actionsClient := actionsconnect.NewActionsServiceClient(http.DefaultClient, endpointURL)
-	runSvc := service.NewRunService(repo, settingsRepo, actionsClient, projectClient, "", nil, nil, "", true, runsConfig.IdentityHeaders)
+	runSvc := service.NewRunService(repo, settingsRepo, actionsClient, projectSvc, "", nil, nil, "", true, runsConfig.IdentityHeaders)
 
 	// Setup HTTP server
 	mux := http.NewServeMux()
