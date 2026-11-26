@@ -20,6 +20,11 @@ message GetImageRequest {
   // different container registries (i.e. different image FQDNs)
   // TODO: This scope will be made required after updating all clients/servers to respect it.
   flyteidl2.common.ProjectIdentifier project_id = 3;
+
+  // Optional queue the image is for: the lookup goes to the registry of that queue's cluster pool
+  // rather than the project/domain default's, where an image built for the queue is pushed (a pool
+  // may build to a registry of its own). Empty looks up the default pool's, as before.
+  string queue = 4;
 }
 
 // GetSecretProxyResponse returns the looked up secret from the secret service
