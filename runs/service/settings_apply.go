@@ -4,6 +4,8 @@ import (
 	"maps"
 	"slices"
 
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/settings"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/task"
@@ -78,6 +80,13 @@ func applyRunSettings(spec *task.RunSpec, resolved *settings.Settings) {
 		spec.Annotations.Values = addMissing(spec.Annotations.Values, annotations)
 	}
 	applyEnvSettings(spec, mapSettingValues(resolved.GetEnvironmentVariables()))
+
+	if defaults := newTaskResourceDefaults(resolved.GetTaskResource()); defaults != nil {
+		if spec.DefaultSettings == nil {
+			spec.DefaultSettings = &task.DefaultSettings{}
+		}
+		spec.DefaultSettings.TaskResourceDefaults = defaults
+	}
 }
 
 // mapSettingValues returns the entries of a map setting in VALUE state, else nil.
@@ -122,4 +131,46 @@ func applyEnvSettings(spec *task.RunSpec, envs map[string]string) {
 		}
 		spec.Envs.Values = append(spec.Envs.Values, &core.KeyValuePair{Key: k, Value: envs[k]})
 	}
+}
+
+func newTaskResourceDefaults(tr *settings.TaskResourceSettings) *task.TaskResourceDefaults {
+	out := &task.TaskResourceDefaults{}
+
+	if accelerator := tr.GetDefaultAccelerator(); accelerator.GetState() == settings.SettingState_SETTING_STATE_VALUE {
+		out.DefaultAccelerator = accelerator.GetAcceleratorValue()
+	}
+
+	minRes, maxRes := tr.GetMin(), tr.GetMax()
+	dimensions := []struct {
+		name     core.Resources_ResourceName
+		min, max *settings.QuantitySetting
+	}{
+		{core.Resources_CPU, minRes.GetCpu(), maxRes.GetCpu()},
+		{core.Resources_GPU, minRes.GetGpu(), maxRes.GetGpu()},
+		{core.Resources_MEMORY, minRes.GetMemory(), maxRes.GetMemory()},
+		{core.Resources_EPHEMERAL_STORAGE, minRes.GetStorage(), maxRes.GetStorage()},
+	}
+
+	for _, d := range dimensions {
+		maxValue := d.max.GetQuantityValue()
+		hasMax := d.max.GetState() == settings.SettingState_SETTING_STATE_VALUE && maxValue != ""
+		if hasMax {
+			out.Max = append(out.Max, &core.Resources_ResourceEntry{Name: d.name, Value: maxValue})
+		}
+		if minValue := d.min.GetQuantityValue(); d.min.GetState() == settings.SettingState_SETTING_STATE_VALUE && minValue != "" {
+			if hasMax {
+				minQ, minErr := resource.ParseQuantity(minValue)
+				maxQ, maxErr := resource.ParseQuantity(maxValue)
+				if minErr == nil && maxErr == nil && minQ.Cmp(maxQ) > 0 {
+					minValue = maxValue
+				}
+			}
+			out.Requests = append(out.Requests, &core.Resources_ResourceEntry{Name: d.name, Value: minValue})
+		}
+	}
+
+	if len(out.GetRequests()) == 0 && len(out.GetMax()) == 0 && out.GetDefaultAccelerator() == nil {
+		return nil
+	}
+	return out
 }
