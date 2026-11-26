@@ -632,6 +632,10 @@ func (m *ArtifactTrigger) validate(all bool) error {
 
 	// no validation rules for PartitionInputArgs
 
+	// no validation rules for Project
+
+	// no validation rules for Domain
+
 	if len(errors) > 0 {
 		return ArtifactTriggerMultiError(errors)
 	}

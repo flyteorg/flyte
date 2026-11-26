@@ -73,7 +73,7 @@ class Schedule(_message.Message):
     def __init__(self, rate: _Optional[_Union[FixedRate, _Mapping]] = ..., cron_expression: _Optional[str] = ..., cron: _Optional[_Union[Cron, _Mapping]] = ..., kickoff_time_input_arg: _Optional[str] = ...) -> None: ...
 
 class ArtifactTrigger(_message.Message):
-    __slots__ = ["artifact_name", "version", "input_arg", "partitions", "partition_input_args"]
+    __slots__ = ["artifact_name", "version", "input_arg", "partitions", "partition_input_args", "project", "domain"]
     class PartitionsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -93,12 +93,16 @@ class ArtifactTrigger(_message.Message):
     INPUT_ARG_FIELD_NUMBER: _ClassVar[int]
     PARTITIONS_FIELD_NUMBER: _ClassVar[int]
     PARTITION_INPUT_ARGS_FIELD_NUMBER: _ClassVar[int]
+    PROJECT_FIELD_NUMBER: _ClassVar[int]
+    DOMAIN_FIELD_NUMBER: _ClassVar[int]
     artifact_name: str
     version: str
     input_arg: str
     partitions: _containers.ScalarMap[str, str]
     partition_input_args: _containers.ScalarMap[str, str]
-    def __init__(self, artifact_name: _Optional[str] = ..., version: _Optional[str] = ..., input_arg: _Optional[str] = ..., partitions: _Optional[_Mapping[str, str]] = ..., partition_input_args: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    project: str
+    domain: str
+    def __init__(self, artifact_name: _Optional[str] = ..., version: _Optional[str] = ..., input_arg: _Optional[str] = ..., partitions: _Optional[_Mapping[str, str]] = ..., partition_input_args: _Optional[_Mapping[str, str]] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ...) -> None: ...
 
 class TriggerAutomationSpec(_message.Message):
     __slots__ = ["type", "schedule", "artifact"]
