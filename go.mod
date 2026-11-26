@@ -28,7 +28,7 @@ require (
 	github.com/fatih/color v1.19.0
 	github.com/fatih/structtag v1.2.0
 	github.com/fergusstrange/embedded-postgres v1.34.0
-	github.com/flyteorg/stow v0.5.1
+	github.com/flyteorg/stow v0.5.3
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/getsentry/sentry-go v0.50.0
 	github.com/ghodss/yaml v1.0.0
