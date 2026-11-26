@@ -967,3 +967,25 @@ func TestTailLogs(t *testing.T) {
 		assert.NoError(t, stream.Err())
 	})
 }
+
+func TestTailLogs_NoLogBackendConfigured(t *testing.T) {
+	runClient := workflowMocks.NewRunServiceClient(t)
+	runClient.EXPECT().GetActionLogContext(mock.Anything, mock.Anything).Return(
+		connect.NewResponse(&workflow.GetActionLogContextResponse{
+			LogContext: &core.LogContext{PrimaryPodName: "p", Pods: []*core.PodLogContext{{PodName: "p", Namespace: "ns"}}},
+		}), nil)
+
+	svc := NewService(config.DataProxyConfig{}, nil, nil, nil, runClient, nil, nil, nil)
+	client := newTailLogsTestClient(t, svc)
+
+	stream, err := client.TailLogs(context.Background(), connect.NewRequest(&dataproxy.TailLogsRequest{
+		ActionId: &common.ActionIdentifier{
+			Run:  &common.RunIdentifier{Org: "o", Project: "p", Domain: "d", Name: "r"},
+			Name: "a0",
+		},
+		Attempt: 1,
+	}))
+	require.NoError(t, err)
+	assert.False(t, stream.Receive())
+	assert.Equal(t, connect.CodeUnimplemented, connect.CodeOf(stream.Err()))
+}
