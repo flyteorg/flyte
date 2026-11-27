@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/v2/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/v2/gen/go/flyteidl2/core"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8stypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/validation"
@@ -379,7 +380,7 @@ func (pm *PluginManager) Abort(ctx context.Context, tCtx pluginsCore.TaskExecuti
 		}
 	}
 
-	if err != nil && !k8serrors.IsNotFound(err) && !k8serrors.IsGone(err) {
+	if err != nil && !isResourceGone(err) {
 		logger.Warningf(ctx, "Failed to abort Resource with name: %v/%v. Error: %v",
 			resourceToFinalize.GetNamespace(), resourceToFinalize.GetName(), err)
 		return err
@@ -400,7 +401,7 @@ func (pm *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExec
 
 	// Clear finalizers
 	if err := pm.kubeClient.GetClient().Get(ctx, nsName, o); err != nil {
-		if k8serrors.IsNotFound(err) || k8serrors.IsGone(err) {
+		if isResourceGone(err) {
 			return nil
 		}
 		return err
@@ -409,7 +410,7 @@ func (pm *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExec
 	if len(o.GetFinalizers()) > 0 {
 		o.SetFinalizers([]string{})
 		if err := pm.kubeClient.GetClient().Update(ctx, o); err != nil {
-			if k8serrors.IsNotFound(err) || k8serrors.IsGone(err) {
+			if isResourceGone(err) {
 				return nil
 			}
 			logger.Warningf(ctx, "Failed to clear finalizers for Resource: %v. Error: %v", nsName, err)
@@ -420,7 +421,7 @@ func (pm *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExec
 	cfg := config.GetK8sPluginConfig()
 	if cfg.DeleteResourceOnFinalize && !pm.plugin.GetProperties().DisableDeleteResourceOnFinalize {
 		if err := pm.kubeClient.GetClient().Delete(ctx, o); err != nil {
-			if k8serrors.IsNotFound(err) || k8serrors.IsGone(err) {
+			if isResourceGone(err) {
 				return nil
 			}
 			logger.Warningf(ctx, "Failed to delete Resource: %v. Error: %v", nsName, err)
@@ -429,4 +430,9 @@ func (pm *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExec
 	}
 
 	return nil
+}
+
+// isResourceGone reports whether err means the resource no longer exists, including when its CRD was never installed.
+func isResourceGone(err error) bool {
+	return k8serrors.IsNotFound(err) || k8serrors.IsGone(err) || meta.IsNoMatchError(err)
 }
