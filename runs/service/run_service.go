@@ -328,6 +328,27 @@ func (s *RunService) CreateRun(
 		}
 	}
 
+	// A run name identifies one execution. Reject a request for a name that already
+	// exists before writing inputs or enqueueing: the insert below is idempotent and
+	// would return the existing run, but Enqueue would still create a TaskAction from
+	// this request's inputs whenever the run's previous TaskAction is gone (aborted,
+	// or garbage-collected after it finished), executing the run a second time and
+	// replacing its outputs. Callers already expect AlreadyExists here (the SDK's
+	// RunAlreadyExistsError, and the trigger executor's skip-if-fired path).
+	if existing, err := s.repo.ActionRepo().GetRun(ctx, runId); err == nil {
+		// A run still QUEUED may have been persisted by a CreateRun that was interrupted
+		// before it enqueued. Enqueue it again from its own stored spec, so a retry can
+		// still start it without ever running this request's inputs.
+		if existing.Phase == int32(common.ActionPhase_ACTION_PHASE_QUEUED) {
+			s.resumeQueuedRun(ctx, existing)
+		}
+		return nil, connect.NewError(connect.CodeAlreadyExists,
+			fmt.Errorf("run %s/%s/%s already exists", runId.GetProject(), runId.GetDomain(), runId.GetName()))
+	} else if !errors.Is(err, sql.ErrNoRows) {
+		logger.Errorf(ctx, "Failed to check for existing run: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
 	// Compute storage URIs before DB insert so they're persisted in the ActionSpec.
 	// runSpec.RunBaseDir overrides the configured storagePrefix when set, either by the
 	// request or from settings above; it must resolve to the same base UploadInputs used
@@ -393,7 +414,7 @@ func (s *RunService) CreateRun(
 	}
 
 	// Persist task spec and create a run model
-	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, runSpec, request.GetSource(), triggerName, triggerTaskName, triggerRevision, triggerType, executedBy)
+	run, err := s.persistRunModel(ctx, runId, taskID, taskSpec, inputPrefix, runOutputBase, cacheKey, runSpec, request.GetSource(), triggerName, triggerTaskName, triggerRevision, triggerType, executedBy)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create run: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, err)
@@ -425,6 +446,44 @@ func (s *RunService) CreateRun(
 	}), nil
 }
 
+// resumeQueuedRun enqueues a QUEUED run again from its stored ActionSpec. It covers a
+// CreateRun that persisted the run but did not reach Enqueue (for example, the process
+// stopped in between). If the run's TaskAction already exists, Enqueue returns
+// AlreadyExists and nothing changes. Errors are logged: the caller still reports that
+// the run exists.
+func (s *RunService) resumeQueuedRun(ctx context.Context, run *models.Run) {
+	spec := &workflow.ActionSpec{}
+	if err := proto.Unmarshal(run.ActionSpec, spec); err != nil || spec.GetTask() == nil {
+		logger.Warnf(ctx, "CreateRun: cannot resume queued run %s: no stored task spec (%v)", run.RunName, err)
+		return
+	}
+	_, err := s.actionsClient.Enqueue(ctx, connect.NewRequest(&actions.EnqueueRequest{
+		Action: &actions.Action{
+			ActionId:      spec.GetActionId(),
+			InputUri:      strings.TrimSuffix(spec.GetInputUri(), "/inputs.pb"),
+			RunOutputBase: spec.GetRunOutputBase(),
+			Spec:          &actions.Action_Task{Task: spec.GetTask()},
+		},
+		RunSpec: spec.GetRunSpec(),
+	}))
+	switch {
+	case err == nil:
+		logger.Infof(ctx, "CreateRun: re-enqueued queued run %s from its stored spec", run.RunName)
+	case connect.CodeOf(err) == connect.CodeAlreadyExists:
+		// Already enqueued: nothing to resume.
+	default:
+		logger.Warnf(ctx, "CreateRun: failed to re-enqueue queued run %s: %v", run.RunName, err)
+	}
+}
+
+// cacheKeyValue wraps a non-empty cache key for a TaskAction.
+func cacheKeyValue(cacheKey string) *wrapperspb.StringValue {
+	if cacheKey == "" {
+		return nil
+	}
+	return wrapperspb.String(cacheKey)
+}
+
 // persistRunModel stores the task spec, builds the run model, and inserts it to DB via CreateAction.
 // triggerName should be non-empty when the run originates from a scheduled trigger; it is stored on
 // the run model and triggers a triggered_at update on the trigger row.
@@ -433,7 +492,7 @@ func (s *RunService) persistRunModel(
 	runId *common.RunIdentifier,
 	taskID *task.TaskIdentifier,
 	taskSpec *task.TaskSpec,
-	inputPrefix, runOutputBase string,
+	inputPrefix, runOutputBase, cacheKey string,
 	runSpec *task.RunSpec,
 	source workflow.RunSource,
 	triggerName, triggerTaskName string,
@@ -468,8 +527,9 @@ func (s *RunService) persistRunModel(
 		RunOutputBase:    runOutputBase,
 		Spec: &workflow.ActionSpec_Task{
 			Task: &workflow.TaskAction{
-				Id:   taskID,
-				Spec: taskSpec,
+				Id:       taskID,
+				Spec:     taskSpec,
+				CacheKey: cacheKeyValue(cacheKey),
 			},
 		},
 	}
@@ -568,6 +628,18 @@ func (s *RunService) AbortRun(
 	// The reconciler deletes "a0"'s CRD; K8s cascades deletion to all child CRDs
 	// via OwnerReferences, and the action service informer marks them ABORTED in DB.
 	if err := s.repo.ActionRepo().AbortRun(ctx, req.Msg.RunId, reason, nil); err != nil {
+		if errors.Is(err, interfaces.ErrActionFinished) {
+			// The run already finished: aborting it is a no-op that keeps its outcome.
+			return connect.NewResponse(&workflow.AbortRunResponse{}), nil
+		}
+		if errors.Is(err, interfaces.ErrActionAborted) {
+			// Already aborted: keep the original abort, but retry terminating its pods
+			// in case an earlier abort gave up.
+			if s.abortReconciler != nil {
+				s.abortReconciler.Push(ctx, &common.ActionIdentifier{Run: req.Msg.RunId, Name: "a0"}, reason)
+			}
+			return connect.NewResponse(&workflow.AbortRunResponse{}), nil
+		}
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("run not found: %s/%s/%s", req.Msg.RunId.Project, req.Msg.RunId.Domain, req.Msg.RunId.Name))
 		}
@@ -1164,6 +1236,18 @@ func (s *RunService) AbortAction(
 
 	// Abort in database, then push to reconciler for background pod termination.
 	if err := s.repo.ActionRepo().AbortAction(ctx, req.Msg.ActionId, reason, nil); err != nil {
+		if errors.Is(err, interfaces.ErrActionFinished) {
+			// The action already finished: aborting it is a no-op that keeps its outcome.
+			return connect.NewResponse(&workflow.AbortActionResponse{}), nil
+		}
+		if errors.Is(err, interfaces.ErrActionAborted) {
+			// Already aborted: keep the original abort, but retry terminating its pods
+			// in case an earlier abort gave up.
+			if s.abortReconciler != nil {
+				s.abortReconciler.Push(ctx, req.Msg.ActionId, reason)
+			}
+			return connect.NewResponse(&workflow.AbortActionResponse{}), nil
+		}
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, connect.NewError(connect.CodeNotFound, fmt.Errorf("action not found: %s", req.Msg.ActionId.Name))
 		}

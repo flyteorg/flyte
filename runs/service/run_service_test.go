@@ -21,6 +21,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/flyteorg/flyte/v2/flytestdlib/storage"
 	storageMocks "github.com/flyteorg/flyte/v2/flytestdlib/storage/mocks"
@@ -599,6 +600,7 @@ func TestCreateRunResponseIncludesMetadataAndStatus(t *testing.T) {
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, storage.Options{}, mock.Anything).Return(nil).Once()
 
 	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("GetRun", mock.Anything, mock.Anything).Return(nil, runNotFound()).Maybe()
 	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).
 		Return(&models.Run{
 			Project:     runID.Project,
@@ -1309,6 +1311,7 @@ func TestCreateRun_WritesEmptyInputsProto(t *testing.T) {
 	})).Return(nil).Once()
 
 	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("GetRun", mock.Anything, mock.Anything).Return(nil, runNotFound()).Maybe()
 	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).Return(expectedRun, nil).Once()
 
 	actionsClient.On("Enqueue", mock.Anything, mock.Anything).
@@ -1367,6 +1370,7 @@ func TestCreateRun_ResponseUsesRunModel(t *testing.T) {
 
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("GetRun", mock.Anything, mock.Anything).Return(nil, runNotFound()).Maybe()
 	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).Return(expectedRun, nil).Once()
 	actionsClient.On("Enqueue", mock.Anything, mock.Anything).Return(connect.NewResponse(&actions.EnqueueResponse{}), nil).Once()
 
@@ -1437,6 +1441,7 @@ func TestCreateRun_TriggerFire_CarriesRunSpecEnvVars(t *testing.T) {
 
 	// Capture the persisted action so we can inspect the run spec it carries.
 	var persisted *models.Action
+	actionRepo.On("GetRun", mock.Anything, mock.Anything).Return(nil, runNotFound()).Maybe()
 	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).
 		Run(func(args mock.Arguments) {
 			persisted = args.Get(1).(*models.Action)
@@ -1522,6 +1527,7 @@ func TestCreateRun_ActionIDUsesRunName(t *testing.T) {
 
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("GetRun", mock.Anything, mock.Anything).Return(nil, runNotFound()).Maybe()
 	actionRepo.On("CreateAction", mock.Anything, mock.Anything, mock.Anything).
 		Return(&models.Run{Project: "proj", Domain: "dev", RunName: "rmy-run-123", Name: "a0"}, nil).Once()
 
@@ -1661,6 +1667,7 @@ func TestCreateRun_PreservesInputContextAndRawDataPath(t *testing.T) {
 	})).Return(nil).Once()
 
 	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("GetRun", mock.Anything, mock.Anything).Return(nil, runNotFound()).Maybe()
 	actionRepo.On("CreateAction", mock.Anything, mock.MatchedBy(func(m *models.Run) bool {
 		var rs task.RunSpec
 		_ = proto.Unmarshal(m.RunSpec, &rs)
@@ -1711,6 +1718,7 @@ func TestCreateRun_LeavesRawDataPrefixEmpty(t *testing.T) {
 
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("GetRun", mock.Anything, mock.Anything).Return(nil, runNotFound()).Maybe()
 	actionRepo.On("CreateAction", mock.Anything, mock.MatchedBy(func(m *models.Run) bool {
 		var rs task.RunSpec
 		_ = proto.Unmarshal(m.RunSpec, &rs)
@@ -1765,6 +1773,7 @@ func TestCreateRun_AppliesSettingsQueue(t *testing.T) {
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
 
+	actionRepo.On("GetRun", mock.Anything, mock.Anything).Return(nil, runNotFound()).Maybe()
 	actionRepo.On("CreateAction", mock.Anything, mock.MatchedBy(func(m *models.Run) bool {
 		var rs task.RunSpec
 		_ = proto.Unmarshal(m.RunSpec, &rs)
@@ -1825,6 +1834,7 @@ func TestCreateRun_StoresLabels(t *testing.T) {
 
 			store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 			taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+			actionRepo.On("GetRun", mock.Anything, mock.Anything).Return(nil, runNotFound()).Maybe()
 			actionRepo.On("CreateAction", mock.Anything, mock.MatchedBy(func(m *models.Run) bool {
 				return string(m.Labels) == tc.stored
 			}), mock.Anything).Return(&models.Run{Project: "proj", Domain: "dev", Name: "rl-123"}, nil).Once()
@@ -1909,6 +1919,7 @@ func TestCreateRun_AppliesSettingsMaps(t *testing.T) {
 
 	store.On("WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
 	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("GetRun", mock.Anything, mock.Anything).Return(nil, runNotFound()).Maybe()
 	actionRepo.On("CreateAction", mock.Anything, mock.MatchedBy(func(m *models.Run) bool {
 		return string(m.Labels) == `{"team":"ml"}`
 	}), mock.Anything).Return(&models.Run{Project: "proj", Domain: "dev", Name: "rs-123"}, nil).Once()
@@ -2014,6 +2025,7 @@ func TestCreateRun_WithOffloadedInputData(t *testing.T) {
 
 	// No ReadProtobuf or WriteProtobuf expected — offloaded inputs are used directly.
 	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Once()
+	actionRepo.On("GetRun", mock.Anything, mock.Anything).Return(nil, runNotFound()).Maybe()
 	actionRepo.On("CreateAction", mock.Anything, mock.MatchedBy(func(m *models.Run) bool {
 		var info workflow.RunInfo
 		_ = proto.Unmarshal(m.DetailedInfo, &info)
@@ -2923,4 +2935,181 @@ func TestWatchActions_KeepsStreamOnResyncListError(t *testing.T) {
 	require.True(t, stream.Receive())
 	require.True(t, stream.Receive(), "a failed re-list must not end the stream: %v", stream.Err())
 	assert.Equal(t, common.ActionPhase_ACTION_PHASE_SUCCEEDED, stream.Msg().GetEnrichedActions()[0].GetAction().GetStatus().GetPhase())
+}
+
+// runNotFound is what ActionRepo.GetRun returns for a run that does not exist.
+func runNotFound() error { return fmt.Errorf("run not found: %w", sql.ErrNoRows) }
+
+// A CreateRun for a name that already exists is rejected with AlreadyExists
+// before any inputs are written or anything is enqueued. Enqueueing it would
+// re-execute the run whenever its previous TaskAction is gone.
+func TestCreateRun_ExistingRunIsRejected(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	taskRepo := &repoMocks.TaskRepo{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	repo := &repoMocks.Repository{}
+	store := &storageMocks.ComposedProtobufStore{}
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(taskRepo).Maybe()
+	taskRepo.On("CreateTaskSpec", mock.Anything, mock.Anything).Return(nil).Maybe()
+
+	svc := &RunService{
+		repo:          repo,
+		settingsRepo:  noSettings(t),
+		actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t),
+		storagePrefix: "s3://flyte-data",
+		dataStore:     &storage.DataStore{ComposedProtobufStore: store},
+	}
+	runID := &common.RunIdentifier{Project: "myproj", Domain: "production", Name: "rexisting1"}
+	actionRepo.On("GetRun", mock.Anything, mock.Anything).Return(&models.Run{
+		Project: runID.Project, Domain: runID.Domain, RunName: runID.Name, Name: "a0",
+		Phase: int32(common.ActionPhase_ACTION_PHASE_SUCCEEDED),
+	}, nil).Once()
+
+	_, err := svc.CreateRun(context.Background(), connect.NewRequest(&workflow.CreateRunRequest{
+		Id:   &workflow.CreateRunRequest_RunId{RunId: runID},
+		Task: &workflow.CreateRunRequest_TaskSpec{TaskSpec: &task.TaskSpec{}},
+	}))
+	require.Error(t, err)
+	assert.Equal(t, connect.CodeAlreadyExists, connect.CodeOf(err))
+	store.AssertNotCalled(t, "WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+	actionRepo.AssertNotCalled(t, "CreateAction", mock.Anything, mock.Anything, mock.Anything)
+	actionsClient.AssertNotCalled(t, "Enqueue", mock.Anything, mock.Anything)
+}
+
+// A CreateRun for a name whose run is still QUEUED re-enqueues that run from its own
+// stored spec (covering a CreateRun interrupted between the insert and Enqueue), never
+// from the new request, and still reports AlreadyExists.
+func TestCreateRun_QueuedRunIsResumedFromStoredSpec(t *testing.T) {
+	runID := &common.RunIdentifier{Project: "myproj", Domain: "production", Name: "rqueued1"}
+	storedSpec, err := proto.Marshal(&workflow.ActionSpec{
+		ActionId:      &common.ActionIdentifier{Run: runID, Name: "a0"},
+		InputUri:      "s3://flyte-data/original/inputs.pb",
+		RunOutputBase: "s3://flyte-data/original/out",
+		Spec: &workflow.ActionSpec_Task{Task: &workflow.TaskAction{
+			Id:       &task.TaskIdentifier{Name: "original-task"},
+			CacheKey: wrapperspb.String("original-cache-key"),
+		}},
+	})
+	require.NoError(t, err)
+
+	for _, tc := range []struct {
+		name       string
+		enqueueErr error
+	}{
+		{"not yet enqueued", nil},
+		{"already enqueued", connect.NewError(connect.CodeAlreadyExists, errors.New("TaskAction CR exists"))},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			actionRepo := &repoMocks.ActionRepo{}
+			actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+			repo := &repoMocks.Repository{}
+			store := &storageMocks.ComposedProtobufStore{}
+			repo.On("ActionRepo").Return(actionRepo)
+			repo.On("TaskRepo").Return(&repoMocks.TaskRepo{}).Maybe()
+			svc := &RunService{
+				repo: repo, settingsRepo: noSettings(t), actionsClient: actionsClient,
+				projectClient: newMockProjectClientAlwaysOK(t), storagePrefix: "s3://flyte-data",
+				dataStore: &storage.DataStore{ComposedProtobufStore: store},
+			}
+			actionRepo.On("GetRun", mock.Anything, mock.Anything).Return(&models.Run{
+				Project: runID.Project, Domain: runID.Domain, RunName: runID.Name, Name: "a0",
+				Phase: int32(common.ActionPhase_ACTION_PHASE_QUEUED), ActionSpec: storedSpec,
+			}, nil).Once()
+			var resp *connect.Response[actions.EnqueueResponse]
+			if tc.enqueueErr == nil {
+				resp = connect.NewResponse(&actions.EnqueueResponse{})
+			}
+			actionsClient.On("Enqueue", mock.Anything, mock.MatchedBy(func(r *connect.Request[actions.EnqueueRequest]) bool {
+				a := r.Msg.GetAction()
+				return a.GetActionId().GetName() == "a0" &&
+					a.GetInputUri() == "s3://flyte-data/original" &&
+					a.GetRunOutputBase() == "s3://flyte-data/original/out" &&
+					a.GetTask().GetId().GetName() == "original-task" &&
+					a.GetTask().GetCacheKey().GetValue() == "original-cache-key"
+			})).Return(resp, tc.enqueueErr).Once()
+
+			_, err := svc.CreateRun(context.Background(), connect.NewRequest(&workflow.CreateRunRequest{
+				Id:   &workflow.CreateRunRequest_RunId{RunId: runID},
+				Task: &workflow.CreateRunRequest_TaskSpec{TaskSpec: &task.TaskSpec{}},
+			}))
+			assert.Equal(t, connect.CodeAlreadyExists, connect.CodeOf(err))
+			store.AssertNotCalled(t, "WriteProtobuf", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+			actionRepo.AssertNotCalled(t, "CreateAction", mock.Anything, mock.Anything, mock.Anything)
+		})
+	}
+}
+
+// A failure to check whether the run exists is an internal error, not a create.
+func TestCreateRun_ExistenceCheckErrorIsInternal(t *testing.T) {
+	actionRepo := &repoMocks.ActionRepo{}
+	actionsClient := actionsconnectmocks.NewActionsServiceClient(t)
+	repo := &repoMocks.Repository{}
+	repo.On("ActionRepo").Return(actionRepo)
+	repo.On("TaskRepo").Return(&repoMocks.TaskRepo{}).Maybe()
+	svc := &RunService{
+		repo: repo, settingsRepo: noSettings(t), actionsClient: actionsClient,
+		projectClient: newMockProjectClientAlwaysOK(t), storagePrefix: "s3://flyte-data",
+		dataStore: &storage.DataStore{ComposedProtobufStore: &storageMocks.ComposedProtobufStore{}},
+	}
+	actionRepo.On("GetRun", mock.Anything, mock.Anything).Return(nil, errors.New("db unavailable")).Once()
+
+	_, err := svc.CreateRun(context.Background(), connect.NewRequest(&workflow.CreateRunRequest{
+		Id:   &workflow.CreateRunRequest_RunId{RunId: &common.RunIdentifier{Project: "p", Domain: "d", Name: "rcheckerr1"}},
+		Task: &workflow.CreateRunRequest_TaskSpec{TaskSpec: &task.TaskSpec{}},
+	}))
+	assert.Equal(t, connect.CodeInternal, connect.CodeOf(err))
+	actionsClient.AssertNotCalled(t, "Enqueue", mock.Anything, mock.Anything)
+}
+
+// Aborting a run or action that already finished is a successful no-op: the
+// repo reports ErrActionFinished, and nothing is pushed to the abort reconciler.
+func TestAbort_FinishedIsNoOp(t *testing.T) {
+	runID := &common.RunIdentifier{Project: "p", Domain: "d", Name: "rdone12345"}
+
+	t.Run("run", func(t *testing.T) {
+		actionRepo, actionsClient, svc := newTestService(t)
+		svc.abortReconciler = NewAbortReconciler(nil, nil, AbortReconcilerConfig{})
+		defer func() { assert.Empty(t, svc.abortReconciler.queue.keys, "nothing to terminate") }()
+		actionRepo.On("AbortRun", mock.Anything, runID, mock.Anything, mock.Anything).Return(
+			fmt.Errorf("wrapped: %w", interfaces.ErrActionFinished))
+		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID}))
+		assert.NoError(t, err)
+		actionsClient.AssertNotCalled(t, "Abort")
+	})
+
+	t.Run("action", func(t *testing.T) {
+		actionRepo, actionsClient, svc := newTestService(t)
+		actionID := &common.ActionIdentifier{Run: runID, Name: "child"}
+		actionRepo.On("AbortAction", mock.Anything, actionID, mock.Anything, mock.Anything).Return(interfaces.ErrActionFinished)
+		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID}))
+		assert.NoError(t, err)
+		actionsClient.AssertNotCalled(t, "Abort")
+	})
+}
+
+// Aborting a run or action that is already ABORTED succeeds and pushes it to the abort
+// reconciler again, so pods an earlier abort failed to terminate get another attempt.
+func TestAbort_AlreadyAbortedRetriesTermination(t *testing.T) {
+	runID := &common.RunIdentifier{Project: "p", Domain: "d", Name: "raborted12"}
+
+	t.Run("run", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		svc.abortReconciler = NewAbortReconciler(nil, nil, AbortReconcilerConfig{})
+		actionRepo.On("AbortRun", mock.Anything, runID, mock.Anything, mock.Anything).Return(interfaces.ErrActionAborted)
+		_, err := svc.AbortRun(context.Background(), connect.NewRequest(&workflow.AbortRunRequest{RunId: runID}))
+		assert.NoError(t, err)
+		assert.Contains(t, svc.abortReconciler.queue.keys, "p/d/raborted12/a0")
+	})
+
+	t.Run("action", func(t *testing.T) {
+		actionRepo, _, svc := newTestService(t)
+		svc.abortReconciler = NewAbortReconciler(nil, nil, AbortReconcilerConfig{})
+		actionID := &common.ActionIdentifier{Run: runID, Name: "child"}
+		actionRepo.On("AbortAction", mock.Anything, actionID, mock.Anything, mock.Anything).Return(interfaces.ErrActionAborted)
+		_, err := svc.AbortAction(context.Background(), connect.NewRequest(&workflow.AbortActionRequest{ActionId: actionID}))
+		assert.NoError(t, err)
+		assert.Contains(t, svc.abortReconciler.queue.keys, "p/d/raborted12/child")
+	})
 }
