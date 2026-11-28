@@ -2126,9 +2126,11 @@ func TestGetEventInfo_DashboardURL(t *testing.T) {
 		tc := testCases[i]
 		t.Run(tc.name, func(t *testing.T) {
 			assert.NoError(t, SetConfig(&Config{DashboardURLTemplate: &tc.dashboardURLTemplate}))
+			configuredLinkType := GetConfig().DashboardURLTemplate.LinkType
 			ti, err := getEventInfoForRayJob(context.TODO(), logs.LogConfig{}, pluginCtx, &tc.rayJob)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
+			assert.Equal(t, configuredLinkType, GetConfig().DashboardURLTemplate.LinkType)
 		})
 	}
 }
